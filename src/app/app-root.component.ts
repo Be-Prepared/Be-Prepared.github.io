@@ -27,15 +27,15 @@ import { I18nService } from '../i18n/i18n.service';
     `,
     template: html`
         <div class="wrapper">
-            <app-tile>{this.i18n.Flashlight}}</app-tile>
-            <app-tile>{this.i18n['Front Light']}}</app-tile>
-            <app-tile>{this.i18n.Magnifier}}</app-tile>
-            <app-tile>{this.i18n.Mirror}}</app-tile>
-            <app-tile>{this.i18n.Compass}}</app-tile>
-            <app-tile>{this.i18n.GPS}}</app-tile>
-            <app-tile>{this.i18n.QR}}</app-tile>
-            <app-tile>{this.i18n.NFC}}</app-tile>
-            <app-tile>{this.i18n.Info}}</app-tile>
+            <app-tile>{{this.i18n.Flashlight}}</app-tile>
+            <app-tile>{{this.i18n['Front Light']}}</app-tile>
+            <app-tile>{{this.i18n.Magnifier}}</app-tile>
+            <app-tile>{{this.i18n.Mirror}}</app-tile>
+            <app-tile>{{this.i18n.Compass}}</app-tile>
+            <app-tile>{{this.i18n.GPS}}</app-tile>
+            <app-tile>{{this.i18n.QR}}</app-tile>
+            <app-tile>{{this.i18n.NFC}}</app-tile>
+            <app-tile>{{this.i18n.Info}}</app-tile>
         </div>
     `
 })

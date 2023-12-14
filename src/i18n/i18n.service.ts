@@ -33,7 +33,7 @@ export class I18nService {
     }
 
     update(obj: { [key: string]: string }) {
-        for (const key in Object.keys(obj)) {
+        for (const key of Object.keys(obj)) {
             obj[key] = this.get(key);
         }
     }

@@ -14,14 +14,14 @@ import { Component, css, html, metadataControllerElement } from 'fudgel';
             cursor: pointer;
         }
 
-        :host, #parent {
+        :host, .wrapper {
             display: flex;
             overflow: none;
             justify-content: center;
             align-items: center;
         }
 
-        #parent {
+        .wrapper {
             width: 100%;
             max-width: 100%;
             height: 100%;
@@ -42,54 +42,70 @@ import { Component, css, html, metadataControllerElement } from 'fudgel';
             }
         }
     `,
-    template: html`<div id="parent"><div id="slot"><slot></slot></div></div>`,
+    template: html`<div class="wrapper" #ref="wrapper"><div #ref="slot"><slot></slot></div></div>`,
 })
 export class AppTileComponent {
-    #slot?: HTMLElement;
+    #resizeObserver?: ResizeObserver;
+    slot?: HTMLElement;
+    wrapper?: HTMLElement;
 
     onViewInit() {
-        this.#slot = metadataControllerElement.get(this)!.shadowRoot!.querySelector('#slot')!;
-        this.findSlotSize();
+        this.#findSlotSize();
+        this.#monitorSizeChanges();
     }
 
-    private findSlotSize() {
-        if (!this.#slot) {
-            return;
+    onDestroy() {
+        if (this.#resizeObserver) {
+            this.#resizeObserver.disconnect();
         }
+    }
 
-        const wrapper = this.#slot.parentElement!;
-        const maxWidth = wrapper.clientWidth;
-        const maxHeight = wrapper.clientHeight;
-
+    #findSlotSize() {
+        const wrapper = this.wrapper!;
+        const slot = this.slot!;
         let fz = 1;
         let step = 16;
-        this.setSlotSize(fz);
+        const setSize = () => slot.style.fontSize = `${fz}px`;
+        const maxWidth = wrapper.clientWidth;
+        const maxHeight = wrapper.clientHeight;
+        setSize();
+        const firstClientHeight = slot.clientHeight;
+        fz = step;
+        setSize();
 
-        while (this.#slot.clientHeight <= maxHeight) {
-            fz += step;
-            this.setSlotSize(fz);
-        }
-
-        while (step >= 0.1) {
-            if (this.#slot.clientHeight > maxHeight || this.#slot.clientWidth > maxWidth) {
-                fz -= step;
-            } else {
-                step -= step / 2;
+        // Ensures that there is content
+        if (slot.clientHeight !== firstClientHeight) {
+            while (slot.clientHeight <= maxHeight) {
+                console.log('grow');
                 fz += step;
+                setSize();
             }
 
-            this.setSlotSize(fz);
-        }
+            while (step >= 0.1) {
+                if (slot.clientHeight > maxHeight || slot.clientWidth > maxWidth) {
+                    console.log('shrink - too big');
+                    fz -= step;
+                } else {
+                    console.log('shrink - fits');
+                    step -= step / 2;
+                    fz += step;
+                }
 
-        if (this.#slot.clientHeight > maxHeight || this.#slot.clientWidth > maxWidth) {
-            fz -= step;
-            this.setSlotSize(fz);
+                setSize();
+            }
+
+            if (slot.clientHeight > maxHeight || slot.clientWidth > maxWidth) {
+                console.log('last');
+                fz -= step;
+                setSize();
+            }
+
+            console.log('done', fz);
         }
     }
 
-    private setSlotSize(fz: number) {
-        if (this.#slot) {
-            this.#slot.style.fontSize = `${fz}px`;
-        }
+    #monitorSizeChanges() {
+        this.#resizeObserver = new ResizeObserver(() => this.#findSlotSize());
+        this.#resizeObserver.observe(this.wrapper!);
     }
 }
