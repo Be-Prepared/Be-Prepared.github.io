@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <path style="stroke:currentColor;stroke-width:20;stroke-linejoin:round;stroke-miterlimit:10;" d="M406,50H106 c-5.523,0-10-4.477-10-10V20c0-5.523,4.477-10,10-10h300c5.523,0,10,4.477,10,10v20C416,45.523,411.523,50,406,50z"/>
+  <path style="stroke:currentColor;stroke-width:20;stroke-linejoin:round;stroke-miterlimit:10;" d="M406,502H106 c-5.523,0-10-4.477-10-10v-20c0-5.523,4.477-10,10-10h300c5.523,0,10,4.477,10,10v20C416,497.523,411.523,502,406,502z"/>
+  <path style="stroke:currentColor;stroke-width:20;stroke-linejoin:round;stroke-miterlimit:10;" d="M396,50v36 c0,82.556-71.172,133.81-112.026,156.425C279.042,245.155,276,250.362,276,256l0,0c0,5.638,3.042,10.845,7.974,13.575 C324.828,292.19,396,343.444,396,426v36"/>
+  <path style="stroke:currentColor;stroke-width:20;stroke-linejoin:round;stroke-miterlimit:10;" d="M116,50v36 c0,82.556,71.172,133.81,112.026,156.425C232.958,245.155,236,250.362,236,256l0,0c0,5.638,-3.042,10.845,-7.974,13.575 C187.182,292.19,116,343.444,116,426v36"/>
+  <path style="stroke:currentColor;stroke-width:20;stroke-linejoin:round;stroke-miterlimit:10;" d="M156,462 c4.274-5.388,39.559-48.321,100-48.321c6.878,0,62.441,0.966,100,48.321"/>
+  <line style="stroke:currentColor;stroke-width:20;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="256" y1="311.893" x2="256" y2="301.893"/>
+  <line style="stroke:currentColor;stroke-width:20;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="256" y1="367.786" x2="256" y2="357.786"/>
+  <path style="stroke:currentColor;stroke-width:20;stroke-linejoin:round;stroke-miterlimit:10;" d="M379.04,152.817 c-15.179-3.989-35.545-7.717-59.68-7.717c-26.23,0-48,4.4-63.51,8.76c-25.25,7.1-47.4,8.76-63.51,8.76 c-23.266,0-43.013-3.459-58.012-7.288"/>
+  <path style="stroke:currentColor;stroke-width:20;stroke-linejoin:round;stroke-miterlimit:10;" d="M228.026,242.425 c4.554,2.515,14.711,7.326,28.433,7.217c13.2-0.105,22.974-4.708,27.516-7.217"/>
+</svg>

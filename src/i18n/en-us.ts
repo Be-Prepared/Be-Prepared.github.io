@@ -5,13 +5,13 @@ export const enUS: LanguageData = {
     "Be Prepared": "Be Prepared",
 
     // Tile labels on index
-    "Flashlight": "Flashlight",
-    "Front Light": "Front Light",
-    "Magnifier": "Magnifier",
-    "Mirror": "Mirror",
-    "Compass": "Compass",
-    "GPS": "GPS",
-    "QR": "QR",
-    "NFC": "NFC",
-    "Info": "Info",
+    "tile.flashlight": "Flashlight",
+    "tile.frontLight": "Front Light",
+    "tile.magnifier": "Magnifier",
+    "tile.mirror": "Mirror",
+    "tile.compass": "Compass",
+    "tile.gps": "GPS",
+    "tile.qr": "QR",
+    "tile.nfc": "NFC",
+    "tile.info": "Info",
 };

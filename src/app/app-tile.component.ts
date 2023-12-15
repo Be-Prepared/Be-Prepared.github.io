@@ -1,111 +1,84 @@
-import { Component, css, html, metadataControllerElement } from 'fudgel';
+import { Attr, Component, css, html } from 'fudgel';
+import { di } from '../di';
+import { I18nService } from '../i18n/i18n.service';
 
 @Component('app-tile', {
     style: css`
         :host {
+            box-sizing: border-box;
+            padding: 0.5em;
+            display: flex;
+            width: 10em;
+        }
+
+        .button {
+            align-items: center;
+            aspect-ratio: 1/1;
+            background-color: #7f7f7f30;
             border: 4px solid gray;
             border-radius: 16px;
             box-sizing: border-box;
-            padding: 8px;
-            background-color: #7f7f7f30;
-            margin: 0.5em;
-            width: 10em;
-            height: 10em;
             cursor: pointer;
-        }
-
-        :host, .wrapper {
             display: flex;
-            overflow: none;
             justify-content: center;
-            align-items: center;
+            overflow: none;
+            padding: 8px;
+            width: 100%;
         }
 
         .wrapper {
-            width: 100%;
-            max-width: 100%;
-            height: 100%;
-            max-height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .icon {
+            height: 5em;
+            width: 5em;
         }
 
         @media (max-width: 60em) {
             :host {
                 width: 8em;
-                height: 8em;
             }
         }
 
         @media (max-width: 30em) {
             :host {
-                width: 6em;
-                height: 6em;
+                width: 33%;
+            }
+        }
+
+        @media (max-width: 20em) {
+            :host {
+                width: 50%;
+            }
+        }
+
+        @media (max-width: 10em) {
+            :host {
+                width: 100%;
             }
         }
     `,
-    template: html`<div class="wrapper" #ref="wrapper"><div #ref="slot"><slot></slot></div></div>`,
+    template: html`
+        <div class="button">
+            <grow-to-fit>
+                <div class="wrapper">
+                    <load-svg class="icon" href="{{this.icon}}"></load-svg>
+                    <div>{{this.labelI18n}}</div>
+                </div>
+            </grow-to-fit>
+        </div>
+    `,
 })
 export class AppTileComponent {
-    #resizeObserver?: ResizeObserver;
-    slot?: HTMLElement;
-    wrapper?: HTMLElement;
+    #i18nService: I18nService = di(I18nService);
+    @Attr() icon?: string;
+    @Attr() label?: string;
+    labelI18n?: string;
 
-    onViewInit() {
-        this.#findSlotSize();
-        this.#monitorSizeChanges();
-    }
-
-    onDestroy() {
-        if (this.#resizeObserver) {
-            this.#resizeObserver.disconnect();
-        }
-    }
-
-    #findSlotSize() {
-        const wrapper = this.wrapper!;
-        const slot = this.slot!;
-        let fz = 1;
-        let step = 16;
-        const setSize = () => slot.style.fontSize = `${fz}px`;
-        const maxWidth = wrapper.clientWidth;
-        const maxHeight = wrapper.clientHeight;
-        setSize();
-        const firstClientHeight = slot.clientHeight;
-        fz = step;
-        setSize();
-
-        // Ensures that there is content
-        if (slot.clientHeight !== firstClientHeight) {
-            while (slot.clientHeight <= maxHeight) {
-                console.log('grow');
-                fz += step;
-                setSize();
-            }
-
-            while (step >= 0.1) {
-                if (slot.clientHeight > maxHeight || slot.clientWidth > maxWidth) {
-                    console.log('shrink - too big');
-                    fz -= step;
-                } else {
-                    console.log('shrink - fits');
-                    step -= step / 2;
-                    fz += step;
-                }
-
-                setSize();
-            }
-
-            if (slot.clientHeight > maxHeight || slot.clientWidth > maxWidth) {
-                console.log('last');
-                fz -= step;
-                setSize();
-            }
-
-            console.log('done', fz);
-        }
-    }
-
-    #monitorSizeChanges() {
-        this.#resizeObserver = new ResizeObserver(() => this.#findSlotSize());
-        this.#resizeObserver.observe(this.wrapper!);
+    onChange() {
+        this.labelI18n = this.#i18nService.get(this.label || '');
     }
 }

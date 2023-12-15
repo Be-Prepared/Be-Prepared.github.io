@@ -1,6 +1,4 @@
 import { Component, css, html } from 'fudgel';
-import { di } from '../di';
-import { I18nService } from '../i18n/i18n.service';
 
 @Component('app-root', {
     style: css`
@@ -9,13 +7,6 @@ import { I18nService } from '../i18n/i18n.service';
             height: 100%;
             width: 100%;
             overflow: none;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :host {
-                background-color: black;
-                color: white;
-            }
         }
 
         .wrapper {
@@ -27,34 +18,25 @@ import { I18nService } from '../i18n/i18n.service';
     `,
     template: html`
         <div class="wrapper">
-            <app-tile>{{this.i18n.Flashlight}}</app-tile>
-            <app-tile>{{this.i18n['Front Light']}}</app-tile>
-            <app-tile>{{this.i18n.Magnifier}}</app-tile>
-            <app-tile>{{this.i18n.Mirror}}</app-tile>
-            <app-tile>{{this.i18n.Compass}}</app-tile>
-            <app-tile>{{this.i18n.GPS}}</app-tile>
-            <app-tile>{{this.i18n.QR}}</app-tile>
-            <app-tile>{{this.i18n.NFC}}</app-tile>
-            <app-tile>{{this.i18n.Info}}</app-tile>
+            <app-tile
+                icon="flashlight.svg"
+                label="tile.flashlight"
+            ></app-tile>
+            <app-tile
+                icon="front-light.svg"
+                label="tile.frontLight"
+            ></app-tile>
+            <app-tile
+                icon="magnifier.svg"
+                label="tile.magnifier"
+            ></app-tile>
+            <app-tile icon="mirror.svg" label="tile.mirror"></app-tile>
+            <app-tile icon="compass.svg" label="tile.compass"></app-tile>
+            <app-tile icon="gps.svg" label="tile.gps"></app-tile>
+            <app-tile icon="qr.svg" label="tile.qr"></app-tile>
+            <app-tile icon="nfc.svg" label="tile.nfc"></app-tile>
+            <app-tile icon="info.svg" label="tile.info"></app-tile>
         </div>
-    `
+    `,
 })
-export class AppRootComponent {
-    #i18nService = di(I18nService);
-    i18n = {
-        'Flashlight': '',
-        'Front Light': '',
-        'Magnifier': '',
-        'Mirror': '',
-        'Compass': '',
-        'GPS': '',
-        'QR': '',
-        'NFC': '',
-        'Info': ''
-    };
-    tiles: string[] = ['info'];
-
-    onInit() {
-        this.#i18nService.update(this.i18n);
-    }
-}
+export class AppRootComponent {}
