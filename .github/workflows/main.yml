@@ -1,9 +1,5 @@
 name: Build and Deploy
 
-permissions:
-  contents: read
-  pages: write
-
 on:
   push:
     branches:
@@ -13,6 +9,11 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pages: write
+
     steps:
       - name: Checkout 🛎️
         # Checks-out your repository under $GITHUB_WORKSPACE, so your job can
