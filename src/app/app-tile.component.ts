@@ -23,7 +23,16 @@ import { I18nService } from '../i18n/i18n.service';
             justify-content: center;
             overflow: none;
             padding: 8px;
+            user-select: none;
             width: 100%;
+        }
+
+        .button.enabled {
+            background-color: #7fff7f30;
+        }
+
+        .button.disabled {
+            display: none;
         }
 
         .wrapper {
