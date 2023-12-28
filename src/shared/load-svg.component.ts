@@ -15,7 +15,11 @@ export class LoadSvgComponent {
     }
 
     #clearImage() {
-        this.#getRoot().innerHTML = '';
+        const root = this.#getRoot();
+
+        if (root) {
+            root.innerHTML = '';
+        }
     }
 
     #loadImage(href: string) {
@@ -24,13 +28,23 @@ export class LoadSvgComponent {
         xhr.onreadystatechange = () => {
             if (xhr.readyState === 4 && xhr.responseXML) {
                 const svg = document.importNode(xhr.responseXML.documentElement, true);
-                this.#getRoot().appendChild(svg);
+                const root = this.#getRoot();
+
+                if (root) {
+                    root.appendChild(svg);
+                }
             }
         };
         xhr.send();
     }
 
     #getRoot() {
-        return metadataControllerElement.get(this)!.shadowRoot!;
+        const root = metadataControllerElement.get(this);
+
+        if (root) {
+            return root.shadowRoot!;
+        }
+
+        return null;
     }
 }

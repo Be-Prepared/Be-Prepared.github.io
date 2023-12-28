@@ -1,5 +1,4 @@
-import { Attr, Component, css, html } from 'fudgel';
-import { di } from '../di';
+import { Attr, Component, css, di, html } from 'fudgel';
 import { I18nService } from '../i18n/i18n.service';
 
 @Component('app-tile', {
@@ -72,7 +71,7 @@ import { I18nService } from '../i18n/i18n.service';
     `,
     template: html`
         <div class="button">
-            <grow-to-fit>
+            <grow-to-fit @click="this.setActiveTool()">
                 <div class="wrapper">
                     <load-svg class="icon" href="{{this.icon}}"></load-svg>
                     <div>{{this.labelI18n}}</div>
@@ -84,10 +83,15 @@ import { I18nService } from '../i18n/i18n.service';
 export class AppTileComponent {
     #i18nService: I18nService = di(I18nService);
     @Attr() icon?: string;
+    @Attr() id?: string;
     @Attr() label?: string;
     labelI18n?: string;
 
     onChange() {
         this.labelI18n = this.#i18nService.get(this.label || '');
+    }
+
+    setActiveTool() {
+        history.pushState({}, document.title, `/${this.id}`);
     }
 }

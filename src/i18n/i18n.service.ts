@@ -24,7 +24,7 @@ export class I18nService {
                 const title = document.getElementsByTagName('title')[0];
 
                 if (title) {
-                    title.textContent = this.get('Be Prepared');
+                    title.textContent = this.get('app.title');
                 }
 
                 return;
