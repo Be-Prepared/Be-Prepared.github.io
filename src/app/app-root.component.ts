@@ -1,4 +1,4 @@
-import { Component, css, di, html } from 'fudgel';
+import { Component, css, html } from 'fudgel';
 
 interface Tile {
     elementName: string;
@@ -130,5 +130,4 @@ export class AppRootComponent {
             label: 'tile.info',
         },
     ];
-    #tool?: HTMLElement;
 }
