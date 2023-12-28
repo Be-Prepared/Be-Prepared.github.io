@@ -70,14 +70,14 @@ import { I18nService } from '../i18n/i18n.service';
         }
     `,
     template: html`
-        <div class="button">
+        <a class="button">
             <grow-to-fit @click="this.setActiveTool()">
                 <div class="wrapper">
                     <load-svg class="icon" href="{{this.icon}}"></load-svg>
                     <div>{{this.labelI18n}}</div>
                 </div>
             </grow-to-fit>
-        </div>
+        </a>
     `,
 })
 export class AppTileComponent {

@@ -39,10 +39,15 @@
 //         <div path="/edit/:pageId" component="edit-page"></div>
 //     </app-router>
 //
-// Navigation can be done by the user clicking on `<a href="...">` links, which is detected automatically with a click event handler on `document.body`. You can also use `pushState()`, `popState()` and `replaceState()` on `window.history`. This also covers the usage of the browser's history, back, and forward buttons. And, if that wasn't enough, routing can happen if you get a reference to the router element and call `go(url)` or `back()`;
+// Navigation can be done by the user clicking on `<a href="...">` links, which
+// is detected automatically with a click event handler on `document.body`. You
+// can also use `pushState()`, `popState()` and `replaceState()` on
+// `window.history`. This also covers the usage of the browser's history, back,
+// and forward buttons. You can also get a reference to the router element and
+// call `go(url)` to navigate.
 //
-//     document.querySelector('app-router').go('/user/test');
-//     document.querySelector('app-router').back();
+//     history.go(-1);
+//     document.querySelector('app-router').go('/edit/profile');
 //
 // This web component is built on the work of these other projects. They have a
 // lot more features than this simple router, so if you need fancier things, I
@@ -79,14 +84,10 @@ class RouterComponent extends HTMLElement {
         }
     }
 
-    back() {
-        window.history.go(-1);
-    }
-
     connectedCallback() {
         this.#listen(window, 'popstate', this.#popState);
         this.#listen(document.body, 'click', this.#clickedLink);
-        this.#navigate(window.location.pathname);
+        this.#route(window.location.pathname);
         this.#patch(window.history, 'pushState', this.#modifyStateGenerator);
         this.#patch(window.history, 'replaceState', this.#modifyStateGenerator);
     }
@@ -98,7 +99,7 @@ class RouterComponent extends HTMLElement {
     }
 
     go(url: string) {
-        this.#navigate(url);
+        window.history.pushState(null, document.title, url);
     }
 
     #activate(matchedRoute: MatchedRoute) {
@@ -145,7 +146,7 @@ class RouterComponent extends HTMLElement {
 
                 if (link.href && link.origin !== location.origin) {
                     e.preventDefault();
-                    this.#navigate(`${link.pathname}${link.search}${link.hash}`);
+                    this.go(`${link.pathname}${link.search}${link.hash}`);
                 }
             }
         }
@@ -196,33 +197,9 @@ class RouterComponent extends HTMLElement {
         original: (state: any, title: string, url?: string | null) => void
     ) {
         return (state: any, title: string, url?: string | null) => {
-            const triggerRouteChange =
-                !state || state.triggerRouteChange !== false;
-
-            if (!triggerRouteChange) {
-                delete state.triggerRouteChange;
-            }
-
             original.call(target, state, title, url);
-
-            if (!triggerRouteChange) {
-                return;
-            }
-
-            this.#navigate(url || '/', true);
+            this.#route(url || '/');
         };
-    }
-
-    #navigate(url: string, skipPushState = false) {
-        const matchedRoute = this.#match(url);
-
-        if (matchedRoute) {
-            if (!skipPushState) {
-                window.history.pushState(null, document.title, url);
-            }
-
-            this.#activate(matchedRoute);
-        }
     }
 
     #patch(
@@ -239,7 +216,15 @@ class RouterComponent extends HTMLElement {
     }
 
     #popState() {
-        this.#navigate(window.location.pathname);
+        this.#route(window.location.pathname);
+    }
+
+    #route(url: string) {
+        const matchedRoute = this.#match(url);
+
+        if (matchedRoute) {
+            this.#activate(matchedRoute);
+        }
     }
 }
 

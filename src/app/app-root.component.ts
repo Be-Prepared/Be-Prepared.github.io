@@ -25,8 +25,14 @@ interface Tile {
     `,
     template: html`
         <app-router>
-            <div *for="tile of this.tiles" path="/{{$scope.tile.id}}">{{$scope.tile.id}}</div>
-            <div path="**">
+            <div
+                *for="tile of this.tiles"
+                path="/{{$scope.tile.id}}"
+                class="wrapper"
+            >
+                {{$scope.tile.id}}
+            </div>
+            <div path="**" class="wrapper">
                 <app-tile
                     *for="tile of this.tiles"
                     id="{{$scope.tile.id}}"
@@ -40,92 +46,92 @@ interface Tile {
 export class AppRootComponent {
     tiles: Tile[] = [
         {
-            elementName: "",
-            id: "flashlight",
+            elementName: '',
+            id: 'flashlight',
             icon: 'flashlight.svg',
             label: 'tile.flashlight',
         },
         {
-            elementName: "",
-            id: "frontLight",
+            elementName: '',
+            id: 'frontLight',
             icon: 'front-light.svg',
             label: 'tile.frontLight',
         },
         {
-            elementName: "",
-            id: "magnifier",
+            elementName: '',
+            id: 'magnifier',
             icon: 'magnifier.svg',
             label: 'tile.magnifier',
         },
         {
-            elementName: "",
-            id: "mirror",
+            elementName: '',
+            id: 'mirror',
             icon: 'mirror.svg',
             label: 'tile.mirror',
         },
         {
-            elementName: "",
-            id: "compass",
+            elementName: '',
+            id: 'compass',
             icon: 'compass.svg',
             label: 'tile.compass',
         },
         {
-            elementName: "",
-            id: "location",
+            elementName: '',
+            id: 'location',
             icon: 'location.svg',
             label: 'tile.location',
         },
         {
-            elementName: "",
-            id: "qrCode",
+            elementName: '',
+            id: 'qrCode',
             icon: 'qr-code.svg',
             label: 'tile.qrCode',
         },
         {
-            elementName: "",
-            id: "nfc",
+            elementName: '',
+            id: 'nfc',
             icon: 'nfc.svg',
             label: 'tile.nfc',
         },
         {
-            elementName: "",
-            id: "timer",
+            elementName: '',
+            id: 'timer',
             icon: 'timer.svg',
             label: 'tile.timer',
         },
         {
-            elementName: "",
-            id: "metal-detector",
+            elementName: '',
+            id: 'metal-detector',
             icon: 'metal-detector.svg',
             label: 'tile.metalDetector',
         },
         {
-            elementName: "",
-            id: "speed",
+            elementName: '',
+            id: 'speed',
             icon: 'speed.svg',
             label: 'tile.speed',
         },
         {
-            elementName: "",
-            id: "level",
+            elementName: '',
+            id: 'level',
             icon: 'level.svg',
             label: 'tile.level',
         },
         {
-            elementName: "",
-            id: "stopwatch",
+            elementName: '',
+            id: 'stopwatch',
             icon: 'stopwatch.svg',
             label: 'tile.stopwatch',
         },
         {
-            elementName: "",
-            id: "temperature",
+            elementName: '',
+            id: 'temperature',
             icon: 'temperature.svg',
             label: 'tile.temperature',
         },
         {
-            elementName: "",
-            id: "info",
+            elementName: '',
+            id: 'info',
             icon: 'info.svg',
             label: 'tile.info',
         },
