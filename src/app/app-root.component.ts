@@ -1,7 +1,6 @@
 import { Component, css, html } from 'fudgel';
 
 interface Tile {
-    elementName: string;
     id: string;
     icon: string;
     label: string;
@@ -79,7 +78,6 @@ interface Tile {
 export class AppRootComponent {
     tiles: Tile[] = [
         {
-            elementName: '',
             id: 'flashlight',
             icon: 'flashlight.svg',
             label: 'tile.flashlight',
@@ -87,7 +85,6 @@ export class AppRootComponent {
             show: false
         },
         {
-            elementName: '',
             id: 'frontLight',
             icon: 'front-light.svg',
             label: 'tile.frontLight',
@@ -95,7 +92,6 @@ export class AppRootComponent {
             show: true
         },
         {
-            elementName: '',
             id: 'magnifier',
             icon: 'magnifier.svg',
             label: 'tile.magnifier',
@@ -103,7 +99,6 @@ export class AppRootComponent {
             show: false
         },
         {
-            elementName: '',
             id: 'mirror',
             icon: 'mirror.svg',
             label: 'tile.mirror',
@@ -111,7 +106,6 @@ export class AppRootComponent {
             show: false
         },
         {
-            elementName: '',
             id: 'compass',
             icon: 'compass.svg',
             label: 'tile.compass',
@@ -119,7 +113,6 @@ export class AppRootComponent {
             show: false
         },
         {
-            elementName: '',
             id: 'location',
             icon: 'location.svg',
             label: 'tile.location',
@@ -127,7 +120,6 @@ export class AppRootComponent {
             show: false
         },
         {
-            elementName: '',
             id: 'qrCode',
             icon: 'qr-code.svg',
             label: 'tile.qrCode',
@@ -135,7 +127,6 @@ export class AppRootComponent {
             show: false
         },
         {
-            elementName: '',
             id: 'nfc',
             icon: 'nfc.svg',
             label: 'tile.nfc',
@@ -143,7 +134,6 @@ export class AppRootComponent {
             show: false
         },
         {
-            elementName: '',
             id: 'timer',
             icon: 'timer.svg',
             label: 'tile.timer',
@@ -151,7 +141,6 @@ export class AppRootComponent {
             show: false
         },
         {
-            elementName: '',
             id: 'metal-detector',
             icon: 'metal-detector.svg',
             label: 'tile.metalDetector',
@@ -159,7 +148,6 @@ export class AppRootComponent {
             show: false
         },
         {
-            elementName: '',
             id: 'speed',
             icon: 'speed.svg',
             label: 'tile.speed',
@@ -167,7 +155,6 @@ export class AppRootComponent {
             show: false
         },
         {
-            elementName: '',
             id: 'level',
             icon: 'level.svg',
             label: 'tile.level',
@@ -175,7 +162,6 @@ export class AppRootComponent {
             show: false
         },
         {
-            elementName: '',
             id: 'stopwatch',
             icon: 'stopwatch.svg',
             label: 'tile.stopwatch',
@@ -183,7 +169,6 @@ export class AppRootComponent {
             show: false
         },
         {
-            elementName: '',
             id: 'temperature',
             icon: 'temperature.svg',
             label: 'tile.temperature',
@@ -191,7 +176,13 @@ export class AppRootComponent {
             show: false
         },
         {
-            elementName: '',
+            id: 'ruler',
+            icon: 'ruler.svg',
+            label: 'tile.ruler',
+            component: 'app-ruler',
+            show: false
+        },
+        {
             id: 'info',
             icon: 'info.svg',
             label: 'tile.info',

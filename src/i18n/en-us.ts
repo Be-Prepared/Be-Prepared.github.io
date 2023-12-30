@@ -16,6 +16,7 @@ export const enUS: LanguageData = {
     "tile.mirror": "Mirror",
     "tile.nfc": "NFC",
     "tile.qrCode": "QR Code",
+    "tile.ruler": "Ruler",
     "tile.speed": "Speed",
     "tile.stopwatch": "Stopwatch",
     "tile.temperature": "Temperature",
