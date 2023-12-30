@@ -4,16 +4,14 @@ import { I18nService } from '../i18n/i18n.service';
 @Component('app-tile', {
     style: css`
         :host {
-            box-sizing: border-box;
-            padding: 0.5em;
             display: flex;
-            width: 10em;
+            width: 100%;
         }
 
         .button {
             align-items: center;
             aspect-ratio: 1/1;
-            background-color: #7f7f7f30;
+            background-color: #7f7f7f27;
             border: 4px solid gray;
             border-radius: 16px;
             box-sizing: border-box;
@@ -43,30 +41,6 @@ import { I18nService } from '../i18n/i18n.service';
         .icon {
             height: 5em;
             width: 5em;
-        }
-
-        @media (max-width: 60em) {
-            :host {
-                width: 8em;
-            }
-        }
-
-        @media (max-width: 30em) {
-            :host {
-                width: 33%;
-            }
-        }
-
-        @media (max-width: 20em) {
-            :host {
-                width: 50%;
-            }
-        }
-
-        @media (max-width: 10em) {
-            :host {
-                width: 100%;
-            }
         }
     `,
     template: html`

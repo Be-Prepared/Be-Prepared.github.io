@@ -1,11 +1,31 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en-US">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Be Prepared</title>
         <script src="main.ts" type="module"></script>
-        <link rel="stylesheet" href="site.css" />
+        <style>
+            html {
+                height: 100%;
+                margin: 0;
+            }
+
+            body {
+                margin: 0;
+                height: 100%;
+                overflow-x: hidden;
+                font-family: sans-serif;
+                line-height: 1.4;
+            }
+
+            @media (prefers-color-scheme: dark) {
+                body {
+                    background-color: black;
+                    color: white;
+                }
+            }
+        </style>
     </head>
     <body>
         <app-root></app-root>
