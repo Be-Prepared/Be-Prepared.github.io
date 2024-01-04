@@ -24,32 +24,32 @@ import { Component, css, html } from 'fudgel';
         <p>Many thanks to the following:</p>
         <p>Tooling:</p>
         <ul>
-            <li><a href="https://fudgel.js.org">Fudgel</a> is the framework driving this app</li>
-            <li><a href="https://vecta.io/nano">Vecta.io</a> for SVG compression</li>
+            <li><styled-link href="https://fudgel.js.org">Fudgel</styled-link> is the framework driving this app</li>
+            <li><styled-link href="https://vecta.io/nano">Vecta.io</styled-link> for SVG compression</li>
         </ul>
         <p>Icons from Flaticon:</p>
         <ul>
-        <li><a href="https://www.flaticon.com/free-icons/toolbox" title="toolbox icons">Toolbox icons created by Muhammad Atif</li>
-        <li><a href="https://www.flaticon.com/free-icons/compass" title="compass icons">Compass icons created by Freepik</a></li>
-        <li><a href="https://www.flaticon.com/free-icons/map-place-holder" title="map place holder icons">Map place holder icons created by Nadiinko</a></li>
-        <li><a href="https://www.flaticon.com/free-icons/flashlight" title="flashlight icons" data-uw-rm-brl="false" style="transition: all 0s ease 0s;">Flashlight icons created by Aranagraphics</a></li>
-        <li><a href="https://www.flaticon.com/free-icons/idea" title="idea icons" data-uw-rm-brl="false">Idea icons created by Good Ware</a></li>
-        <li><a href="https://www.flaticon.com/free-icons/magnifying-glass" title="magnifying glass icons">Magnifying glass icons created by Freepik</a></li>
-        <li><a href="https://www.flaticon.com/free-icons/mirror" title="mirror icons">Mirror icons created by catkuro</a></li>
-        <li><a href="https://www.flaticon.com/free-icons/stopwatch" title="stopwatch icons">Stopwatch icons created by Good Ware</a></li>
-        <li><a href="https://www.flaticon.com/free-icons/timer" title="timer icons">Timer icons created by Freepik</a></li>
-        <li><a href="https://www.flaticon.com/free-icons/ruler" title="ruler icons">Ruler icons created by Freepik</a></li>
-        <li><a href="https://www.flaticon.com/free-icons/spirit-level" title="spirit level icons">Spirit level icons created by pmicon</a></li>
-        <li><a href="https://www.flaticon.com/free-icons/car" title="car icons">Car icons created by Freepik</a></li>
-        <li><a href="https://www.flaticon.com/free-icons/sensor" title="sensor icons">Sensor icons created by LAFS</a></li>
-        <li><a href="https://www.flaticon.com/free-icons/metal-detector" title="metal detector icons">Metal detector icons created by Freepik</a></li>
-        <li><a href="https://www.flaticon.com/free-icons/pause" title="pause icons">Pause icons created by Freepik</a></li>
-        <li><a href="https://www.flaticon.com/free-icons/video" title="video icons">Video icons created by Bingge Liu</a></li>
-        <li><a href="https://www.flaticon.com/free-icons/refresh" title="refresh icons">Refresh icons created by Freepik</a></li>
+        <li><styled-link href="https://www.flaticon.com/free-icons/toolbox" title="toolbox icons">Toolbox icons created by Muhammad Atif</li>
+        <li><styled-link href="https://www.flaticon.com/free-icons/compass" title="compass icons">Compass icons created by Freepik</styled-link></li>
+        <li><styled-link href="https://www.flaticon.com/free-icons/map-place-holder" title="map place holder icons">Map place holder icons created by Nadiinko</styled-link></li>
+        <li><styled-link href="https://www.flaticon.com/free-icons/flashlight" title="flashlight icons" data-uw-rm-brl="false" style="transition: all 0s ease 0s;">Flashlight icons created by Aranagraphics</styled-link></li>
+        <li><styled-link href="https://www.flaticon.com/free-icons/idea" title="idea icons" data-uw-rm-brl="false">Idea icons created by Good Ware</styled-link></li>
+        <li><styled-link href="https://www.flaticon.com/free-icons/magnifying-glass" title="magnifying glass icons">Magnifying glass icons created by Freepik</styled-link></li>
+        <li><styled-link href="https://www.flaticon.com/free-icons/mirror" title="mirror icons">Mirror icons created by catkuro</styled-link></li>
+        <li><styled-link href="https://www.flaticon.com/free-icons/stopwatch" title="stopwatch icons">Stopwatch icons created by Good Ware</styled-link></li>
+        <li><styled-link href="https://www.flaticon.com/free-icons/timer" title="timer icons">Timer icons created by Freepik</styled-link></li>
+        <li><styled-link href="https://www.flaticon.com/free-icons/ruler" title="ruler icons">Ruler icons created by Freepik</styled-link></li>
+        <li><styled-link href="https://www.flaticon.com/free-icons/spirit-level" title="spirit level icons">Spirit level icons created by pmicon</styled-link></li>
+        <li><styled-link href="https://www.flaticon.com/free-icons/car" title="car icons">Car icons created by Freepik</styled-link></li>
+        <li><styled-link href="https://www.flaticon.com/free-icons/sensor" title="sensor icons">Sensor icons created by LAFS</styled-link></li>
+        <li><styled-link href="https://www.flaticon.com/free-icons/metal-detector" title="metal detector icons">Metal detector icons created by Freepik</styled-link></li>
+        <li><styled-link href="https://www.flaticon.com/free-icons/pause" title="pause icons">Pause icons created by Freepik</styled-link></li>
+        <li><styled-link href="https://www.flaticon.com/free-icons/video" title="video icons">Video icons created by Bingge Liu</styled-link></li>
+        <li><styled-link href="https://www.flaticon.com/free-icons/refresh" title="refresh icons">Refresh icons created by Freepik</styled-link></li>
     </ul>
     <p>Other icons:</p>
     <ul>
-        <li><a href="https://www.stockio.com/free-icon/info" data-uw-rm-brl="false">Info icon by Stockio.com</a></li>
+        <li><styled-link href="https://www.stockio.com/free-icon/info" data-uw-rm-brl="false">Info icon by Stockio.com</styled-link></li>
     </ul>
     </div>
     `,

@@ -14,7 +14,6 @@ interface Tile {
             display: block;
             height: 100%;
             width: 100%;
-            overflow: none;
         }
 
         .index {
@@ -31,25 +30,25 @@ interface Tile {
         }
 
         @media (max-width: 60em) {
-            wrapper {
+            .wrapper {
                 width: 8em;
             }
         }
 
         @media (max-width: 30em) {
-            wrapper {
+            .wrapper {
                 width: 33%;
             }
         }
 
         @media (max-width: 20em) {
-            wrapper {
+            .wrapper {
                 width: 50%;
             }
         }
 
         @media (max-width: 10em) {
-            wrapper {
+            .wrapper {
                 width: 100%;
             }
         }

@@ -11,7 +11,7 @@ import { I18nService } from '../i18n/i18n.service';
         .button {
             align-items: center;
             aspect-ratio: 1/1;
-            background-color: #7f7f7f27;
+            background-color: var(--button-bg-color);
             border: 4px solid gray;
             border-radius: 16px;
             box-sizing: border-box;
