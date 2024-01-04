@@ -1,0 +1,14 @@
+{
+  "version": "2024-01-04T02:35:03.334Z",
+  "name": "Be Prepared",
+  "description": "Collection of offline utilities",
+  "icons": {
+    "60": "/firefox_app_60x60.png",
+    "128": "/firefox_app_128x128.png",
+    "512": "/firefox_app_512x512.png"
+  },
+  "developer": {
+    "name": "Tyler Akins",
+    "url": "https://github.com/Be-Prepared/Be-Prepared.github.io/"
+  }
+}
