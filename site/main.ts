@@ -9,14 +9,22 @@ if (redirect && redirect != location.href) {
     history.pushState(null, null, redirect);
 }
 
-bootstrap();
+const startApp = () => {
+    bootstrap();
+    document.body.append(document.createElement('app-root'));
+};
 
-// Enable Eruda (a developer console) when "eruda=true" is in the URL.
+// Enable Eruda (a developer console) when "eruda" is in the URL.
 const src = '//cdn.jsdelivr.net/npm/eruda';
 
 if (window.location.toString().indexOf('eruda') >= 0) {
     const script = document.createElement('script');
     script.src = '//cdn.jsdelivr.net/npm/eruda';
-    script.onload = () => (window as any).eruda.init();
+    script.onload = () => {
+        (window as any).eruda.init();
+        startApp();
+    }
     document.body.append(script);
+} else {
+    startApp();
 }

@@ -93,11 +93,11 @@ export class InstallPwaComponent {
     }
 
     install() {
-        console.log('install');
+        this.#installPwaService.triggerSavedEvent();
     }
 
     #destroy() {
-        this.#installPwaService.triggerSavedEvent();
+        this.#element().remove();
     }
 
     #element() {
