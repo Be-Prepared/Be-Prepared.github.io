@@ -4,6 +4,10 @@ export const enUS: LanguageData = {
     // Application-related
     "app.title": "Be Prepared",
 
+    // Flashlight
+    "flashlight.turnOff": "Turn Off",
+    "flashlight.turnOn": "Turn On",
+
     // Tile labels on index
     "tile.compass": "Compass",
     "tile.flashlight": "Flashlight",

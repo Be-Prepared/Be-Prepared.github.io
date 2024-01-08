@@ -1,9 +1,11 @@
-interface TileDef {
+import { PermissionsServiceName } from './services/permissions.service';
+
+export interface TileDef {
     id: string;
     icon: string;
     label: string;
     component: string;
-    show: boolean;
+    show: boolean | PermissionsServiceName[];
 }
 
 export const tileDefs: TileDef[] = [
@@ -11,112 +13,112 @@ export const tileDefs: TileDef[] = [
         id: 'flashlight',
         icon: 'flashlight.svg',
         label: 'tile.flashlight',
-        component: 'app-flashlight',
+        component: 'flashlight-app',
         show: false,
     },
     {
         id: 'frontLight',
         icon: 'front-light.svg',
         label: 'tile.frontLight',
-        component: 'app-front-light',
+        component: 'front-light-app',
         show: true,
     },
     {
         id: 'magnifier',
         icon: 'magnifier.svg',
         label: 'tile.magnifier',
-        component: 'app-magnifier',
+        component: 'magnifier-app',
         show: false,
     },
     {
         id: 'mirror',
         icon: 'mirror.svg',
         label: 'tile.mirror',
-        component: 'app-mirror',
+        component: 'mirror-app',
         show: false,
     },
     {
         id: 'compass',
         icon: 'compass.svg',
         label: 'tile.compass',
-        component: 'app-compass',
+        component: 'compass-app',
         show: false,
     },
     {
         id: 'location',
         icon: 'location.svg',
         label: 'tile.location',
-        component: 'app-location',
+        component: 'location-app',
         show: false,
     },
     {
         id: 'qrCode',
         icon: 'qr-code.svg',
         label: 'tile.qrCode',
-        component: 'app-qr-code',
+        component: 'qr-code-app',
         show: false,
     },
     {
         id: 'nfc',
         icon: 'nfc.svg',
         label: 'tile.nfc',
-        component: 'app-nfc',
+        component: 'nfc-app',
         show: false,
     },
     {
         id: 'timer',
         icon: 'timer.svg',
         label: 'tile.timer',
-        component: 'app-timer',
+        component: 'timer-app',
         show: false,
     },
     {
         id: 'metal-detector',
         icon: 'metal-detector.svg',
         label: 'tile.metalDetector',
-        component: 'app-metal-detector',
+        component: 'metal-detector-app',
         show: false,
     },
     {
         id: 'speed',
         icon: 'speed.svg',
         label: 'tile.speed',
-        component: 'app-speed',
+        component: 'speed-app',
         show: false,
     },
     {
         id: 'level',
         icon: 'level.svg',
         label: 'tile.level',
-        component: 'app-level',
+        component: 'level-app',
         show: false,
     },
     {
         id: 'stopwatch',
         icon: 'stopwatch.svg',
         label: 'tile.stopwatch',
-        component: 'app-stopwatch',
+        component: 'stopwatch-app',
         show: false,
     },
     {
         id: 'temperature',
         icon: 'temperature.svg',
         label: 'tile.temperature',
-        component: 'app-temperature',
+        component: 'temperature-app',
         show: false,
     },
     {
         id: 'ruler',
         icon: 'ruler.svg',
         label: 'tile.ruler',
-        component: 'app-ruler',
+        component: 'ruler-app',
         show: false,
     },
     {
         id: 'info',
         icon: 'info.svg',
         label: 'tile.info',
-        component: 'app-info',
+        component: 'info-app',
         show: true,
     },
 ];

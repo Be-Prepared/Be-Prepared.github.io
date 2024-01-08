@@ -1,6 +1,6 @@
 import { Component, css, html } from 'fudgel';
 
-@Component('app-info', {
+@Component('info-app', {
     style: css`
         :host {
             display: block;
@@ -21,7 +21,6 @@ import { Component, css, html } from 'fudgel';
     `,
     template: html`
     <div class="modal">
-        <p>Many thanks to the following:</p>
         <p>Tooling:</p>
         <ul>
             <li><styled-link href="https://fudgel.js.org">Fudgel</styled-link> is the framework driving this app</li>
@@ -46,12 +45,16 @@ import { Component, css, html } from 'fudgel';
         <li><styled-link href="https://www.flaticon.com/free-icons/pause" title="pause icons">Pause icons created by Freepik</styled-link></li>
         <li><styled-link href="https://www.flaticon.com/free-icons/video" title="video icons">Video icons created by Bingge Liu</styled-link></li>
         <li><styled-link href="https://www.flaticon.com/free-icons/refresh" title="refresh icons">Refresh icons created by Freepik</styled-link></li>
+        <li><styled-link href="https://www.flaticon.com/free-icons/left-arrow" title="left arrow icons">Left arrow (back) icons created by Freepik</styled-link>
+        <li><styled-link href="https://www.flaticon.com/free-icons/compass" title="compass icons">Compass icons created by Freepik</styled-link></li>
+        <li><styled-link href="https://www.flaticon.com/free-icons/qr-code" title="qr code icons">Qr code icons created by LAFS - Flaticon</styled-link></li>
     </ul>
     <p>Other icons:</p>
     <ul>
         <li><styled-link href="https://www.stockio.com/free-icon/info" data-uw-rm-brl="false">Info icon by Stockio.com</styled-link></li>
     </ul>
+    <back-button></back-button>
     </div>
     `,
 })
-export class AppInfoComponent {}
+export class InfoAppComponent {}

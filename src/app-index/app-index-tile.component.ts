@@ -1,35 +1,28 @@
 import { Attr, Component, css, di, html } from 'fudgel';
 import { I18nService } from '../i18n/i18n.service';
 
-@Component('app-tile', {
+@Component('app-index-tile', {
     style: css`
         :host {
             display: flex;
             width: 100%;
+            padding: 1vw;
         }
 
-        .button {
+        button {
             align-items: center;
             aspect-ratio: 1/1;
             background-color: var(--button-bg-color);
-            border: 4px solid gray;
+            border: var(--button-border);
             border-radius: 16px;
             box-sizing: border-box;
+            color: inherit;
             cursor: pointer;
             display: flex;
             justify-content: center;
             overflow: none;
             padding: 8px;
             user-select: none;
-            width: 100%;
-        }
-
-        .button.enabled {
-            background-color: #7fff7f30;
-        }
-
-        .button.disabled {
-            display: none;
         }
 
         .wrapper {
@@ -37,25 +30,18 @@ import { I18nService } from '../i18n/i18n.service';
             flex-direction: column;
             align-items: center;
         }
-
-        .icon {
-            height: 5em;
-            width: 5em;
-        }
     `,
     template: html`
-        <a class="button">
-            <grow-to-fit @click="this.setActiveTool()">
-                <div class="wrapper">
-                    <load-svg class="icon" href="{{this.icon}}"></load-svg>
-                    <div>{{this.labelI18n}}</div>
-                </div>
-            </grow-to-fit>
-        </a>
+        <button @click.stop.prevent="this.setActiveTool()">
+            <div class="wrapper">
+                <scaling-icon href="{{this.icon}}"></scaling-icon>
+                <div>{{this.labelI18n}}</div>
+            </div>
+        </button>
     `,
 })
-export class AppTileComponent {
-    #i18nService: I18nService = di(I18nService);
+export class AppIndexTileComponent {
+    #i18nService = di(I18nService);
     @Attr() icon?: string;
     @Attr() id?: string;
     @Attr() label?: string;

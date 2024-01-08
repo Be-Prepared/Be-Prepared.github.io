@@ -1,6 +1,11 @@
-import { Attr, Component, emit, metadataControllerElement } from 'fudgel';
+import { Attr, Component, css, emit, metadataControllerElement } from 'fudgel';
 
 @Component('load-svg', {
+    style: css`
+        :host {
+            display: block;
+        }
+    `,
     template: '',
 })
 export class LoadSvgComponent {
