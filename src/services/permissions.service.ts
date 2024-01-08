@@ -5,19 +5,9 @@ export class PermissionsService {
         return this.#getPermission('camera' as PermissionName);
     }
 
-    #getPermission(name: PermissionName) {
+    #getPermission(name: PermissionName): Promise<PermissionState> {
         return window.navigator.permissions.query({
             name: name as unknown as PermissionName
-        }).then((result) => {
-            if (result.state === 'denied') {
-                return false;
-            }
-
-            if (result.state === 'prompt') {
-                return null;
-            }
-
-            return true;
-        });
+        }).then((result) => result.state);
     }
 }

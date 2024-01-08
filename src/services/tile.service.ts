@@ -1,5 +1,5 @@
 import { di } from 'fudgel';
-import { PermissionsService } from './permissions.service';
+import { PermissionsService, PermissionsServiceName } from './permissions.service';
 import { tileDefs } from '../tile-defs';
 
 export interface TileDefResolved {
@@ -23,7 +23,7 @@ export class TileService {
     }
 
     #lookupPermission(
-        name: string,
+        name: PermissionsServiceName,
         permissionsMap: Map<string, Promise<boolean>>
     ) {
         const previousPromise = permissionsMap.get(name);
@@ -32,18 +32,18 @@ export class TileService {
             return previousPromise;
         }
 
-        const newPromise = this.#permissionsService[name]();
+        const newPromise = this.#permissionsService[name]().then((result) => result !== 'denied');
         permissionsMap.set(name, newPromise);
 
         return newPromise;
     }
 
     #lookupTile(
-        permissions: string[],
+        permissions: PermissionsServiceName[],
         permissionsMap: Map<string, Promise<boolean>>
     ) {
         return Promise.all(
-            permissions.map((name: string) =>
+            permissions.map((name) =>
                 this.#lookupPermission(name, permissionsMap)
             )
         ).then((permissionResults: boolean[]) => {
