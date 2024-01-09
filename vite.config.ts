@@ -43,8 +43,7 @@ export default defineConfig({
                         purpose: 'maskable',
                     },
                 ],
-                name: "Be Prepared",
-                theme_color: "#7f7f7f" // Gray as a compromise between light and dark modes
+                name: "Be Prepared"
             },
             registerType: 'autoUpdate',
             workbox: {
