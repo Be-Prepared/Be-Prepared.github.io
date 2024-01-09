@@ -1,7 +1,5 @@
 import { defineConfig } from 'vite';
 import minifyLiterals from 'rollup-plugin-minify-html-literals-v3';
-import { ViteFaviconsPlugin } from 'vite-plugin-favicon';
-import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
@@ -20,28 +18,32 @@ export default defineConfig({
     },
     plugins: [
         minifyLiterals(),
-        ViteFaviconsPlugin({
-            logo: 'site/public/toolbox.svg',
-            favicons: {
-                appName: 'Be Prepared',
-                appDescription: 'Collection of offline utilities',
-                background: '#dddddd',
-                developerName: 'Tyler Akins',
-                developerURL:
-                    'https://github.com/Be-Prepared/Be-Prepared.github.io/',
-                icons: {
-                    appleStartup: false, // TOO SLOW
-                    yandex: false // It's now Chromium based
-                },
-                theme_color: '#dddddd',
-                version: new Date().toISOString()
-            },
-        }),
-        ViteImageOptimizer({
-            includePublic: true,
-            logStats: true,
-        }),
         VitePWA({
+            manifest: {
+                icons: [
+                    {
+                        src: 'pwa-64x64.png',
+                        sizes: '64x64',
+                        type: 'image/png',
+                    },
+                    {
+                        src: 'pwa-192x192.png',
+                        sizes: '192x192',
+                        type: 'image/png',
+                    },
+                    {
+                        src: 'pwa-512x512.png',
+                        sizes: '512x512',
+                        type: 'image/png',
+                    },
+                    {
+                        src: 'maskable-icon-512x512.png',
+                        sizes: '512x512',
+                        type: 'image/png',
+                        purpose: 'maskable',
+                    },
+                ],
+            },
             registerType: 'autoUpdate',
             workbox: {
                 globPatterns: ['**/*.{js,css,html,svg}'],
