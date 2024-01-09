@@ -43,6 +43,7 @@ export default defineConfig({
                         purpose: 'maskable',
                     },
                 ],
+                name: "Be Prepared"
             },
             registerType: 'autoUpdate',
             workbox: {

@@ -65,15 +65,20 @@ import { InstallPwaService } from './install-pwa.service';
     template: html`
         <div class="tab">
             <div class="load-svg-wrapper">
-               <load-svg href="toolbox.svg" @loadsvg.stop.prevent="this.logoLoaded()"></load-svg>
+                <load-svg
+                    href="toolbox.svg"
+                    @loadsvg.stop.prevent="this.logoLoaded()"
+                ></load-svg>
             </div>
-            <div class="install-text">
-                Install to Home Screen
-            </div>
+            <div class="install-text">Install to Home Screen</div>
             <div class="space"></div>
-            <div class="install-button"><styled-link @click.stop.prevent="this.install()">Install</styled-link></div>
+            <div class="install-button">
+                <styled-link @click.stop.prevent="this.install()"
+                    >Install</styled-link
+                >
+            </div>
         </div>
-    `
+    `,
 })
 export class InstallPwaComponent {
     #installPwaService = di(InstallPwaService);
@@ -94,6 +99,8 @@ export class InstallPwaComponent {
 
     install() {
         this.#installPwaService.triggerSavedEvent();
+        clearTimeout(this.#timeout);
+        this.#hide();
     }
 
     #destroy() {
