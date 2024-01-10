@@ -1,4 +1,5 @@
 import { Component, css, html } from 'fudgel';
+import { goBack } from '../util/go-back';
 
 @Component('front-light-app', {
     style: css`
@@ -25,6 +26,6 @@ import { Component, css, html } from 'fudgel';
 })
 export class FrontLightAppComponent {
     back() {
-        window.history.go(-1);
+        goBack();
     }
 }

@@ -1,5 +1,9 @@
 import { Component, css, di, html } from 'fudgel';
+import { goBack } from '../util/go-back';
 import { I18nService } from '../i18n/i18n.service';
+import { permissionIsAllowed } from '../util/permission-is-allowed';
+import { PermissionsService } from '../services/permissions.service';
+import { Subscription } from 'rxjs';
 
 @Component('flashlight-app', {
     style: css`
@@ -43,12 +47,27 @@ import { I18nService } from '../i18n/i18n.service';
 })
 export class FlashlightAppComponent {
     #i18nService = di(I18nService);
+    #permissionsService = di(PermissionsService);
+    #subscription: Subscription;
     buttonClass = '';
     enabled = false;
     labelI18n?: string;
 
     constructor() {
         this.#updateLabel();
+        this.#subscription = this.#permissionsService
+            .camera()
+            .subscribe((value) => {
+                if (!permissionIsAllowed(value)) {
+                    goBack();
+                }
+            });
+    }
+
+    onDestroy() {
+        if (this.#subscription) {
+            this.#subscription.unsubscribe();
+        }
     }
 
     toggle() {

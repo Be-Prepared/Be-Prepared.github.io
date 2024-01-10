@@ -1,6 +1,7 @@
 import { combineLatest, Observable, of, ReplaySubject } from 'rxjs';
 import { di } from 'fudgel';
 import { map } from 'rxjs/operators';
+import { permissionIsAllowed } from '../util/permission-is-allowed';
 import { PermissionsService } from './permissions.service';
 import { TileDef, tileDefs } from '../tile-defs';
 
@@ -34,7 +35,7 @@ export class TileService {
         ).pipe(
             map((results) => {
                 for (const result of results) {
-                    if (result !== 'granted' && result !== 'prompt') {
+                    if (!permissionIsAllowed(result)) {
                         return false;
                     }
                 }
