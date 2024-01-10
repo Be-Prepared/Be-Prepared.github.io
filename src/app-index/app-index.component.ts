@@ -1,4 +1,5 @@
 import { Component, css, di, html } from 'fudgel';
+import { Subscription } from 'rxjs';
 import { TileDefResolved, TileService } from '../services/tile.service';
 
 @Component('app-index', {
@@ -10,20 +11,29 @@ import { TileDefResolved, TileService } from '../services/tile.service';
         }
     `,
     template: html`
-                    <div *for="tile of this.tiles">
-                        <app-index-tile
-                            id="{{$scope.tile.id}}"
-                            icon="{{$scope.tile.icon}}"
-                            label="{{$scope.tile.label}}"
-                        ></app-index-tile>
-                    </div>
-    `
+        <div *for="tile of this.tiles">
+            <app-index-tile
+                id="{{$scope.tile.id}}"
+                icon="{{$scope.tile.icon}}"
+                label="{{$scope.tile.label}}"
+            ></app-index-tile>
+        </div>
+    `,
 })
 export class AppIndex {
+    #subscription?: Subscription;
     #tileService = di(TileService);
-    tiles: TileDefResolved[] = [];
+    tiles?: TileDefResolved[];
 
-    onInit() {
-        this.#tileService.getAllowedTiles().then((tiles) => this.tiles = tiles);
+    constructor() {
+        this.#subscription = this.#tileService
+        .getAllowedTiles()
+        .subscribe((tiles) => (this.tiles = tiles));
+    }
+
+    onDestroy() {
+        if (this.#subscription) {
+            this.#subscription.unsubscribe();
+        }
     }
 }

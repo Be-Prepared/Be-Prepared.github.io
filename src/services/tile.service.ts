@@ -1,6 +1,8 @@
+import { combineLatest, Observable, of, ReplaySubject } from 'rxjs';
 import { di } from 'fudgel';
-import { PermissionsService, PermissionsServiceName } from './permissions.service';
-import { tileDefs } from '../tile-defs';
+import { map } from 'rxjs/operators';
+import { PermissionsService } from './permissions.service';
+import { TileDef, tileDefs } from '../tile-defs';
 
 export interface TileDefResolved {
     id: string;
@@ -12,71 +14,49 @@ export interface TileDefResolved {
 
 export class TileService {
     #permissionsService = di(PermissionsService);
-    #promise: Promise<TileDefResolved[]> = this.#updateTiles();
+    #subject = new ReplaySubject<TileDefResolved[]>(1);
+
+    constructor() {
+        this.#updateTiles();
+    }
 
     getAllowedTiles() {
-        return this.#promise;
+        return this.#subject.asObservable();
     }
 
-    update() {
-        this.#promise = this.#updateTiles();
-    }
-
-    #lookupPermission(
-        name: PermissionsServiceName,
-        permissionsMap: Map<string, Promise<boolean>>
-    ) {
-        const previousPromise = permissionsMap.get(name);
-
-        if (previousPromise) {
-            return previousPromise;
+    #lookupTilePermission(tile: TileDef): Observable<TileDefResolved> {
+        if (!Array.isArray(tile.show)) {
+            return of(tile as TileDefResolved);
         }
 
-        const newPromise = this.#permissionsService[name]().then((result) => result !== 'denied');
-        permissionsMap.set(name, newPromise);
+        return combineLatest(
+            tile.show.map((name) => this.#permissionsService[name]())
+        ).pipe(
+            map((results) => {
+                for (const result of results) {
+                    if (result !== 'granted' && result !== 'prompt') {
+                        return false;
+                    }
+                }
 
-        return newPromise;
-    }
+                return true;
+            }),
+            map((show) => {
+                const resolved: TileDefResolved = {
+                    ...tile,
+                    show,
+                };
 
-    #lookupTile(
-        permissions: PermissionsServiceName[],
-        permissionsMap: Map<string, Promise<boolean>>
-    ) {
-        return Promise.all(
-            permissions.map((name) =>
-                this.#lookupPermission(name, permissionsMap)
-            )
-        ).then((permissionResults: boolean[]) => {
-            if (permissionResults.includes(false)) {
-                return false;
-            }
-
-            return true;
-        });
+                return resolved;
+            })
+        );
     }
 
     #updateTiles() {
-        const permissionsMap = new Map<string, Promise<boolean>>();
-
-        return Promise.all(
-            tileDefs.map((tile) => {
-                if (Array.isArray(tile.show)) {
-                    return this.#lookupTile(tile.show, permissionsMap).then(
-                        (show) => {
-                            const resolved: TileDefResolved = {
-                                ...tile,
-                                show,
-                            };
-
-                            return resolved;
-                        }
-                    );
-                }
-
-                return tile as TileDefResolved;
-            })
-        ).then((tileResults: TileDefResolved[]) => {
-            return tileResults.filter((tile) => tile.show);
+        return combineLatest(
+            tileDefs.map((tile) => this.#lookupTilePermission(tile))
+        ).subscribe((tilesWithResults) => {
+            this.#subject.next(tilesWithResults.filter((tile) => tile.show));
         });
     }
 }

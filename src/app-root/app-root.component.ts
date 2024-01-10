@@ -1,4 +1,5 @@
 import { Component, css, di, html } from 'fudgel/dist/fudgel.js';
+import { Subscription } from 'rxjs';
 import { TileDefResolved, TileService } from '../services/tile.service';
 
 @Component('app-root', {
@@ -21,12 +22,21 @@ import { TileDefResolved, TileService } from '../services/tile.service';
     `,
 })
 export class AppRootComponent {
-    tiles: TileDefResolved[] | null = null;
+    #subscription?: Subscription;
     #tileService = di(TileService);
+    tiles?: TileDefResolved[];
 
     constructor() {
-        this.#tileService
+        this.#subscription = this.#tileService
             .getAllowedTiles()
-            .then((tiles) => (this.tiles = tiles));
+            .subscribe((tiles) => {
+                this.tiles = tiles;
+            });
+    }
+
+    onDestroy() {
+        if (this.#subscription) {
+            this.#subscription.unsubscribe();
+        }
     }
 }

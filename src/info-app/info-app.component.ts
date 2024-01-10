@@ -21,11 +21,17 @@ import { Component, css, html } from 'fudgel';
     `,
     template: html`
     <div class="modal">
+        <p>Permissions:</p>
+        <ul>
+            <li><info-app-permission name="Camera" permission="camera"></info-app-permission></li>
+        </ul>
+
         <p>Tooling:</p>
         <ul>
             <li><styled-link href="https://fudgel.js.org">Fudgel</styled-link> is the framework driving this app</li>
             <li><styled-link href="https://vecta.io/nano">Vecta.io</styled-link> for SVG compression</li>
         </ul>
+
         <p>Icons from Flaticon:</p>
         <ul>
         <li><styled-link href="https://www.flaticon.com/free-icons/toolbox" title="toolbox icons">Toolbox icons created by Muhammad Atif</li>
