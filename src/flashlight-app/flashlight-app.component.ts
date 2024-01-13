@@ -1,5 +1,4 @@
 import { Component, css, di, html } from 'fudgel';
-import { goBack } from '../util/go-back';
 import { I18nService } from '../i18n/i18n.service';
 import { PermissionsService, PermissionsServiceState } from '../services/permissions.service';
 import { Subscription } from 'rxjs';
