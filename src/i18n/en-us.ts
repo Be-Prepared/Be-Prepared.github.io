@@ -1,10 +1,13 @@
 import type { LanguageData } from './language-data';
 
 export const enUS: LanguageData = {
-    // Application-related
+    // Application-related and global strings
     "app.title": "Be Prepared",
+    "app.currentPermissionStatus": "Current permission status",
 
     // Flashlight
+    "flashlight.explainAsk": "In order to turn on the flashlight, the camera permission needs to be granted.",
+    "flashlight.explainDeny": "The camera permission is required to access the camera's light. The permission was denied or your device does not have a light.",
     "flashlight.turnOff": "Turn Off",
     "flashlight.turnOn": "Turn On",
 

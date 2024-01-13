@@ -1,16 +1,17 @@
 import { Component, css, di, html } from 'fudgel';
 import { goBack } from '../util/go-back';
 import { I18nService } from '../i18n/i18n.service';
-import { permissionIsAllowed } from '../util/permission-is-allowed';
-import { PermissionsService } from '../services/permissions.service';
+import { PermissionsService, PermissionsServiceState } from '../services/permissions.service';
 import { Subscription } from 'rxjs';
+import { TorchService } from '../services/torch.service';
 
 @Component('flashlight-app', {
     style: css`
         :host {
             height: 100%;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
         }
 
@@ -26,40 +27,53 @@ import { Subscription } from 'rxjs';
         .enabled {
             background-color: var(--button-bg-color-enabled);
         }
-
-        .back {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-        }
     `,
     template: html`
+        <div></div>
+        <p *if="this.explainAsk">{{this.explainAskText}}</p>
         <button
+            *if="!this.explainDeny"
             class="toggle {{this.buttonClass}}"
             @click.stop.prevent="this.toggle()"
         >
             {{this.labelI18n}}
         </button>
-        <div class="back">
-            <back-button></back-button>
-        </div>
+        <p *if="this.explainDeny">{{this.explainDenyText}}</p>
+        <info-app-permission *if="this.explainDeny" name="{{this.currentPermissionStatus}}" permission="torch"></info-app-permission>
+        <back-button></back-button>
     `,
 })
 export class FlashlightAppComponent {
     #i18nService = di(I18nService);
     #permissionsService = di(PermissionsService);
     #subscription: Subscription;
+    #torchService = di(TorchService);
     buttonClass = '';
+    currentPermissionStatus: string;
     enabled = false;
+    explainAsk = false;
+    explainAskText: string;
+    explainDeny = false;
+    explainDenyText: string;
     labelI18n?: string;
 
     constructor() {
+        this.currentPermissionStatus = this.#i18nService.get('app.currentPermissionStatus');
+        this.explainAskText = this.#i18nService.get('flashlight.explainAsk');
+        this.explainDenyText = this.#i18nService.get('flashlight.explainDeny');
         this.#updateLabel();
         this.#subscription = this.#permissionsService
-            .camera()
+            .torch()
             .subscribe((value) => {
-                if (!permissionIsAllowed(value)) {
-                    goBack();
+                if (value === PermissionsServiceState.PROMPT) {
+                    this.explainDeny = false;
+                    this.explainAsk = true;
+                } else if (value === PermissionsServiceState.GRANTED) {
+                    this.explainDeny = false;
+                    this.explainAsk = false;
+                } else {
+                    this.explainDeny = true;
+                    this.explainAsk = false;
                 }
             });
     }
@@ -73,6 +87,7 @@ export class FlashlightAppComponent {
     toggle() {
         this.enabled = !this.enabled;
         this.buttonClass = this.enabled ? 'enabled' : '';
+        this.#torchService.toggleTorch(this.enabled);
         this.#updateLabel();
     }
 

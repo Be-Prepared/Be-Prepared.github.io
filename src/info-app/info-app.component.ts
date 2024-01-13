@@ -24,6 +24,7 @@ import { Component, css, html } from 'fudgel';
         <p>Permissions:</p>
         <ul>
             <li><info-app-permission name="Camera" permission="camera"></info-app-permission></li>
+            <li><info-app-permission name="Torch" permission="torch"></info-app-permission></li>
         </ul>
 
         <p>Tooling:</p>

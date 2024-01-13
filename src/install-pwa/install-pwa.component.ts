@@ -4,12 +4,12 @@ import { InstallPwaService } from './install-pwa.service';
 @Component('install-pwa', {
     style: css`
         :host {
-            width: 100%;
             top: 200vh;
             position: fixed;
             display: flex;
-            justify-content: center;
             transition: bottom 1s ease-in-out 0s;
+            left: 50%;
+            transform: translate(-50%);
         }
 
         .tab {
@@ -126,6 +126,6 @@ export class InstallPwaComponent {
 
     #show() {
         this.#element().style.bottom = '0';
-        this.#timeout = setTimeout(() => this.#hide(), 30000);
+        this.#timeout = setTimeout(() => this.#hide(), 15000);
     }
 }

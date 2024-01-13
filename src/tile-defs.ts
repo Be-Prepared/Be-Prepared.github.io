@@ -14,7 +14,7 @@ export const tileDefs: TileDef[] = [
         icon: 'flashlight.svg',
         label: 'tile.flashlight',
         component: 'flashlight-app',
-        show: false,
+        show: ['torch'],
     },
     {
         id: 'frontLight',
