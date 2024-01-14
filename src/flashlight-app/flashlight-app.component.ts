@@ -1,6 +1,7 @@
 import { AvailabilityState } from '../datatypes/availability-state';
 import { Component, css, di, html } from 'fudgel';
-import { Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { TorchService } from '../services/torch.service';
 
 @Component('flashlight-app', {
@@ -40,52 +41,44 @@ import { TorchService } from '../services/torch.service';
         <div *if="this.showControls" class="wrapper">
             <div></div>
             <button
-                *if="this.label"
                 class="toggle {{this.buttonClass}}"
                 @click.stop.prevent="this.toggle()"
             >
-                <i18n-label id="{{this.label}}"></i18n-label>
+                <scaling-icon href="flashlight.svg"></scaling-icon>
             </button>
             <back-button></back-button>
         </div>
     `,
 })
 export class FlashlightAppComponent {
-    #subscription: Subscription;
+    #subject = new Subject();
     #torchService = di(TorchService);
     buttonClass = '';
     enabled = false;
     explainAsk = false;
     explainDeny = false;
     explainUnavailable = false;
-    label: string | null = null;
     showControls = false;
 
-    constructor() {
-        this.#subscription = this.#torchService
+    onInit() {
+        this.#torchService
             .availabilityState()
+            .pipe(takeUntil(this.#subject))
             .subscribe((value) => {
-                this.label = null;
-                this.explainAsk = false;
-                this.explainDeny = false;
-                this.explainUnavailable = false;
-                this.showControls = false;
+                this.explainAsk = value === AvailabilityState.PROMPT;
+                this.explainDeny = value === AvailabilityState.DENIED;
+                this.explainUnavailable = value === AvailabilityState.UNAVAILABLE;
+                this.showControls = value === AvailabilityState.GRANTED;
 
-                if (value === AvailabilityState.PROMPT) {
-                    this.explainAsk = true;
-                } else if (value === AvailabilityState.DENIED) {
-                    this.explainDeny = true;
-                } else if (value === AvailabilityState.UNAVAILABLE) {
-                    this.explainUnavailable = true;
-                } else {
-                    this.showControls = true;
+                if (this.showControls) {
                     this.#getCurrentStatus();
                 }
             });
     }
 
     onDestroy() {
-        this.#subscription.unsubscribe();
+        this.#subject.next(null);
+        this.#subject.complete();
     }
 
     grant() {
@@ -109,8 +102,7 @@ export class FlashlightAppComponent {
     }
 
     #setEnabled(enabled: boolean) {
-        this.buttonClass = this.enabled ? 'enabled' : '';
         this.enabled = enabled;
-        this.label = enabled ? 'flashlight.turnOff' : 'flashlight.turnOn';
+        this.buttonClass = enabled ? 'enabled' : '';
     }
 }

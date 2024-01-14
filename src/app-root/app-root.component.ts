@@ -1,4 +1,4 @@
-import { Component, css, di, html } from 'fudgel/dist/fudgel.js';
+import { Component, css, di, html } from 'fudgel';
 import { Subscription } from 'rxjs';
 import { TileDefResolved, TileService } from '../services/tile.service';
 

@@ -10,8 +10,6 @@ export const enUS: LanguageData = {
         'In order to turn on the flashlight, the camera permission needs to be granted.',
     'flashlight.explainDeny':
         "The camera permission is required to access the camera's light. The permission was denied or your device does not have a light.",
-    'flashlight.turnOff': 'Turn Off',
-    'flashlight.turnOn': 'Turn On',
     'flashlight.unavailable': 'Not Available',
     'flashlight.unavailableMessage':
         'This device does not have a camera with a flashlight that is accessible to the application. Because this feature is not available, the button will be removed from the menu.',
