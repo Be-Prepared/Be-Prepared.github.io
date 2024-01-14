@@ -79,7 +79,7 @@ export class FlashlightAppComponent {
                     this.explainUnavailable = true;
                 } else {
                     this.showControls = true;
-                    this.#updateLabel();
+                    this.#getCurrentStatus();
                 }
             });
     }
@@ -99,15 +99,18 @@ export class FlashlightAppComponent {
             this.#torchService.turnOn();
         }
 
-        this.enabled = !this.enabled;
-        this.buttonClass = this.enabled ? 'enabled' : '';
-        this.#updateLabel();
+        this.#setEnabled(!this.enabled);
     }
 
-    #updateLabel() {
+    #getCurrentStatus() {
         this.#torchService.currentStatus().then((enabled) => {
-            this.label = enabled ? 'flashlight.turnOff' : 'flashlight.turnOn';
-            this.enabled = enabled;
+            this.#setEnabled(enabled);
         });
+    }
+
+    #setEnabled(enabled: boolean) {
+        this.buttonClass = this.enabled ? 'enabled' : '';
+        this.enabled = enabled;
+        this.label = enabled ? 'flashlight.turnOff' : 'flashlight.turnOn';
     }
 }
