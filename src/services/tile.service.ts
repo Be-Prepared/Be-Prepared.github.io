@@ -1,7 +1,5 @@
-import { combineLatest, Observable, of, ReplaySubject } from 'rxjs';
-import { di } from 'fudgel';
+import { combineLatest, Observable, ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { PermissionsService, PermissionsServiceState } from './permissions.service';
 import { TileDef, tileDefs } from '../tile-defs';
 
 export interface TileDefResolved {
@@ -13,7 +11,6 @@ export interface TileDefResolved {
 }
 
 export class TileService {
-    #permissionsService = di(PermissionsService);
     #subject = new ReplaySubject<TileDefResolved[]>(1);
 
     constructor() {
@@ -25,22 +22,7 @@ export class TileService {
     }
 
     #lookupTilePermission(tile: TileDef): Observable<TileDefResolved> {
-        if (!Array.isArray(tile.show)) {
-            return of(tile as TileDefResolved);
-        }
-
-        return combineLatest(
-            tile.show.map((name) => this.#permissionsService[name]())
-        ).pipe(
-            map((results) => {
-                for (const result of results) {
-                    if (result !== PermissionsServiceState.GRANTED && result !== PermissionsServiceState.PROMPT) {
-                        return false;
-                    }
-                }
-
-                return true;
-            }),
+        return tile.show.pipe(
             map((show) => {
                 const resolved: TileDefResolved = {
                     ...tile,

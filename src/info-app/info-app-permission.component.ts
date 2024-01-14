@@ -13,7 +13,7 @@ import { Subscription } from 'rxjs';
         }
 
         .state_granted::before {
-            content: "✔ ";
+            content: '✔ ';
         }
 
         .state_error {
@@ -29,37 +29,30 @@ import { Subscription } from 'rxjs';
         }
 
         .state_denied::before {
-            content: "✖ "
-        }
-
-        .state_unavailable {
-            color: gray;
+            content: '✖ ';
         }
     `,
     template: html`
-        {{this.name}}: <span class="state_{{this.stateStr}}">{{this.stateStr}}</span>
+        <span class="state_{{this.stateStr}}">{{this.stateStr}}</span>
     `,
 })
-export class InfoAppPermission {
+export class InfoAppPermissionComponent {
     #permissionsService = di(PermissionsService);
     #subscription?: Subscription;
-    @Attr() name?: string;
     @Attr() permission?: PermissionsServiceName;
     stateStr = 'error';
 
     onChange(property: string) {
-        if (property !== 'permission') {
-            return;
-        }
+        if (property === 'permission') {
+            this.#unsub();
 
-        this.#unsub();
-
-        if (this.permission && this.#permissionsService[this.permission]) {
-            this.#subscription = this.#permissionsService
-                [this.permission]()
-                .subscribe((state) => this.#setState(state));
-        } else {
-            this.#setState(PermissionsServiceState.ERROR);
+            if (this.permission && this.#permissionsService[this.permission]) {
+                this.#subscription = this.#permissionsService
+                    [this.permission]()
+                    .subscribe((state) => this.#setState(state));
+            } else {
+                this.#setState(PermissionsServiceState.ERROR);
+            }
         }
     }
 
@@ -74,8 +67,6 @@ export class InfoAppPermission {
             this.stateStr = 'granted';
         } else if (state === PermissionsServiceState.PROMPT) {
             this.stateStr = 'prompt';
-        } else if (state === PermissionsServiceState.UNAVAILABLE) {
-            this.stateStr = 'unavailable';;
         } else {
             this.stateStr = 'error';
         }

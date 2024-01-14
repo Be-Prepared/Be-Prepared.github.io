@@ -1,45 +1,27 @@
-import { di } from 'fudgel';
-import { from, Observable, of, Subject } from 'rxjs';
-import { map, shareReplay, switchMap } from 'rxjs/operators';
-import { TorchService } from './torch.service';
+import { map, shareReplay } from 'rxjs/operators';
+import { Observable, of, ReplaySubject } from 'rxjs';
 
 export const enum PermissionsServiceState {
-    DENIED,
-    ERROR,
-    GRANTED,
-    PROMPT,
-    UNAVAILABLE,
+    ERROR = 'ERROR',
+    DENIED = 'DENIED',
+    PROMPT = 'PROMPT',
+    GRANTED = 'GRANTED',
 }
-export type PermissionsServiceName = 'camera' | 'torch';
+export type PermissionsServiceName = 'camera';
 
 export class PermissionsService {
     #cachedPermissions = new Map<string, Observable<PermissionsServiceState>>();
-    #torchService = di(TorchService);
-
     camera() {
         return this.#getPermission('camera' as PermissionName);
     }
 
-    torch() {
-        if (!this.#torchService.browserSupport()) {
-            return of(PermissionsServiceState.UNAVAILABLE);
-        }
+    #cache(
+        name: PermissionName,
+        observable: Observable<PermissionsServiceState>
+    ) {
+        this.#cachedPermissions.set(name, observable);
 
-        return this.#getPermission('camera' as PermissionName).pipe(
-            switchMap((state) => {
-                if (state !== PermissionsServiceState.GRANTED) {
-                    return of(state);
-                }
-
-                return from(this.#torchService.getVideoTrackWithTorch()).pipe(
-                    map((track) => {
-                        return !!track
-                            ? PermissionsServiceState.GRANTED
-                            : PermissionsServiceState.UNAVAILABLE;
-                    })
-                );
-            })
-        );
+        return observable;
     }
 
     #getPermission(name: PermissionName): Observable<PermissionsServiceState> {
@@ -49,9 +31,25 @@ export class PermissionsService {
             return cached;
         }
 
-        const subject = new Subject<PermissionsServiceState>();
-        const observable = subject.asObservable().pipe(shareReplay(1));
-        this.#cachedPermissions.set(name, observable);
+        if (!window.navigator.permissions) {
+            return this.#cache(name, of(PermissionsServiceState.ERROR));
+        }
+
+        const subject = new ReplaySubject<PermissionState>(1);
+        const observable = subject.asObservable().pipe(
+            map((state: PermissionState) => {
+                let mapped = PermissionsServiceState.DENIED;
+
+                if (state === 'granted') {
+                    mapped = PermissionsServiceState.GRANTED;
+                } else if (state === 'prompt') {
+                    mapped = PermissionsServiceState.PROMPT;
+                }
+
+                return mapped;
+            }),
+            shareReplay(1)
+        );
 
         window.navigator.permissions
             .query({
@@ -59,25 +57,14 @@ export class PermissionsService {
             })
             .then(
                 (result) => {
-                    const mapState = (state: PermissionState) => {
-                        let mapped = PermissionsServiceState.DENIED;
-
-                        if (state === 'granted') {
-                            mapped = PermissionsServiceState.GRANTED;
-                        } else if (state === 'prompt') {
-                            mapped = PermissionsServiceState.PROMPT;
-                        }
-
-                        subject.next(mapped);
-                    };
-                    mapState(result.state);
-                    result.onchange = () => mapState(result.state);
+                    subject.next(result.state);
+                    result.onchange = () => subject.next(result.state);
                 },
                 () => {
-                    subject.next(PermissionsServiceState.DENIED);
+                    subject.next('denied');
                 }
             );
 
-        return observable;
+        return this.#cache(name, observable);
     }
 }

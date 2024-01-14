@@ -70,12 +70,14 @@ import { InstallPwaService } from './install-pwa.service';
                     @loadsvg.stop.prevent="this.logoLoaded()"
                 ></load-svg>
             </div>
-            <div class="install-text">Install to Home Screen</div>
+            <div class="install-text">
+                <i18n-label id="install.message"></i18n-label>
+            </div>
             <div class="space"></div>
             <div class="install-button">
                 <styled-link @click.stop.prevent="this.install()"
-                    >Install</styled-link
-                >
+                    ><i18n-label id="install.action"></i18n-label
+                ></styled-link>
             </div>
         </div>
     `,

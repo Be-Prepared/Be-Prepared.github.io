@@ -1,12 +1,12 @@
+import { AvailabilityState } from '../datatypes/availability-state';
 import { Component, css, di, html } from 'fudgel';
-import { I18nService } from '../i18n/i18n.service';
-import { PermissionsService, PermissionsServiceState } from '../services/permissions.service';
 import { Subscription } from 'rxjs';
 import { TorchService } from '../services/torch.service';
 
 @Component('flashlight-app', {
     style: css`
-        :host {
+        :host,
+        .wrapper {
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -28,71 +28,86 @@ import { TorchService } from '../services/torch.service';
         }
     `,
     template: html`
-        <div></div>
-        <p *if="this.explainAsk">{{this.explainAskText}}</p>
-        <button
-            *if="!this.explainDeny"
-            class="toggle {{this.buttonClass}}"
-            @click.stop.prevent="this.toggle()"
-        >
-            {{this.labelI18n}}
-        </button>
-        <p *if="this.explainDeny">{{this.explainDenyText}}</p>
-        <info-app-permission *if="this.explainDeny" name="{{this.currentPermissionStatus}}" permission="torch"></info-app-permission>
-        <back-button></back-button>
+        <permission-prompt
+            *if="this.explainAsk"
+            @grant.stop.prevent="this.grant()"
+            message-id="flashlight.explainAsk"
+        ></permission-prompt>
+        <permission-denied *if="this.explainDeny"></permission-denied>
+        <flashlight-unavailable
+            *if="this.explainUnavailable"
+        ></flashlight-unavailable>
+        <div *if="this.showControls" class="wrapper">
+            <div></div>
+            <button
+                *if="this.label"
+                class="toggle {{this.buttonClass}}"
+                @click.stop.prevent="this.toggle()"
+            >
+                <i18n-label id="{{this.label}}"></i18n-label>
+            </button>
+            <back-button></back-button>
+        </div>
     `,
 })
 export class FlashlightAppComponent {
-    #i18nService = di(I18nService);
-    #permissionsService = di(PermissionsService);
     #subscription: Subscription;
     #torchService = di(TorchService);
     buttonClass = '';
-    currentPermissionStatus: string;
     enabled = false;
     explainAsk = false;
-    explainAskText: string;
     explainDeny = false;
-    explainDenyText: string;
-    labelI18n?: string;
+    explainUnavailable = false;
+    label: string | null = null;
+    showControls = false;
 
     constructor() {
-        this.currentPermissionStatus = this.#i18nService.get('app.currentPermissionStatus');
-        this.explainAskText = this.#i18nService.get('flashlight.explainAsk');
-        this.explainDenyText = this.#i18nService.get('flashlight.explainDeny');
-        this.#updateLabel();
-        this.#subscription = this.#permissionsService
-            .torch()
+        this.#subscription = this.#torchService
+            .availabilityState()
             .subscribe((value) => {
-                if (value === PermissionsServiceState.PROMPT) {
-                    this.explainDeny = false;
+                this.label = null;
+                this.explainAsk = false;
+                this.explainDeny = false;
+                this.explainUnavailable = false;
+                this.showControls = false;
+
+                if (value === AvailabilityState.PROMPT) {
                     this.explainAsk = true;
-                } else if (value === PermissionsServiceState.GRANTED) {
-                    this.explainDeny = false;
-                    this.explainAsk = false;
-                } else {
+                } else if (value === AvailabilityState.DENIED) {
                     this.explainDeny = true;
-                    this.explainAsk = false;
+                } else if (value === AvailabilityState.UNAVAILABLE) {
+                    this.explainUnavailable = true;
+                } else {
+                    this.showControls = true;
+                    this.#updateLabel();
                 }
             });
     }
 
     onDestroy() {
-        if (this.#subscription) {
-            this.#subscription.unsubscribe();
-        }
+        this.#subscription.unsubscribe();
+    }
+
+    grant() {
+        this.#torchService.currentStatus();
     }
 
     toggle() {
+        if (this.enabled) {
+            this.#torchService.turnOff();
+        } else {
+            this.#torchService.turnOn();
+        }
+
         this.enabled = !this.enabled;
         this.buttonClass = this.enabled ? 'enabled' : '';
-        this.#torchService.toggleTorch(this.enabled);
         this.#updateLabel();
     }
 
     #updateLabel() {
-        this.labelI18n = this.#i18nService.get(
-            this.enabled ? 'flashlight.turnOff' : 'flashlight.turnOn'
-        );
+        this.#torchService.currentStatus().then((enabled) => {
+            this.label = enabled ? 'flashlight.turnOff' : 'flashlight.turnOn';
+            this.enabled = enabled;
+        });
     }
 }
