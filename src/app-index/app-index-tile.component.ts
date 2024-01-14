@@ -1,4 +1,4 @@
-import { Attr, Component, css, di, html } from 'fudgel';
+import { Attr, Component, css, html } from 'fudgel';
 
 @Component('app-index-tile', {
     style: css`
