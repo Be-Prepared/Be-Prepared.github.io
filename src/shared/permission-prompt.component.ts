@@ -1,7 +1,8 @@
-import { Attr, Component, css, emit, html } from 'fudgel';
+import { Component, css, emit, html } from 'fudgel';
 import { goBack } from '../util/go-back';
 
 @Component('permission-prompt', {
+    attr: ['messageId'],
     style: css`
         :host {
             height: 100%;
@@ -38,7 +39,7 @@ import { goBack } from '../util/go-back';
     `,
 })
 export class PermissionPromptComponent {
-    @Attr() messageId: string = '';
+    messageId: string = '';
 
     goBack() {
         goBack();

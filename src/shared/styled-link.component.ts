@@ -1,6 +1,7 @@
-import { Attr, Component, css } from 'fudgel';
+import { Component, css } from 'fudgel';
 
 @Component('styled-link', {
+    attr:['href', 'target'],
     style: css`
         :host {
             display: inline;
@@ -17,6 +18,6 @@ import { Attr, Component, css } from 'fudgel';
     template: ' <a href="{{this.href || "#"}}" target="{{this.target}}"><slot></slot></a> ',
 })
 export class StyledLinkComponent {
-    @Attr() href?: string;
-    @Attr() target?: string;
+    href?: string;
+    target?: string;
 }

@@ -1,4 +1,4 @@
-import { Attr, Component, css, di, html } from 'fudgel';
+import { Component, css, di, html } from 'fudgel';
 import {
     PermissionsService,
     PermissionsServiceName,
@@ -7,6 +7,7 @@ import {
 import { Subscription } from 'rxjs';
 
 @Component('info-app-permission', {
+    attr: ['permission'],
     style: css`
         .state_granted {
             color: green;
@@ -39,7 +40,7 @@ import { Subscription } from 'rxjs';
 export class InfoAppPermissionComponent {
     #permissionsService = di(PermissionsService);
     #subscription?: Subscription;
-    @Attr() permission?: PermissionsServiceName;
+    permission?: PermissionsServiceName;
     stateStr = 'error';
 
     onChange(property: string) {

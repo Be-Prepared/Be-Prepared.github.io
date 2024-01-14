@@ -1,6 +1,7 @@
-import { Attr, Component, css, html } from 'fudgel';
+import { Component, css, html } from 'fudgel';
 
 @Component('app-index-tile', {
+    attr: ['icon', 'id', 'label'],
     style: css`
         :host {
             display: flex;
@@ -40,9 +41,13 @@ import { Attr, Component, css, html } from 'fudgel';
     `,
 })
 export class AppIndexTileComponent {
-    @Attr() icon?: string;
-    @Attr() id?: string;
-    @Attr() label?: string;
+    icon?: string;
+    id?: string;
+    label?: string;
+
+    onInit() {
+        history.replaceState({}, document.title, '/');
+    }
 
     setActiveTool() {
         history.pushState({}, document.title, `/${this.id}`);

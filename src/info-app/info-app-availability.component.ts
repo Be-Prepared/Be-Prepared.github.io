@@ -1,7 +1,8 @@
 import { AvailabilityState } from '../datatypes/availability-state';
-import { Component, css, html, Prop } from 'fudgel';
+import { Component, css, html } from 'fudgel';
 
 @Component('info-app-availability', {
+    prop: ['availabilityState'],
     style: css`
         .state_granted {
             color: green;
@@ -36,7 +37,7 @@ import { Component, css, html, Prop } from 'fudgel';
     `,
 })
 export class InfoAppAvailabilityComponent {
-    @Prop() availabilityState = AvailabilityState.ERROR;
+    availabilityState = AvailabilityState.ERROR;
     stateStr = 'error';
 
     onChange() {

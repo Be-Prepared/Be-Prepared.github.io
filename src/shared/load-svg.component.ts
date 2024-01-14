@@ -1,6 +1,7 @@
-import { Attr, Component, css, emit, metadataControllerElement } from 'fudgel';
+import { Component, css, emit, metadataControllerElement } from 'fudgel';
 
 @Component('load-svg', {
+    attr: ['href'],
     style: css`
         :host {
             display: block;
@@ -9,7 +10,7 @@ import { Attr, Component, css, emit, metadataControllerElement } from 'fudgel';
     template: '',
 })
 export class LoadSvgComponent {
-    @Attr() href?: string;
+    href?: string;
     #deferred = 0;
     #deferredTimeout: null | ReturnType<typeof setTimeout> = null;
 
