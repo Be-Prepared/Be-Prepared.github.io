@@ -6,6 +6,7 @@ import { goBack } from '../util/go-back';
     style: css`
         :host {
             height: 100%;
+            width: 100%;
             display: flex;
             flex-direction: column;
             justify-content: space-between;

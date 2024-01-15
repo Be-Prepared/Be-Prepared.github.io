@@ -4,6 +4,7 @@ import { Component, css, html } from 'fudgel';
     style: css`
         :host {
             height: 100%;
+            width: 100%;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
