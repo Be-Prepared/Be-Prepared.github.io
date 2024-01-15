@@ -5,6 +5,11 @@ export const enUS: LanguageData = {
     'app.title': 'Be Prepared',
     'app.currentPermissionStatus': 'Current permission status',
 
+    // Camera unavailable
+    'cameraUnavailable.heading': 'No Suitable Camera',
+    'cameraUnavailable.message':
+        'There is no camera available that this app can use for the selected tool. This tool will be removed from the starting menu.',
+
     // Flashlight
     'flashlight.explainAsk':
         'In order to turn on the flashlight, the camera permission needs to be granted.',

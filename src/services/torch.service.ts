@@ -12,7 +12,6 @@ export class TorchService {
 
     availabilityState() {
         if (!window.navigator.mediaDevices) {
-            console.log('a');
             return of(AvailabilityState.UNAVAILABLE);
         }
 

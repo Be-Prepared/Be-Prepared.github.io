@@ -1,5 +1,6 @@
 import { AvailabilityState } from './datatypes/availability-state';
 import { di } from 'fudgel';
+import { MagnifierService } from './services/magnifier.service';
 import { map } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 // import {
@@ -8,6 +9,7 @@ import { Observable, of } from 'rxjs';
 // } from './services/permissions.service';
 import { TorchService } from './services/torch.service';
 
+const magnifierService = di(MagnifierService);
 // const permissionsService = di(PermissionsService);
 const torchService = di(TorchService);
 
@@ -48,7 +50,7 @@ export const tileDefs: TileDef[] = [
         icon: 'magnifier.svg',
         label: 'tile.magnifier',
         component: 'magnifier-app',
-        show: of(false),
+        show: magnifierService.availabilityState().pipe(availabilityToBoolean)
     },
     {
         id: 'mirror',

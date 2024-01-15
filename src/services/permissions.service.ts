@@ -11,6 +11,7 @@ export type PermissionsServiceName = 'camera';
 
 export class PermissionsService {
     #cachedPermissions = new Map<string, Observable<PermissionsServiceState>>();
+
     camera() {
         return this.#getPermission('camera' as PermissionName);
     }

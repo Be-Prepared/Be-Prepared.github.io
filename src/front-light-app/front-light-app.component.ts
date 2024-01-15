@@ -1,5 +1,6 @@
-import { Component, css, html } from 'fudgel';
+import { Component, css, di, html } from 'fudgel';
 import { goBack } from '../util/go-back';
+import { WakeLockService } from '../services/wake-lock.service';
 
 @Component('front-light-app', {
     style: css`
@@ -25,6 +26,16 @@ import { goBack } from '../util/go-back';
     `
 })
 export class FrontLightAppComponent {
+    #wakeLockService = di(WakeLockService);
+
+    onInit() {
+        this.#wakeLockService.request();
+    }
+
+    onDestroy() {
+        this.#wakeLockService.release();
+    }
+
     back() {
         goBack();
     }

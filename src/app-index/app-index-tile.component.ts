@@ -35,7 +35,7 @@ import { Component, css, html } from 'fudgel';
         <button @click.stop.prevent="this.setActiveTool()">
             <div class="wrapper">
                 <scaling-icon href="{{this.icon}}"></scaling-icon>
-                <div><i18n-label id="{{this.labelI18n}}"></i18n-label></div>
+                <div><i18n-label id="{{this.label}}"></i18n-label></div>
             </div>
         </button>
     `,

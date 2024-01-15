@@ -3,6 +3,7 @@ import { Component, css, di, html } from 'fudgel';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { TorchService } from '../services/torch.service';
+import { WakeLockService } from '../services/wake-lock.service';
 
 @Component('flashlight-app', {
     style: css`
@@ -53,6 +54,7 @@ import { TorchService } from '../services/torch.service';
 export class FlashlightAppComponent {
     #subject = new Subject();
     #torchService = di(TorchService);
+    #wakeLockService = di(WakeLockService);
     buttonClass = '';
     enabled = false;
     explainAsk = false;
@@ -72,6 +74,8 @@ export class FlashlightAppComponent {
 
                 if (this.showControls) {
                     this.#getCurrentStatus();
+                } else {
+                    this.#wakeLockService.release();
                 }
             });
     }
@@ -79,6 +83,7 @@ export class FlashlightAppComponent {
     onDestroy() {
         this.#subject.next(null);
         this.#subject.complete();
+        this.#wakeLockService.release();
     }
 
     grant() {
@@ -96,6 +101,7 @@ export class FlashlightAppComponent {
     }
 
     #getCurrentStatus() {
+        this.#wakeLockService.request();
         this.#torchService.currentStatus().then((enabled) => {
             this.#setEnabled(enabled);
         });

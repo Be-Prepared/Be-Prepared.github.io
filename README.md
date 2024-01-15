@@ -14,6 +14,11 @@ Also is an example of how to use [Fudgel](https://github.com/fidian/fudgel), an 
 * Front screen
     * Makes the screen white. Useful for devices without a flashlight on the camera.
 
+* Magnifier
+    * Uses the camera and starts it at maximum zoom.
+    * Requires the `camera` permission.
+    * Can turn on and off the camera's light, if one exists.
+
 * Info
     * Shows permission statuses that the application could use.
     * Provides links to tools that are used to build the PWA.
