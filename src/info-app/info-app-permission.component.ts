@@ -13,10 +13,6 @@ import { Subscription } from 'rxjs';
             color: green;
         }
 
-        .state_granted::before {
-            content: '✔ ';
-        }
-
         .state_error {
             color: purple;
         }
@@ -28,13 +24,11 @@ import { Subscription } from 'rxjs';
         .state_denied {
             color: orange;
         }
-
-        .state_denied::before {
-            content: '✖ ';
-        }
     `,
     template: html`
-        <span class="state_{{this.stateStr}}">{{this.stateStr}}</span>
+        <span class="state_{{this.stateStr}}"
+            ><i18n-label id="info.permission.{{this.stateStr}}"></i18n-label
+        ></span>
     `,
 })
 export class InfoAppPermissionComponent {

@@ -34,7 +34,7 @@ export class MagnifierService {
                         const tracks = stream.getVideoTracks();
 
                         return !!tracks.length
-                            ? AvailabilityState.GRANTED
+                            ? AvailabilityState.ALLOWED
                             : AvailabilityState.UNAVAILABLE;
                     })
                 );

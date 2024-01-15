@@ -32,7 +32,7 @@ export class TorchService {
                 return from(
                     this.#getAllTracksWithTorch().then((tracks) =>
                         !!tracks.length
-                            ? AvailabilityState.GRANTED
+                            ? AvailabilityState.ALLOWED
                             : AvailabilityState.UNAVAILABLE
                     )
                 );

@@ -40,7 +40,7 @@ import { TorchService } from '../services/torch.service';
         <permission-prompt
             *if="this.explainAsk"
             @grant.stop.prevent="this.grant()"
-            message-id="flashlight.explainAsk"
+            message-id="magnifier.explainAsk"
         ></permission-prompt>
         <permission-denied *if="this.explainDeny"></permission-denied>
         <camera-unavailable *if="this.explainUnavailable"></camera-unavailable>
@@ -99,7 +99,7 @@ export class MagnifierAppComponent {
                 this.explainDeny = value === AvailabilityState.DENIED;
                 this.explainUnavailable =
                     value === AvailabilityState.UNAVAILABLE;
-                const showVideo = value === AvailabilityState.GRANTED;
+                const showVideo = value === AvailabilityState.ALLOWED;
 
                 if (this.showControls !== showVideo) {
                     this.showControls = showVideo;
@@ -115,7 +115,7 @@ export class MagnifierAppComponent {
             .availabilityState()
             .pipe(takeUntil(this.#subject))
             .subscribe((value) => {
-                this.torchAvailable = value === AvailabilityState.GRANTED;
+                this.torchAvailable = value === AvailabilityState.ALLOWED;
             });
     }
 

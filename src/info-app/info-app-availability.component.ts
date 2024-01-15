@@ -4,12 +4,8 @@ import { Component, css, html } from 'fudgel';
 @Component('info-app-availability', {
     prop: ['availabilityState'],
     style: css`
-        .state_granted {
+        .state_allowed {
             color: green;
-        }
-
-        .state_granted::before {
-            content: '✔ ';
         }
 
         .state_error {
@@ -24,16 +20,14 @@ import { Component, css, html } from 'fudgel';
             color: orange;
         }
 
-        .state_denied::before {
-            content: '✖ ';
-        }
-
         .state_unavailable {
             color: gray;
         }
     `,
     template: html`
-        <span class="state_{{this.stateStr}}">{{this.stateStr}}</span>
+        <span class="state_{{this.stateStr}}"
+            ><i18n-label id="info.availability.{{this.stateStr}}"></i18n-label
+        ></span>
     `,
 })
 export class InfoAppAvailabilityComponent {
@@ -47,8 +41,8 @@ export class InfoAppAvailabilityComponent {
             this.stateStr = 'denied';
         } else if (this.availabilityState === AvailabilityState.PROMPT) {
             this.stateStr = 'prompt';
-        } else if (this.availabilityState === AvailabilityState.GRANTED) {
-            this.stateStr = 'granted';
+        } else if (this.availabilityState === AvailabilityState.ALLOWED) {
+            this.stateStr = 'allowed';
         } else {
             this.stateStr = 'error';
         }

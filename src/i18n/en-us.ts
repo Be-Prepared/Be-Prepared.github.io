@@ -20,16 +20,30 @@ export const enUS: LanguageData = {
         'This device does not have a camera with a flashlight that is accessible to the application. Because this feature is not available, the button will be removed from the menu.',
 
     // Info
+    'info.availability.allowed': '✔ Allowed',
+    'info.availability.denied': '✖ Denied',
+    'info.availability.error': 'Error',
+    'info.availability.prompt': 'Prompt',
+    'info.availability.unavailable': 'Unavailable',
     'info.camera': 'Camera:',
     'info.framework': 'the framework driving this app',
-    'info.permissionsHeader': 'Permissions:',
+    'info.permission.denied': '✖ Denied',
+    'info.permission.error': 'Error',
+    'info.permission.granted': '✔ Granted',
+    'info.permission.prompt': 'Prompt',
+    'info.permissionsAndFeaturesHeader': 'Permissions and Features:',
     'info.svgCompression': 'SVG compression',
     'info.torch': 'Torch:',
     'info.toolingHeader': 'Tooling:',
+    'info.wakeLock': 'Wake Lock:',
 
     // Install
     'install.action': 'Install',
     'install.message': 'Install to Home Screen',
+
+    // Magnifier
+    'magnifier.explainAsk':
+        'The magnifier requires the camera permission to function.',
 
     // Permission denied
     'permissionDenied.heading': 'Permission Denied',

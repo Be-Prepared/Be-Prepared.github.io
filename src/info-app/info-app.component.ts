@@ -3,6 +3,7 @@ import { Component, css, di, html } from 'fudgel';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { TorchService } from '../services/torch.service';
+import { WakeLockService } from '../services/wake-lock.service';
 
 @Component('info-app', {
     style: css`
@@ -26,10 +27,11 @@ import { TorchService } from '../services/torch.service';
     `,
     template: html`
     <div class="wrapper">
-        <p><i18n-label id="info.permissionsHeader"></i18n-label></p>
+        <p><i18n-label id="info.permissionsAndFeaturesHeader"></i18n-label></p>
         <ul>
             <li><i18n-label id="info.camera"></i18n-label> <info-app-permission permission="camera"></info-app-permission></li>
             <li><i18n-label id="info.torch"></i18n-label> <info-app-availability .availability-state="this.torch"></info-app-permission></li>
+            <li><i18n-label id="info.wakeLock"></i18n-label> <info-app-availability .availability-state="this.wakeLock"></info-app-permission></li>
         </ul>
 
         <p><i18n-label id="info.toolingHeader"></i18n-label></p>
@@ -43,16 +45,25 @@ import { TorchService } from '../services/torch.service';
     `,
 })
 export class InfoAppComponent {
-    #subject = new Subject;
+    #subject = new Subject();
     #torchService = di(TorchService);
+    #wakeLockService = di(WakeLockService);
     torch = AvailabilityState.ERROR;
+    wakeLock = AvailabilityState.ERROR;
 
     constructor() {
-        this.#torchService.availabilityState().pipe(
-            takeUntil(this.#subject)
-        ).subscribe((status) => {
-            this.torch = status
-        });
+        this.#torchService
+            .availabilityState()
+            .pipe(takeUntil(this.#subject))
+            .subscribe((status) => {
+                this.torch = status;
+            });
+        this.#wakeLockService
+            .availabilityState()
+            .pipe(takeUntil(this.#subject))
+            .subscribe((status) => {
+                this.wakeLock = status;
+            });
     }
 
     onDestroy() {

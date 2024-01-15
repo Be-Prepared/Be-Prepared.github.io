@@ -3,5 +3,5 @@ export const enum AvailabilityState {
     UNAVAILABLE = 'UNAVAILABLE',
     DENIED = 'DENIED',
     PROMPT = 'PROMPT',
-    GRANTED = 'GRANTED',
+    ALLOWED = 'ALLOWED',
 }

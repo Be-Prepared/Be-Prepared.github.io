@@ -15,7 +15,7 @@ const torchService = di(TorchService);
 
 const availabilityToBoolean = map(
     (state: AvailabilityState) =>
-        state === AvailabilityState.GRANTED || state === AvailabilityState.PROMPT);
+        state === AvailabilityState.ALLOWED || state === AvailabilityState.PROMPT);
 // const permissionToBoolean = map(
 //     (state: PermissionsServiceState) =>
 //         state === PermissionsServiceState.GRANTED ||

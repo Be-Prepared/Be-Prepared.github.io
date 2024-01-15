@@ -23,6 +23,9 @@ export default defineConfig({
         host: true,
         port: 8080,
         strictPort: true,
+        watch: {
+            usePolling: true
+        }
     },
     plugins: [
         minifyLiterals(),
