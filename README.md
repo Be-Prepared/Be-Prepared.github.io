@@ -41,6 +41,8 @@ If you want to test all of the features on mobile devices, you will need to go t
 
 ![Chrome Flags Screenshot](chrome-flags.jpg)
 
+Unfortunately, that will not be a valid workaround for iOS, so there's also `npm run https` to serve the content with HTTPS locally. It's a self-signed certificate that you will need to accept each time you visit the site, but it does the trick.
+
 Also, debugging on mobile devices is difficult. If you add "?eruda" to the URL, it will load [Eruda](https://github.com/liriliri/eruda), a console for mobile browsers. It will be configured to fully initialize before the application starts, allowing all messages and errors to get logged appropriately. This is extremely useful.
 
 Pull requests for additional functionality are welcome. Please make sure you maintain the intent of this code.
