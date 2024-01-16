@@ -54,6 +54,8 @@ import { TorchService } from '../services/torch.service';
                 @pointerleave.stop.prevent="this.pointerUp($event)"
                 #ref="video"
                 autoplay
+                muted
+                playsinline
             ></video>
             <div class="bottom">
                 <back-button></back-button>
