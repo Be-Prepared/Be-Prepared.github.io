@@ -146,7 +146,15 @@ export class MagnifierAppComponent {
 
         const diff = this.#pointerDiff();
 
-        if (!diff || !this.#pointerInitialDiff || !this.#pointerInitialZoom || !this.#zoomScale || !this.#zoomMax || !this.#zoomMin || !this.#zoomStep) {
+        if (
+            !diff ||
+            !this.#pointerInitialDiff ||
+            !this.#pointerInitialZoom ||
+            !this.#zoomScale ||
+            !this.#zoomMax ||
+            !this.#zoomMin ||
+            !this.#zoomStep
+        ) {
             return;
         }
 
@@ -154,7 +162,8 @@ export class MagnifierAppComponent {
         const scaled = change / this.#zoomScale;
         const stepsTotal = (this.#zoomMax - this.#zoomMin) / this.#zoomStep;
         const stepsChange = scaled * stepsTotal;
-        const endZoom = this.#pointerInitialZoom + Math.floor(stepsChange) * this.#zoomStep
+        const endZoom =
+            this.#pointerInitialZoom + Math.floor(stepsChange) * this.#zoomStep;
 
         this.#zoom(endZoom);
     }
@@ -227,7 +236,8 @@ export class MagnifierAppComponent {
                 this.video.srcObject = stream;
             }
 
-            this.#zoomScale = Math.min(window.screen.width + window.screen.height) / 2;
+            this.#zoomScale =
+                Math.min(window.screen.width + window.screen.height) / 2;
             this.#setupTorch();
         });
     }
@@ -243,7 +253,7 @@ export class MagnifierAppComponent {
         this.#track.applyConstraints({
             advanced: [
                 {
-                    zoom: zoom
+                    zoom: zoom,
                 } as any,
             ],
         });
