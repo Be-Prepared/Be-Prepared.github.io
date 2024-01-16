@@ -14,11 +14,15 @@ import { Component, css, html } from 'fudgel';
         .heading {
             font-size: 2em;
         }
+
+        .message {
+            max-width: 90%;
+        }
     `,
     template: html`
         <div></div>
         <div class="heading"><i18n-label id="cameraUnavailable.heading"></i18n-label></div>
-        <div><i18n-label id="cameraUnavailable.message"></i18n-label></div>
+        <div class="message"><i18n-label id="cameraUnavailable.message"></i18n-label></div>
         <back-button></back-button>
         <div></div>
     `
