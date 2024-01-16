@@ -1,5 +1,5 @@
 import { map, shareReplay } from 'rxjs/operators';
-import { Observable, of, ReplaySubject } from 'rxjs';
+import { Observable, of, ReplaySubject, Subject } from 'rxjs';
 
 export const enum PermissionsServiceState {
     ERROR = 'ERROR',
@@ -52,20 +52,41 @@ export class PermissionsService {
             shareReplay(1)
         );
 
-        window.navigator.permissions
-            .query({
-                name: name as unknown as PermissionName,
-            })
-            .then(
+        this.#checkPermission(name).then(
                 (result) => {
                     subject.next(result.state);
-                    result.onchange = () => subject.next(result.state);
-                },
-                () => {
-                    subject.next('denied');
+
+                    result.onchange = () => {
+                        subject.next(result.state);
+                    };
+
+                    // iOS does not use onChange, so we also need to poll.
+                    this.#pollPermission(name, result, subject);
                 }
             );
 
         return this.#cache(name, observable);
+    }
+
+    #checkPermission(name: PermissionName) {
+        return window.navigator.permissions.query({name}).catch(() => {
+            return {
+                state: 'denied'
+            } as PermissionStatus;
+        });
+    }
+
+    #pollPermission(name: PermissionName, result: PermissionStatus, subject: Subject<PermissionState>) {
+        setTimeout(() => {
+            if (result.state === 'prompt') {
+                this.#checkPermission(name).then((pollResult) => {
+                    if (pollResult.state !== result.state) {
+                        subject.next(pollResult.state);
+                    }
+
+                    this.#pollPermission(name, result, subject);
+                });
+            }
+        }, 250);
     }
 }
