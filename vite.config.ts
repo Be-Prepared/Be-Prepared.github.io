@@ -1,8 +1,15 @@
+import basicSsl from '@vitejs/plugin-basic-ssl';
 import { defineConfig } from 'vite';
 import minifyLiterals from 'rollup-plugin-minify-html-literals-v3';
 import { resolve } from 'path';
 import simpleHtmlPlugin from 'vite-plugin-simple-html';
 import { VitePWA } from 'vite-plugin-pwa';
+
+const sslPlugin = [];
+
+if (process.env.HTTPS) {
+    sslPlugin.push(basicSsl());
+}
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -25,6 +32,7 @@ export default defineConfig({
         strictPort: true,
     },
     plugins: [
+        ...sslPlugin,
         minifyLiterals(),
         simpleHtmlPlugin({
             minify: true
