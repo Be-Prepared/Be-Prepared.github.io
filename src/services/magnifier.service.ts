@@ -1,53 +1,47 @@
 import { AvailabilityState } from '../datatypes/availability-state';
 import { di } from 'fudgel';
 import { from, of } from 'rxjs';
-import {
-    PermissionsService,
-    PermissionsServiceState
-} from './permissions.service';
+import { PermissionsService } from './permissions.service';
 import { switchMap } from 'rxjs/operators';
 
 export class MagnifierService {
     #permissionsService = di(PermissionsService);
 
     availabilityState() {
-        if (!window.navigator.mediaDevices) {
+        if (!navigator.mediaDevices) {
             return of(AvailabilityState.UNAVAILABLE);
         }
 
-        return this.#permissionsService.camera().pipe(
-            switchMap((state) => {
-                if (state === PermissionsServiceState.ERROR) {
-                    return of(AvailabilityState.ERROR);
-                }
+        const whenGranted = () => {
+            return from(
+                this.getStream().then((stream) => {
+                    const tracks = stream.getVideoTracks();
 
-                if (state === PermissionsServiceState.PROMPT) {
-                    return of(AvailabilityState.PROMPT);
-                }
+                    return !!tracks.length
+                        ? AvailabilityState.ALLOWED
+                        : AvailabilityState.UNAVAILABLE;
+                })
+            );
+        };
 
-                if (state === PermissionsServiceState.DENIED) {
-                    return of(AvailabilityState.DENIED);
-                }
-
-                return from(
-                    this.getStream().then((stream) => {
-                        const tracks = stream.getVideoTracks();
-
-                        return !!tracks.length
-                            ? AvailabilityState.ALLOWED
-                            : AvailabilityState.UNAVAILABLE;
-                    })
-                );
-            })
-        );
+        return this.#permissionsService
+            .camera()
+            .pipe(
+                switchMap((state) =>
+                    this.#permissionsService.toAvailability(state, whenGranted)
+                )
+            );
     }
 
     getStream() {
-        return window.navigator.mediaDevices
-            .getUserMedia({
-                video: {
-                    facingMode: 'environment',
-                },
-            });
+        return navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: 'environment',
+            },
+        });
+    }
+
+    prompt() {
+        return this.#permissionsService.camera(true);
     }
 }

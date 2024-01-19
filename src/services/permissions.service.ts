@@ -1,5 +1,11 @@
-import { map, shareReplay } from 'rxjs/operators';
-import { Observable, of, ReplaySubject, Subject } from 'rxjs';
+import { AvailabilityState } from '../datatypes/availability-state';
+import {
+    distinctUntilChanged,
+    map,
+    shareReplay,
+    switchMap,
+} from 'rxjs/operators';
+import { Observable, of, ReplaySubject } from 'rxjs';
 
 export const enum PermissionsServiceState {
     ERROR = 'ERROR',
@@ -10,83 +16,107 @@ export const enum PermissionsServiceState {
 export type PermissionsServiceName = 'camera';
 
 export class PermissionsService {
-    #cachedPermissions = new Map<string, Observable<PermissionsServiceState>>();
+    #observables = new Map<string, Observable<PermissionsServiceState>>();
+    #subjects = new Map<string, ReplaySubject<null>>();
 
-    camera() {
-        return this.#getPermission('camera' as PermissionName);
+    camera(prompt = false) {
+        if (!navigator.mediaDevices || !navigator.permissions) {
+            return of(PermissionsServiceState.ERROR);
+        }
+
+        const name = 'camera' as PermissionName;
+        const subject = this.#getSubject(name);
+
+        if (prompt) {
+            // Asking for `video: true` or `video: { facingMode: 'self' }` does
+            // not work when viewing the app locally. Unsure about what happens
+            // when deployed to HTTPS and if that changes.
+            navigator.mediaDevices
+                .getUserMedia({ video: { facingMode: 'environment' } })
+                .catch(() => {})
+                .then(() => subject.next(null));
+        }
+
+        return this.#getPermission(name, subject);
     }
 
-    #cache(
-        name: PermissionName,
-        observable: Observable<PermissionsServiceState>
+    toAvailability(
+        state: PermissionsServiceState,
+        whenGranted: () => Observable<AvailabilityState>
     ) {
-        this.#cachedPermissions.set(name, observable);
+        if (state === PermissionsServiceState.ERROR) {
+            return of(AvailabilityState.ERROR);
+        }
+
+        if (state === PermissionsServiceState.PROMPT) {
+            return of(AvailabilityState.PROMPT);
+        }
+
+        if (state === PermissionsServiceState.DENIED) {
+            return of(AvailabilityState.DENIED);
+        }
+
+        return whenGranted();
+    }
+
+    #checkPermission(name: PermissionName) {
+        const subject = new ReplaySubject<PermissionState>(1);
+
+        navigator.permissions.query({ name }).then(
+            (status) => {
+                subject.next(status.state);
+                status.onchange = () => {
+                    subject.next(status.state);
+                };
+            },
+            () => subject.next('denied' as PermissionState)
+        );
+
+        return subject.asObservable();
+    }
+
+    #getPermission(
+        name: PermissionName,
+        subject: ReplaySubject<null>
+    ): Observable<PermissionsServiceState> {
+        let observable = this.#observables.get(name);
+
+        if (observable) {
+            return observable;
+        }
+
+        observable = subject.asObservable().pipe(
+            switchMap(() => this.#checkPermission(name)),
+            map((state: PermissionState) => this.#mapPermission(state)),
+            distinctUntilChanged(),
+            shareReplay(1)
+        );
+        this.#observables.set(name, observable);
 
         return observable;
     }
 
-    #getPermission(name: PermissionName): Observable<PermissionsServiceState> {
-        const cached = this.#cachedPermissions.get(name);
+    #getSubject(name: PermissionName) {
+        let subject = this.#subjects.get(name);
 
-        if (cached) {
-            return cached;
+        if (!subject) {
+            subject = new ReplaySubject(1);
+            subject.next(null);
+            this.#subjects.set(name, subject);
         }
 
-        if (!window.navigator.permissions) {
-            return this.#cache(name, of(PermissionsServiceState.ERROR));
+        return subject;
+    }
+
+    #mapPermission(state: PermissionState) {
+        let mapped = PermissionsServiceState.DENIED;
+
+        if (state === 'granted') {
+            mapped = PermissionsServiceState.GRANTED;
+        } else if (state === 'prompt') {
+            mapped = PermissionsServiceState.PROMPT;
         }
 
-        const subject = new ReplaySubject<PermissionState>(1);
-        const observable = subject.asObservable().pipe(
-            map((state: PermissionState) => {
-                let mapped = PermissionsServiceState.DENIED;
-
-                if (state === 'granted') {
-                    mapped = PermissionsServiceState.GRANTED;
-                } else if (state === 'prompt') {
-                    mapped = PermissionsServiceState.PROMPT;
-                }
-
-                return mapped;
-            }),
-            shareReplay(1)
-        );
-
-        this.#checkPermission(name).then(
-                (result) => {
-                    subject.next(result.state);
-
-                    result.onchange = () => {
-                        subject.next(result.state);
-                    };
-
-                    // iOS does not use onChange, so we also need to poll.
-                    this.#pollPermission(name, result, subject);
-                }
-            );
-
-        return this.#cache(name, observable);
-    }
-
-    #checkPermission(name: PermissionName) {
-        return window.navigator.permissions.query({name}).catch(() => {
-            return {
-                state: 'denied'
-            } as PermissionStatus;
-        });
-    }
-
-    #pollPermission(name: PermissionName, result: PermissionStatus, subject: Subject<PermissionState>) {
-        setTimeout(() => {
-            if (result.state === 'prompt') {
-                this.#checkPermission(name).then((pollResult) => {
-                    if (pollResult.state !== result.state) {
-                        subject.next(pollResult.state);
-                    }
-
-                    this.#pollPermission(name, result, subject);
-                });
-            }
-        }, 250);
+        return mapped;
     }
 }

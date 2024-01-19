@@ -127,7 +127,7 @@ export class MagnifierAppComponent {
     }
 
     grant() {
-        this.#magnifierService.getStream();
+        this.#magnifierService.prompt();
     }
 
     pointerDown(event: PointerEvent) {
