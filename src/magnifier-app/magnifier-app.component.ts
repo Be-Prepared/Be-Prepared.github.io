@@ -219,10 +219,12 @@ export class MagnifierAppComponent {
             const track = stream.getVideoTracks()[0];
 
             if (!track) {
+                console.log('no video track');
                 return;
             }
 
             const zoom = (track.getCapabilities() as any).zoom;
+            console.log('zoom', zoom);
 
             if (zoom) {
                 this.#zoomMin = zoom.min;
