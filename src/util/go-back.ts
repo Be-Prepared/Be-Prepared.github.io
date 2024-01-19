@@ -1,1 +1,1 @@
-export const goBack = () => window.history.go(-1);
+export const goBack = () => history.pushState({}, document.title, `/`);
