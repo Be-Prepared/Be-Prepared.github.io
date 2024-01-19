@@ -25,6 +25,7 @@ export const enUS: LanguageData = {
     'info.availability.error': 'Error',
     'info.availability.prompt': 'Prompt',
     'info.availability.unavailable': 'Unavailable',
+    'info.buildInformationHeader': 'Build Information',
     'info.camera': 'Camera:',
     'info.framework': 'the framework driving this app',
     'info.permission.denied': '✖ Denied',

@@ -3,6 +3,7 @@ import { defineConfig } from 'vite';
 import minifyLiterals from 'rollup-plugin-minify-html-literals-v3';
 import { resolve } from 'path';
 import simpleHtmlPlugin from 'vite-plugin-simple-html';
+import { vitePluginVersionMark } from 'vite-plugin-version-mark'
 import { VitePWA } from 'vite-plugin-pwa';
 
 const sslPlugin = [];
@@ -25,14 +26,21 @@ export default defineConfig({
         target: 'esnext',
     },
     clearScreen: false,
-    root: 'site',
-    server: {
-        host: true,
-        port: 8080,
-        strictPort: true,
+    define: {
+        __BUILD_DATE__: JSON.stringify(new Date().toISOString()),
+        __NODE_VERSION__: JSON.stringify(process.version),
+        __HOST_PLATFORM__: JSON.stringify(process.platform),
+        __HOST_ARCH__: JSON.stringify(process.arch),
     },
     plugins: [
         ...sslPlugin,
+        vitePluginVersionMark({
+            ifGitSHA: true,
+            ifShortSHA: true,
+            ifLog: true,
+            ifGlobal: true,
+            ifMeta: false,
+        }),
         minifyLiterals(),
         simpleHtmlPlugin({
             minify: true
@@ -70,4 +78,10 @@ export default defineConfig({
             },
         }),
     ],
+    root: 'site',
+    server: {
+        host: true,
+        port: 8080,
+        strictPort: true,
+    },
 });

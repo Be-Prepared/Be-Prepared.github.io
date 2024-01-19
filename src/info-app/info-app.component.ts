@@ -40,6 +40,11 @@ import { WakeLockService } from '../services/wake-lock.service';
             <li><styled-link href="https://vecta.io/nano">Vecta.io</styled-link> - <i18n-label id="info.svgCompression"></i18n-label></li>
         </ul>
 
+        <p><i18n-label id="info.buildInformationHeader"></i18n-label></p>
+        <ul>
+            <li>{{this.buildDate}} ({{this.version}})</li>
+            <li>Node.js {{this.nodeVersion}} ({{this.hostPlatform}} {{this.hostArch}})</li>
+        </ul>
     </div>
     <back-button></back-button>
     `,
@@ -48,7 +53,12 @@ export class InfoAppComponent {
     #subject = new Subject();
     #torchService = di(TorchService);
     #wakeLockService = di(WakeLockService);
+    buildDate = __BUILD_DATE__;
+    hostPlatform = __HOST_PLATFORM__;
+    hostArch = __HOST_ARCH__;
+    nodeVersion = __NODE_VERSION__;
     torch = AvailabilityState.ERROR;
+    version = __BE_PREPARED_VERSION__;
     wakeLock = AvailabilityState.ERROR;
 
     constructor() {
