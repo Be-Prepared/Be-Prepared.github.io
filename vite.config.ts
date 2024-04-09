@@ -70,7 +70,8 @@ export default defineConfig({
                         purpose: 'maskable',
                     },
                 ],
-                name: "Be Prepared"
+                name: "Be Prepared",
+                theme_color: "#000000",
             },
             registerType: 'autoUpdate',
             workbox: {

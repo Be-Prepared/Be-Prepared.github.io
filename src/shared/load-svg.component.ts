@@ -1,4 +1,4 @@
-import { Component, css, emit, metadataControllerElement, rootElement } from 'fudgel';
+import { Component, css, emit, rootElement } from 'fudgel';
 
 @Component('load-svg', {
     attr: ['href'],
