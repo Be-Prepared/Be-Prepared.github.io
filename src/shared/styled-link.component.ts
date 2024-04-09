@@ -15,7 +15,8 @@ import { Component, css } from 'fudgel';
     // The spaces at the ends are important because this is an inline element,
     // but vite/esbuild doesn't treat it as such and will remove surrounding
     // spaces.
-    template: ' <a href="{{this.href || "#"}}" target="{{this.target}}"><slot></slot></a> ',
+    template: ' <a href="{{href || "#"}}" target="{{target}}"><slot></slot></a> ',
+    useShadow: true
 })
 export class StyledLinkComponent {
     href?: string;

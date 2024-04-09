@@ -11,11 +11,11 @@ import { TileDefResolved, TileService } from '../services/tile.service';
         }
     `,
     template: html`
-        <div *for="tile of this.tiles">
+        <div *for="tile of tiles">
             <app-index-tile
-                id="{{$scope.tile.id}}"
-                icon="{{$scope.tile.icon}}"
-                label="{{$scope.tile.label}}"
+                id="{{tile.id}}"
+                icon="{{tile.icon}}"
+                label="{{tile.label}}"
             ></app-index-tile>
         </div>
     `,

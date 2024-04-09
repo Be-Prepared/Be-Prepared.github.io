@@ -67,7 +67,7 @@ import { InstallPwaService } from './install-pwa.service';
             <div class="load-svg-wrapper">
                 <load-svg
                     href="toolbox.svg"
-                    @loadsvg.stop.prevent="this.logoLoaded()"
+                    @loadsvg.stop.prevent="logoLoaded()"
                 ></load-svg>
             </div>
             <div class="install-text">
@@ -75,7 +75,7 @@ import { InstallPwaService } from './install-pwa.service';
             </div>
             <div class="space"></div>
             <div class="install-button">
-                <styled-link @click.stop.prevent="this.install()"
+                <styled-link @click.stop.prevent="install()"
                     ><i18n-label id="install.action"></i18n-label
                 ></styled-link>
             </div>

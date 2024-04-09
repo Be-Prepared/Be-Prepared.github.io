@@ -10,7 +10,7 @@ import { goBack } from '../util/go-back';
     template: html`
         <scaling-icon
             class="back"
-            @click.stop.prevent="this.back()"
+            @click.stop.prevent="back()"
             href="./back.svg"
         ></scaling-icon>
     `

@@ -38,20 +38,20 @@ import { TorchService } from '../services/torch.service';
     `,
     template: html`
         <permission-prompt
-            *if="this.explainAsk"
-            @grant.stop.prevent="this.grant()"
+            *if="explainAsk"
+            @grant.stop.prevent="grant()"
             message-id="magnifier.explainAsk"
         ></permission-prompt>
-        <permission-denied *if="this.explainDeny"></permission-denied>
-        <camera-unavailable *if="this.explainUnavailable"></camera-unavailable>
-        <div *if="this.showControls" class="wrapper">
+        <permission-denied *if="explainDeny"></permission-denied>
+        <camera-unavailable *if="explainUnavailable"></camera-unavailable>
+        <div *if="showControls" class="wrapper">
             <video
-                @pointerdown.stop.prevent="this.pointerDown($event)"
-                @pointermove.stop.prevent="this.pointerMove($event)"
-                @pointerup.stop.prevent="this.pointerUp($event)"
-                @pointercancel.stop.prevent="this.pointerUp($event)"
-                @pointerout.stop.prevent="this.pointerUp($event)"
-                @pointerleave.stop.prevent="this.pointerUp($event)"
+                @pointerdown.stop.prevent="pointerDown($event)"
+                @pointermove.stop.prevent="pointerMove($event)"
+                @pointerup.stop.prevent="pointerUp($event)"
+                @pointercancel.stop.prevent="pointerUp($event)"
+                @pointerout.stop.prevent="pointerUp($event)"
+                @pointerleave.stop.prevent="pointerUp($event)"
                 #ref="video"
                 autoplay
                 muted
@@ -61,9 +61,9 @@ import { TorchService } from '../services/torch.service';
                 <back-button></back-button>
                 <div></div>
                 <scaling-icon
-                    *if="this.torchAvailable"
-                    @click.stop.prevent="this.toggleTorch()"
-                    class="{{this.torchClass}}"
+                    *if="torchAvailable"
+                    @click.stop.prevent="toggleTorch()"
+                    class="{{torchClass}}"
                     href="flashlight.svg"
                 ></scaling-icon>
             </div>

@@ -11,11 +11,11 @@ import { TileDefResolved, TileService } from '../services/tile.service';
         }
     `,
     template: html`
-        <app-router *if="this.tiles">
+        <app-router *if="tiles">
             <div
-                *for="tile of this.tiles"
-                path="/{{$scope.tile.id}}"
-                component="{{$scope.tile.component}}"
+                *for="tile of tiles"
+                path="/{{tile.id}}"
+                component="{{tile.component}}"
             ></div>
             <div path="**" component="app-index"></div>
         </app-router>

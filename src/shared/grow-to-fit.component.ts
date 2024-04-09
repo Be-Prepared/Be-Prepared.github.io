@@ -21,6 +21,7 @@ import { Component, css, html } from 'fudgel';
             <div #ref="content"><slot #ref="slot"></slot></div>
         </div>
     `,
+    useShadow: true
 })
 export class GrowToFitComponent {
     #mutationObserver?: MutationObserver;

@@ -25,8 +25,8 @@ import { Component, css, html } from 'fudgel';
         }
     `,
     template: html`
-        <span class="state_{{this.stateStr}}"
-            ><i18n-label id="info.availability.{{this.stateStr}}"></i18n-label
+        <span class="state_{{stateStr}}"
+            ><i18n-label id="info.availability.{{stateStr}}"></i18n-label
         ></span>
     `,
 })

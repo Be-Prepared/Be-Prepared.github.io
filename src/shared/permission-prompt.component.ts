@@ -33,9 +33,9 @@ import { goBack } from '../util/go-back';
     template: html`
         <div></div>
         <div class="heading"><i18n-label id="permissionPrompt.heading"></i18n-label></div>
-        <div class="message"><i18n-label id="{{this.messageId}}"></i18n-label></div>
-        <div><button @click.stop.prevent="this.grant()"><i18n-label id="permissionPrompt.grantPermission"></i18n-label></div>
-        <div><button @click.stop.prevent="this.goBack()"><i18n-label id="permissionPrompt.goBack"></i18n-label></button></div>
+        <div class="message"><i18n-label id="{{messageId}}"></i18n-label></div>
+        <div><button @click.stop.prevent="grant()"><i18n-label id="permissionPrompt.grantPermission"></i18n-label></div>
+        <div><button @click.stop.prevent="goBack()"><i18n-label id="permissionPrompt.goBack"></i18n-label></button></div>
         <div></div>
     `,
 })

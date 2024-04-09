@@ -30,8 +30,8 @@ import { WakeLockService } from '../services/wake-lock.service';
         <p><i18n-label id="info.permissionsAndFeaturesHeader"></i18n-label></p>
         <ul>
             <li><i18n-label id="info.camera"></i18n-label> <info-app-permission permission="camera"></info-app-permission></li>
-            <li><i18n-label id="info.torch"></i18n-label> <info-app-availability .availability-state="this.torch"></info-app-permission></li>
-            <li><i18n-label id="info.wakeLock"></i18n-label> <info-app-availability .availability-state="this.wakeLock"></info-app-permission></li>
+            <li><i18n-label id="info.torch"></i18n-label> <info-app-availability .availability-state="torch"></info-app-permission></li>
+            <li><i18n-label id="info.wakeLock"></i18n-label> <info-app-availability .availability-state="wakeLock"></info-app-permission></li>
         </ul>
 
         <p><i18n-label id="info.toolingHeader"></i18n-label></p>
@@ -42,8 +42,8 @@ import { WakeLockService } from '../services/wake-lock.service';
 
         <p><i18n-label id="info.buildInformationHeader"></i18n-label></p>
         <ul>
-            <li>{{this.buildDate}} ({{this.version}})</li>
-            <li>Node.js {{this.nodeVersion}} ({{this.hostPlatform}} {{this.hostArch}})</li>
+            <li>{{buildDate}} ({{version}})</li>
+            <li>Node.js {{nodeVersion}} ({{hostPlatform}} {{hostArch}})</li>
         </ul>
     </div>
     <back-button></back-button>

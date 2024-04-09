@@ -31,19 +31,19 @@ import { WakeLockService } from '../services/wake-lock.service';
     `,
     template: html`
         <permission-prompt
-            *if="this.explainAsk"
-            @grant.stop.prevent="this.grant()"
+            *if="explainAsk"
+            @grant.stop.prevent="grant()"
             message-id="flashlight.explainAsk"
         ></permission-prompt>
-        <permission-denied *if="this.explainDeny"></permission-denied>
+        <permission-denied *if="explainDeny"></permission-denied>
         <flashlight-unavailable
-            *if="this.explainUnavailable"
+            *if="explainUnavailable"
         ></flashlight-unavailable>
-        <div *if="this.showControls" class="wrapper">
+        <div *if="showControls" class="wrapper">
             <div></div>
             <button
-                class="toggle {{this.buttonClass}}"
-                @click.stop.prevent="this.toggle()"
+                class="toggle {{buttonClass}}"
+                @click.stop.prevent="toggle()"
             >
                 <scaling-icon href="flashlight.svg"></scaling-icon>
             </button>

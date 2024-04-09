@@ -5,19 +5,20 @@
         "build": "tsc && vite build",
         "generate-pwa-assets": "pwa-assets-generator",
         "https": "HTTPS=true vite",
+        "reinstall": "rm -rf node_modules && npm install",
         "start": "vite"
     },
     "type": "module",
     "devDependencies": {
-        "@vite-pwa/assets-generator": "^0.2.3",
+        "@vite-pwa/assets-generator": "^0.2.4",
         "@vitejs/plugin-basic-ssl": "^1.1.0",
-        "fudgel": "^0.15.0",
+        "fudgel": "^1.2.2",
         "rollup-plugin-minify-html-literals-v3": "^1.3.4",
         "rxjs": "^7.8.1",
-        "typescript": "^5.3.3",
-        "vite": "^5.0.11",
-        "vite-plugin-pwa": "^0.17.4",
+        "typescript": "^5.4.4",
+        "vite": "^5.2.8",
+        "vite-plugin-pwa": "^0.19.8",
         "vite-plugin-simple-html": "^0.1.2",
-        "vite-plugin-version-mark": "^0.0.10"
+        "vite-plugin-version-mark": "^0.0.12"
     }
 }

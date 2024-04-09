@@ -26,8 +26,8 @@ import { Subscription } from 'rxjs';
         }
     `,
     template: html`
-        <span class="state_{{this.stateStr}}"
-            ><i18n-label id="info.permission.{{this.stateStr}}"></i18n-label
+        <span class="state_{{stateStr}}"
+            ><i18n-label id="info.permission.{{stateStr}}"></i18n-label
         ></span>
     `,
 })

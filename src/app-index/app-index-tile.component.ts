@@ -32,10 +32,10 @@ import { Component, css, html } from 'fudgel';
         }
     `,
     template: html`
-        <button @click.stop.prevent="this.setActiveTool()">
+        <button @click.stop.prevent="setActiveTool()">
             <div class="wrapper">
-                <scaling-icon href="{{this.icon}}"></scaling-icon>
-                <div><i18n-label id="{{this.label}}"></i18n-label></div>
+                <scaling-icon href="{{icon}}"></scaling-icon>
+                <div><i18n-label id="{{label}}"></i18n-label></div>
             </div>
         </button>
     `,

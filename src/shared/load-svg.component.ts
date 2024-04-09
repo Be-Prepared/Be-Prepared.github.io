@@ -1,4 +1,4 @@
-import { Component, css, emit, metadataControllerElement } from 'fudgel';
+import { Component, css, emit, metadataControllerElement, rootElement } from 'fudgel';
 
 @Component('load-svg', {
     attr: ['href'],
@@ -26,7 +26,7 @@ export class LoadSvgComponent {
 
     #apply(svgContent: HTMLElement) {
         const svg = document.importNode(svgContent, true);
-        const root = this.#getRoot();
+        const root = rootElement(this);
 
         if (!root) {
             this.#deferred = this.#deferred * 2 + 1;
@@ -41,7 +41,7 @@ export class LoadSvgComponent {
     }
 
     #clearImage() {
-        const root = this.#getRoot();
+        const root = rootElement(this);
 
         if (root) {
             root.innerHTML = '';
@@ -61,11 +61,5 @@ export class LoadSvgComponent {
             }
         };
         xhr.send();
-    }
-
-    #getRoot() {
-        const element = metadataControllerElement.get(this);
-
-        return element ? element.shadowRoot : null;
     }
 }
