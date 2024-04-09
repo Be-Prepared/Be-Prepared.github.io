@@ -36,7 +36,6 @@ export default defineConfig({
         ...sslPlugin,
         vitePluginVersionMark({
             ifGitSHA: true,
-            ifShortSHA: true,
             ifLog: false,
             ifGlobal: true,
             ifMeta: false,

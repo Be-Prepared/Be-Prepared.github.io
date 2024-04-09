@@ -42,7 +42,7 @@ import { WakeLockService } from '../services/wake-lock.service';
 
         <p><i18n-label id="info.buildInformationHeader"></i18n-label></p>
         <ul>
-            <li>{{buildDate}} ({{version}})</li>
+            <li>{{buildDate}}, commit <styled-link href="https://github.com/fidian/be-prepared/commit/{{version}}">{{shortVersion}}</styled-link></li>
             <li>Node.js {{nodeVersion}} ({{hostPlatform}} {{hostArch}})</li>
         </ul>
     </div>
@@ -57,6 +57,7 @@ export class InfoAppComponent {
     hostPlatform = __HOST_PLATFORM__;
     hostArch = __HOST_ARCH__;
     nodeVersion = __NODE_VERSION__;
+    shortVersion = __BE_PREPARED_VERSION__.substr(0, 7)
     torch = AvailabilityState.ERROR;
     version = __BE_PREPARED_VERSION__;
     wakeLock = AvailabilityState.ERROR;
