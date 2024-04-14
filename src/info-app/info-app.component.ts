@@ -57,14 +57,14 @@ export class InfoAppComponent {
     hostPlatform = __HOST_PLATFORM__;
     hostArch = __HOST_ARCH__;
     nodeVersion = __NODE_VERSION__;
-    shortVersion = __BE_PREPARED_VERSION__.substr(0, 7)
+    shortVersion = __BE_PREPARED_VERSION__.substr(0, 7);
     torch = AvailabilityState.ERROR;
     version = __BE_PREPARED_VERSION__;
     wakeLock = AvailabilityState.ERROR;
 
     constructor() {
         this.#torchService
-            .availabilityState()
+            .availabilityState(false)
             .pipe(takeUntil(this.#subject))
             .subscribe((status) => {
                 this.torch = status;

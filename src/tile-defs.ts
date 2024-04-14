@@ -36,7 +36,7 @@ export const tileDefs: TileDef[] = [
         icon: 'flashlight.svg',
         label: 'tile.flashlight',
         component: 'flashlight-app',
-        show: torchService.availabilityState().pipe(availabilityToBoolean)
+        show: torchService.availabilityState(false).pipe(availabilityToBoolean)
     },
     {
         id: 'frontLight',
@@ -50,7 +50,7 @@ export const tileDefs: TileDef[] = [
         icon: 'magnifier.svg',
         label: 'tile.magnifier',
         component: 'magnifier-app',
-        show: magnifierService.availabilityState().pipe(availabilityToBoolean)
+        show: magnifierService.availabilityState(false).pipe(availabilityToBoolean)
     },
     {
         id: 'mirror',

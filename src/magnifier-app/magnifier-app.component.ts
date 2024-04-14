@@ -94,7 +94,7 @@ export class MagnifierAppComponent {
 
     onInit() {
         this.#magnifierService
-            .availabilityState()
+            .availabilityState(true)
             .pipe(takeUntil(this.#subject))
             .subscribe((value) => {
                 this.explainAsk = value === AvailabilityState.PROMPT;
@@ -114,7 +114,7 @@ export class MagnifierAppComponent {
                 }
             });
         this.#torchService
-            .availabilityState()
+            .availabilityState(true)
             .pipe(takeUntil(this.#subject))
             .subscribe((value) => {
                 this.torchAvailable = value === AvailabilityState.ALLOWED;

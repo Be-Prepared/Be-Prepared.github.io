@@ -10,7 +10,7 @@ import { switchMap } from 'rxjs/operators';
 export class TorchService {
     #permissionsService = di(PermissionsService);
 
-    availabilityState() {
+    availabilityState(useLiveValue: boolean) {
         if (!window.navigator.mediaDevices) {
             return of(AvailabilityState.UNAVAILABLE);
         }
@@ -29,12 +29,30 @@ export class TorchService {
                     return of(AvailabilityState.DENIED);
                 }
 
+                if (!useLiveValue) {
+                    const cached = localStorage.getItem('torch');
+
+                    if (cached === 'true') {
+                        return of(AvailabilityState.ALLOWED);
+                    }
+
+                    if (cached === 'false') {
+                        return of(AvailabilityState.UNAVAILABLE);
+                    }
+                }
+
                 return from(
-                    this.#getAllTracksWithTorch().then((tracks) =>
-                        !!tracks.length
-                            ? AvailabilityState.ALLOWED
-                            : AvailabilityState.UNAVAILABLE
-                    )
+                    this.#getAllTracksWithTorch().then((tracks) => {
+                        if (tracks.length) {
+                            localStorage.setItem('torch', 'true');
+
+                            return AvailabilityState.ALLOWED;
+                        }
+
+                        localStorage.setItem('torch', 'false');
+
+                        return AvailabilityState.UNAVAILABLE;
+                    })
                 );
             })
         );

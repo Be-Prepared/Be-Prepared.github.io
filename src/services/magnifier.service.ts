@@ -7,7 +7,7 @@ import { switchMap } from 'rxjs/operators';
 export class MagnifierService {
     #permissionsService = di(PermissionsService);
 
-    availabilityState() {
+    availabilityState(useLiveValue: boolean) {
         if (!navigator.mediaDevices) {
             return of(AvailabilityState.UNAVAILABLE);
         }
@@ -17,20 +17,39 @@ export class MagnifierService {
                 this.getStream().then((stream) => {
                     const tracks = stream.getVideoTracks();
 
-                    return !!tracks.length
-                        ? AvailabilityState.ALLOWED
-                        : AvailabilityState.UNAVAILABLE;
+                    if (tracks.length) {
+                        localStorage.setItem('magnifier', 'true');
+
+                        return AvailabilityState.ALLOWED;
+                    }
+
+                    localStorage.setItem('magnifier', 'false');
+
+                    return AvailabilityState.UNAVAILABLE;
                 })
             );
         };
 
-        return this.#permissionsService
-            .camera()
-            .pipe(
-                switchMap((state) =>
-                    this.#permissionsService.toAvailability(state, whenGranted)
-                )
-            );
+        return this.#permissionsService.camera().pipe(
+            switchMap((state) => {
+                if (!useLiveValue) {
+                    const cached = localStorage.getItem('magnifier');
+
+                    if (cached === 'true') {
+                        return of(AvailabilityState.ALLOWED);
+                    }
+
+                    if (cached === 'false') {
+                        return of(AvailabilityState.UNAVAILABLE);
+                    }
+                }
+
+                return this.#permissionsService.toAvailability(
+                    state,
+                    whenGranted
+                );
+            })
+        );
     }
 
     getStream() {

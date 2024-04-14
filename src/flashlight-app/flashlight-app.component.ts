@@ -64,7 +64,7 @@ export class FlashlightAppComponent {
 
     onInit() {
         this.#torchService
-            .availabilityState()
+            .availabilityState(true)
             .pipe(takeUntil(this.#subject))
             .subscribe((value) => {
                 this.explainAsk = value === AvailabilityState.PROMPT;
