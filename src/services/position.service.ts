@@ -1,6 +1,6 @@
 import { AvailabilityState } from '../datatypes/availability-state';
 import { catchError, finalize, first, map, share } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { Observable, ReplaySubject, Subject } from 'rxjs';
 
 export type PositionEvent =
@@ -127,43 +127,47 @@ export class PositionService {
     }
 
     #listenAbsoluteOrientationSensor() {
-        const sensor = new AbsoluteOrientationSensor({
-            frequency: 60,
-            referenceFrame: 'screen',
-        });
-        const subject = new Subject<PositionEventQuaternion>();
-        const lastQuaternion = new Float32Array(4);
-        sensor.addEventListener('reading', () => {
-            if (sensor.quaternion) {
-                if (
-                    sensor.quaternion[0] === lastQuaternion[0] &&
-                    sensor.quaternion[1] === lastQuaternion[1] &&
-                    sensor.quaternion[2] === lastQuaternion[2] &&
-                    sensor.quaternion[3] === lastQuaternion[3]
-                ) {
-                    return;
-                }
+        try {
+            const sensor = new AbsoluteOrientationSensor({
+                frequency: 60,
+                referenceFrame: 'screen',
+            });
+            const subject = new Subject<PositionEventQuaternion>();
+            const lastQuaternion = new Float32Array(4);
+            sensor.addEventListener('reading', () => {
+                if (sensor.quaternion) {
+                    if (
+                        sensor.quaternion[0] === lastQuaternion[0] &&
+                        sensor.quaternion[1] === lastQuaternion[1] &&
+                        sensor.quaternion[2] === lastQuaternion[2] &&
+                        sensor.quaternion[3] === lastQuaternion[3]
+                    ) {
+                        return;
+                    }
 
-                lastQuaternion.set(sensor.quaternion);
-                subject.next({
-                    quaternion: sensor.quaternion,
-                });
-            }
-        });
-        sensor.addEventListener('error', (event) => {
-            subject.error(event);
-        });
-        sensor.start();
-        this.#observable = subject.asObservable().pipe(
-            finalize(() => {
-                sensor.stop();
-                this.#observable = null;
-            }),
-            share({
-                connector: () => new ReplaySubject(1),
-                resetOnRefCountZero: true,
-            })
-        );
+                    lastQuaternion.set(sensor.quaternion);
+                    subject.next({
+                        quaternion: sensor.quaternion,
+                    });
+                }
+            });
+            sensor.addEventListener('error', (event) => {
+                subject.error(event);
+            });
+            sensor.start();
+            this.#observable = subject.asObservable().pipe(
+                finalize(() => {
+                    sensor.stop();
+                    this.#observable = null;
+                }),
+                share({
+                    connector: () => new ReplaySubject(1),
+                    resetOnRefCountZero: true,
+                })
+            );
+        } catch (ignore) {
+            this.#observable = throwError(new Error('Unsupported'));
+        }
     }
 
     #listenDeviceOrientationAbsolute() {
