@@ -130,6 +130,7 @@ export class PositionService {
         try {
             const sensor = new AbsoluteOrientationSensor({
                 frequency: 60,
+                referenceFrame: 'screen',
             });
             const subject = new Subject<PositionEventQuaternion>();
             const lastQuaternion = new Float32Array(4);
