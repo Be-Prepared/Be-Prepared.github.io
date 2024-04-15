@@ -20,5 +20,8 @@
         "vite-plugin-pwa": "^0.19.8",
         "vite-plugin-simple-html": "^0.1.2",
         "vite-plugin-version-mark": "^0.0.12"
+    },
+    "dependencies": {
+        "@types/w3c-generic-sensor": "^1.0.9"
     }
 }

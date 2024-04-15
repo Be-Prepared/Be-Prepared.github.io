@@ -14,6 +14,7 @@ import { WakeLockService } from '../services/wake-lock.service';
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
+            width: 100%;
         }
 
         .toggle {
@@ -27,6 +28,12 @@ import { WakeLockService } from '../services/wake-lock.service';
 
         .enabled {
             background-color: var(--button-bg-color-enabled);
+        }
+
+        .buttonBar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
         }
     `,
     template: html`
@@ -47,7 +54,9 @@ import { WakeLockService } from '../services/wake-lock.service';
             >
                 <scaling-icon href="flashlight.svg"></scaling-icon>
             </button>
-            <back-button></back-button>
+            <div class="buttonBar">
+                <back-button></back-button>
+            </div>
         </div>
     `,
 })

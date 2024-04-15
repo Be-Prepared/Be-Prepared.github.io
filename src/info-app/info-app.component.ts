@@ -1,5 +1,6 @@
 import { AvailabilityState } from '../datatypes/availability-state';
 import { Component, css, di, html } from 'fudgel';
+import { PositionService } from '../services/position.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { TorchService } from '../services/torch.service';
@@ -13,12 +14,12 @@ import { WakeLockService } from '../services/wake-lock.service';
             font-size: 1.2em;
             height: 100%;
             box-sizing: border-box;
-            padding: 1em;
         }
 
         .wrapper {
             border-width: 1px;
             padding: 0.3em;
+            margin: 1em;
             border-style: solid;
             box-sizing: border-box;
             height: 100%;
@@ -30,6 +31,7 @@ import { WakeLockService } from '../services/wake-lock.service';
         <p><i18n-label id="info.permissionsAndFeaturesHeader"></i18n-label></p>
         <ul>
             <li><i18n-label id="info.camera"></i18n-label> <info-app-permission permission="camera"></info-app-permission></li>
+            <li><i18n-label id="info.position"></i18n-label> <info-app-availability .availability-state="position"></info-app-availability></li>
             <li><i18n-label id="info.torch"></i18n-label> <info-app-availability .availability-state="torch"></info-app-permission></li>
             <li><i18n-label id="info.wakeLock"></i18n-label> <info-app-availability .availability-state="wakeLock"></info-app-permission></li>
         </ul>
@@ -46,10 +48,11 @@ import { WakeLockService } from '../services/wake-lock.service';
             <li>Node.js {{nodeVersion}} ({{hostPlatform}} {{hostArch}})</li>
         </ul>
     </div>
-    <back-button></back-button>
+    <back-button class="paddingTop"></back-button>
     `,
 })
 export class InfoAppComponent {
+    #positionService = di(PositionService);
     #subject = new Subject();
     #torchService = di(TorchService);
     #wakeLockService = di(WakeLockService);
@@ -57,12 +60,19 @@ export class InfoAppComponent {
     hostPlatform = __HOST_PLATFORM__;
     hostArch = __HOST_ARCH__;
     nodeVersion = __NODE_VERSION__;
+    position = AvailabilityState.ERROR;
     shortVersion = __BE_PREPARED_VERSION__.substr(0, 7);
     torch = AvailabilityState.ERROR;
     version = __BE_PREPARED_VERSION__;
     wakeLock = AvailabilityState.ERROR;
 
     constructor() {
+        this.#positionService
+            .availabilityState()
+            .pipe(takeUntil(this.#subject))
+            .subscribe((status) => {
+                this.position = status;
+            });
         this.#torchService
             .availabilityState(false)
             .pipe(takeUntil(this.#subject))

@@ -33,6 +33,7 @@ export const enUS: LanguageData = {
     'info.permission.granted': '✔ Granted',
     'info.permission.prompt': 'Prompt',
     'info.permissionsAndFeaturesHeader': 'Permissions and Features:',
+    "info.position": "Position:",
     'info.svgCompression': 'SVG compression',
     'info.torch': 'Torch:',
     'info.toolingHeader': 'Tooling:',

@@ -7,10 +7,12 @@ import { Observable, of } from 'rxjs';
 //     PermissionsService,
 //     PermissionsServiceState,
 // } from './services/permissions.service';
+import { PositionService } from './services/position.service';
 import { TorchService } from './services/torch.service';
 
 const magnifierService = di(MagnifierService);
 // const permissionsService = di(PermissionsService);
+const positionService = di(PositionService);
 const torchService = di(TorchService);
 
 const availabilityToBoolean = map(
@@ -64,7 +66,7 @@ export const tileDefs: TileDef[] = [
         icon: 'compass.svg',
         label: 'tile.compass',
         component: 'compass-app',
-        show: of(false),
+        show: positionService.availabilityState().pipe(availabilityToBoolean)
     },
     {
         id: 'location',
