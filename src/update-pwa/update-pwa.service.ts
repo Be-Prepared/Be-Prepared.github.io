@@ -20,7 +20,6 @@ export class UpdatePwaService {
                 this.#showCustomUi();
             },
         });
-        setTimeout(() => this.#showCustomUi(), 1000);
     }
 
     performUpdate() {
