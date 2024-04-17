@@ -28,6 +28,8 @@ import { WakeLockService } from '../services/wake-lock.service';
     `,
     template: html`
     <div class="wrapper">
+        <p><i18n-label id="info.shareApp"></i18n-label></p>
+        <info-share></info-share>
         <p><i18n-label id="info.permissionsAndFeaturesHeader"></i18n-label></p>
         <ul>
             <li><i18n-label id="info.camera"></i18n-label> <info-app-permission permission="camera"></info-app-permission></li>
