@@ -40,6 +40,7 @@ import { WakeLockService } from '../services/wake-lock.service';
 
         <p><i18n-label id="info.toolingHeader"></i18n-label></p>
         <ul>
+            <li><styled-link href="https://github.com/fidian/be-prepared">GitHub</styled-link> - <i18n-label id="info.sourceCode"></i18n-label></li>
             <li><styled-link href="https://fudgel.js.org">Fudgel</styled-link> - <i18n-label id="info.framework"></i18n-label></li>
             <li><styled-link href="https://vecta.io/nano">Vecta.io</styled-link> - <i18n-label id="info.svgCompression"></i18n-label></li>
         </ul>
