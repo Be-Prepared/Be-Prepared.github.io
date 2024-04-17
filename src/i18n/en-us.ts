@@ -76,8 +76,4 @@ export const enUS: LanguageData = {
     'tile.stopwatch': 'Stopwatch',
     'tile.temperature': 'Temperature',
     'tile.timer': 'Timer',
-
-    // Update
-    'update.message': 'An update is available.',
-    'update.reload': 'Reload',
 };
