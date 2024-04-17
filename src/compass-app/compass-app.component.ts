@@ -6,11 +6,6 @@ import { Subscription } from 'rxjs';
 
 @Component('compass-app', {
     style: css`
-        @media screen and (orientation: landscape) {
-            .wrapper {
-                flex-direction: row-reverse;
-            }
-        }
         .wrapper {
             display: flex;
             flex-direction: column;
@@ -18,6 +13,11 @@ import { Subscription } from 'rxjs';
             justify-content: center;
             height: 100%;
             width: 100%;
+        }
+        @media (orientation: landscape) {
+            .wrapper {
+                flex-direction: row-reverse;
+            }
         }
         .compassRose {
             padding: 2em;
