@@ -72,7 +72,7 @@ export default defineConfig({
                 name: "Be Prepared",
                 theme_color: "#000000",
             },
-            registerType: 'autoUpdate',
+            registerType: 'prompt',
             workbox: {
                 globPatterns: ['**/*.{js,css,html,svg}'],
             },
