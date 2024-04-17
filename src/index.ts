@@ -8,6 +8,7 @@ export * from './info-app/info-app.module';
 export * from './install-pwa/install-pwa.module';
 export * from './magnifier-app/magnifier-app.module';
 export * from './shared/shared.module';
+export * from './update-pwa/update-pwa.module';
 
 export { bootstrap } from './bootstrap';
 import { defineRouterComponent } from 'fudgel';
