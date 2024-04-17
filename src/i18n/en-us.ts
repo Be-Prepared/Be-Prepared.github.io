@@ -36,7 +36,7 @@ export const enUS: LanguageData = {
     'info.position': 'Position:',
     'info.shareApp': 'Share This App:',
     'info.shareCopied': 'Website copied to clipboard',
-    'info.sourceCode': 'Source code',
+    'info.sourceCode': 'source code',
     'info.svgCompression': 'SVG compression',
     'info.torch': 'Torch:',
     'info.toolingHeader': 'Tooling:',
