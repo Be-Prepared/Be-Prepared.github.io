@@ -1,29 +1,8 @@
-import { Component, css, di, html, metadataControllerElement } from 'fudgel';
+import { Component, css, di, html } from 'fudgel';
 import { InstallPwaService } from './install-pwa.service';
 
 @Component('install-pwa', {
     style: css`
-        :host {
-            top: 200vh;
-            position: fixed;
-            display: flex;
-            transition: bottom 1s ease-in-out 0s;
-            left: 50%;
-            transform: translate(-50%);
-        }
-
-        .tab {
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
-            border-top: 2px solid;
-            border-left: 2px solid;
-            border-right: 2px solid;
-            padding: 0.3em 0.6em;
-            background-color: var(--button-bg-color);
-            display: flex;
-            align-items: center;
-        }
-
         .load-svg-wrapper {
             padding: 0 3%;
             width: 5em;
@@ -63,7 +42,7 @@ import { InstallPwaService } from './install-pwa.service';
         }
     `,
     template: html`
-        <div class="tab">
+        <bottom-drawer #ref="drawer">
             <div class="load-svg-wrapper">
                 <load-svg
                     href="toolbox.svg"
@@ -79,55 +58,25 @@ import { InstallPwaService } from './install-pwa.service';
                     ><i18n-label id="install.action"></i18n-label
                 ></styled-link>
             </div>
-        </div>
+        </bottom-drawer>
     `,
 })
 export class InstallPwaComponent {
     #installPwaService = di(InstallPwaService);
-    #timeout?: ReturnType<typeof setTimeout>;
-
-    onDestroy() {
-        if (this.#timeout) {
-            clearTimeout(this.#timeout);
-        }
-    }
+    drawer?: HTMLElement;
 
     logoLoaded() {
-        const style = this.#element().style;
-        style.top = 'auto';
-        style.bottom = `-${this.#height()}px`;
-        this.#timeout = setTimeout(() => this.#show(), 400);
+        setTimeout(() => this.#callDrawer('show'), 400);
     }
 
     install() {
         this.#installPwaService.triggerSavedEvent();
-        clearTimeout(this.#timeout);
-        this.#hide();
+        this.#callDrawer('hide');
     }
 
-    #destroy() {
-        this.#element().remove();
-    }
-
-    #element() {
-        return metadataControllerElement.get(this)!;
-    }
-
-    #height() {
-        // Round any partials up and then add a 1 pixel buffer to ensure no
-        // artifacts are visible by accident.
-        const rect = this.#element().getBoundingClientRect();
-
-        return Math.ceil(rect.height + 1);
-    }
-
-    #hide() {
-        this.#element().style.bottom = `-${this.#height()}px`;
-        this.#timeout = setTimeout(() => this.#destroy(), 2000);
-    }
-
-    #show() {
-        this.#element().style.bottom = '0';
-        this.#timeout = setTimeout(() => this.#hide(), 15000);
+    #callDrawer(action: 'show' | 'hide') {
+        if (this.drawer) {
+            (this.drawer as any)[action]();
+        }
     }
 }
