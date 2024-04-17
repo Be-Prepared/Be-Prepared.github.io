@@ -79,6 +79,7 @@ export const enUS: LanguageData = {
     'tile.timer': 'Timer',
 
     // Update
-    'update.message': 'An update is available.',
-    'update.reload': 'Reload',
+    'update.message': 'Update Available!',
+    'update.reload': 'Reload Now',
+    'update.skip': 'Next Launch',
 };

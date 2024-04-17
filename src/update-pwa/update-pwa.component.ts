@@ -10,23 +10,43 @@ import { UpdatePwaService } from './update-pwa.service';
         }
 
         .update-text {
+            display: flex;
+            justify-content: center;
             padding: 0 0.3em;
         }
 
         .space {
+            min-width: 2em;
             flex-grow: 1;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .drawer {
+            width: 100%;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
     `,
     template: html`
         <bottom-drawer #ref="drawer">
-            <div class="update-text">
-                <i18n-label id="update.message"></i18n-label>
-            </div>
-            <div class="space"></div>
-            <div class="reload-button">
-                <styled-link @click.stop.prevent="reload()"
-                    ><i18n-label id="update.reload"></i18n-label
-                ></styled-link>
+            <div class="drawer">
+                <div class="update-text">
+                    <i18n-label id="update.message"></i18n-label>
+                </div>
+                <div class="buttons">
+                    <styled-link @click.stop.prevent="reload()"
+                        ><i18n-label id="update.reload"></i18n-label
+                    ></styled-link>
+                    <div class="space"></div>
+                    <styled-link @click.stop.prevent="skip()"
+                        ><i18n-label id="update.skip"></i18n-label
+                    ></styled-link>
+                </div>
             </div>
         </bottom-drawer>
     `,
