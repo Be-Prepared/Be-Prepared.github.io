@@ -40,6 +40,28 @@ export class PermissionsService {
         return this.#getPermission(name, subject);
     }
 
+    geolocation(prompt = false) {
+        if (!navigator.geolocation || !navigator.permissions) {
+            return of(PermissionsServiceState.ERROR);
+        }
+
+        const name: PermissionName = 'geolocation';
+        const subject = this.#getSubject(name);
+
+        if (prompt) {
+            navigator.geolocation.getCurrentPosition(
+                () => subject.next(null),
+                () => subject.next(null),
+                {
+                    maximumAge: Infinity,
+                    timeout: 0,
+                }
+            );
+        }
+
+        return this.#getPermission(name, subject);
+    }
+
     toAvailability(
         state: PermissionsServiceState,
         whenGranted: () => Observable<AvailabilityState>

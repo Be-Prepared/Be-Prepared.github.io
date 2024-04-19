@@ -22,6 +22,8 @@
         "vite-plugin-version-mark": "^0.0.13"
     },
     "dependencies": {
-        "@types/w3c-generic-sensor": "^1.0.9"
+        "@bencevans/kalman-filter": "^1.0.0",
+        "@types/w3c-generic-sensor": "^1.0.9",
+        "cheap-ruler": "^3.0.2"
     }
 }
