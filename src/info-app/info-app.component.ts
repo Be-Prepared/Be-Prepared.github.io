@@ -1,5 +1,6 @@
 import { AvailabilityState } from '../datatypes/availability-state';
 import { Component, css, di, html } from 'fudgel';
+import { GeolocationService } from '../services/geolocation.service';
 import { PositionService } from '../services/position.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -17,49 +18,77 @@ import { WakeLockService } from '../services/wake-lock.service';
         }
 
         .wrapper {
-            border-width: 1px;
+            padding: 1em;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            display: flex;
+            box-sizing: border-box;
+        }
+
+        .wrapper-inner {
+            flex-grow: 1;
             padding: 0.3em;
-            margin: 1em;
             border-style: solid;
             box-sizing: border-box;
-            height: 100%;
+            border-width: 1px;
             overflow-x: auto;
+            height: 100%;
+            width: 100%;
+        }
+
+        @media (orientation: landscape) {
+            :host {
+                flex-direction: row-reverse;
+            }
+
+            .buttons {
+                display: flex;
+                flex-direction: column-reverse;
+            }
         }
     `,
     template: html`
     <div class="wrapper">
-        <p><i18n-label id="info.shareApp"></i18n-label></p>
-        <info-share></info-share>
-        <p><i18n-label id="info.permissionsAndFeaturesHeader"></i18n-label></p>
-        <ul>
-            <li><i18n-label id="info.camera"></i18n-label> <info-app-permission permission="camera"></info-app-permission></li>
-            <li><i18n-label id="info.position"></i18n-label> <info-app-availability .availability-state="position"></info-app-availability></li>
-            <li><i18n-label id="info.torch"></i18n-label> <info-app-availability .availability-state="torch"></info-app-permission></li>
-            <li><i18n-label id="info.wakeLock"></i18n-label> <info-app-availability .availability-state="wakeLock"></info-app-permission></li>
-        </ul>
+        <div class="wrapper-inner">
+            <p><i18n-label id="info.shareApp"></i18n-label></p>
+            <info-share></info-share>
+            <p><i18n-label id="info.permissionsAndFeaturesHeader"></i18n-label></p>
+            <ul>
+                <li><i18n-label id="info.camera"></i18n-label> <info-app-permission permission="camera"></info-app-permission></li>
+                <li><i18n-label id="info.geolocation"></i18n-label> <info-app-availability .availability-state="geolocation"></info-app-availability></li>
+                <li><i18n-label id="info.position"></i18n-label> <info-app-availability .availability-state="position"></info-app-availability></li>
+                <li><i18n-label id="info.torch"></i18n-label> <info-app-availability .availability-state="torch"></info-app-permission></li>
+                <li><i18n-label id="info.wakeLock"></i18n-label> <info-app-availability .availability-state="wakeLock"></info-app-permission></li>
+            </ul>
 
-        <p><i18n-label id="info.toolingHeader"></i18n-label></p>
-        <ul>
-            <li><styled-link href="https://github.com/fidian/be-prepared">GitHub</styled-link> - <i18n-label id="info.sourceCode"></i18n-label></li>
-            <li><styled-link href="https://fudgel.js.org">Fudgel</styled-link> - <i18n-label id="info.framework"></i18n-label></li>
-            <li><styled-link href="https://vecta.io/nano">Vecta.io</styled-link> - <i18n-label id="info.svgCompression"></i18n-label></li>
-        </ul>
+            <p><i18n-label id="info.toolingHeader"></i18n-label></p>
+            <ul>
+                <li><styled-link href="https://github.com/fidian/be-prepared">GitHub</styled-link> - <i18n-label id="info.sourceCode"></i18n-label></li>
+                <li><styled-link href="https://fudgel.js.org">Fudgel</styled-link> - <i18n-label id="info.framework"></i18n-label></li>
+                <li><styled-link href="https://vecta.io/nano">Vecta.io</styled-link> - <i18n-label id="info.svgCompression"></i18n-label></li>
+            </ul>
 
-        <p><i18n-label id="info.buildInformationHeader"></i18n-label></p>
-        <ul>
-            <li>{{buildDate}}, commit <styled-link href="https://github.com/fidian/be-prepared/commit/{{version}}">{{shortVersion}}</styled-link></li>
-            <li>Node.js {{nodeVersion}} ({{hostPlatform}} {{hostArch}})</li>
-        </ul>
+            <p><i18n-label id="info.buildInformationHeader"></i18n-label></p>
+            <ul>
+                <li>{{buildDate}}, commit <styled-link href="https://github.com/fidian/be-prepared/commit/{{version}}">{{shortVersion}}</styled-link></li>
+                <li>Node.js {{nodeVersion}} ({{hostPlatform}} {{hostArch}})</li>
+            </ul>
+        </div>
     </div>
-    <back-button class="paddingTop"></back-button>
+    <div class="buttons">
+        <back-button class="paddingTop"></back-button>
+    </div>
     `,
 })
 export class InfoAppComponent {
+    #geolocationService = di(GeolocationService);
     #positionService = di(PositionService);
     #subject = new Subject();
     #torchService = di(TorchService);
     #wakeLockService = di(WakeLockService);
     buildDate = __BUILD_DATE__;
+    geolocation = AvailabilityState.ERROR;
     hostPlatform = __HOST_PLATFORM__;
     hostArch = __HOST_ARCH__;
     nodeVersion = __NODE_VERSION__;
@@ -70,6 +99,12 @@ export class InfoAppComponent {
     wakeLock = AvailabilityState.ERROR;
 
     constructor() {
+        this.#geolocationService
+            .availabilityState()
+            .pipe(takeUntil(this.#subject))
+            .subscribe((status) => {
+                this.geolocation = status;
+            });
         this.#positionService
             .availabilityState()
             .pipe(takeUntil(this.#subject))

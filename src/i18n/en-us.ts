@@ -28,6 +28,7 @@ export const enUS: LanguageData = {
     'info.buildInformationHeader': 'Build Information',
     'info.camera': 'Camera:',
     'info.framework': 'the framework driving this app',
+    'info.geolocation': 'Geolocation:',
     'info.permission.denied': '✖ Denied',
     'info.permission.error': 'Error',
     'info.permission.granted': '✔ Granted',
