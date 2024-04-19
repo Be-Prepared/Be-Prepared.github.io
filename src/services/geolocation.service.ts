@@ -1,4 +1,5 @@
 import { AvailabilityState } from '../datatypes/availability-state';
+import { BearingService } from './bearing.service';
 import CheapRuler from 'cheap-ruler';
 import { di } from 'fudgel';
 import { finalize, share, switchMap } from 'rxjs/operators';
@@ -26,18 +27,17 @@ export interface GeolocationCoordinateResultError {
     error: GeolocationPositionError;
 }
 
-export type GeolocationCoordinateResult = GeolocationCoordinateResultSuccess | GeolocationCoordinateResultError;
+export type GeolocationCoordinateResult =
+    | GeolocationCoordinateResultSuccess
+    | GeolocationCoordinateResultError;
 
 export class GeolocationService {
+    #bearingService = di(BearingService);
     #permissionsService = di(PermissionsService);
     #observable: Observable<GeolocationCoordinateResult> | null = null;
 
     availabilityState() {
-        if (
-            !(
-                'geolocation' in navigator
-            )
-        ) {
+        if (!('geolocation' in navigator)) {
             return of(AvailabilityState.UNAVAILABLE);
         }
 
@@ -111,7 +111,9 @@ export class GeolocationService {
         return this.#observable;
     }
 
-    #calculateSpeedHeading(lastPositions: GeolocationCoordinateResultSuccess[]) {
+    #calculateSpeedHeading(
+        lastPositions: GeolocationCoordinateResultSuccess[]
+    ) {
         const first = lastPositions[0];
         const last = lastPositions[lastPositions.length - 1];
 
@@ -129,15 +131,18 @@ export class GeolocationService {
 
         const filter = new KalmanFilterArray({
             initialEstimate: [first.longitude, first.latitude],
-            initialErrorInEstimate: first.accuracy
+            initialErrorInEstimate: first.accuracy,
         });
 
         let estimate: [number[], number] = [[0, 0], 0];
 
         for (let i = 1; i < lastPositions.length; i += 1) {
             estimate = filter.update({
-                measurement: [lastPositions[i].longitude, lastPositions[i].latitude],
-                errorInMeasurement: lastPositions[i].accuracy
+                measurement: [
+                    lastPositions[i].longitude,
+                    lastPositions[i].latitude,
+                ],
+                errorInMeasurement: lastPositions[i].accuracy,
             }) as [number[], number];
         }
 
@@ -146,14 +151,14 @@ export class GeolocationService {
             [estimate[0][0], estimate[0][1]],
             [last.longitude, last.latitude]
         );
-        const speed = distance / (last.timestamp - first.timestamp);
+        const speed = distance / (((last.timestamp + first.timestamp) / 2) - first.timestamp);
         let heading: number;
 
         if (speed) {
-            heading = cheapRuler.bearing(
+            heading = this.#bearingService.standardize360(cheapRuler.bearing(
                 [estimate[0][0], estimate[0][1]],
                 [last.longitude, last.latitude]
-            );
+            ));
         } else {
             heading = NaN;
         }

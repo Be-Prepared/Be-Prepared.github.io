@@ -1,3 +1,4 @@
+import { BearingService } from '../services/bearing.service';
 import { Component, css, di, html } from 'fudgel';
 import {
     PositionService,
@@ -61,11 +62,12 @@ import { Subscription } from 'rxjs';
     `,
 })
 export class CompassAppComponent {
+    #bearingService = di(BearingService);
     #positionService = di(PositionService);
     #subscription?: Subscription;
     compassRose?: HTMLElement;
     degrees = 0;
-    bearing = 'N';
+    bearing = '';
 
     onInit() {
         this.#subscription = this.#positionService
@@ -73,7 +75,7 @@ export class CompassAppComponent {
             .subscribe((heading: number) => {
                 const rounded = Math.round(heading);
                 this.degrees = rounded;
-                this.bearing = this.#getBearing(rounded);
+                this.bearing = this.#bearingService.toCompassPoint(rounded);
 
                 if (this.compassRose) {
                     this.compassRose.style.transform = `rotate(${rounded}deg)`;
@@ -85,41 +87,5 @@ export class CompassAppComponent {
         if (this.#subscription) {
             this.#subscription.unsubscribe();
         }
-    }
-
-    #getBearing(degrees: number) {
-        if (degrees < 22.5 || degrees >= 337.5) {
-            return 'N';
-        }
-
-        if (degrees < 67.5) {
-            return 'NE';
-        }
-
-        if (degrees < 112.5) {
-            return 'E';
-        }
-
-        if (degrees < 157.5) {
-            return 'SE';
-        }
-
-        if (degrees < 202.5) {
-            return 'S';
-        }
-
-        if (degrees < 247.5) {
-            return 'SW';
-        }
-
-        if (degrees < 292.5) {
-            return 'W';
-        }
-
-        if (degrees < 337.5) {
-            return 'NW';
-        }
-
-        return '?';
     }
 }
