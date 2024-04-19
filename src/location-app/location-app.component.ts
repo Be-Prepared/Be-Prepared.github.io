@@ -1,5 +1,8 @@
 import { AvailabilityState } from '../datatypes/availability-state';
+import { BearingService } from '../services/bearing.service';
 import { Component, css, di, html } from 'fudgel';
+import { CoordinateService } from '../services/coordinate.service';
+import { DistanceService } from '../services/distance.service';
 import {
     GeolocationCoordinateResult,
     GeolocationCoordinateResultSuccess,
@@ -9,6 +12,19 @@ import { PermissionsService } from '../services/permissions.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { WakeLockService } from '../services/wake-lock.service';
+
+interface DataToDisplay {
+    lat: string | null;
+    lon: string | null;
+    mgrs: string | null;
+    utmups: string | null;
+    acc: string;
+    alt: string | null;
+    altAcc: string | null;
+    speed: string;
+    heading: number | null;
+    bearing: string | null;
+}
 
 @Component('location-app', {
     style: css`
@@ -33,6 +49,7 @@ import { WakeLockService } from '../services/wake-lock.service';
             justify-content: center;
             align-items: center;
             box-sizing: border-box;
+            overflow: hidden;
         }
 
         @media (orientation: landscape) {
@@ -54,32 +71,86 @@ import { WakeLockService } from '../services/wake-lock.service';
         <permission-denied *if="explainDeny"></permission-denied>
         <location-unavailable *if="explainUnavailable"></location-unavailable>
         <div *if="showControls" class="wrapper">
-            <div *if="coords && coords.timestamp" class="content">
+            <div *if="dataToDisplay" class="content">
                 <grow-to-fit>
-                    <div>Latitude: {{ lat }}</div>
-                    <div>Longitude: {{ lon }}</div>
-                    <div>Accuracy: {{ acc }}m</div>
-                    <div>Speed: {{ speed }}m/s</div>
-                    <div>
-                        Heading:
-                        <span *if="heading !== null">{{ heading }}°</span>
+                    <div
+                        *if="dataToDisplay.lat"
+                        @click="toggleCoordinateSystem()"
+                    >
+                        <i18n-label id="location.lat" ws=""></i18n-label
+                        >&nbsp;{{ dataToDisplay.lat }}
                     </div>
-                    <div *if="alt">Altitude: {{ alt }}m</div>
-                    <div *if="altAcc">Altitude Accuracy: {{ altAcc }}m</div>
+                    <div
+                        *if="dataToDisplay.lon"
+                        @click="toggleCoordinateSystem()"
+                    >
+                        <i18n-label id="location.lon" ws=""></i18n-label
+                        >&nbsp;{{ dataToDisplay.lon }}
+                    </div>
+                    <div
+                        *if="dataToDisplay.mgrs"
+                        @click="toggleCoordinateSystem()"
+                    >
+                        <div>
+                            <i18n-label id="location.mgrs" ws=""></i18n-label>
+                        </div>
+                        <div>{{ dataToDisplay.mgrs }}</div>
+                    </div>
+                    <div
+                        *if="dataToDisplay.utmups"
+                        @click="toggleCoordinateSystem()"
+                    >
+                        <div>
+                            <i18n-label id="location.utmups" ws=""></i18n-label>
+                        </div>
+                        <div>{{ dataToDisplay.utmups }}</div>
+                    </div>
+                    <div @click="toggleDistanceSystem()">
+                        <i18n-label id="location.accuracy" ws=""></i18n-label
+                        >&nbsp;{{ dataToDisplay.acc }}
+                    </div>
+                    <div @click="toggleDistanceSystem()">
+                        <i18n-label id="location.speed" ws=""></i18n-label
+                        >&nbsp;{{ dataToDisplay.speed }}/s
+                    </div>
+                    <div>
+                        <i18n-label id="location.heading" ws=""></i18n-label
+                        >&nbsp;<span *if="dataToDisplay.heading !== null"
+                            >{{ dataToDisplay.heading }}°&nbsp;{{ bearing
+                            }}</span
+                        ><span *if="dataToDisplay.heading === null"
+                            ><i18n-label
+                                id="location.headingNowhere"
+                            ></i18n-label
+                        ></span>
+                    </div>
+                    <div *if="alt" @click="toggleDistanceSystem()">
+                        <i18n-label id="location.altitude" ws=""></i18n-label
+                        >&nbsp;{{ dataToDisplay.alt }}
+                    </div>
+                    <div *if="altAcc" @click="toggleDistanceSystem()">
+                        <i18n-label
+                            id="location.altitudeAccuracy"
+                            ws=""
+                        ></i18n-label
+                        >&nbsp;{{ dataToDisplay.altAcc }}m
+                    </div>
                 </grow-to-fit>
             </div>
-            <div *if="coords && coords.error" class="content">
+            <div *if="position && position.error" class="content">
                 <p>There is an error retrieving the location.</p>
-                <p *if="coords.error.code === coords.error.PERMISSION_DENIED">
+                <p
+                    *if="position.error.code === position.error.PERMISSION_DENIED"
+                >
                     Permission denied.
                 </p>
                 <p
-                    *if="coords.error.code === coords.error.POSITION_UNAVAILABLE"
+                    *if="position.error.code === position.error.POSITION_UNAVAILABLE"
                 >
                     Position unavailable.
                 </p>
             </div>
-            <div *if="!coords" class="content">
+            <div *if="!position" class="content">
                 <p>Retrieving location...</p>
             </div>
             <div class="buttons">
@@ -89,22 +160,19 @@ import { WakeLockService } from '../services/wake-lock.service';
     `,
 })
 export class LocationAppComponent {
+    #bearingService = di(BearingService);
+    #coordinateService = di(CoordinateService);
+    #distanceService = di(DistanceService);
     #geolocationService = di(GeolocationService);
     #permissionsService = di(PermissionsService);
     #subject = new Subject();
     #wakeLockService = di(WakeLockService);
-    coords: GeolocationCoordinateResult | null = null;
+    dataToDisplay: DataToDisplay | null = null;
     explainAsk = false;
     explainDeny = false;
     explainUnavailable = false;
+    position: GeolocationCoordinateResult | null = null;
     showControls = false;
-    lat: number | null = null;
-    lon: number | null = null;
-    acc: number | null = null;
-    alt: number | null = null;
-    altAcc: number | null = null;
-    speed: number | null = null;
-    heading: number | null = null;
 
     onInit() {
         this.#geolocationService
@@ -135,30 +203,71 @@ export class LocationAppComponent {
         this.#permissionsService.geolocation(true);
     }
 
+    toggleCoordinateSystem() {
+        this.#coordinateService.toggleSystem();
+        this.#redraw();
+    }
+
+    toggleDistanceSystem() {
+        this.#distanceService.toggleDistanceSystem();
+        this.#redraw();
+    }
+
     #getCurrentStatus() {
         this.#wakeLockService.request();
         this.#geolocationService
             .getPosition()
             .pipe(takeUntil(this.#subject))
             .subscribe((position) => {
-                this.coords = position;
-
-                if (position.timestamp) {
-                    const positionTyped =
-                        position as GeolocationCoordinateResultSuccess;
-                    this.lat = positionTyped.latitude;
-                    this.lon = positionTyped.longitude;
-                    this.acc = positionTyped.accuracy;
-                    this.alt = positionTyped.altitude;
-                    this.altAcc = positionTyped.altitudeAccuracy;
-                    this.speed = positionTyped.speed;
-
-                    if (!isNaN(positionTyped.heading)) {
-                        this.heading = positionTyped.heading;
-                    } else {
-                        this.heading = null;
-                    }
-                }
+                this.position = position;
+                this.#redraw();
             });
+    }
+
+    #redraw() {
+        if (this.position && this.position.timestamp) {
+            this.#updateDisplayedValues(
+                this.position as GeolocationCoordinateResultSuccess
+            );
+        } else {
+            this.dataToDisplay = null;
+        }
+    }
+
+    #updateDisplayedValues(position: GeolocationCoordinateResultSuccess) {
+        const system = this.#coordinateService.latLonToSystem(
+            position.latitude,
+            position.longitude
+        );
+        const acc = this.#distanceService.metersToString(position.accuracy);
+        const alt = position.altitude
+            ? this.#distanceService.metersToString(position.altitude)
+            : null;
+        const altAcc = position.altitudeAccuracy
+            ? this.#distanceService.metersToString(position.altitudeAccuracy)
+            : null;
+        const speed = this.#distanceService.metersToString(position.speed);
+        let heading = null;
+        let bearing = null;
+
+        // Preserve the last heading
+        if (!isNaN(position.heading)) {
+            heading = Math.round(position.heading);
+            bearing = this.#bearingService.toCompassPoint(heading);
+        }
+
+        // Tie to a single property for faster updates
+        this.dataToDisplay = {
+            lat: 'lat' in system ? system.lat : null,
+            lon: 'lon' in system ? system.lon : null,
+            mgrs: 'mgrs' in system ? system.mgrs : null,
+            utmups: 'utmups' in system ? system.utmups : null,
+            acc,
+            alt,
+            altAcc,
+            speed,
+            heading,
+            bearing,
+        };
     }
 }

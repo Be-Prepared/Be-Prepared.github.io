@@ -71,8 +71,9 @@ export class GeolocationService {
                 accuracy: position.coords.accuracy,
                 altitude: position.coords.altitude,
                 altitudeAccuracy: position.coords.altitudeAccuracy,
-                speed: position.coords.speed,
-                heading: position.coords.heading,
+                // NULL values are calculated later
+                speed: position.coords.speed as any,
+                heading: position.coords.heading as any,
             };
 
             lastPositions.push(lastPosition);
@@ -104,6 +105,7 @@ export class GeolocationService {
                 resetOnRefCountZero: true,
             })
         );
+        navigator.geolocation.getCurrentPosition(success, error);
         const watch = navigator.geolocation.watchPosition(success, error, {
             enableHighAccuracy: true,
         });

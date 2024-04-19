@@ -24,6 +24,7 @@
     "dependencies": {
         "@bencevans/kalman-filter": "^1.0.0",
         "@types/w3c-generic-sensor": "^1.0.9",
-        "cheap-ruler": "^3.0.2"
+        "cheap-ruler": "^3.0.2",
+        "usng.js": "^0.4.5"
     }
 }

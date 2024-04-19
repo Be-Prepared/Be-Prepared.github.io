@@ -48,8 +48,18 @@ export const enUS: LanguageData = {
     'install.message': 'Install to Home Screen',
 
     // Location
+    'location.accuracy': 'Accuracy:',
+    'location.altitude': 'Altitude:',
+    'location.altitudeAccuracy': 'Altitude Accuracy:',
     'location.explainAsk':
         'To use the GPS, the geolocation permission is required.',
+    'location.heading': 'Heading:',
+    'location.headingNowhere': '(none)',
+    'location.lat': 'Lat:',
+    'location.lon': 'Lon:',
+    'location.mgrs': 'MGRS:',
+    'location.speed': 'Speed:',
+    'location.utmups': 'UTM/UPS:',
     'location.unavailable': 'Not Available',
     'location.unavailableMessage':
         'There is no GPS available on this device. The location tool will be removed from the starting menu.',
