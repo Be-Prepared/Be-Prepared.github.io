@@ -9,8 +9,14 @@ import { I18nService } from './i18n.service';
 export class I18nLabel {
     #i18nService = di(I18nService);
     id: string = '';
-    ws = ' ';
+    ws: string = ' '; // Overwritten by attr
     value: string = '';
+
+    onInit() {
+        if (typeof this.ws !== 'string') {
+            this.ws = ' ';
+        }
+    }
 
     onChange() {
         this.value = this.#i18nService.get(this.id);
