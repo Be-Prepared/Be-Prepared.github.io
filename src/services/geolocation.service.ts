@@ -78,7 +78,7 @@ export class GeolocationService {
 
             lastPositions.push(lastPosition);
 
-            if (lastPosition.speed === null || lastPosition.heading === null) {
+            if (isNaN(lastPosition.speed) || lastPosition.speed === null || lastPosition.heading === null) {
                 this.#calculateSpeedHeading(lastPositions);
             }
 
@@ -120,7 +120,7 @@ export class GeolocationService {
         const last = lastPositions[lastPositions.length - 1];
 
         if (lastPositions.length < 2) {
-            if (last.speed === null) {
+            if (last.speed === null || isNaN(last.speed)) {
                 last.speed = 0;
             }
 
@@ -153,10 +153,11 @@ export class GeolocationService {
             [estimate[0][0], estimate[0][1]],
             [last.longitude, last.latitude]
         );
-        const speed = distance / (((last.timestamp + first.timestamp) / 2) - first.timestamp);
+        const elapsedTime = (((last.timestamp + first.timestamp) / 2) - first.timestamp);
+        const speed = elapsedTime ? distance / elapsedTime : 0;
         let heading: number;
 
-        if (speed) {
+        if (speed > 0) {
             heading = this.#bearingService.standardize360(cheapRuler.bearing(
                 [estimate[0][0], estimate[0][1]],
                 [last.longitude, last.latitude]
@@ -165,7 +166,7 @@ export class GeolocationService {
             heading = NaN;
         }
 
-        if (last.speed === null) {
+        if (last.speed === null || isNaN(last.speed)) {
             last.speed = speed;
         }
 
