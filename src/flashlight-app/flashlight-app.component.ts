@@ -1,5 +1,6 @@
 import { AvailabilityState } from '../datatypes/availability-state';
 import { Component, css, di, html } from 'fudgel';
+import { PermissionsService } from '../services/permissions.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { TorchService } from '../services/torch.service';
@@ -61,6 +62,7 @@ import { WakeLockService } from '../services/wake-lock.service';
     `,
 })
 export class FlashlightAppComponent {
+    #permissionsService = di(PermissionsService);
     #subject = new Subject();
     #torchService = di(TorchService);
     #wakeLockService = di(WakeLockService);
@@ -96,7 +98,7 @@ export class FlashlightAppComponent {
     }
 
     grant() {
-        this.#torchService.currentStatus();
+        this.#permissionsService.camera(true);
     }
 
     toggle() {
