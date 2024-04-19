@@ -2,6 +2,7 @@ import { AvailabilityState } from './datatypes/availability-state';
 import { di } from 'fudgel';
 import { MagnifierService } from './services/magnifier.service';
 import { map } from 'rxjs/operators';
+import { GeolocationService } from './services/geolocation.service';
 import { Observable, of } from 'rxjs';
 // import {
 //     PermissionsService,
@@ -10,6 +11,7 @@ import { Observable, of } from 'rxjs';
 import { PositionService } from './services/position.service';
 import { TorchService } from './services/torch.service';
 
+const geolocationService = di(GeolocationService);
 const magnifierService = di(MagnifierService);
 // const permissionsService = di(PermissionsService);
 const positionService = di(PositionService);
@@ -17,7 +19,9 @@ const torchService = di(TorchService);
 
 const availabilityToBoolean = map(
     (state: AvailabilityState) =>
-        state === AvailabilityState.ALLOWED || state === AvailabilityState.PROMPT);
+        state === AvailabilityState.ALLOWED ||
+        state === AvailabilityState.PROMPT
+);
 // const permissionToBoolean = map(
 //     (state: PermissionsServiceState) =>
 //         state === PermissionsServiceState.GRANTED ||
@@ -38,7 +42,7 @@ export const tileDefs: TileDef[] = [
         icon: 'flashlight.svg',
         label: 'tile.flashlight',
         component: 'flashlight-app',
-        show: torchService.availabilityState(false).pipe(availabilityToBoolean)
+        show: torchService.availabilityState(false).pipe(availabilityToBoolean),
     },
     {
         id: 'frontLight',
@@ -52,7 +56,9 @@ export const tileDefs: TileDef[] = [
         icon: 'magnifier.svg',
         label: 'tile.magnifier',
         component: 'magnifier-app',
-        show: magnifierService.availabilityState(false).pipe(availabilityToBoolean)
+        show: magnifierService
+            .availabilityState(false)
+            .pipe(availabilityToBoolean),
     },
     {
         id: 'mirror',
@@ -66,14 +72,16 @@ export const tileDefs: TileDef[] = [
         icon: 'compass.svg',
         label: 'tile.compass',
         component: 'compass-app',
-        show: positionService.availabilityState().pipe(availabilityToBoolean)
+        show: positionService.availabilityState().pipe(availabilityToBoolean),
     },
     {
         id: 'location',
         icon: 'location.svg',
         label: 'tile.location',
         component: 'location-app',
-        show: of(false),
+        show: geolocationService
+            .availabilityState()
+            .pipe(availabilityToBoolean),
     },
     {
         id: 'qrCode',

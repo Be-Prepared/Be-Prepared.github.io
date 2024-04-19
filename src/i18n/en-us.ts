@@ -47,6 +47,13 @@ export const enUS: LanguageData = {
     'install.action': 'Install',
     'install.message': 'Install to Home Screen',
 
+    // Location
+    'location.explainAsk':
+        'To use the GPS, the geolocation permission is required.',
+    'location.unavailable': 'Not Available',
+    'location.unavailableMessage':
+        'There is no GPS available on this device. The location tool will be removed from the starting menu.',
+
     // Magnifier
     'magnifier.explainAsk':
         'The magnifier requires the camera permission to function.',

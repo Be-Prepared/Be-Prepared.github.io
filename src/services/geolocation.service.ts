@@ -18,8 +18,8 @@ export interface GeolocationCoordinateResultSuccess {
     accuracy: number;
     altitude: number | null;
     altitudeAccuracy: number | null;
-    speed: number | null;
-    heading: number | null;
+    speed: number; // If null, we calculate one
+    heading: number; // If null, we calculate one or use NaN
 }
 
 export interface GeolocationCoordinateResultError {
@@ -60,7 +60,7 @@ export class GeolocationService {
         );
     }
 
-    getGeolocationPosition() {
+    getPosition() {
         const subject = new Subject<GeolocationCoordinateResult>();
         const lastPositions: GeolocationCoordinateResultSuccess[] = [];
         const success = (position: GeolocationPosition) => {
