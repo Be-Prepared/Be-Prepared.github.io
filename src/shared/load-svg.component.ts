@@ -11,17 +11,17 @@ import { Component, css, emit, rootElement } from 'fudgel';
 })
 export class LoadSvgComponent {
     href?: string;
-    #deferred = 0;
-    #deferredTimeout: null | ReturnType<typeof setTimeout> = null;
+    #svg: HTMLElement | null = null;
 
     onChange() {
-        this.#deferred = 0;
-
-        if (!this.href) {
+        if (this.#svg) {
             this.#clearImage();
-        } else {
             this.#loadImage(this.href);
         }
+    }
+
+    onViewInit() {
+        this.#loadImage(this.href);
     }
 
     #apply(svgContent: HTMLElement) {
@@ -29,30 +29,26 @@ export class LoadSvgComponent {
         const root = rootElement(this);
 
         if (!root) {
-            this.#deferred = this.#deferred * 2 + 1;
-            this.#deferredTimeout = setTimeout(
-                () => this.#apply(svgContent),
-                this.#deferred
-            );
-        } else {
-            root.appendChild(svg);
-            emit(this, 'loadsvg');
+            return;
         }
+
+        root.appendChild(svg);
+        emit(this, 'loadsvg');
+        this.#svg = svg;
     }
 
     #clearImage() {
-        const root = rootElement(this);
-
-        if (root) {
-            root.innerHTML = '';
-        }
-
-        if (this.#deferredTimeout) {
-            clearTimeout(this.#deferredTimeout);
+        if (this.#svg) {
+            this.#svg.remove();
+            this.#svg = null;
         }
     }
 
-    #loadImage(href: string) {
+    #loadImage(href: string | undefined) {
+        if (!href) {
+            return;
+        }
+
         const xhr = new XMLHttpRequest();
         xhr.open('get', href, true);
         xhr.onreadystatechange = () => {
