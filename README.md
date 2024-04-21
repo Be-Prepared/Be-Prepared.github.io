@@ -31,6 +31,11 @@ This PWA is also an example for how to use the following:
     * Requires a magnetometer (compass) in the device. Can work from being laid flat and up to vertical by using a 3D sensor.
     * Your compass is likely not calibrated and calibration detection is disabled in PWAs. To increase accuracy, slowly turn your device around in all axis several times.
 
+* Location
+    * Show your current location using DMS, DDM, or DDD formats for coordinates as well as UTM/UPS and MGRS by tapping on the coordinates.
+    * List your speed and accuracy using imperial (feet/miles) or metric (meters/kilometers) by tapping on the relevant fields.
+    * Automatically will use high resolution locations and will calculate your speed and heading even when the device doesn't support these fields.
+
 * Info
     * Contains a QR code for easy sharing of the application. Tapping on the icon copies the website to your clipboard.
     * Shows permission statuses that the application could use.
