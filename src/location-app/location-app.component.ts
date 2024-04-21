@@ -50,6 +50,41 @@ interface DataToDisplay {
             align-items: center;
             box-sizing: border-box;
             overflow: hidden;
+            font-size: 3em;
+        }
+
+        .gapAbove {
+            padding-top: 0.4em;
+        }
+
+        .multi-line {
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        @media (max-width: 960px) {
+            .content {
+                font-size: 2.5em;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .content {
+                font-size: 1.8em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .content {
+                font-size: 1.3em;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .content {
+                font-size: 1em;
+            }
         }
 
         @media (orientation: landscape) {
@@ -72,70 +107,64 @@ interface DataToDisplay {
         <location-unavailable *if="explainUnavailable"></location-unavailable>
         <div *if="showControls" class="wrapper">
             <div *if="dataToDisplay" class="content">
-                <grow-to-fit>
-                    <div
-                        *if="dataToDisplay.lat"
-                        @click="toggleCoordinateSystem()"
-                    >
-                        <i18n-label id="location.lat" ws=""></i18n-label
-                        >&nbsp;{{ dataToDisplay.lat }}
-                    </div>
-                    <div
-                        *if="dataToDisplay.lon"
-                        @click="toggleCoordinateSystem()"
-                    >
-                        <i18n-label id="location.lon" ws=""></i18n-label
-                        >&nbsp;{{ dataToDisplay.lon }}
-                    </div>
-                    <div
-                        *if="dataToDisplay.mgrs"
-                        @click="toggleCoordinateSystem()"
-                    >
-                        <div>
-                            <i18n-label id="location.mgrs" ws=""></i18n-label>
-                        </div>
-                        <div>{{ dataToDisplay.mgrs }}</div>
-                    </div>
-                    <div
-                        *if="dataToDisplay.utmups"
-                        @click="toggleCoordinateSystem()"
-                    >
-                        <div>
-                            <i18n-label id="location.utmups" ws=""></i18n-label>
-                        </div>
-                        <div>{{ dataToDisplay.utmups }}</div>
-                    </div>
-                    <div @click="toggleDistanceSystem()">
-                        <i18n-label id="location.accuracy" ws=""></i18n-label
-                        >&nbsp;{{ dataToDisplay.acc }}
-                    </div>
-                    <div @click="toggleDistanceSystem()">
-                        <i18n-label id="location.speed" ws=""></i18n-label
-                        >&nbsp;{{ dataToDisplay.speed }}/s
-                    </div>
+                <div
+                    *if="dataToDisplay.lat"
+                    @click="toggleCoordinateSystem()"
+                    class="multi-line"
+                >
+                    <div>{{ dataToDisplay.lat }}</div>
+                    <div>{{ dataToDisplay.lon }}</div>
+                </div>
+                <div
+                    *if="dataToDisplay.mgrs"
+                    @click="toggleCoordinateSystem()"
+                    class="multi-line"
+                >
                     <div>
-                        <i18n-label id="location.heading" ws=""></i18n-label
-                        >&nbsp;<span *if="dataToDisplay.heading !== null"
-                            >{{ dataToDisplay.heading }}°&nbsp;{{ bearing
-                            }}</span
-                        ><span *if="dataToDisplay.heading === null"
-                            ><i18n-label
-                                id="location.headingNowhere"
-                            ></i18n-label
-                        ></span>
+                        <i18n-label id="location.mgrs" ws=""></i18n-label>
                     </div>
-                    <div *if="alt" @click="toggleDistanceSystem()">
-                        <i18n-label id="location.altitude" ws=""></i18n-label
-                        >&nbsp;{{ dataToDisplay.alt }}
+                    <div>{{ dataToDisplay.mgrs }}</div>
+                </div>
+                <div
+                    *if="dataToDisplay.utmups"
+                    @click="toggleCoordinateSystem()"
+                    class="multi-line"
+                >
+                    <div>
+                        <i18n-label id="location.utmups" ws=""></i18n-label>
                     </div>
-                    <div *if="altAcc" @click="toggleDistanceSystem()">
-                        <i18n-label
-                            id="location.altitudeAccuracy"
-                            ws=""
+                    <div>{{ dataToDisplay.utmups }}</div>
+                </div>
+                <div @click="toggleDistanceSystem()" class="gapAbove">
+                    <i18n-label id="location.accuracy" ws=""></i18n-label
+                    >&nbsp;{{ dataToDisplay.acc }}
+                </div>
+                <div @click="toggleDistanceSystem()">
+                    <i18n-label id="location.speed" ws=""></i18n-label
+                    >&nbsp;{{ dataToDisplay.speed }}/s
+                </div>
+                <div>
+                    <i18n-label id="location.heading" ws=""></i18n-label
+                    >&nbsp;<span *if="dataToDisplay.heading !== null"
+                        >{{ dataToDisplay.heading }}°&nbsp;{{ bearing
+                        }}</span
+                    ><span *if="dataToDisplay.heading === null"
+                        ><i18n-label
+                            id="location.headingNowhere"
                         ></i18n-label
-                        >&nbsp;{{ dataToDisplay.altAcc }}m
-                    </div>
-                </grow-to-fit>
+                    ></span>
+                </div>
+                <div *if="alt" @click="toggleDistanceSystem()">
+                    <i18n-label id="location.altitude" ws=""></i18n-label
+                    >&nbsp;{{ dataToDisplay.alt }}
+                </div>
+                <div *if="altAcc" @click="toggleDistanceSystem()">
+                    <i18n-label
+                        id="location.altitudeAccuracy"
+                        ws=""
+                    ></i18n-label
+                    >&nbsp;{{ dataToDisplay.altAcc }}m
+                </div>
             </div>
             <div *if="position && position.error" class="content">
                 <p>There is an error retrieving the location.</p>
