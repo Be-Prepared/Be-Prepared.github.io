@@ -1,6 +1,7 @@
 export * from './back-button.component';
 export * from './bottom-drawer.component';
 export * from './camera-unavailable.component';
+export * from './changeable-setting.component';
 export * from './grow-to-fit.component';
 export * from './load-svg.component';
 export * from './permission-denied.component';

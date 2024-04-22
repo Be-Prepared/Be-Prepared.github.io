@@ -53,6 +53,7 @@ import { WakeLockService } from '../services/wake-lock.service';
         <div class="wrapper-inner">
             <p><i18n-label id="info.shareApp"></i18n-label></p>
             <info-share></info-share>
+
             <p><i18n-label id="info.permissionsAndFeaturesHeader"></i18n-label></p>
             <ul>
                 <li><i18n-label id="info.camera"></i18n-label> <info-app-permission permission="camera"></info-app-permission></li>
@@ -61,6 +62,9 @@ import { WakeLockService } from '../services/wake-lock.service';
                 <li><i18n-label id="info.torch"></i18n-label> <info-app-availability .availability-state="torch"></info-app-permission></li>
                 <li><i18n-label id="info.wakeLock"></i18n-label> <info-app-availability .availability-state="wakeLock"></info-app-permission></li>
             </ul>
+
+            <p><i18n-label id="info.preferences"></i18n-label></p>
+            <info-preferences></info-preferences>
 
             <p><i18n-label id="info.toolingHeader"></i18n-label></p>
             <ul>

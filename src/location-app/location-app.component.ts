@@ -107,63 +107,63 @@ interface DataToDisplay {
         <location-unavailable *if="explainUnavailable"></location-unavailable>
         <div *if="showControls" class="wrapper">
             <div *if="dataToDisplay" class="content">
-                <div
-                    *if="dataToDisplay.lat"
-                    @click="toggleCoordinateSystem()"
-                    class="multi-line"
-                >
-                    <div>{{ dataToDisplay.lat }}</div>
-                    <div>{{ dataToDisplay.lon }}</div>
+                <div *if="dataToDisplay.lat" class="multi-line">
+                    <changeable-setting @click="toggleCoordinateSystem()">
+                        <div>{{ dataToDisplay.lat }}</div>
+                        <div>{{ dataToDisplay.lon }}</div>
+                    </changeable-setting>
                 </div>
-                <div
-                    *if="dataToDisplay.mgrs"
-                    @click="toggleCoordinateSystem()"
-                    class="multi-line"
-                >
-                    <div>
-                        <i18n-label id="location.mgrs" ws=""></i18n-label>
-                    </div>
-                    <div>{{ dataToDisplay.mgrs }}</div>
+                <div *if="dataToDisplay.mgrs" class="multi-line">
+                    <changeable-setting @click="toggleCoordinateSystem()">
+                        <div>
+                            <i18n-label id="location.mgrs" ws=""></i18n-label>
+                        </div>
+                        <div>{{ dataToDisplay.mgrs }}</div>
+                    </changeable-setting>
                 </div>
-                <div
-                    *if="dataToDisplay.utmups"
-                    @click="toggleCoordinateSystem()"
-                    class="multi-line"
-                >
-                    <div>
-                        <i18n-label id="location.utmups" ws=""></i18n-label>
-                    </div>
-                    <div>{{ dataToDisplay.utmups }}</div>
+                <div *if="dataToDisplay.utmups" class="multi-line">
+                    <changeable-setting @click="toggleCoordinateSystem()">
+                        <div>
+                            <i18n-label id="location.utmups" ws=""></i18n-label>
+                        </div>
+                        <div>{{ dataToDisplay.utmups }}</div>
+                    </changeable-setting>
                 </div>
-                <div @click="toggleDistanceSystem()" class="gapAbove">
-                    <i18n-label id="location.accuracy" ws=""></i18n-label
-                    >&nbsp;{{ dataToDisplay.acc }}
+                <div class="gapAbove">
+                    <changeable-setting @click="toggleDistanceSystem()">
+                        <i18n-label id="location.accuracy" ws=""></i18n-label
+                        >&nbsp;{{ dataToDisplay.acc }}
+                    </changeable-setting>
                 </div>
-                <div @click="toggleDistanceSystem()">
-                    <i18n-label id="location.speed" ws=""></i18n-label
-                    >&nbsp;{{ dataToDisplay.speed }}/s
+                <div>
+                    <changeable-setting @click="toggleDistanceSystem()">
+                        <i18n-label id="location.speed" ws=""></i18n-label
+                        >&nbsp;{{ dataToDisplay.speed }}/s
+                    </changeable-setting>
                 </div>
                 <div>
                     <i18n-label id="location.heading" ws=""></i18n-label
                     >&nbsp;<span *if="dataToDisplay.heading !== null"
-                        >{{ dataToDisplay.heading }}°&nbsp;{{ bearing
-                        }}</span
+                        >{{ dataToDisplay.heading }}°&nbsp;{{
+                        dataToDisplay.bearing }}</span
                     ><span *if="dataToDisplay.heading === null"
-                        ><i18n-label
-                            id="location.headingNowhere"
-                        ></i18n-label
+                        ><i18n-label id="location.headingNowhere"></i18n-label
                     ></span>
                 </div>
-                <div *if="alt" @click="toggleDistanceSystem()">
-                    <i18n-label id="location.altitude" ws=""></i18n-label
-                    >&nbsp;{{ dataToDisplay.alt }}
+                <div *if="alt">
+                    <changeable-setting @click="toggleDistanceSystem()">
+                        <i18n-label id="location.altitude" ws=""></i18n-label
+                        >&nbsp;{{ dataToDisplay.alt }}
+                    </changeable-setting>
                 </div>
-                <div *if="altAcc" @click="toggleDistanceSystem()">
-                    <i18n-label
-                        id="location.altitudeAccuracy"
-                        ws=""
-                    ></i18n-label
-                    >&nbsp;{{ dataToDisplay.altAcc }}m
+                <div *if="altAcc">
+                    <changeable-setting @click="toggleDistanceSystem()">
+                        <i18n-label
+                            id="location.altitudeAccuracy"
+                            ws=""
+                        ></i18n-label
+                        >&nbsp;{{ dataToDisplay.altAcc }}
+                    </changeable-setting>
                 </div>
             </div>
             <div *if="position && position.error" class="content">
@@ -238,7 +238,7 @@ export class LocationAppComponent {
     }
 
     toggleDistanceSystem() {
-        this.#distanceService.toggleDistanceSystem();
+        this.#distanceService.toggleSystem();
         this.#redraw();
     }
 

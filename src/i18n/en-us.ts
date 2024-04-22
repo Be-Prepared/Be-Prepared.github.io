@@ -27,6 +27,15 @@ export const enUS: LanguageData = {
     'info.availability.unavailable': 'Unavailable',
     'info.buildInformationHeader': 'Build Information',
     'info.camera': 'Camera:',
+    'info.coordinates': 'Coordinates:',
+    'info.coordinates.DDD': 'Decimal Degrees',
+    'info.coordinates.DDM': 'Degrees Decimal Minutes',
+    'info.coordinates.DMS': 'Degrees Minutes Seconds',
+    'info.coordinates.MGRS': 'MGRS',
+    'info.coordinates.UTM/UPS': 'UTM/UPS',
+    'info.distances': 'Distances:',
+    'info.distances.imperial': 'Imperial',
+    'info.distances.metric': 'Metric',
     'info.framework': 'the framework driving this app',
     'info.geolocation': 'Geolocation:',
     'info.permission.denied': '✖ Denied',
@@ -35,6 +44,7 @@ export const enUS: LanguageData = {
     'info.permission.prompt': 'Prompt',
     'info.permissionsAndFeaturesHeader': 'Permissions and Features:',
     'info.position': 'Position:',
+    'info.preferences': 'Preferences:',
     'info.shareApp': 'Share This App:',
     'info.shareCopied': 'Website copied to clipboard',
     'info.sourceCode': 'source code',
@@ -71,7 +81,7 @@ export const enUS: LanguageData = {
     // Permission denied
     'permissionDenied.heading': 'Permission Denied',
     'permissionDenied.message':
-        'Because the necessary permission was denied, the button in the menu will be removed. If this was done by mistake, you will need to go load the site in a web browser and manually reset the permissions. This is not something that the application can do for you.',
+        'Because the necessary permission was denied, the button in the menu will be removed. If this was done by mistake, you will need to go load the site in a web browser and manually reset the permissions. It is not possible for this application to prompt you again.',
 
     // Permission prompt
     'permissionPrompt.goBack': 'Not Right Now',
