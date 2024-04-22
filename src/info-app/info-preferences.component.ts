@@ -54,6 +54,7 @@ export class InfoPreferencesComponent {
 
     onDestroy() {
         this.#subject.next(null);
+        this.#subject.complete();
     }
 
     toggleCoordinates() {
