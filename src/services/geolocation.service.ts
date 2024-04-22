@@ -1,5 +1,5 @@
 import { AvailabilityState } from '../datatypes/availability-state';
-import { BearingService } from './bearing.service';
+import { DirectionService } from './direction.service';
 import CheapRuler from 'cheap-ruler';
 import { di } from 'fudgel';
 import { finalize, share, switchMap } from 'rxjs/operators';
@@ -32,9 +32,9 @@ export type GeolocationCoordinateResult =
     | GeolocationCoordinateResultError;
 
 export class GeolocationService {
-    #bearingService = di(BearingService);
-    #permissionsService = di(PermissionsService);
+    #directionService = di(DirectionService);
     #observable: Observable<GeolocationCoordinateResult> | null = null;
+    #permissionsService = di(PermissionsService);
 
     availabilityState() {
         if (!('geolocation' in navigator)) {
@@ -158,7 +158,8 @@ export class GeolocationService {
         let heading: number;
 
         if (speed > 0) {
-            heading = this.#bearingService.standardize360(cheapRuler.bearing(
+            // Calculates the heading, not the bearing
+            heading = this.#directionService.standardize360(cheapRuler.bearing(
                 [estimate[0][0], estimate[0][1]],
                 [last.longitude, last.latitude]
             ));

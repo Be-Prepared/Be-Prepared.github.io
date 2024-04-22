@@ -16,14 +16,14 @@ import { takeUntil } from 'rxjs/operators';
     template: html`
         <ul>
             <li>
+                <i18n-label id="info.coordinates"></i18n-label>
                 <changeable-setting @click="toggleCoordinates()">
-                    <i18n-label id="info.coordinates"></i18n-label>
                     <i18n-label id="info.coordinates.{{coordinates}}"></i18n-label>
                 </changeable-setting>
             </li>
             <li>
+                <i18n-label id="info.distances"></i18n-label>
                 <changeable-setting @click="toggleDistances()">
-                    <i18n-label id="info.distances"></i18n-label>
                     <i18n-label id="info.distances.{{distances}}"></i18n-label>
                 </changeable-setting>
             </li>

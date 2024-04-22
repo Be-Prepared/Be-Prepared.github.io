@@ -1,5 +1,5 @@
-import { BearingService } from '../services/bearing.service';
 import { Component, css, di, html } from 'fudgel';
+import { DirectionService } from '../services/direction.service';
 import {
     PositionService,
 } from '../services/position.service';
@@ -51,7 +51,7 @@ import { Subscription } from 'rxjs';
             <load-svg class="compassRose" href="/compass-rose.svg" #ref="compassRose"></load-svg>
             <div class="info">
                 <div class="infoDegrees">
-                    {{degrees}}° {{bearing}}
+                    {{degrees}}° {{direction}}
                 </div>
 
                 <div class="buttons">
@@ -62,20 +62,20 @@ import { Subscription } from 'rxjs';
     `,
 })
 export class CompassAppComponent {
-    #bearingService = di(BearingService);
+    #directionService = di(DirectionService);
     #positionService = di(PositionService);
     #subscription?: Subscription;
     compassRose?: HTMLElement;
     degrees = 0;
-    bearing = '';
+    direction = '';
 
     onInit() {
         this.#subscription = this.#positionService
-            .getCompassHeading()
-            .subscribe((heading: number) => {
-                const rounded = Math.round(heading);
+            .getCompassBearing()
+            .subscribe((bearing: number) => {
+                const rounded = Math.round(bearing);
                 this.degrees = rounded;
-                this.bearing = this.#bearingService.toCompassPoint(rounded);
+                this.direction = this.#directionService.toCompassPoint(rounded);
 
                 if (this.compassRose) {
                     this.compassRose.style.transform = `rotate(${rounded}deg)`;

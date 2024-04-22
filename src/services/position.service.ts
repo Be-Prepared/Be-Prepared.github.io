@@ -4,12 +4,12 @@ import { of, throwError } from 'rxjs';
 import { Observable, ReplaySubject, Subject } from 'rxjs';
 
 export type PositionEvent =
-    | PositionEventHeading
+    | PositionEventBearing
     | PositionEventDeviceOrientation
     | PositionEventQuaternion;
 
-export interface PositionEventHeading {
-    heading: number;
+export interface PositionEventBearing {
+    bearing: number;
 }
 
 export interface PositionEventDeviceOrientation {
@@ -38,18 +38,18 @@ export class PositionService {
         return this.#checkAvailability();
     }
 
-    getCompassHeading() {
+    getCompassBearing() {
         return this.getLocationEvents().pipe(
             map((event: PositionEvent) => {
                 if ('alpha' in event) {
-                    return this.#convertDeviceOrientationToHeading(event);
+                    return this.#convertDeviceOrientationToBearing(event);
                 }
 
                 if ('quaternion' in event) {
-                    return this.#convertQuaternionToHeading(event);
+                    return this.#convertQuaternionToBearing(event);
                 }
 
-                return event.heading;
+                return event.bearing;
             }),
             share({
                 connector: () => new ReplaySubject(1),
@@ -78,7 +78,7 @@ export class PositionService {
         );
     }
 
-    #convertDeviceOrientationToHeading(
+    #convertDeviceOrientationToBearing(
         event: PositionEventDeviceOrientation
     ): number {
         // Convert degrees to radians
@@ -97,23 +97,23 @@ export class PositionService {
         const rA = -cA * sG - sA * sB * cG;
         const rB = -sA * sG + cA * sB * cG;
 
-        // Calculate compass heading
-        let heading = Math.atan(rA / rB);
+        // Calculate compass bearing
+        let bearing = Math.atan(rA / rB);
 
         // Convert from half unit circle to whole unit circle
         if (rB < 0) {
-            heading += Math.PI;
+            bearing += Math.PI;
         } else if (rA < 0) {
-            heading += 2 * Math.PI;
+            bearing += 2 * Math.PI;
         }
 
         // Convert radians to degrees
-        heading *= 180 / Math.PI;
+        bearing *= 180 / Math.PI;
 
-        return heading;
+        return bearing;
     }
 
-    #convertQuaternionToHeading(event: PositionEventQuaternion): number {
+    #convertQuaternionToBearing(event: PositionEventQuaternion): number {
         const q = event.quaternion;
         const alpha =
             Math.atan2(
@@ -121,9 +121,9 @@ export class PositionService {
                 1 - 2 * q[1] * q[1] - 2 * q[2] * q[2]
             ) *
             (180 / Math.PI);
-        const heading = alpha < 0 ? alpha + 360 : alpha;
+        const bearing = alpha < 0 ? alpha + 360 : alpha;
 
-        return heading;
+        return bearing;
     }
 
     #listenAbsoluteOrientationSensor() {
@@ -172,9 +172,9 @@ export class PositionService {
 
     #listenDeviceOrientationAbsolute() {
         const subject = new Subject<
-            PositionEventHeading | PositionEventDeviceOrientation
+            PositionEventBearing | PositionEventDeviceOrientation
         >();
-        let lastWebkitCompassHeading: number | null = null;
+        let lastWebkitCompassBearing: number | null = null;
         let lastAlpha: number | null = null;
         let lastBeta: number | null = null;
         let lastGamma: number | null = null;
@@ -182,16 +182,19 @@ export class PositionService {
             // Webkit doesn't use "alpha" correctly
             // https://stackoverflow.com/questions/16048514/can-i-use-javascript-to-get-the-compass-heading-for-ios-and-android/26275869#answer-27390389
             if (typeof (event as any).webkitCompassHeading === 'number') {
+                // Note that "bearing" is the direction you are facing,
+                // "heading" is the direction you are moving. In this case,
+                // compasses only return bearing.
                 if (
                     (event as any).webkitCompassHeading ===
-                    lastWebkitCompassHeading
+                    lastWebkitCompassBearing
                 ) {
                     return;
                 }
 
-                lastWebkitCompassHeading = (event as any).webkitCompassHeading;
+                lastWebkitCompassBearing = (event as any).webkitCompassHeading;
                 subject.next({
-                    heading: (event as any).webkitCompassHeading,
+                    bearing: (event as any).webkitCompassHeading,
                 });
             } else if (
                 event.alpha === null ||

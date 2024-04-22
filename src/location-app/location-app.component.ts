@@ -1,5 +1,5 @@
 import { AvailabilityState } from '../datatypes/availability-state';
-import { BearingService } from '../services/bearing.service';
+import { DirectionService } from '../services/direction.service';
 import { Component, css, di, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
 import { DistanceService } from '../services/distance.service';
@@ -23,7 +23,7 @@ interface DataToDisplay {
     altAcc: string | null;
     speed: string;
     heading: number | null;
-    bearing: string | null;
+    direction: string | null;
 }
 
 @Component('location-app', {
@@ -130,39 +130,40 @@ interface DataToDisplay {
                     </changeable-setting>
                 </div>
                 <div class="gapAbove">
+                    <i18n-label id="location.accuracy"></i18n-label>
                     <changeable-setting @click="toggleDistanceSystem()">
-                        <i18n-label id="location.accuracy" ws=""></i18n-label
-                        >&nbsp;{{ dataToDisplay.acc }}
+                        {{ dataToDisplay.acc }}
                     </changeable-setting>
                 </div>
                 <div>
+                    <i18n-label id="location.speed"></i18n-label>
                     <changeable-setting @click="toggleDistanceSystem()">
-                        <i18n-label id="location.speed" ws=""></i18n-label
-                        >&nbsp;{{ dataToDisplay.speed }}/s
+                        {{ dataToDisplay.speed }}/s
                     </changeable-setting>
                 </div>
                 <div>
-                    <i18n-label id="location.heading" ws=""></i18n-label
-                    >&nbsp;<span *if="dataToDisplay.heading !== null"
-                        >{{ dataToDisplay.heading }}°&nbsp;{{
-                        dataToDisplay.bearing }}</span
-                    ><span *if="dataToDisplay.heading === null"
+                    <i18n-label id="location.heading"></i18n-label>
+                    <span *if="dataToDisplay.heading !== null"
+                        >{{ dataToDisplay.heading }}° {{ dataToDisplay.direction
+                        }}</span
+                    >
+                    <span *if="dataToDisplay.heading === null"
                         ><i18n-label id="location.headingNowhere"></i18n-label
                     ></span>
                 </div>
                 <div *if="alt">
+                    <i18n-label id="location.altitude" ws=""></i18n-label>
                     <changeable-setting @click="toggleDistanceSystem()">
-                        <i18n-label id="location.altitude" ws=""></i18n-label
-                        >&nbsp;{{ dataToDisplay.alt }}
+                        {{ dataToDisplay.alt }}
                     </changeable-setting>
                 </div>
                 <div *if="altAcc">
+                    <i18n-label
+                        id="location.altitudeAccuracy"
+                        ws=""
+                    ></i18n-label>
                     <changeable-setting @click="toggleDistanceSystem()">
-                        <i18n-label
-                            id="location.altitudeAccuracy"
-                            ws=""
-                        ></i18n-label
-                        >&nbsp;{{ dataToDisplay.altAcc }}
+                        {{ dataToDisplay.altAcc }}
                     </changeable-setting>
                 </div>
             </div>
@@ -189,8 +190,8 @@ interface DataToDisplay {
     `,
 })
 export class LocationAppComponent {
-    #bearingService = di(BearingService);
     #coordinateService = di(CoordinateService);
+    #directionService = di(DirectionService);
     #distanceService = di(DistanceService);
     #geolocationService = di(GeolocationService);
     #permissionsService = di(PermissionsService);
@@ -277,12 +278,12 @@ export class LocationAppComponent {
             : null;
         const speed = this.#distanceService.metersToString(position.speed);
         let heading = null;
-        let bearing = null;
+        let direction = null;
 
         // Preserve the last heading
         if (!isNaN(position.heading)) {
             heading = Math.round(position.heading);
-            bearing = this.#bearingService.toCompassPoint(heading);
+            direction = this.#directionService.toCompassPoint(heading);
         }
 
         // Tie to a single property for faster updates
@@ -296,7 +297,7 @@ export class LocationAppComponent {
             altAcc,
             speed,
             heading,
-            bearing,
+            direction,
         };
     }
 }
