@@ -1,4 +1,3 @@
-import { DirectionService } from '../services/direction.service';
 import { Component, css, di, emit, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
 import { DistanceService } from '../services/distance.service';
@@ -7,20 +6,9 @@ import {
     GeolocationCoordinateResultSuccess,
     GeolocationService,
 } from '../services/geolocation.service';
+import { LatLon } from './location-coordinates.component';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-
-interface DataToDisplay {
-    lat: string | null;
-    lon: string | null;
-    mgrs: string | null;
-    utmups: string | null;
-    acc: string;
-    alt: string | null;
-    altAcc: string | null;
-    speed: string;
-    headingDirection: string | null;
-}
 
 @Component('location-current', {
     style: css`
@@ -100,64 +88,22 @@ interface DataToDisplay {
     `,
     template: html`
         <div class="wrapper">
-            <div *if="dataToDisplay" class="content">
-                <div *if="dataToDisplay.lat" class="multi-line">
-                    <changeable-setting @click="toggleCoordinateSystem()">
-                        <div>{{ dataToDisplay.lat }}</div>
-                        <div>{{ dataToDisplay.lon }}</div>
-                    </changeable-setting>
-                </div>
-                <div *if="dataToDisplay.mgrs" class="multi-line">
-                    <changeable-setting @click="toggleCoordinateSystem()">
-                        <div>
-                            <i18n-label id="location.mgrs" ws=""></i18n-label>
-                        </div>
-                        <div>{{ dataToDisplay.mgrs }}</div>
-                    </changeable-setting>
-                </div>
-                <div *if="dataToDisplay.utmups" class="multi-line">
-                    <changeable-setting @click="toggleCoordinateSystem()">
-                        <div>
-                            <i18n-label id="location.utmups" ws=""></i18n-label>
-                        </div>
-                        <div>{{ dataToDisplay.utmups }}</div>
-                    </changeable-setting>
-                </div>
+            <div *if="latLon" class="content">
+                <location-coordinates .coords="latLon"></location-coordinates>
                 <div class="gapAbove">
-                    <i18n-label id="location.accuracy"></i18n-label>
-                    <changeable-setting @click="toggleDistanceSystem()">
-                        {{ dataToDisplay.acc }}
-                    </changeable-setting>
+                    <location-field id="current.1" default="ACCURACY"></location-field>
                 </div>
                 <div>
-                    <i18n-label id="location.speed"></i18n-label>
-                    <changeable-setting @click="toggleDistanceSystem()">
-                        {{ dataToDisplay.speed }}
-                    </changeable-setting>
+                    <location-field id="current.2" default="SPEED"></location-field>
                 </div>
                 <div>
-                    <i18n-label id="location.heading"></i18n-label>
-                    <span *if="dataToDisplay.headingDirection !== null"
-                        >{{ dataToDisplay.headingDirection }}</span
-                    >
-                    <span *if="dataToDisplay.heading === null"
-                        ><i18n-label id="location.headingNowhere"></i18n-label
-                    ></span>
+                    <location-field id="current.3" default="HEADING"></location-field>
                 </div>
-                <div *if="alt">
-                    <i18n-label id="location.altitude" ws=""></i18n-label>
-                    <changeable-setting @click="toggleDistanceSystem()">
-                        {{ dataToDisplay.alt }}
-                    </changeable-setting>
+                <div>
+                    <location-field id="current.4" default="ALTITUDE"></location-field>
                 </div>
-                <div *if="altAcc">
-                    <i18n-label
-                        id="location.altitudeAccuracy"
-                        ws=""
-                    ></i18n-label>
-                    <changeable-setting @click="toggleDistanceSystem()">
-                        {{ dataToDisplay.altAcc }}
-                    </changeable-setting>
+                <div>
+                    <location-field id="current.5" default="ALTITUDE_ACCURACY"></location-field>
                 </div>
             </div>
             <div *if="position && position.error" class="content">
@@ -189,11 +135,10 @@ interface DataToDisplay {
 })
 export class LocationCurrentComponent {
     #coordinateService = di(CoordinateService);
-    #directionService = di(DirectionService);
     #distanceService = di(DistanceService);
     #geolocationService = di(GeolocationService);
     #subject = new Subject();
-    dataToDisplay: DataToDisplay | null = null;
+    latLon: LatLon | null = null;
     position: GeolocationCoordinateResult | null = null;
 
     onInit() {
@@ -227,50 +172,13 @@ export class LocationCurrentComponent {
 
     #redraw() {
         if (this.position && this.position.timestamp) {
-            this.#updateDisplayedValues(
-                this.position as GeolocationCoordinateResultSuccess
-            );
+            const positionTyped = this.position as GeolocationCoordinateResultSuccess;
+            this.latLon = {
+                lat: positionTyped.latitude,
+                lon: positionTyped.longitude,
+            };
         } else {
-            this.dataToDisplay = null;
+            this.latLon = null;
         }
-    }
-
-    #updateDisplayedValues(position: GeolocationCoordinateResultSuccess) {
-        const system = this.#coordinateService.latLonToSystem(
-            position.latitude,
-            position.longitude
-        );
-        const acc = this.#distanceService.metersToString(position.accuracy);
-        const alt = position.altitude
-            ? this.#distanceService.metersToString(position.altitude)
-            : null;
-        const altAcc = position.altitudeAccuracy
-            ? this.#distanceService.metersToString(position.altitudeAccuracy)
-            : null;
-        const speed = this.#distanceService.metersToString(
-            position.speed,
-            true
-        );
-        let headingDirection = null;
-
-        // Preserve the last heading
-        if (!isNaN(position.heading)) {
-            headingDirection = this.#directionService.toHeadingDirection(
-                position.heading
-            );
-        }
-
-        // Tie to a single property for faster updates
-        this.dataToDisplay = {
-            lat: 'lat' in system ? system.lat : null,
-            lon: 'lon' in system ? system.lon : null,
-            mgrs: 'mgrs' in system ? system.mgrs : null,
-            utmups: 'utmups' in system ? system.utmups : null,
-            acc,
-            alt,
-            altAcc,
-            speed,
-            headingDirection,
-        };
     }
 }

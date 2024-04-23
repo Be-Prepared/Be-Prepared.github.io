@@ -35,6 +35,7 @@ This PWA is also an example for how to use the following:
     * Show your current location using DMS, DDM, or DDD formats for coordinates as well as UTM/UPS and MGRS by tapping on the coordinates.
     * List your speed and accuracy using imperial (feet/miles) or metric (meters/kilometers) by tapping on the relevant fields.
     * Automatically will use high resolution locations (GPS) and will calculate your speed and heading even when the device doesn't support these fields.
+    * Ability to change field functions (especially for Geocaching and the Geocaching merit badge)
 
 * Info
     * Contains a QR code for easy sharing of the application. Tapping on the icon copies the website to your clipboard.
