@@ -85,6 +85,8 @@ export class LocationFieldComponent {
             });
         }
 
+        this.allowedFields.sort((a, b) => a.label.localeCompare(b.label));
+
         if (!this.id) {
             return;
         }
