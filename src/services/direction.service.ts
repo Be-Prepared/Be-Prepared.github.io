@@ -20,6 +20,16 @@ export class DirectionService {
         return ((direction % 360) + 360) % 360;
     }
 
+    toHeadingDirection(direction: number, precision = 2): string {
+        if (isNaN(direction)) {
+            return '';
+        }
+
+        const rounded = Math.round(direction);
+
+        return `${rounded}° ${this.toCompassPoint(rounded, precision)}`;
+    }
+
     toCompassPoint(direction: number, precision = 2) {
         // Thanks to https://github.com/chrisveness/geodesy/blob/master/dms.js
         precision = Math.max(1, Math.min(3, Math.floor(precision)));

@@ -51,7 +51,7 @@ import { Subscription } from 'rxjs';
             <load-svg class="compassRose" href="/compass-rose.svg" #ref="compassRose"></load-svg>
             <div class="info">
                 <div class="infoDegrees">
-                    {{degrees}}° {{direction}}
+                    {{headingDirection}}
                 </div>
 
                 <div class="buttons">
@@ -67,15 +67,14 @@ export class CompassAppComponent {
     #subscription?: Subscription;
     compassRose?: HTMLElement;
     degrees = 0;
-    direction = '';
+    headingDirection = '';
 
     onInit() {
         this.#subscription = this.#positionService
             .getCompassBearing()
             .subscribe((bearing: number) => {
                 const rounded = Math.round(bearing);
-                this.degrees = rounded;
-                this.direction = this.#directionService.toCompassPoint(rounded);
+                this.headingDirection = this.#directionService.toHeadingDirection(bearing);
 
                 if (this.compassRose) {
                     this.compassRose.style.transform = `rotate(${rounded}deg)`;

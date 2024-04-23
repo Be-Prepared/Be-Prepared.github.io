@@ -22,12 +22,12 @@ export class DistanceService {
         return this.#currentSetting.asObservable();
     }
 
-    metersToString(meters: number): string {
+    metersToString(meters: number, isSpeed = false): string {
         if (this.#currentSetting.value === DistanceSystem.METRIC) {
-            return this.#toMetric(meters);
+            return this.#toMetric(meters, isSpeed);
         }
 
-        return this.#toImperial(meters);
+        return this.#toImperial(meters, isSpeed);
     }
 
     toggleSystem() {
@@ -41,24 +41,30 @@ export class DistanceService {
 
     #fixed(n: number): string {
         const a = Math.abs(n);
+        let digits = 0;
 
         if (a < 1) {
-            return n.toFixed(3);
+            digits = 3;
+        } else if (a < 10) {
+            digits = 2;
+        } else if (a < 100) {
+            digits = 1;
         }
 
-        if (a < 10) {
-            return n.toFixed(2);
-        }
+        const factor = Math.pow(10, digits);
+        const result = Math.round(n * factor) / factor;
 
-        if (a < 100) {
-            return n.toFixed(1);
-        }
-
-        return n.toFixed(0);
+        return result.toLocaleString();
     }
 
-    #toImperial(meters: number): string {
+    #toImperial(meters: number, isSpeed: boolean): string {
         const feet = meters * 3.2808398950131;
+
+        if (isSpeed) {
+            const mph = (feet / 5280) / 60;
+
+            return `${this.#fixed(mph)} mph`;
+        }
 
         if (feet < 528) {
             return `${Math.round(feet)} ft`;
@@ -69,7 +75,11 @@ export class DistanceService {
         return `${this.#fixed(miles)} mi`;
     }
 
-    #toMetric(meters: number): string {
+    #toMetric(meters: number, isSpeed: boolean): string {
+        if (isSpeed) {
+            return `${this.#fixed(meters / 1000)} km/h`;
+        }
+
         if (meters < 1000) {
             return `${Math.round(meters)} m`;
         }

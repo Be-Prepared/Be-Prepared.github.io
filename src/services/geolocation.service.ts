@@ -61,6 +61,10 @@ export class GeolocationService {
     }
 
     getPosition() {
+        if (this.#observable) {
+            return this.#observable;
+        }
+
         const subject = new Subject<GeolocationCoordinateResult>();
         const lastPositions: GeolocationCoordinateResultSuccess[] = [];
         const success = (position: GeolocationPosition) => {
@@ -148,7 +152,7 @@ export class GeolocationService {
             }) as [number[], number];
         }
 
-        const cheapRuler = new CheapRuler(last.latitude);
+        const cheapRuler = new CheapRuler(last.latitude, 'meters');
         const distance = cheapRuler.distance(
             [estimate[0][0], estimate[0][1]],
             [last.longitude, last.latitude]

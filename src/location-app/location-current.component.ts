@@ -1,5 +1,5 @@
 import { DirectionService } from '../services/direction.service';
-import { Component, css, di, html } from 'fudgel';
+import { Component, css, di, emit, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
 import { DistanceService } from '../services/distance.service';
 import {
@@ -19,8 +19,7 @@ interface DataToDisplay {
     alt: string | null;
     altAcc: string | null;
     speed: string;
-    heading: number | null;
-    direction: string | null;
+    headingDirection: string | null;
 }
 
 @Component('location-current', {
@@ -35,6 +34,11 @@ interface DataToDisplay {
         .buttons {
             display: flex;
             flex-direction: row;
+            justify-content: space-between;
+        }
+
+        .list {
+            padding: 5px;
         }
 
         .content {
@@ -128,14 +132,13 @@ interface DataToDisplay {
                 <div>
                     <i18n-label id="location.speed"></i18n-label>
                     <changeable-setting @click="toggleDistanceSystem()">
-                        {{ dataToDisplay.speed }}/s
+                        {{ dataToDisplay.speed }}
                     </changeable-setting>
                 </div>
                 <div>
                     <i18n-label id="location.heading"></i18n-label>
-                    <span *if="dataToDisplay.heading !== null"
-                        >{{ dataToDisplay.heading }}° {{ dataToDisplay.direction
-                        }}</span
+                    <span *if="dataToDisplay.headingDirection !== null"
+                        >{{ dataToDisplay.headingDirection }}</span
                     >
                     <span *if="dataToDisplay.heading === null"
                         ><i18n-label id="location.headingNowhere"></i18n-label
@@ -175,6 +178,11 @@ interface DataToDisplay {
             </div>
             <div class="buttons">
                 <back-button></back-button>
+                <scaling-icon
+                    class="list"
+                    @click.stop.prevent="goToList()"
+                    href="./list.svg"
+                ></scaling-icon>
             </div>
         </div>
     `,
@@ -201,6 +209,10 @@ export class LocationCurrentComponent {
     onDestroy() {
         this.#subject.next(null);
         this.#subject.complete();
+    }
+
+    goToList() {
+        emit(this, 'list');
     }
 
     toggleCoordinateSystem() {
@@ -235,14 +247,17 @@ export class LocationCurrentComponent {
         const altAcc = position.altitudeAccuracy
             ? this.#distanceService.metersToString(position.altitudeAccuracy)
             : null;
-        const speed = this.#distanceService.metersToString(position.speed);
-        let heading = null;
-        let direction = null;
+        const speed = this.#distanceService.metersToString(
+            position.speed,
+            true
+        );
+        let headingDirection = null;
 
         // Preserve the last heading
         if (!isNaN(position.heading)) {
-            heading = Math.round(position.heading);
-            direction = this.#directionService.toCompassPoint(heading);
+            headingDirection = this.#directionService.toHeadingDirection(
+                position.heading
+            );
         }
 
         // Tie to a single property for faster updates
@@ -255,8 +270,7 @@ export class LocationCurrentComponent {
             alt,
             altAcc,
             speed,
-            heading,
-            direction,
+            headingDirection,
         };
     }
 }

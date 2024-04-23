@@ -73,6 +73,10 @@ export const enUS: LanguageData = {
     'location.unavailable': 'Not Available',
     'location.unavailableMessage':
         'There is no GPS available on this device. The location tool will be removed from the starting menu.',
+    'location.waypoints.location': 'Location',
+    'location.waypoints.name': 'Name',
+    'location.waypoints.noWaypoints': 'No waypoints have been saved.',
+    'location.waypoints.unknownLocation': 'Unknown',
 
     // Magnifier
     'magnifier.explainAsk':

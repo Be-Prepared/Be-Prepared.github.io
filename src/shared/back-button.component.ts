@@ -1,7 +1,8 @@
-import { Component, css, html } from 'fudgel';
+import { Component, css, emit, html } from 'fudgel';
 import { goBack } from '../util/go-back';
 
 @Component('back-button', {
+    attr: ['emit'],
     style: css`
         .back {
             padding: 5px;
@@ -16,7 +17,13 @@ import { goBack } from '../util/go-back';
     `
 })
 export class BackButtonComponent {
+    emit?: string;
+
     back() {
-        goBack();
+        if (this.emit) {
+            emit(this, this.emit);
+        } else {
+            goBack();
+        }
     }
 }

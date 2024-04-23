@@ -1,26 +1,9 @@
 import { AvailabilityState } from '../datatypes/availability-state';
 import { Component, css, di, html } from 'fudgel';
-import {
-    GeolocationCoordinateResult,
-    GeolocationService,
-} from '../services/geolocation.service';
+import { GeolocationService } from '../services/geolocation.service';
 import { PermissionsService } from '../services/permissions.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { WakeLockService } from '../services/wake-lock.service';
-
-interface DataToDisplay {
-    lat: string | null;
-    lon: string | null;
-    mgrs: string | null;
-    utmups: string | null;
-    acc: string;
-    alt: string | null;
-    altAcc: string | null;
-    speed: string;
-    heading: number | null;
-    direction: string | null;
-}
 
 @Component('location-app', {
     style: css`
@@ -38,7 +21,20 @@ interface DataToDisplay {
         <permission-denied *if="explainDeny"></permission-denied>
         <location-unavailable *if="explainUnavailable"></location-unavailable>
         <div *if="showControls" class="full">
-            <location-current> *if="control === 'current'"></location-current>
+            <location-current
+                *if="control === 'current'"
+                @list.stop.prevent="setControl('waypoints')"
+            ></location-current>
+            <location-waypoints
+                *if="control === 'waypoints'"
+                @current.stop.prevent="setControl('current')"
+                @add.stop.prevent="setControl('add-edit')"
+                @edit.stop.prevent="setControl('add-edit', $event.detail)"
+            ></location-waypoints>
+            <location-add-edit
+                *if="control === 'add-edit'"
+                id="{{waypointId}}"
+            ></location-add-edit>
         </div>
     `,
 })
@@ -46,14 +42,12 @@ export class LocationAppComponent {
     #geolocationService = di(GeolocationService);
     #permissionsService = di(PermissionsService);
     #subject = new Subject();
-    #wakeLockService = di(WakeLockService);
     control = 'current';
-    dataToDisplay: DataToDisplay | null = null;
     explainAsk = false;
     explainDeny = false;
     explainUnavailable = false;
-    position: GeolocationCoordinateResult | null = null;
     showControls = false;
+    waypointId?: number;
 
     onInit() {
         this.#geolocationService
@@ -68,8 +62,6 @@ export class LocationAppComponent {
 
                 if (this.showControls) {
                     this.#getCurrentStatus();
-                } else {
-                    this.#wakeLockService.release();
                 }
             });
     }
@@ -77,16 +69,19 @@ export class LocationAppComponent {
     onDestroy() {
         this.#subject.next(null);
         this.#subject.complete();
-        this.#wakeLockService.release();
     }
 
     grant() {
         this.#permissionsService.geolocation(true);
     }
 
-    #getCurrentStatus() {
-        this.#wakeLockService.request();
+    setControl(control: string, waypointId?: number) {
+        console.log(arguments);
+        this.control = control;
+        this.waypointId = waypointId;
+    }
 
+    #getCurrentStatus() {
         // Add a subscriber to keep the service active no matter what route is
         // being shown.
         this.#geolocationService
