@@ -8,5 +8,6 @@ export * from './location-field-altitude.component.ts';
 export * from './location-field-altitude-accuracy.component.ts';
 export * from './location-field-heading.component.ts';
 export * from './location-field-speed.component.ts';
+export * from './location-navigate.component.ts';
 export * from './location-unavailable.component.ts';
 export * from './location-waypoints.component.ts';

@@ -1,5 +1,10 @@
 import { BehaviorSubject } from 'rxjs';
 
+export interface DistanceOptions {
+    useSmallUnits?: boolean;
+    isSpeed?: boolean;
+}
+
 export enum DistanceSystem {
     IMPERIAL = 'imperial',
     METRIC = 'metric',
@@ -22,12 +27,12 @@ export class DistanceService {
         return this.#currentSetting.asObservable();
     }
 
-    metersToString(meters: number, isSpeed = false): string {
+    metersToString(meters: number, options: DistanceOptions = {}): string {
         if (this.#currentSetting.value === DistanceSystem.METRIC) {
-            return this.#toMetric(meters, isSpeed);
+            return this.#toMetric(meters, options);
         }
 
-        return this.#toImperial(meters, isSpeed);
+        return this.#toImperial(meters, options);
     }
 
     toggleSystem() {
@@ -57,16 +62,16 @@ export class DistanceService {
         return result.toLocaleString();
     }
 
-    #toImperial(meters: number, isSpeed: boolean): string {
+    #toImperial(meters: number, options: DistanceOptions): string {
         const feet = meters * 3.2808398950131;
 
-        if (isSpeed) {
-            const mph = (feet / 5280) / 60;
+        if (options.isSpeed) {
+            const mph = (feet / 5280) * 3600;
 
             return `${this.#fixed(mph)} mph`;
         }
 
-        if (feet < 528) {
+        if (feet < 528 || options.useSmallUnits) {
             return `${Math.round(feet)} ft`;
         }
 
@@ -75,13 +80,13 @@ export class DistanceService {
         return `${this.#fixed(miles)} mi`;
     }
 
-    #toMetric(meters: number, isSpeed: boolean): string {
-        if (isSpeed) {
-            return `${this.#fixed(meters / 1000)} km/h`;
+    #toMetric(meters: number, options: DistanceOptions): string {
+        if (options.isSpeed) {
+            return `${this.#fixed(3600 * meters / 1000)} km/h`;
         }
 
-        if (meters < 1000) {
-            return `${Math.round(meters)} m`;
+        if (meters < 1000 || options.useSmallUnits) {
+            return `${this.#fixed(meters)} m`;
         }
 
         const kilometers = meters / 1000;

@@ -34,7 +34,14 @@ import { takeUntil } from 'rxjs/operators';
             <location-add-edit
                 *if="control === 'add-edit'"
                 id="{{waypointId}}"
+                @list.stop.prevent="setControl('waypoints')"
+                @navigate.stop.prevent="setControl('navigate', $event.detail)"
             ></location-add-edit>
+            <location-navigate
+                *if="control === 'navigate'"
+                id="{{waypointId}}"
+                @edit.stop.prevent="setControl('add-edit', $event.detail)"
+            ></location-navigate>
         </div>
     `,
 })
@@ -76,8 +83,11 @@ export class LocationAppComponent {
     }
 
     setControl(control: string, waypointId?: number) {
-        this.control = control;
+        // Set the waypoint first so the control can access it
         this.waypointId = waypointId;
+
+        // Next, update the control
+        this.control = control;
     }
 
     #getCurrentStatus() {

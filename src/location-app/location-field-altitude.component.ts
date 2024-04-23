@@ -39,7 +39,10 @@ export class LocationFieldAltitudeComponent {
                     this.value = unknownValue;
                 } else {
                     this.value = this.#distanceService.metersToString(
-                        positionTyped.altitude
+                        positionTyped.altitude,
+                        {
+                            useSmallUnits: true
+                        }
                     );
                 }
             } else {

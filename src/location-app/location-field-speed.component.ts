@@ -37,7 +37,9 @@ export class LocationFieldSpeedComponent {
 
                 this.value = this.#distanceService.metersToString(
                     positionTyped.speed,
-                    true
+                    {
+                        isSpeed: true
+                    }
                 );
             } else {
                 this.value = unknownValue;

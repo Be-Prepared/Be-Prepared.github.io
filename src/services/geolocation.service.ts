@@ -18,7 +18,7 @@ export interface GeolocationCoordinateResultSuccess {
     accuracy: number;
     altitude: number | null;
     altitudeAccuracy: number | null;
-    speed: number; // If null, we calculate one
+    speed: number; // If null, we calculate one in m/s
     heading: number; // If null, we calculate one or use NaN
 }
 

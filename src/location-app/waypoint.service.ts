@@ -18,15 +18,6 @@ export class WaypointService {
         this.#load();
     }
 
-    addPoint(point: WaypointSaved) {
-        this.#maxId += 1;
-        this.#points.push({
-            ...point,
-            id: this.#maxId,
-        });
-        this.#save();
-    }
-
     deletePoint(id: number) {
         const index = this.#points.findIndex((point) => point.id === id);
 
@@ -39,11 +30,45 @@ export class WaypointService {
     }
 
     getPoint(id: number): WaypointSaved | null {
-        return this.#points.find((point) => point.id === id) || null;
+        const point = this.#points.find((point) => point.id === id);
+
+        if (!point) {
+            return null;
+        }
+
+        return {
+            ...point,
+        };
     }
 
     getPoints() {
         return this.#points;
+    }
+
+    newPoint(): WaypointSaved {
+        this.#maxId += 1;
+        const point = {
+            id: this.#maxId,
+            name: '',
+            lat: 0,
+            lon: 0,
+            created: Date.now(),
+        };
+        this.#points.push(point);
+        this.#save();
+
+        return point;
+    }
+
+    updatePoint(point: WaypointSaved) {
+        const index = this.#points.findIndex((p) => p.id === point.id);
+
+        if (index >= 0) {
+            this.#points.splice(index, 1);
+        }
+
+        this.#points.push({ ...point });
+        this.#save();
     }
 
     #isValidPoint(point: any): boolean {
