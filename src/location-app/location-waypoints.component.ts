@@ -238,7 +238,6 @@ export class LocationWaypointsComponent {
             ];
             const pointB: [number, number] = [point.lon, point.lat];
             const meters = cheapRuler.distance(pointA, pointB);
-            console.log(pointA, pointB, meters);
             const distance = this.#distanceService.metersToString(meters);
             const direction = cheapRuler.bearing(pointA, pointB);
             const compassPoint =

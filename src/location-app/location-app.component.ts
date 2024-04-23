@@ -76,7 +76,6 @@ export class LocationAppComponent {
     }
 
     setControl(control: string, waypointId?: number) {
-        console.log(arguments);
         this.control = control;
         this.waypointId = waypointId;
     }

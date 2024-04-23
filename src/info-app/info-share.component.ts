@@ -76,8 +76,6 @@ export class InfoShareComponent {
                     }
                 }, 3000);
             }
-        } else {
-            console.log('no');
         }
     }
 }
