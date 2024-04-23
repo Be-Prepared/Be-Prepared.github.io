@@ -66,7 +66,7 @@ export class DistanceService {
         const feet = meters * 3.2808398950131;
 
         if (options.isSpeed) {
-            const mph = (feet / 5280) * 3600;
+            const mph = feet * 3600 / 5280;
 
             return `${this.#fixed(mph)} mph`;
         }
@@ -82,7 +82,7 @@ export class DistanceService {
 
     #toMetric(meters: number, options: DistanceOptions): string {
         if (options.isSpeed) {
-            return `${this.#fixed(3600 * meters / 1000)} km/h`;
+            return `${this.#fixed(3.6 * meters)} km/h`;
         }
 
         if (meters < 1000 || options.useSmallUnits) {
