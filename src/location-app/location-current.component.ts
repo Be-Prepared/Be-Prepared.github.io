@@ -6,7 +6,7 @@ import {
     GeolocationCoordinateResultSuccess,
     GeolocationService,
 } from '../services/geolocation.service';
-import { LatLon } from './location-coordinates.component';
+import { LatLon } from '../services/coordinate.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 

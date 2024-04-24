@@ -10,9 +10,7 @@ const LOCAL_STORAGE_KEY = 'points';
 
 export class WaypointService {
     #maxId = 0;
-    #points: WaypointSaved[] = [
-        { id: 1, lat: 0, lon: 0, name: 'Home', created: Date.now() },
-    ];
+    #points: WaypointSaved[] = [];
 
     constructor() {
         this.#load();

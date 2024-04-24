@@ -27,6 +27,11 @@ const COORDINATE_SYSTEMS = [
     CoordinateSystem.MGRS,
 ];
 
+export interface LatLon {
+    lat: number;
+    lon: number;
+}
+
 export interface LL {
     lat: string;
     lon: string;
@@ -64,6 +69,46 @@ export class CoordinateService {
         }
     }
 
+    fromString(str: string): LatLon | null {
+        if (converter.isUSNG(str)) {
+            const [lat, lon] = converter.USNGtoLL(str);
+            return { lat, lon };
+        }
+
+        try {
+            const [lat, lon] = converter.UTMUPStoLL(str);
+            return { lat, lon };
+        } catch (ignore) {}
+
+        const cleansed = str.toUpperCase().replace(/[^-0-9.ENSW]+/g, ' ').trim();
+        let west = cleansed.indexOf('W') >= 0; // Force negative longitude
+        let south = cleansed.indexOf('S') >= 0; // Force negative latitude
+        const coordinateStrings = this.#breakIntoCoordinateChunks(cleansed);
+
+        if (!coordinateStrings) {
+            return null;
+        }
+
+        const coordinates = coordinateStrings.map((item) => this.#parseCoordinateString(item));
+
+        if (coordinates[0] === null || coordinates[1] === null) {
+            return null;
+        }
+
+        if (south) {
+            coordinates[0] = -Math.abs(coordinates[0]);
+        }
+
+        if (west) {
+            coordinates[1] = -Math.abs(coordinates[1]);
+        }
+
+        return {
+            lat: coordinates[0],
+            lon: coordinates[1],
+        };
+    }
+
     getCurrentSetting() {
         return this.#currentSetting.asObservable();
     }
@@ -97,6 +142,56 @@ export class CoordinateService {
         const newIndex = (currentIndex + 1) % COORDINATE_SYSTEMS.length;
         this.#currentSetting.next(COORDINATE_SYSTEMS[newIndex]);
         localStorage.setItem('coordinateSystem', COORDINATE_SYSTEMS[newIndex]);
+    }
+
+    #breakIntoCoordinateChunks(cleansed: string): [string, string] | null {
+        const coordinates = cleansed.split(/[ENSW]/).map((item) => item.trim()).filter((item) => item !== '');
+
+        if (coordinates.length > 1) {
+            return [coordinates[0], coordinates[1]];
+        }
+
+        const x = coordinates.pop();
+
+        if (!x) {
+            return null;
+        }
+
+        const digitStrings = x.split(/ /);
+
+        if (digitStrings.length % 2) {
+            // Can't figure out odd numbered sets of digits
+            return null;
+        }
+
+        const partsPerChunk = digitStrings.length / 2;
+        const firstHalf = digitStrings.slice(0, partsPerChunk);
+        const secondHalf = digitStrings.slice(partsPerChunk);
+
+        return [firstHalf.join(' '), secondHalf.join(' ')];
+    }
+
+    #isUTM(str: string): boolean {
+    }
+
+    #parseCoordinateString(str: string): number | null {
+        const parts = str.split(/ /).map((item) => parseFloat(item));
+
+        for (const part of parts) {
+            if (isNaN(part)) {
+                return null;
+            }
+        }
+
+        let multiplier = 1/60;
+        let result = parts.shift()!;
+
+        while (parts.length) {
+            result += parts.shift()! * multiplier;
+            multiplier /= 60;
+        }
+
+        return result;
     }
 
     #toDDD(lat: number, lon: number): LL {

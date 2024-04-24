@@ -33,14 +33,30 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
         .content {
             height: 100%;
             width: 100%;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            font-size: 3em;
+        }
+
+        .detail {
+            height: 100%;
+            width: 100%;
             padding: 1em;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             box-sizing: border-box;
             overflow: hidden;
-            font-size: 3em;
+        }
+
+        .delete {
+            box-sizing: border-box;
+            padding: 8px 8px 0 0;
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
         }
 
         @media (max-width: 960px) {
@@ -84,26 +100,31 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
     template: html`
         <div class="wrapper" *if="point">
             <div class="content">
-                <div><i18n-label id="location.addEdit.name"></i18n-label></div>
-                <div>
-                    <input
-                        type="text"
-                        value="{{point.name}}"
-                        @change="nameChange($event.target.value)"
-                    />
+                <div class="delete">
+                    <pretty-button @click="deletePoint()" id="location.addEdit.delete"></pretty-button>
                 </div>
-                <div class="gapAbove">
-                    <i18n-label id="location.addEdit.location"></i18n-label>
-                </div>
-                <div>
-                    <input
-                        type="text"
-                        value="{{location}}"
-                        @change="nameChange($event.target.value)"
-                    />
-                </div>
-                <div class="gapAbove centeredText">
-                    <i18n-label id="location.addEdit.help"></i18n-label>
+                <div class="detail">
+                    <div><i18n-label id="location.addEdit.name"></i18n-label></div>
+                    <div>
+                        <input
+                            type="text"
+                            value="{{point.name}}"
+                            @change="nameChange($event.target.value)"
+                        />
+                    </div>
+                    <div class="gapAbove">
+                        <i18n-label id="location.addEdit.location"></i18n-label>
+                    </div>
+                    <div>
+                        <input
+                            type="text"
+                            value="{{location}}"
+                            @change="locationChange($event.target.value)"
+                        />
+                    </div>
+                    <div class="gapAbove centeredText">
+                        <i18n-label id="location.addEdit.help"></i18n-label>
+                    </div>
                 </div>
             </div>
             <div class="buttons">
@@ -136,6 +157,21 @@ export class LocationAddEditComponent {
         }
 
         this.#updateLocation();
+    }
+
+    deletePoint() {
+        this.#waypointService.deletePoint(this.point!.id);
+        emit(this, 'list');
+    }
+
+    locationChange(location: string) {
+        const convertedLocation = this.#coordinateService.fromString(location);
+
+        if (convertedLocation) {
+            this.point!.lat = convertedLocation.lat;
+            this.point!.lon = convertedLocation.lon;
+            this.#waypointService.updatePoint(this.point!);
+        }
     }
 
     nameChange(name: string) {

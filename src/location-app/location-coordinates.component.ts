@@ -1,11 +1,7 @@
 import { Component, css, di, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
+import { LatLon } from '../services/coordinate.service';
 import { Subscription } from 'rxjs';
-
-export interface LatLon {
-    lat: number;
-    lon: number;
-}
 
 interface DataToDisplay {
     lat?: string | null;

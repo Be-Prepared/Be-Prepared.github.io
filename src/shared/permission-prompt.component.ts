@@ -21,21 +21,16 @@ import { goBack } from '../util/go-back';
             max-width: 90%;
         }
 
-        button {
-            background-color: var(--button-bg-color);
-            border: 2px solid var(--fg-color);
-            border-radius: 15px;
+        .bigger {
             font-size: 1.5em;
-            padding: 7.5px;
-            color: inherit;
         }
     `,
     template: html`
         <div></div>
         <div class="heading"><i18n-label id="permissionPrompt.heading"></i18n-label></div>
         <div class="message"><i18n-label id="{{messageId}}"></i18n-label></div>
-        <div><button @click.stop.prevent="grant()"><i18n-label id="permissionPrompt.grantPermission"></i18n-label></div>
-        <div><button @click.stop.prevent="goBack()"><i18n-label id="permissionPrompt.goBack"></i18n-label></button></div>
+        <div class="bigger"><pretty-button @click.stop.prevent="grant()" id="permissionPrompt.grantPermission"></pretty-button></div>
+        <div class="bigger"><pretty-button @click.stop.prevent="goBack()" id="permissionPrompt.goBack"></prettybutton></div>
         <div></div>
     `,
 })

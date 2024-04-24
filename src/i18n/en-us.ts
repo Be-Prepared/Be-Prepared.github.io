@@ -58,9 +58,10 @@ export const enUS: LanguageData = {
     'install.message': 'Install to Home Screen',
 
     // Location
-    'location.addEdit.name': 'Waypoint Name:',
-    'location.addEdit.location': 'Location:',
+    'location.addEdit.delete': 'Delete',
     'location.addEdit.help': 'Locations can be entered using many formats and are converted automatically.',
+    'location.addEdit.location': 'Location:',
+    'location.addEdit.name': 'Waypoint Name:',
     'location.explainAsk':
         'To use the GPS, the geolocation permission is required.',
     'location.field.ACCURACY': 'Accuracy:',
