@@ -230,7 +230,7 @@ export class LocationListAppComponent {
     #updatePoints(points: WaypointSaved[]) {
         const position = this.position;
 
-        if (!position || !position.timestamp) {
+        if (!position || !position.success) {
             this.#updatePointsNoPosition(points);
             return;
         }

@@ -12,6 +12,7 @@ import {
 } from './permissions.service';
 
 export interface GeolocationCoordinateResultSuccess {
+    success: true;
     timestamp: number;
     latitude: number;
     longitude: number;
@@ -23,6 +24,7 @@ export interface GeolocationCoordinateResultSuccess {
 }
 
 export interface GeolocationCoordinateResultError {
+    success: false;
     timestamp: number;
     error: GeolocationPositionError;
 }
@@ -69,6 +71,7 @@ export class GeolocationService {
         const lastPositions: GeolocationCoordinateResultSuccess[] = [];
         const success = (position: GeolocationPosition) => {
             const lastPosition: GeolocationCoordinateResultSuccess = {
+                success: true,
                 timestamp: position.timestamp,
                 latitude: position.coords.latitude,
                 longitude: position.coords.longitude,
@@ -95,6 +98,7 @@ export class GeolocationService {
         const error = (error: GeolocationPositionError) => {
             lastPositions.splice(0, lastPositions.length);
             subject.next({
+                success: false,
                 timestamp: Date.now(),
                 error,
             });

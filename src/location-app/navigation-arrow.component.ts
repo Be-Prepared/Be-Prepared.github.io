@@ -85,12 +85,11 @@ export class NavigationArrowComponent {
             .getPosition()
             .pipe(takeUntil(this.#subject))
             .subscribe((position) => {
-                if (position && position.timestamp) {
-                    const positionTyped = position as GeolocationCoordinateResultSuccess;
-                    this.#currentPosition = positionTyped;
+                if (position && position.success) {
+                    this.#currentPosition = position;
 
-                    if (!isNaN(positionTyped.heading)) {
-                        this.#currentHeading = positionTyped.heading;
+                    if (!isNaN(position.heading)) {
+                        this.#currentHeading = position.heading;
                     }
 
                     this.#updateCompassRose();

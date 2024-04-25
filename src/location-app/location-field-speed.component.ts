@@ -1,10 +1,7 @@
 import { combineLatest, Subscription } from 'rxjs';
 import { Component, css, di, html } from 'fudgel';
 import { DistanceService } from '../services/distance.service';
-import {
-    GeolocationCoordinateResultSuccess,
-    GeolocationService,
-} from '../services/geolocation.service';
+import { GeolocationService } from '../services/geolocation.service';
 import { I18nService } from '../i18n/i18n.service';
 
 @Component('location-field-speed', {
@@ -31,14 +28,11 @@ export class LocationFieldSpeedComponent {
             this.#geolocationService.getPosition(),
             this.#distanceService.getCurrentSetting(),
         ]).subscribe(([position]) => {
-            if (position && position.timestamp) {
-                const positionTyped =
-                    position as GeolocationCoordinateResultSuccess;
-
+            if (position && position.success) {
                 this.value = this.#distanceService.metersToString(
-                    positionTyped.speed,
+                    position.speed,
                     {
-                        isSpeed: true
+                        isSpeed: true,
                     }
                 );
             } else {

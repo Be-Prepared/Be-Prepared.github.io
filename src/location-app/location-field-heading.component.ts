@@ -1,9 +1,6 @@
 import { Component, css, di, html } from 'fudgel';
 import { DirectionService } from '../services/direction.service';
-import {
-    GeolocationCoordinateResultSuccess,
-    GeolocationService,
-} from '../services/geolocation.service';
+import { GeolocationService } from '../services/geolocation.service';
 import { I18nService } from '../i18n/i18n.service';
 import { Subscription } from 'rxjs';
 
@@ -26,14 +23,12 @@ export class LocationFieldHeadingComponent {
         this.#subscription = this.#geolocationService
             .getPosition()
             .subscribe((position) => {
-                if (position && position.timestamp) {
-                    const positionTyped = position as GeolocationCoordinateResultSuccess;
-
-                    if (isNaN(positionTyped.heading)) {
+                if (position && position.success) {
+                    if (isNaN(position.heading)) {
                         this.value = unknownValue;
                     } else {
                         this.value = this.#directionService.toHeadingDirection(
-                            positionTyped.heading
+                            position.heading
                         );
                     }
                 } else {

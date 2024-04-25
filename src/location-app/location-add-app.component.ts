@@ -1,8 +1,5 @@
 import { Component, css, di, html } from 'fudgel';
-import {
-    GeolocationCoordinateResultSuccess,
-    GeolocationService,
-} from '../services/geolocation.service';
+import { GeolocationService } from '../services/geolocation.service';
 import { Subscription } from 'rxjs';
 import { first, timeout } from 'rxjs/operators';
 import { WaypointSaved, WaypointService } from './waypoint.service';
@@ -26,11 +23,9 @@ export class LocationAddAppComponent {
             .getPosition()
             .pipe(timeout(2000), first())
             .subscribe((position) => {
-                if (position && position.timestamp) {
-                    const positionTyped =
-                        position as GeolocationCoordinateResultSuccess;
-                    point.lat = positionTyped.latitude;
-                    point.lon = positionTyped.longitude;
+                if (position && position.success) {
+                    point.lat = position.latitude;
+                    point.lon = position.longitude;
                 }
 
                 this.#waypointService.updatePoint(point);

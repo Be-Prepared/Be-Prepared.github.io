@@ -3,7 +3,6 @@ import { CoordinateService } from '../services/coordinate.service';
 import { DistanceService } from '../services/distance.service';
 import {
     GeolocationCoordinateResult,
-    GeolocationCoordinateResultSuccess,
     GeolocationService,
 } from '../services/geolocation.service';
 import { LatLon } from '../services/coordinate.service';
@@ -194,12 +193,10 @@ export class LocationAppComponent {
     }
 
     #redraw() {
-        if (this.position && this.position.timestamp) {
-            const positionTyped = this
-                .position as GeolocationCoordinateResultSuccess;
+        if (this.position && this.position.success) {
             this.latLon = {
-                lat: positionTyped.latitude,
-                lon: positionTyped.longitude,
+                lat: this.position.latitude,
+                lon: this.position.longitude,
             };
         } else {
             this.latLon = null;
