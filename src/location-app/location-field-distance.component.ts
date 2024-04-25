@@ -36,7 +36,6 @@ export class LocationFieldDistanceComponent {
     onInit() {
         const lat = parseFloat(this.lat || '');
         const lon = parseFloat(this.lon || '');
-        console.log(lat, lon);
         const unknownValue = this.value;
 
         this.#subscription = this.#geolocationService

@@ -1,12 +1,17 @@
 import { BehaviorSubject } from 'rxjs';
 
-const allowedOptions = ['COMPASS', 'DIRECTION_OF_TRAVEL', 'NORTH_UP'];
+export enum NavigationType {
+    COMPASS = 'COMPASS',
+    DIRECTION_OF_TRAVEL = 'DIRECTION_OF_TRAVEL',
+    NORTH_UP = 'NORTH_UP',
+};
+const allowedOptions = [NavigationType.COMPASS, NavigationType.DIRECTION_OF_TRAVEL, NavigationType.NORTH_UP];
 
 export class NavigationTypeService {
-    #subject = new BehaviorSubject<string>(allowedOptions[0]);
+    #subject = new BehaviorSubject<NavigationType>(allowedOptions[0]);
 
     constructor() {
-        const savedValue = localStorage.getItem('navigationType') || '';
+        const savedValue = localStorage.getItem('navigationType') as NavigationType;
 
         if (allowedOptions.includes(savedValue)) {
             this.#subject.next(savedValue);

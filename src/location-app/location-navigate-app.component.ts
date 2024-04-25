@@ -81,6 +81,10 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
             flex-grow: 1;
             width: 100%;
         }
+
+        .gapAbove {
+            padding-top: 0.4em;
+        }
     `,
     template: html`
         <div class="wrapper">
