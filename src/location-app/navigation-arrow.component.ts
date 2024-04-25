@@ -50,7 +50,7 @@ import { switchMap, takeUntil } from 'rxjs/operators';
             height: 100%;
             padding: 30%;
             box-sizing: border-box;
-            color: cyan;
+            color: #00e5e5;
         }
     `,
     template: html`
