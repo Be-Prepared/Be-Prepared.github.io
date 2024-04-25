@@ -30,7 +30,7 @@ interface DataToDisplay {
         <div *if="dataToDisplay.mgrs" class="multi-line">
             <changeable-setting @click="toggleCoordinateSystem()">
                 <div>
-                    <i18n-label id="location.mgrs" ws=""></i18n-label>
+                    <i18n-label id="location.coordinates.mgrs" ws=""></i18n-label>
                 </div>
                 <div>{{ dataToDisplay.mgrs }}</div>
             </changeable-setting>
@@ -38,7 +38,7 @@ interface DataToDisplay {
         <div *if="dataToDisplay.utmups" class="multi-line">
             <changeable-setting @click="toggleCoordinateSystem()">
                 <div>
-                    <i18n-label id="location.utmups" ws=""></i18n-label>
+                    <i18n-label id="location.coordinates.utmups" ws=""></i18n-label>
                 </div>
                 <div>{{ dataToDisplay.utmups }}</div>
             </changeable-setting>
