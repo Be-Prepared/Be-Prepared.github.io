@@ -1,4 +1,4 @@
-import { Component, css, di, emit, html } from 'fudgel';
+import { Component, css, di, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
 import { GeolocationService } from '../services/geolocation.service';
 import { Subscription } from 'rxjs';
