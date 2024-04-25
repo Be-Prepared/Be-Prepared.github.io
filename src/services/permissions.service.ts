@@ -53,8 +53,7 @@ export class PermissionsService {
                 () => subject.next(null),
                 () => subject.next(null),
                 {
-                    maximumAge: Infinity,
-                    timeout: 0,
+                    timeout: 4000,
                 }
             );
         }
