@@ -17,7 +17,10 @@ export type PermissionsServiceName = 'camera';
 
 export class PermissionsService {
     #observables = new Map<string, Observable<PermissionsServiceState>>();
-    #subjects = new Map<string, ReplaySubject<null>>();
+    #subjects = new Map<
+        string,
+        ReplaySubject<null | PermissionsServiceState>
+    >();
 
     camera(prompt = false) {
         if (!navigator.mediaDevices || !navigator.permissions) {
@@ -33,8 +36,10 @@ export class PermissionsService {
             // when deployed to HTTPS and if that changes.
             navigator.mediaDevices
                 .getUserMedia({ video: { facingMode: 'environment' } })
-                .catch(() => {})
-                .then(() => subject.next(null));
+                .then(
+                    () => subject.next(PermissionsServiceState.GRANTED),
+                    () => subject.next(PermissionsServiceState.DENIED)
+                );
         }
 
         return this.#getPermission(name, subject);
@@ -50,8 +55,8 @@ export class PermissionsService {
 
         if (prompt) {
             navigator.geolocation.getCurrentPosition(
-                () => subject.next(null),
-                () => subject.next(null),
+                () => subject.next(PermissionsServiceState.GRANTED),
+                () => subject.next(PermissionsServiceState.ERROR),
                 {
                     timeout: 4000,
                 }
@@ -86,6 +91,7 @@ export class PermissionsService {
         navigator.permissions.query({ name }).then(
             (status) => {
                 subject.next(status.state);
+                // Note: iOS has poor support for onchange.
                 status.onchange = () => {
                     subject.next(status.state);
                 };
@@ -98,7 +104,7 @@ export class PermissionsService {
 
     #getPermission(
         name: PermissionName,
-        subject: ReplaySubject<null>
+        subject: ReplaySubject<null | PermissionsServiceState>
     ): Observable<PermissionsServiceState> {
         let observable = this.#observables.get(name);
 
@@ -107,8 +113,15 @@ export class PermissionsService {
         }
 
         observable = subject.asObservable().pipe(
-            switchMap(() => this.#checkPermission(name)),
-            map((state: PermissionState) => this.#mapPermission(state)),
+            switchMap((value) => {
+                if (value !== null) {
+                    return of(value);
+                }
+
+                return this.#checkPermission(name).pipe(
+                    map((state: PermissionState) => this.#mapPermission(state))
+                );
+            }),
             distinctUntilChanged(),
             shareReplay(1)
         );
