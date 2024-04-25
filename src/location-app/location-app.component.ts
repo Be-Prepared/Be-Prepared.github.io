@@ -128,20 +128,26 @@ import { takeUntil } from 'rxjs/operators';
                     </div>
                 </div>
                 <div *if="position && position.error" class="content">
-                    <p>There is an error retrieving the location.</p>
+                    <p><i18n-label id="location.positionError"></i18n-label></p>
                     <p
                         *if="position.error.code === position.error.PERMISSION_DENIED"
                     >
-                        Permission denied.
+                        <i18n-label id="location.positionDenied"></i18n-label>
                     </p>
                     <p
                         *if="position.error.code === position.error.POSITION_UNAVAILABLE"
                     >
-                        Position unavailable.
+                        <i18n-label
+                            id="location.positionUnavailable"
+                        ></i18n-label>
                     </p>
                 </div>
                 <div *if="!position" class="content">
-                    <p>Retrieving location...</p>
+                    <p>
+                        <i18n-label
+                            id="location.retrievingLocation"
+                        ></i18n-label>
+                    </p>
                 </div>
                 <div class="buttons">
                     <back-button></back-button>
