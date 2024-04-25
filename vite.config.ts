@@ -46,6 +46,7 @@ export default defineConfig({
         }),
         VitePWA({
             manifest: {
+                display: 'minimal-ui',
                 icons: [
                     {
                         src: 'pwa-64x64.png',
