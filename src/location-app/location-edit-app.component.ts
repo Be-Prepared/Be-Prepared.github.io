@@ -1,8 +1,10 @@
 import { Component, css, di, emit, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
+import { GeolocationService } from '../services/geolocation.service';
+import { Subscription } from 'rxjs';
 import { WaypointSaved, WaypointService } from './waypoint.service';
 
-@Component('location-add-edit', {
+@Component('location-edit-app', {
     attr: ['id'],
     style: css`
         .wrapper {
@@ -95,73 +97,103 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
 
         input {
             font: inherit;
+            width: 100%;
+            text-align: center;
+        }
+
+        .fullWidth {
+            width: 100%;
         }
     `,
     template: html`
-        <div class="wrapper" *if="point">
-            <div class="content">
-                <div class="delete">
-                    <pretty-button @click="deletePoint()" id="location.addEdit.delete"></pretty-button>
+        <location-wrapper>
+            <div class="wrapper" *if="point">
+                <div class="content">
+                    <div class="delete">
+                        <pretty-button
+                            @click="deletePoint()"
+                            id="location.addEdit.delete"
+                        ></pretty-button>
+                    </div>
+                    <div class="detail">
+                        <div>
+                            <i18n-label id="location.addEdit.name"></i18n-label>
+                        </div>
+                        <div class="fullWidth">
+                            <input
+                                type="text"
+                                value="{{point.name}}"
+                                @change="nameChange($event.target.value)"
+                            />
+                        </div>
+                        <div class="gapAbove">
+                            <i18n-label
+                                id="location.addEdit.location"
+                            ></i18n-label>
+                        </div>
+                        <div class="fullWidth">
+                            <input
+                                type="text"
+                                value="{{location}}"
+                                @change="locationChange($event.target.value)"
+                            />
+                        </div>
+                        <div class="gapAbove centeredText">
+                            <i18n-label id="location.addEdit.helpSave"></i18n-label>
+                        </div>
+                        <div class="gapAbove centeredText">
+                            <i18n-label id="location.addEdit.helpCoordinates"></i18n-label>
+                        </div>
+                    </div>
                 </div>
-                <div class="detail">
-                    <div><i18n-label id="location.addEdit.name"></i18n-label></div>
-                    <div>
-                        <input
-                            type="text"
-                            value="{{point.name}}"
-                            @change="nameChange($event.target.value)"
-                        />
-                    </div>
-                    <div class="gapAbove">
-                        <i18n-label id="location.addEdit.location"></i18n-label>
-                    </div>
-                    <div>
-                        <input
-                            type="text"
-                            value="{{location}}"
-                            @change="locationChange($event.target.value)"
-                        />
-                    </div>
-                    <div class="gapAbove centeredText">
-                        <i18n-label id="location.addEdit.help"></i18n-label>
-                    </div>
+                <div class="buttons">
+                    <back-button></back-button>
+                    <scaling-icon
+                        class="navigate"
+                        @click.stop.prevent="navigate()"
+                        href="/navigate.svg"
+                    ></scaling-icon>
                 </div>
             </div>
-            <div class="buttons">
-                <back-button emit="list"></back-button>
-                <scaling-icon
-                    class="navigate"
-                    @click.stop.prevent="navigate()"
-                    href="./compass-icon.svg"
-                ></scaling-icon>
-            </div>
-        </div>
+        </location-wrapper>
     `,
 })
 export class LocationAddEditComponent {
     #coordinateService = di(CoordinateService);
+    #geolocationService = di(GeolocationService);
+    #subscription?: Subscription;
     #waypointService = di(WaypointService);
     id?: string;
     location: string = '';
     point: WaypointSaved | null = null;
 
     onInit() {
+        this.#subscription = this.#geolocationService.getPosition().subscribe(() => {
+            // Empty, but keeps the GPS active
+        });
         const id = this.id;
+        let point;
 
-        if (!id) {
-            this.point = this.#waypointService.newPoint();
-        } else {
-            const point = this.#waypointService.getPoint(+id);
-
-            this.point = point || this.#waypointService.newPoint();
+        if (id) {
+            point = this.#waypointService.getPoint(+id);
         }
 
+        if (!point) {
+            history.go(-1);
+            return;
+        }
+
+        this.point = point;
         this.#updateLocation();
+    }
+
+    onDestroy() {
+        this.#subscription && this.#subscription.unsubscribe();
     }
 
     deletePoint() {
         this.#waypointService.deletePoint(this.point!.id);
-        emit(this, 'list');
+        history.go(-1);
     }
 
     locationChange(location: string) {
@@ -180,7 +212,11 @@ export class LocationAddEditComponent {
     }
 
     navigate() {
-        emit(this, 'navigate', this.id);
+        history.pushState(
+            {},
+            document.title,
+            `/location-navigate/${this.point!.id}`
+        );
     }
 
     #updateLocation() {

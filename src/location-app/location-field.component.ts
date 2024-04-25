@@ -7,11 +7,24 @@ interface FieldInfo {
 }
 
 @Component('location-field', {
-    attr: ['default', 'id'],
+    attr: ['default', 'id', 'lat', 'lon', 'name'],
     style: css`
+        .field-line {
+            display: flex;
+            overflow: hidden;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+        }
+
         .field-label-wrapper {
             display: inline-block;
             padding-right: 0.4em;
+        }
+
+        .field-value-wrapper {
+            flex-shrink: 1;
+            overflow: hidden;
         }
 
         .field-label {
@@ -31,36 +44,52 @@ interface FieldInfo {
         }
     `,
     template: html`
-        <div class="field-label-wrapper">
-            <div class="field-label">
-                {{selectedField.label}}
-                <select
-                    id="{{id}}"
-                    #ref="select"
-                    class="hidden-select"
-                    @change="selectField($event.target.value)"
-                >
-                    <option *for="field of allowedFields" value="{{field.id}}">
-                        {{field.label}}
-                    </option>
-                </select>
+        <div class="field-line">
+            <div class="field-label-wrapper">
+                <div class="field-label">
+                    {{selectedField.label}}
+                    <select
+                        id="{{id}}"
+                        #ref="select"
+                        class="hidden-select"
+                        @change="selectField($event.target.value)"
+                    >
+                        <option
+                            *for="field of allowedFields"
+                            value="{{field.id}}"
+                        >
+                            {{field.label}}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="field-value-wrapper">
+                <location-field-accuracy
+                    *if="selectedField.id === 'ACCURACY'"
+                ></location-field-accuracy>
+                <location-field-altitude
+                    *if="selectedField.id === 'ALTITUDE'"
+                ></location-field-altitude>
+                <location-field-altitude-accuracy
+                    *if="selectedField.id === 'ALTITUDE_ACCURACY'"
+                ></location-field-altitude-accuracy>
+                <location-field-destination
+                    *if="selectedField.id === 'DESTINATION'"
+                    name="{{name}}"
+                ></location-field-destination>
+                <location-field-distance
+                    *if="selectedField.id === 'DISTANCE'"
+                    lat="{{lat}}"
+                    lon="{{lon}}"
+                ></location-field-distance>
+                <location-field-heading
+                    *if="selectedField.id === 'HEADING'"
+                ></location-field-heading>
+                <location-field-speed
+                    *if="selectedField.id === 'SPEED'"
+                ></location-field-speed>
             </div>
         </div>
-        <location-field-accuracy
-            *if="selectedField.id === 'ACCURACY'"
-        ></location-field-accuracy>
-        <location-field-altitude
-            *if="selectedField.id === 'ALTITUDE'"
-        ></location-field-altitude>
-        <location-field-altitude-accuracy
-            *if="selectedField.id === 'ALTITUDE_ACCURACY'"
-        ></location-field-altitude-accuracy>
-        <location-field-heading
-            *if="selectedField.id === 'HEADING'"
-        ></location-field-heading>
-        <location-field-speed
-            *if="selectedField.id === 'SPEED'"
-        ></location-field-speed>
     `,
 })
 export class LocationFieldComponent {
@@ -68,17 +97,26 @@ export class LocationFieldComponent {
     allowedFields: FieldInfo[] = [];
     default?: string;
     id?: string;
+    lat?: string;
+    lon?: string;
+    name?: string;
     select?: HTMLSelectElement;
     selectedField?: FieldInfo;
 
     onInit() {
-        for (const id of [
+        const allowedFieldTypes = [
             'ACCURACY',
             'ALTITUDE',
             'ALTITUDE_ACCURACY',
             'HEADING',
             'SPEED',
-        ]) {
+        ];
+
+        if (this.lat !== undefined && this.lon !== undefined) {
+            allowedFieldTypes.push('DESTINATION', 'DISTANCE');
+        }
+
+        for (const id of allowedFieldTypes) {
             this.allowedFields.push({
                 id,
                 label: this.#i18nService.get(`location.field.${id}`),

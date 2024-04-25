@@ -171,7 +171,12 @@ export class CoordinateService {
         return [firstHalf.join(' '), secondHalf.join(' ')];
     }
 
-    #isUTM(str: string): boolean {
+    #padLeading(str: string): string {
+        if (str.length === 1 || str.charAt(1) === '.') {
+            return `0${str}`;
+        }
+
+        return str;
     }
 
     #parseCoordinateString(str: string): number | null {
@@ -214,12 +219,12 @@ export class CoordinateService {
         lat = Math.abs(lat);
         const latDeg = Math.floor(lat);
         const latMin = (lat - latDeg) * 60;
-        const latMinFixed = latMin.toFixed(3);
+        const latMinFixed = this.#padLeading(latMin.toFixed(3));
 
         lon = Math.abs(lon);
         const lonDeg = Math.floor(lon);
         const lonMin = (lon - lonDeg) * 60;
-        const lonMinFixed = lonMin.toFixed(3);
+        const lonMinFixed = this.#padLeading(lonMin.toFixed(3));
 
         return {
             lat: `${latDir} ${latDeg}° ${latMinFixed}'`,
@@ -236,20 +241,22 @@ export class CoordinateService {
         const latDeg = Math.floor(lat);
         lat = (lat - latDeg) * 60;
         const latMin = Math.floor(lat);
+        const latMinFixed = this.#padLeading(latMin.toFixed(0));
         const latSec = (lat - latMin) * 60;
-        const latSecFixed = latSec.toFixed(1);
+        const latSecFixed = this.#padLeading(latSec.toFixed(1));
 
         lon = Math.abs(lon);
         const lonDeg = Math.floor(lon);
         lon = (lon - lonDeg) * 60;
         const lonMin = Math.floor(lon);
+        const lonMinFixed = this.#padLeading(lonMin.toFixed(0));
         const lonSec = (lon - lonMin) * 60;
-        const lonSecFixed = lonSec.toFixed(1);
+        const lonSecFixed = this.#padLeading(lonSec.toFixed(1));
 
         return {
-            lat: `${latDir} ${latDeg}° ${latMin}' ${latSecFixed}"`,
-            lon: `${lonDir} ${lonDeg}° ${lonMin}' ${lonSecFixed}"`,
-            latLon: `${latDir} ${latDeg} ${latMin} ${latSecFixed} ${lonDir} ${lonDeg} ${lonMin} ${lonSecFixed}`,
+            lat: `${latDir} ${latDeg}° ${latMinFixed}' ${latSecFixed}"`,
+            lon: `${lonDir} ${lonDeg}° ${lonMinFixed}' ${lonSecFixed}"`,
+            latLon: `${latDir} ${latDeg} ${latMinFixed} ${latSecFixed} ${lonDir} ${lonDeg} ${lonMinFixed} ${lonSecFixed}`,
         };
     }
 

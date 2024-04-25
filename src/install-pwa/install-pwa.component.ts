@@ -45,7 +45,7 @@ import { InstallPwaService } from './install-pwa.service';
         <bottom-drawer #ref="drawer">
             <div class="load-svg-wrapper">
                 <load-svg
-                    href="toolbox.svg"
+                    href="/toolbox.svg"
                     @loadsvg.stop.prevent="logoLoaded()"
                 ></load-svg>
             </div>

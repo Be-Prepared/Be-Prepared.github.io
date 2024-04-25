@@ -59,7 +59,8 @@ export const enUS: LanguageData = {
 
     // Location
     'location.addEdit.delete': 'Delete',
-    'location.addEdit.help': 'Locations can be entered using many formats and are converted automatically.',
+    'location.addEdit.helpCoordinates': 'Locations can be entered using many common formats.',
+    'location.addEdit.helpSave': 'Changes are saved automatically.',
     'location.addEdit.location': 'Location:',
     'location.addEdit.name': 'Waypoint Name:',
     'location.explainAsk':
@@ -67,12 +68,18 @@ export const enUS: LanguageData = {
     'location.field.ACCURACY': 'Accuracy:',
     'location.field.ALTITUDE': 'Altitude:',
     'location.field.ALTITUDE_ACCURACY': 'Altitude Accuracy:',
+    'location.field.DESTINATION': 'Name:',
+    'location.field.DISTANCE': 'Distance:',
     'location.field.HEADING': 'Heading:',
     'location.field.SPEED': 'Speed:',
     'location.field.unknownValue': 'Unknown',
     'location.coordinates.empty': 'No coordinates available.',
     'location.coordinates.mgrs': 'MGRS:',
     'location.coordinates.utmups': 'UTM/UPS:',
+    'location.navigation.COMPASS': 'Compass',
+    'location.navigation.DIRECTION_OF_TRAVEL': 'Direction of Travel',
+    'location.navigation.NORTH_UP': 'North Up',
+    'location.navigation.unknownValue': 'Unknown',
     'location.unavailable': 'Not Available',
     'location.unavailableMessage':
         'There is no GPS available on this device. The location tool will be removed from the starting menu.',

@@ -17,6 +17,10 @@ import { TileDefResolved, TileService } from '../services/tile.service';
                 path="/{{tile.id}}"
                 component="{{tile.component}}"
             ></div>
+            <div path="/location-add" component="location-add-app"></div>
+            <div path="/location-edit/:id" component="location-edit-app"></div>
+            <div path="/location-list" component="location-list-app"></div>
+            <div path="/location-navigate/:id" component="location-navigate-app"></div>
             <div path="**" component="app-index"></div>
         </app-router>
     `,

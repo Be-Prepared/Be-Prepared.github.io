@@ -1,5 +1,5 @@
 import CheapRuler from 'cheap-ruler';
-import { Component, css, di, emit, html } from 'fudgel';
+import { Component, css, di, html } from 'fudgel';
 import { DirectionService } from '../services/direction.service';
 import { DistanceService } from '../services/distance.service';
 import {
@@ -17,7 +17,7 @@ interface WaypointAugmented extends WaypointSaved {
     location: string;
 }
 
-@Component('location-waypoints', {
+@Component('location-list-app', {
     style: css`
         .wrapper {
             display: flex;
@@ -131,48 +131,54 @@ interface WaypointAugmented extends WaypointSaved {
         }
     `,
     template: html`
-        <div class="wrapper">
-            <div class="content">
-                <div *if="points.length" class="pointListWrapper">
-                    <div class="pointListHeader">
-                        <div class="name" @click="sortByName()">
-                            <i18n-label
-                                id="location.waypoints.name"
-                            ></i18n-label>
+        <location-wrapper>
+            <div class="wrapper">
+                <div class="content">
+                    <div *if="points.length" class="pointListWrapper">
+                        <div class="pointListHeader">
+                            <div class="name" @click="sortByName()">
+                                <i18n-label
+                                    id="location.waypoints.name"
+                                ></i18n-label>
+                            </div>
+                            <div class="location" @click="sortByDistance()">
+                                <i18n-label
+                                    id="location.waypoints.location"
+                                ></i18n-label>
+                            </div>
                         </div>
-                        <div class="location" @click="sortByDistance()">
-                            <i18n-label
-                                id="location.waypoints.location"
-                            ></i18n-label>
+                        <div class="pointList">
+                            <div
+                                *for="waypoint of points"
+                                class="pointListLine"
+                                @click.stop.prevent="goToEdit(waypoint)"
+                            >
+                                <div class="name">{{ waypoint.name }}</div>
+                                <div class="location">
+                                    {{ waypoint.location }}
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="pointList">
-                        <div
-                            *for="waypoint of points"
-                            class="pointListLine"
-                            @click.stop.prevent="goToEdit(waypoint)"
-                        >
-                            <div class="name">{{ waypoint.name }}</div>
-                            <div class="location">{{ waypoint.location }}</div>
-                        </div>
+                    <div *if="!points.length">
+                        <i18n-label
+                            id="location.waypoints.noWaypoints"
+                        ></i18n-label>
                     </div>
                 </div>
-                <div *if="!points.length">
-                    <i18n-label id="location.waypoints.noWaypoints"></i18n-label>
+                <div class="buttons">
+                    <back-button></back-button>
+                    <scaling-icon
+                        class="add"
+                        @click.stop.prevent="goToAdd()"
+                        href="/add.svg"
+                    ></scaling-icon>
                 </div>
             </div>
-            <div class="buttons">
-                <back-button emit="current"></back-button>
-                <scaling-icon
-                    class="add"
-                    @click.stop.prevent="goToAdd()"
-                    href="./add.svg"
-                ></scaling-icon>
-            </div>
-        </div>
+        </location-wrapper>
     `,
 })
-export class LocationWaypointsComponent {
+export class LocationListAppComponent {
     #directionService = di(DirectionService);
     #distanceService = di(DistanceService);
     #geolocationService = di(GeolocationService);
@@ -198,11 +204,11 @@ export class LocationWaypointsComponent {
     }
 
     goToAdd() {
-        emit(this, 'add');
+        history.pushState({}, document.title, '/location-add');
     }
 
     goToEdit(waypoint: WaypointSaved) {
-        emit(this, 'edit', waypoint.id);
+        history.pushState({}, document.title, `/location-edit/${waypoint.id}`);
     }
 
     sortByDistance() {

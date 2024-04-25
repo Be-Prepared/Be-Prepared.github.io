@@ -50,7 +50,7 @@ import { Component, css, html } from 'fudgel';
     `,
     template: html`
         <div class="wrapper" @click.stop.prevent="clicked()">
-        <load-svg href="qr-code.svg"></load-svg>
+        <load-svg href="/qr-code.svg"></load-svg>
         <div class="copied" #ref="copied"><div><i18n-label id="info.shareCopied"></i18n-label></div></div>
         </div>
     `,

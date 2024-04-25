@@ -4,7 +4,7 @@ import CheapRuler from 'cheap-ruler';
 import { di } from 'fudgel';
 import { finalize, share, switchMap } from 'rxjs/operators';
 import { KalmanFilterArray } from '@bencevans/kalman-filter';
-import { of } from 'rxjs';
+import { of, timer } from 'rxjs';
 import { Observable, ReplaySubject, Subject } from 'rxjs';
 import {
     PermissionsService,
@@ -106,7 +106,7 @@ export class GeolocationService {
             }),
             share({
                 connector: () => new ReplaySubject(1),
-                resetOnRefCountZero: true,
+                resetOnRefCountZero: () => timer(5000),
             })
         );
         navigator.geolocation.getCurrentPosition(success, error);

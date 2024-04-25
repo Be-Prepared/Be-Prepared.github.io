@@ -65,7 +65,7 @@ import { TorchService } from '../services/torch.service';
                     *if="torchAvailable"
                     @click.stop.prevent="toggleTorch()"
                     class="{{torchClass}}"
-                    href="flashlight.svg"
+                    href="/flashlight.svg"
                 ></scaling-icon>
             </div>
         </div>

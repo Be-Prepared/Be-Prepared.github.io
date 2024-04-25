@@ -53,7 +53,7 @@ import { WakeLockService } from '../services/wake-lock.service';
                 class="toggle {{buttonClass}}"
                 @click.stop.prevent="toggle()"
             >
-                <scaling-icon href="flashlight.svg"></scaling-icon>
+                <scaling-icon href="/flashlight.svg"></scaling-icon>
             </button>
             <div class="buttonBar">
                 <back-button></back-button>
