@@ -52,14 +52,15 @@ export class PermissionsService {
 
         const name: PermissionName = 'geolocation';
         const subject = this.#getSubject(name);
-        console.log('1getting geolocation', prompt);
 
         if (prompt) {
             navigator.geolocation.getCurrentPosition(
                 () => {
-                    console.log('1ok');
-                    subject.next(PermissionsServiceState.GRANTED)},
-                () => {console.log('1err'); subject.next(PermissionsServiceState.ERROR)},
+                    subject.next(PermissionsServiceState.GRANTED);
+                },
+                () => {
+                    subject.next(PermissionsServiceState.ERROR);
+                },
                 {
                     timeout: 4000,
                 }
@@ -90,15 +91,12 @@ export class PermissionsService {
 
     #checkPermission(name: PermissionName) {
         const subject = new ReplaySubject<PermissionState>(1);
-        console.log('3check', name);
 
         navigator.permissions.query({ name }).then(
             (status) => {
-                console.log('3status', status.state);
                 subject.next(status.state);
                 // Note: iOS has poor support for onchange.
                 status.onchange = () => {
-                    console.log('3onchange', status.state);
                     subject.next(status.state);
                 };
             },
@@ -115,21 +113,19 @@ export class PermissionsService {
         let observable = this.#observables.get(name);
 
         if (observable) {
-            console.log('2observable');
             return observable;
         }
 
         observable = subject.asObservable().pipe(
             switchMap((value) => {
-                console.log('2value', value);
                 if (value !== null) {
                     return of(value);
                 }
 
                 return this.#checkPermission(name).pipe(
                     map((state: PermissionState) => {
-                        console.log('2state', state);
-                        return this.#mapPermission(state);})
+                        return this.#mapPermission(state);
+                    })
                 );
             }),
             distinctUntilChanged(),
