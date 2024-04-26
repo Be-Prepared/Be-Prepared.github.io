@@ -37,13 +37,16 @@ import { WakeLockService } from '../services/wake-lock.service';
             width: 100%;
         }
 
+        .buttons {
+            display: flex;
+        }
+
         @media (orientation: landscape) {
             :host {
                 flex-direction: row-reverse;
             }
 
             .buttons {
-                display: flex;
                 flex-direction: column-reverse;
             }
         }
@@ -75,7 +78,7 @@ import { WakeLockService } from '../services/wake-lock.service';
 
             <p><i18n-label id="info.buildInformationHeader"></i18n-label></p>
             <ul>
-                <li>{{buildDate}}, commit <styled-link href="https://github.com/fidian/be-prepared/commit/{{version}}">{{shortVersion}}</styled-link></li>
+                <li>{{buildDate}}, commit <styled-link href="https://github.com/Be-Prepared/Be-Prepared/commit/{{version}}">{{shortVersion}}</styled-link></li>
                 <li>Node.js {{nodeVersion}} ({{hostPlatform}} {{hostArch}})</li>
             </ul>
         </div>

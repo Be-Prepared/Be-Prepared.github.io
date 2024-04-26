@@ -2,6 +2,7 @@ import { Component, css, di, html } from 'fudgel';
 import { I18nService } from '../i18n/i18n.service';
 
 interface FieldInfo {
+    heading: string;
     id: string;
     label: string;
 }
@@ -51,7 +52,7 @@ interface FieldInfo {
         <div class="field-line">
             <div class="field-label-wrapper">
                 <div class="field-label">
-                    <changeable-setting>{{selectedField.label}}</changeable-setting>
+                    <changeable-setting>{{selectedField.heading}}</changeable-setting>
                     <select
                         id="{{id}}"
                         #ref="select"
@@ -122,14 +123,15 @@ export class LocationFieldComponent {
             'SPEED',
         ];
 
-        if (this.lat !== undefined && this.lon !== undefined) {
+        if (typeof this.lat === 'string' && typeof this.lon === 'string') {
             allowedFieldTypes.push('DESTINATION', 'DISTANCE');
         }
 
         for (const id of allowedFieldTypes) {
             this.allowedFields.push({
+                heading: this.#i18nService.get(`location.field.${id}.heading`),
                 id,
-                label: this.#i18nService.get(`location.field.${id}`),
+                label: this.#i18nService.get(`location.field.${id}.label`),
             });
         }
 
