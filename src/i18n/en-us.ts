@@ -71,6 +71,7 @@ export const enUS: LanguageData = {
     'location.field.ACCURACY': 'Accuracy:',
     'location.field.ALTITUDE': 'Altitude:',
     'location.field.ALTITUDE_ACCURACY': 'Altitude Accuracy:',
+    'location.field.BEARING': 'Bearing:',
     'location.field.DESTINATION': 'Name:',
     'location.field.DISTANCE': 'Distance:',
     'location.field.HEADING': 'Heading:',

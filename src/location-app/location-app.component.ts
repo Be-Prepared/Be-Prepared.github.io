@@ -38,7 +38,6 @@ import { takeUntil } from 'rxjs/operators';
             align-items: center;
             box-sizing: border-box;
             overflow: hidden;
-            font-size: 3em;
         }
 
         .gapAbove {
@@ -49,30 +48,6 @@ import { takeUntil } from 'rxjs/operators';
             display: flex;
             flex-direction: column;
             text-align: center;
-        }
-
-        @media (max-width: 960px) {
-            .content {
-                font-size: 2.5em;
-            }
-        }
-
-        @media (max-width: 720px) {
-            .content {
-                font-size: 1.8em;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .content {
-                font-size: 1.3em;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .content {
-                font-size: 1em;
-            }
         }
 
         @media (orientation: landscape) {

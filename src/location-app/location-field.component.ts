@@ -9,6 +9,10 @@ interface FieldInfo {
 @Component('location-field', {
     attr: ['default', 'id', 'lat', 'lon', 'name'],
     style: css`
+        :host {
+            max-width: 100%;
+        }
+
         .field-line {
             display: flex;
             overflow: hidden;
@@ -47,7 +51,7 @@ interface FieldInfo {
         <div class="field-line">
             <div class="field-label-wrapper">
                 <div class="field-label">
-                    {{selectedField.label}}
+                    <changeable-setting>{{selectedField.label}}</changeable-setting>
                     <select
                         id="{{id}}"
                         #ref="select"
@@ -73,6 +77,11 @@ interface FieldInfo {
                 <location-field-altitude-accuracy
                     *if="selectedField.id === 'ALTITUDE_ACCURACY'"
                 ></location-field-altitude-accuracy>
+                <location-field-distance
+                    *if="selectedField.id === 'BEARING'"
+                    lat="{{lat}}"
+                    lon="{{lon}}"
+                ></location-field-distance>
                 <location-field-destination
                     *if="selectedField.id === 'DESTINATION'"
                     name="{{name}}"
@@ -108,6 +117,7 @@ export class LocationFieldComponent {
             'ACCURACY',
             'ALTITUDE',
             'ALTITUDE_ACCURACY',
+            'BEARING',
             'HEADING',
             'SPEED',
         ];

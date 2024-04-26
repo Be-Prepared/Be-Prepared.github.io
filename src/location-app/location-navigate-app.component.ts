@@ -31,30 +31,20 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
             align-items: center;
             box-sizing: border-box;
             overflow: hidden;
-            font-size: 3em;
         }
 
-        @media (max-width: 960px) {
-            .content {
-                font-size: 2.5em;
-            }
+        .type-and-arrow {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            text-align: center;
         }
 
-        @media (max-width: 720px) {
-            .content {
-                font-size: 1.8em;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .content {
-                font-size: 1.3em;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .content {
-                font-size: 1em;
+        @media (orientation: portrait) {
+            .type-and-arrow {
+                width: 100%;
             }
         }
 
@@ -66,15 +56,28 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
             .buttons {
                 flex-direction: column-reverse;
             }
+
+            .content {
+                flex-direction: row;
+            }
+
+            .type-and-arrow {
+                height: 100%;
+            }
         }
 
-        .fullWidth {
-            width: 100%;
+        .field {
+            display: flex;
+            max-width: 100%;
         }
 
         .fields {
             overflow: hidden;
-            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            max-width: 100%;
         }
 
         .navigationArrow {
@@ -87,69 +90,73 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
         }
     `,
     template: html`
-        <div class="wrapper">
-            <div class="content">
-                <navigation-type></navigation-type>
-                <navigation-arrow
-                    class="navigationArrow"
-                    lat="{{point.lat}}"
-                    lon="{{point.lon}}"
-                ></navigation-arrow>
-                <div class="gapAbove fields">
-                    <div class="fullWidth">
-                        <location-field
-                            id="navigate.1"
-                            default="DISTANCE"
+        <location-wrapper>
+            <div class="wrapper">
+                <div class="content">
+                    <div class="type-and-arrow">
+                        <navigation-type></navigation-type>
+                        <navigation-arrow
+                            class="navigationArrow"
                             lat="{{point.lat}}"
                             lon="{{point.lon}}"
-                            name="{{point.name}}"
-                        ></location-field>
+                        ></navigation-arrow>
                     </div>
-                    <div class="fullWidth">
-                        <location-field
-                            id="navigate.2"
-                            default="DESTINATION"
-                            lat="{{point.lat}}"
-                            lon="{{point.lon}}"
-                            name="{{point.name}}"
-                        ></location-field>
-                    </div>
-                    <div class="fullWidth">
-                        <location-field
-                            id="navigate.3"
-                            default="SPEED"
-                            lat="{{point.lat}}"
-                            lon="{{point.lon}}"
-                            name="{{point.name}}"
-                        ></location-field>
-                    </div>
-                    <div class="fullWidth">
-                        <location-field
-                            id="navigate.4"
-                            default="HEADING"
-                            lat="{{point.lat}}"
-                            lon="{{point.lon}}"
-                            name="{{point.name}}"
-                        ></location-field>
-                    </div>
-                    <div class="fullWidth">
-                        <location-field
-                            id="navigate.5"
-                            default="ACCURACY"
-                            lat="{{point.lat}}"
-                            lon="{{point.lon}}"
-                            name="{{point.name}}"
-                        ></location-field>
+                    <div class="gapAbove fields">
+                        <div class="field">
+                            <location-field
+                                id="navigate.1"
+                                default="DISTANCE"
+                                lat="{{point.lat}}"
+                                lon="{{point.lon}}"
+                                name="{{point.name}}"
+                            ></location-field>
+                        </div>
+                        <div class="field">
+                            <location-field
+                                id="navigate.2"
+                                default="DESTINATION"
+                                lat="{{point.lat}}"
+                                lon="{{point.lon}}"
+                                name="{{point.name}}"
+                            ></location-field>
+                        </div>
+                        <div class="field">
+                            <location-field
+                                id="navigate.3"
+                                default="SPEED"
+                                lat="{{point.lat}}"
+                                lon="{{point.lon}}"
+                                name="{{point.name}}"
+                            ></location-field>
+                        </div>
+                        <div class="field">
+                            <location-field
+                                id="navigate.4"
+                                default="HEADING"
+                                lat="{{point.lat}}"
+                                lon="{{point.lon}}"
+                                name="{{point.name}}"
+                            ></location-field>
+                        </div>
+                        <div class="field">
+                            <location-field
+                                id="navigate.5"
+                                default="ACCURACY"
+                                lat="{{point.lat}}"
+                                lon="{{point.lon}}"
+                                name="{{point.name}}"
+                            ></location-field>
+                        </div>
                     </div>
                 </div>
+                <div class="buttons">
+                    <back-button
+                        @back.stop.prevent="goBack()"
+                        emit="back"
+                    ></back-button>
+                </div>
             </div>
-            <div class="buttons">
-                <back-button
-                    @back.stop.prevent="goBack()"
-                    emit="back"
-                ></back-button>
-            </div>
-        </div>
+        </location-wrapper>
     `,
 })
 export class LocationNavigateAppComponent {

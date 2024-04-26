@@ -38,7 +38,6 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
             display: flex;
             flex-direction: column;
             box-sizing: border-box;
-            font-size: 3em;
         }
 
         .detail {
@@ -61,30 +60,6 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
             justify-content: flex-end;
         }
 
-        @media (max-width: 960px) {
-            .content {
-                font-size: 2.5em;
-            }
-        }
-
-        @media (max-width: 720px) {
-            .content {
-                font-size: 1.8em;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .content {
-                font-size: 1.3em;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .content {
-                font-size: 1em;
-            }
-        }
-
         @media (orientation: landscape) {
             .wrapper {
                 flex-direction: row-reverse;
@@ -93,6 +68,19 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
             .buttons {
                 flex-direction: column-reverse;
             }
+
+            .landscape-side-by-side {
+                display: flex;
+                flex-direction: row;
+                whitespace: no-wrap;
+                width: 100%;
+                gap: 10px;
+                align-items: center;
+            }
+        }
+
+        .no-shrink {
+            flex-shrink: 0;
         }
 
         input {
@@ -116,27 +104,31 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
                         ></pretty-button>
                     </div>
                     <div class="detail">
-                        <div>
-                            <i18n-label id="location.addEdit.name"></i18n-label>
+                        <div class="landscape-side-by-side">
+                            <div class="no-shrink">
+                                <i18n-label id="location.addEdit.name"></i18n-label>
+                            </div>
+                            <div class="fullWidth">
+                                <input
+                                    type="text"
+                                    value="{{point.name}}"
+                                    @change="nameChange($event.target.value)"
+                                />
+                            </div>
                         </div>
-                        <div class="fullWidth">
-                            <input
-                                type="text"
-                                value="{{point.name}}"
-                                @change="nameChange($event.target.value)"
-                            />
-                        </div>
-                        <div class="gapAbove">
-                            <i18n-label
-                                id="location.addEdit.location"
-                            ></i18n-label>
-                        </div>
-                        <div class="fullWidth">
-                            <input
-                                type="text"
-                                value="{{location}}"
-                                @change="locationChange($event.target.value)"
-                            />
+                        <div class="landscape-side-by-side gapAbove">
+                            <div class="no-shrink">
+                                <i18n-label
+                                    id="location.addEdit.location"
+                                ></i18n-label>
+                            </div>
+                            <div class="fullWidth">
+                                <input
+                                    type="text"
+                                    value="{{location}}"
+                                    @change="locationChange($event.target.value)"
+                                />
+                            </div>
                         </div>
                         <div class="gapAbove centeredText">
                             <i18n-label id="location.addEdit.helpSave"></i18n-label>

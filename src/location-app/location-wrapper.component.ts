@@ -10,6 +10,65 @@ import { takeUntil } from 'rxjs/operators';
         .full {
             height: 100%;
             width: 100%;
+            font-size: 3em;
+        }
+
+        @media (max-width: 960px) {
+            .full {
+                font-size: 2.5em;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .full {
+                font-size: 1.8em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .full {
+                font-size: 1.3em;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .full {
+                font-size: 1em;
+            }
+        }
+
+        @media (orientation: landscape) {
+            .wrapper {
+                flex-direction: row-reverse;
+            }
+
+            .buttons {
+                flex-direction: column-reverse;
+            }
+
+            @media (max-width: 960px) {
+                .full {
+                    font-size: 1.3em;
+                }
+            }
+
+            @media (max-width: 720px) {
+                .full {
+                    font-size: 1.2em;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .full {
+                    font-size: 1.1em;
+                }
+            }
+
+            @media (max-width: 360px) {
+                .full {
+                    font-size: 1em;
+                }
+            }
         }
     `,
     template: html`

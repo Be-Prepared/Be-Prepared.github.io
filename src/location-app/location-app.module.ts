@@ -5,6 +5,7 @@ export * from './location-edit-app.component.ts';
 export * from './location-field-accuracy.component.ts';
 export * from './location-field-altitude-accuracy.component.ts';
 export * from './location-field-altitude.component.ts';
+export * from './location-field-bearing.component.ts';
 export * from './location-field.component.ts';
 export * from './location-field-destination.component.ts';
 export * from './location-field-distance.component.ts';

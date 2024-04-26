@@ -4,7 +4,7 @@ import { Component, css } from 'fudgel';
     style: css`
         :host {
             text-decoration: underline;
-            text-decoration-style: dotted;
+            text-decoration-style: solid;
             text-decoration-color: var(--changeable-setting-underline-color);
             cursor: pointer;
         }

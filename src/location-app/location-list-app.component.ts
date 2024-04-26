@@ -46,7 +46,6 @@ interface WaypointAugmented extends WaypointSaved {
             align-items: center;
             box-sizing: border-box;
             overflow: hidden;
-            font-size: 3em;
         }
 
         .pointListWrapper {
@@ -94,30 +93,6 @@ interface WaypointAugmented extends WaypointSaved {
             box-sizing: border-box;
             white-space: nowrap;
             padding: 0 0.2em 0 0.8em;
-        }
-
-        @media (max-width: 960px) {
-            .content {
-                font-size: 2.5em;
-            }
-        }
-
-        @media (max-width: 720px) {
-            .content {
-                font-size: 1.8em;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .content {
-                font-size: 1.3em;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .content {
-                font-size: 1em;
-            }
         }
 
         @media (orientation: landscape) {
