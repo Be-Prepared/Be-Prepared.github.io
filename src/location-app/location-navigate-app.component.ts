@@ -1,4 +1,5 @@
 import { Component, css, di, emit, html } from 'fudgel';
+import { WakeLockService } from '../services/wake-lock.service';
 import { WaypointSaved, WaypointService } from './waypoint.service';
 
 @Component('location-navigate-app', {
@@ -160,6 +161,7 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
     `,
 })
 export class LocationNavigateAppComponent {
+    #wakeLockService = di(WakeLockService);
     #waypointService = di(WaypointService);
     id?: string;
     point: WaypointSaved | null = null;
@@ -174,6 +176,12 @@ export class LocationNavigateAppComponent {
         if (!this.point) {
             this.goBack();
         }
+
+        this.#wakeLockService.request();
+    }
+
+    onDestroy() {
+        this.#wakeLockService.release();
     }
 
     goBack() {

@@ -36,6 +36,22 @@ import { Component, css, html } from 'fudgel';
             text-align: center;
         }
 
+        .qr-wrapper {
+            height: min(50vh, 50vw);
+        }
+
+        .qr-code {
+            position: absolute;
+            aspect-ratio: 1/1;
+            margin: auto;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
         @media (max-width: 960px) {
             load-svg {
                 max-width: 50vw;
@@ -50,7 +66,9 @@ import { Component, css, html } from 'fudgel';
     `,
     template: html`
         <div class="wrapper" @click.stop.prevent="clicked()">
-        <load-svg href="/qr-code.svg"></load-svg>
+        <div class="qr-wrapper">
+            <load-svg class="qr-code" href="/qr-code.svg"></load-svg>
+        </div>
         <div class="copied" #ref="copied"><div><i18n-label id="info.shareCopied"></i18n-label></div></div>
         </div>
     `,
