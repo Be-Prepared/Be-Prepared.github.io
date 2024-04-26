@@ -57,13 +57,13 @@ npm run start
 
 The server is started at `http://localhost:8080/` and is exposed to everyone on your network through your computer's IP address, which makes testing on mobile devices much easier. The IP address and port will be displayed when the server starts.
 
-If you want to test all of the features on mobile devices, you will need to go to `chrome://flags` and look for "Insecure origins treated as secure" (you can get there directly with `chrome://flags#unsafely-treat-insecure-origins-as-secure`). Add your computer's URL to the exceptions box and change the option to Enabled. This is how it looks on my device; your IP address will likely be different.
+**Android & Chrome:** The easiest way is to go to `chrome://flags` and look for "Insecure origins treated as secure" (go there directly with `chrome://flags#unsafely-treat-insecure-origins-as-secure`). Add your computer's URL to the exceptions box and change the option to Enabled. The screenshot is how it looks on my device; your IP address will likely be different. You can also hook up a USB cable and enable [remote debugging](https://developer.chrome.com/docs/devtools/remote-debugging).
 
 ![Chrome Flags Screenshot](chrome-flags.jpg)
 
-Unfortunately, that will not be a valid workaround for iOS, so there's also `npm run https` to serve the content with HTTPS locally. It's a self-signed certificate that you will need to accept each time you visit the site, but it does the trick.
+**iOS & Safari:** Run the server and then run `npx localtunnel -p 8080` in another terminal. Go to the generated URL and enter your *public IP address* as the password. You can use Eruda (see below) and `console.log()` statements. To get access to the debugger, read [this article](https://www.closingtags.com/remote-debugging-web-apps-on-ios-from-linux/).
 
-Also, debugging on mobile devices is difficult. If you add "?eruda" to the URL, it will load [Eruda](https://github.com/liriliri/eruda), a console for mobile browsers. It will be configured to fully initialize before the application starts, allowing all messages and errors to get logged appropriately. This is extremely useful.
+**Debugging:** Add "?eruda" to the URL to automatically load [Eruda](https://github.com/liriliri/eruda), a console for mobile browsers. It will be configured to fully initialize before the application starts, allowing all messages and errors to get logged appropriately. This is extremely useful.
 
 Pull requests for additional functionality are welcome. Please make sure you maintain the intent of this code.
 
