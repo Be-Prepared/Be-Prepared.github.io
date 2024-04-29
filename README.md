@@ -1,6 +1,8 @@
-Work in progress - yet another toolbox filled with offline-only tools. Useful for your everyday life and can turn your backup phone into a useful device. Nothing uses the internet, accesses local files, or sends content to a remote server. I care about your privacy and security.
+# Be Prepared
 
-Use this application at [Be-Prepared.github.io](https://be-prepared.github.io). It's a PWA and is installable as an application with a tap. Because it's a PWA, it can only auto-update itself when you are online. This can happen in the background or when you launch the application. You can detect if a new version is available by a drawer that opens on the bottom after the update is downloaded. An easy way to ensure you have the latest version is to make sure you are on the internet and run the app, wait a minute, close the app, then open it again.
+A toolbox filled with offline-only tools. Useful for your everyday life and can turn your backup phone into a useful device. Nothing uses the internet, accesses local files, or sends content to a remote server. I care about your privacy and security, so please feel free to audit the code.
+
+Use this application at [Be-Prepared.github.io](https://be-prepared.github.io). It's a PWA and is installable as an application or you can run it from your web browser. Because it's a PWA, it can only auto-update itself when you are online. This can happen in the background or when you launch the application. You can detect if a new version is available by a drawer that opens on the bottom after the update is downloaded. An easy way to ensure you have the latest version is to make sure you are on the internet and run the app, wait a minute, close the app, then open it again.
 
 This PWA is also an example for how to use the following:
     * [Fudgel](https://github.com/fidian/fudgel), an extremely lightweight web component library.
@@ -63,7 +65,9 @@ The server is started at `http://localhost:8080/` and is exposed to everyone on 
 
 **iOS & Safari:** Run the server and then run `npx localtunnel -p 8080` in another terminal. Go to the generated URL and enter your *public IP address* as the password. You can use Eruda (see below) and `console.log()` statements. To get access to the debugger, read [this article](https://www.closingtags.com/remote-debugging-web-apps-on-ios-from-linux/).
 
-**Debugging:** Add "?eruda" to the URL to automatically load [Eruda](https://github.com/liriliri/eruda), a console for mobile browsers. It will be configured to fully initialize before the application starts, allowing all messages and errors to get logged appropriately. This is extremely useful.
+**Old Browsers:** The TypeScript uses private fields (identifiers prefixed with `#`), but we still want to support as many devices as possible. So, there's a string replacement that happens after the build to change these newer identifiers into ones that will work with ES5. The `#` prefix gets changed to `µ` as this character isn't used elsewhere in the codebase, making it a safe swap.
+
+**Debugging:** Add "?eruda" to the URL to automatically load [Eruda](https://github.com/liriliri/eruda), a console for mobile browsers. It will be configured to fully initialize before the application starts, allowing all messages and errors to get logged appropriately. This is extremely useful. Also, you may want to use `npx localtunnel -p 8080` to forward the app to a public address, allowing devices to more easily use your development build.
 
 Pull requests for additional functionality are welcome. Please make sure you maintain the intent of this code.
 
