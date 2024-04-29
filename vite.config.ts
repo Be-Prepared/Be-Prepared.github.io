@@ -16,7 +16,7 @@ export default defineConfig({
                 404: resolve(__dirname, 'site/404.html')
             }
         },
-        target: 'esnext',
+        target: 'es6',
     },
     clearScreen: false,
     define: {

@@ -2,7 +2,7 @@
     "name": "Be Prepared",
     "private": true,
     "scripts": {
-        "build": "tsc && vite build && sed -i 's/\\([.}{;]\\)#/\\1µ/g' dist/assets/*.js",
+        "build": "tsc && vite build",
         "generate-pwa-assets": "pwa-assets-generator",
         "reinstall": "rm -rf node_modules && npm install",
         "start": "vite"

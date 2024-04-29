@@ -65,8 +65,6 @@ The server is started at `http://localhost:8080/` and is exposed to everyone on 
 
 **iOS & Safari:** Run the server and then run `npx localtunnel -p 8080` in another terminal. Go to the generated URL and enter your *public IP address* as the password. You can use Eruda (see below) and `console.log()` statements. To get access to the debugger, read [this article](https://www.closingtags.com/remote-debugging-web-apps-on-ios-from-linux/).
 
-**Old Browsers:** The TypeScript uses private fields (identifiers prefixed with `#`), but we still want to support as many devices as possible. So, there's a string replacement that happens after the build to change these newer identifiers into ones that will work with ES5. The `#` prefix gets changed to `µ` as this character isn't used elsewhere in the codebase, making it a safe swap.
-
 **Debugging:** Add "?eruda" to the URL to automatically load [Eruda](https://github.com/liriliri/eruda), a console for mobile browsers. It will be configured to fully initialize before the application starts, allowing all messages and errors to get logged appropriately. This is extremely useful. Also, you may want to use `npx localtunnel -p 8080` to forward the app to a public address, allowing devices to more easily use your development build.
 
 Pull requests for additional functionality are welcome. Please make sure you maintain the intent of this code.
