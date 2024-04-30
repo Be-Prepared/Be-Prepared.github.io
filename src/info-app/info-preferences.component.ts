@@ -11,14 +11,15 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component('info-preferences', {
-    style: css`
-    `,
+    style: css``,
     template: html`
         <ul>
             <li>
                 <i18n-label id="info.coordinates"></i18n-label>
                 <changeable-setting @click="toggleCoordinates()">
-                    <i18n-label id="info.coordinates.{{coordinates}}"></i18n-label>
+                    <i18n-label
+                        id="info.coordinates.{{coordinates}}"
+                    ></i18n-label>
                 </changeable-setting>
             </li>
             <li>
@@ -31,37 +32,37 @@ import { takeUntil } from 'rxjs/operators';
     `,
 })
 export class InfoPreferencesComponent {
-    #coordinateService = di(CoordinateService);
-    #distanceService = di(DistanceService);
-    #subject = new Subject();
+    private _coordinateService = di(CoordinateService);
+    private _distanceService = di(DistanceService);
+    private _subject = new Subject();
     coordinates = CoordinateSystemDefault;
     distances = DistanceSystemDefault;
 
     onInit() {
-        this.#coordinateService
+        this._coordinateService
             .getCurrentSetting()
-            .pipe(takeUntil(this.#subject))
+            .pipe(takeUntil(this._subject))
             .subscribe((value) => {
                 this.coordinates = value;
             });
-        this.#distanceService
+        this._distanceService
             .getCurrentSetting()
-            .pipe(takeUntil(this.#subject))
+            .pipe(takeUntil(this._subject))
             .subscribe((value) => {
                 this.distances = value;
             });
     }
 
     onDestroy() {
-        this.#subject.next(null);
-        this.#subject.complete();
+        this._subject.next(null);
+        this._subject.complete();
     }
 
     toggleCoordinates() {
-        this.#coordinateService.toggleSystem();
+        this._coordinateService.toggleSystem();
     }
 
     toggleDistances() {
-        this.#distanceService.toggleSystem();
+        this._distanceService.toggleSystem();
     }
 }

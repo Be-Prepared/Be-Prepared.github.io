@@ -34,46 +34,46 @@ import { Component, css, html, metadataControllerElement } from 'fudgel';
 export class BottomDrawerComponent {
     hide?: () => void;
     show?: () => void;
-    #timeout?: ReturnType<typeof setTimeout>;
+    private _timeout?: ReturnType<typeof setTimeout>;
 
     onInit() {
         const hide = (this.hide = () => {
-            if (this.#timeout) {
-                clearTimeout(this.#timeout);
+            if (this._timeout) {
+                clearTimeout(this._timeout);
             }
 
-            this.#element().style.bottom = `-${this.#height()}px`;
-            this.#timeout = setTimeout(() => this.#destroy(), 2000);
+            this._element().style.bottom = `-${this._height()}px`;
+            this._timeout = setTimeout(() => this._destroy(), 2000);
         });
         this.show = () => {
-            const style = this.#element().style;
+            const style = this._element().style;
             style.top = 'auto';
-            style.bottom = `-${this.#height()}px`;
-            this.#timeout = setTimeout(() => {
+            style.bottom = `-${this._height()}px`;
+            this._timeout = setTimeout(() => {
                 style.bottom = '0';
-                this.#timeout = setTimeout(() => hide(), 15000);
+                this._timeout = setTimeout(() => hide(), 15000);
             }, 400);
         };
     }
 
     onDestroy() {
-        if (this.#timeout) {
-            clearTimeout(this.#timeout);
+        if (this._timeout) {
+            clearTimeout(this._timeout);
         }
     }
 
-    #destroy() {
-        this.#element().remove();
+    private _destroy() {
+        this._element().remove();
     }
 
-    #element() {
+    private _element() {
         return metadataControllerElement.get(this)!;
     }
 
-    #height() {
+    private _height() {
         // Round any partials up and then add a 1 pixel buffer to ensure no
         // artifacts are visible by accident or with antialiasing.
-        const rect = this.#element().getBoundingClientRect();
+        const rect = this._element().getBoundingClientRect();
 
         return Math.ceil(rect.height + 1);
     }

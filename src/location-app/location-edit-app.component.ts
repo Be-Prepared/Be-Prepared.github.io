@@ -106,7 +106,9 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
                     <div class="detail">
                         <div class="landscape-side-by-side">
                             <div class="no-shrink">
-                                <i18n-label id="location.addEdit.name"></i18n-label>
+                                <i18n-label
+                                    id="location.addEdit.name"
+                                ></i18n-label>
                             </div>
                             <div class="fullWidth">
                                 <input
@@ -131,10 +133,14 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
                             </div>
                         </div>
                         <div class="gapAbove centeredText">
-                            <i18n-label id="location.addEdit.helpSave"></i18n-label>
+                            <i18n-label
+                                id="location.addEdit.helpSave"
+                            ></i18n-label>
                         </div>
                         <div class="gapAbove centeredText">
-                            <i18n-label id="location.addEdit.helpCoordinates"></i18n-label>
+                            <i18n-label
+                                id="location.addEdit.helpCoordinates"
+                            ></i18n-label>
                         </div>
                     </div>
                 </div>
@@ -151,23 +157,25 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
     `,
 })
 export class LocationAddEditComponent {
-    #coordinateService = di(CoordinateService);
-    #geolocationService = di(GeolocationService);
-    #subscription?: Subscription;
-    #waypointService = di(WaypointService);
+    private _coordinateService = di(CoordinateService);
+    private _geolocationService = di(GeolocationService);
+    private _subscription?: Subscription;
+    private _waypointService = di(WaypointService);
     id?: string;
     location: string = '';
     point: WaypointSaved | null = null;
 
     onInit() {
-        this.#subscription = this.#geolocationService.getPosition().subscribe(() => {
-            // Empty, but keeps the GPS active
-        });
+        this._subscription = this._geolocationService
+            .getPosition()
+            .subscribe(() => {
+                // Empty, but keeps the GPS active
+            });
         const id = this.id;
         let point;
 
         if (id) {
-            point = this.#waypointService.getPoint(+id);
+            point = this._waypointService.getPoint(+id);
         }
 
         if (!point) {
@@ -176,45 +184,45 @@ export class LocationAddEditComponent {
         }
 
         this.point = point;
-        this.#updateLocation();
+        this._updateLocation();
     }
 
     onDestroy() {
-        this.#subscription && this.#subscription.unsubscribe();
+        this._subscription && this._subscription.unsubscribe();
     }
 
     deletePoint() {
-        this.#waypointService.deletePoint(this.point!.id);
+        this._waypointService.deletePoint(this.point!.id);
         history.go(-1);
     }
 
     locationChange(location: string) {
-        const convertedLocation = this.#coordinateService.fromString(location);
+        const convertedLocation = this._coordinateService.fromString(location);
 
         if (convertedLocation) {
             this.point!.lat = convertedLocation.lat;
             this.point!.lon = convertedLocation.lon;
-            this.#waypointService.updatePoint(this.point!);
+            this._waypointService.updatePoint(this.point!);
         }
     }
 
     nameChange(name: string) {
         this.point!.name = name;
-        this.#waypointService.updatePoint(this.point!);
+        this._waypointService.updatePoint(this.point!);
     }
 
     navigate() {
         history.pushState(
             {},
             document.title,
-            `/location-navigate/${this.point!.id}`
+            `/location-navigate/${this.point!.id}`,
         );
     }
 
-    #updateLocation() {
-        const location = this.#coordinateService.latLonToSystem(
+    private _updateLocation() {
+        const location = this._coordinateService.latLonToSystem(
             this.point!.lat,
-            this.point!.lon
+            this.point!.lon,
         );
 
         if ('mgrs' in location) {

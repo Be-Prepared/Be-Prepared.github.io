@@ -15,17 +15,17 @@ import { Subscription } from 'rxjs';
     `,
 })
 export class LocationFieldDistanceComponent {
-    #distanceService = di(DistanceService);
-    #geolocationService = di(GeolocationService);
-    #i18nService = di(I18nService);
-    #subscription: Subscription | null = null;
+    private _distanceService = di(DistanceService);
+    private _geolocationService = di(GeolocationService);
+    private _i18nService = di(I18nService);
+    private _subscription: Subscription | null = null;
     lat?: string;
     lon?: string;
     value: string;
 
     constructor() {
-        const unknownValue = this.#i18nService.get(
-            'location.field.unknownValue'
+        const unknownValue = this._i18nService.get(
+            'location.field.unknownValue',
         );
         this.value = unknownValue;
     }
@@ -35,19 +35,19 @@ export class LocationFieldDistanceComponent {
         const lon = parseFloat(this.lon || '');
         const unknownValue = this.value;
 
-        this.#subscription = this.#geolocationService
+        this._subscription = this._geolocationService
             .getPosition()
             .subscribe((position) => {
                 if (position && position.success) {
                     const cheapRuler = new CheapRuler(
                         position.latitude,
-                        'meters'
+                        'meters',
                     );
                     const distance = cheapRuler.distance(
                         [lon, lat],
-                        [position.longitude, position.latitude]
+                        [position.longitude, position.latitude],
                     );
-                    this.value = this.#distanceService.metersToString(distance);
+                    this.value = this._distanceService.metersToString(distance);
                 } else {
                     this.value = unknownValue;
                 }
@@ -55,10 +55,10 @@ export class LocationFieldDistanceComponent {
     }
 
     onDestroy() {
-        this.#subscription && this.#subscription.unsubscribe();
+        this._subscription && this._subscription.unsubscribe();
     }
 
     toggleDistanceSystem() {
-        this.#distanceService.toggleSystem();
+        this._distanceService.toggleSystem();
     }
 }

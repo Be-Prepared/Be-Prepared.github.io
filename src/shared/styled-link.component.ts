@@ -1,7 +1,7 @@
 import { Component, css } from 'fudgel';
 
 @Component('styled-link', {
-    attr:['href', 'target'],
+    attr: ['href', 'target'],
     style: css`
         :host {
             display: inline;
@@ -16,7 +16,7 @@ import { Component, css } from 'fudgel';
     // but vite/esbuild doesn't treat it as such and will remove surrounding
     // spaces.
     template: ' <a href="{{href}}" target="{{target}}"><slot></slot></a> ',
-    useShadow: true
+    useShadow: true,
 })
 export class StyledLinkComponent {
     href?: string = '#';

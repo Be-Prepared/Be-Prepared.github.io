@@ -13,27 +13,27 @@ import { I18nService } from '../i18n/i18n.service';
     `,
 })
 export class LocationFieldAltitudeAccuracyComponent {
-    #distanceService = di(DistanceService);
-    #geolocationService = di(GeolocationService);
-    #i18nService = di(I18nService);
-    #subscription: Subscription | null = null;
+    private _distanceService = di(DistanceService);
+    private _geolocationService = di(GeolocationService);
+    private _i18nService = di(I18nService);
+    private _subscription: Subscription | null = null;
     value: string;
 
     constructor() {
-        const unknownValue = this.#i18nService.get(
-            'location.field.unknownValue'
+        const unknownValue = this._i18nService.get(
+            'location.field.unknownValue',
         );
         this.value = unknownValue;
-        this.#subscription = combineLatest([
-            this.#geolocationService.getPosition(),
-            this.#distanceService.getCurrentSetting(),
+        this._subscription = combineLatest([
+            this._geolocationService.getPosition(),
+            this._distanceService.getCurrentSetting(),
         ]).subscribe(([position]) => {
             if (position && position.success) {
                 if (position.altitudeAccuracy === null) {
                     this.value = unknownValue;
                 } else {
-                    this.value = this.#distanceService.metersToString(
-                        position.altitudeAccuracy
+                    this.value = this._distanceService.metersToString(
+                        position.altitudeAccuracy,
                     );
                 }
             } else {
@@ -43,10 +43,10 @@ export class LocationFieldAltitudeAccuracyComponent {
     }
 
     onDestroy() {
-        this.#subscription && this.#subscription.unsubscribe();
+        this._subscription && this._subscription.unsubscribe();
     }
 
     toggleDistanceSystem() {
-        this.#distanceService.toggleSystem();
+        this._distanceService.toggleSystem();
     }
 }

@@ -66,10 +66,12 @@ import { Component, css, html } from 'fudgel';
     `,
     template: html`
         <div class="wrapper" @click.stop.prevent="clicked()">
-        <div class="qr-wrapper">
-            <load-svg class="qr-code" href="/qr-code.svg"></load-svg>
-        </div>
-        <div class="copied" #ref="copied"><div><i18n-label id="info.shareCopied"></i18n-label></div></div>
+            <div class="qr-wrapper">
+                <load-svg class="qr-code" href="/qr-code.svg"></load-svg>
+            </div>
+            <div class="copied" #ref="copied">
+                <div><i18n-label id="info.shareCopied"></i18n-label></div>
+            </div>
         </div>
     `,
 })

@@ -1,7 +1,7 @@
 import { registerSW } from 'virtual:pwa-register';
 
 export class UpdatePwaService {
-    #updateSW: ReturnType<typeof registerSW> | null = null;
+    private _updateSW: ReturnType<typeof registerSW> | null = null;
 
     listenForEvents() {
         // Allow for local development without the "reload" drawer opening.
@@ -15,20 +15,20 @@ export class UpdatePwaService {
             return;
         }
 
-        this.#updateSW = registerSW({
+        this._updateSW = registerSW({
             onNeedRefresh: () => {
-                this.#showCustomUi();
+                this._showCustomUi();
             },
         });
     }
 
     performUpdate() {
-        if (this.#updateSW) {
-            this.#updateSW();
+        if (this._updateSW) {
+            this._updateSW();
         }
     }
 
-    #showCustomUi() {
+    private _showCustomUi() {
         document.body.appendChild(document.createElement('update-pwa'));
     }
 }

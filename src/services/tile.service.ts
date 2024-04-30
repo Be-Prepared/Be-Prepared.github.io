@@ -11,17 +11,17 @@ export interface TileDefResolved {
 }
 
 export class TileService {
-    #subject = new ReplaySubject<TileDefResolved[]>(1);
+    private _subject = new ReplaySubject<TileDefResolved[]>(1);
 
     constructor() {
-        this.#updateTiles();
+        this._updateTiles();
     }
 
     getAllowedTiles() {
-        return this.#subject.asObservable();
+        return this._subject.asObservable();
     }
 
-    #lookupTilePermission(tile: TileDef): Observable<TileDefResolved> {
+    private _lookupTilePermission(tile: TileDef): Observable<TileDefResolved> {
         return tile.show.pipe(
             map((show) => {
                 const resolved: TileDefResolved = {
@@ -30,15 +30,15 @@ export class TileService {
                 };
 
                 return resolved;
-            })
+            }),
         );
     }
 
-    #updateTiles() {
+    private _updateTiles() {
         return combineLatest(
-            tileDefs.map((tile) => this.#lookupTilePermission(tile))
+            tileDefs.map((tile) => this._lookupTilePermission(tile)),
         ).subscribe((tilesWithResults) => {
-            this.#subject.next(tilesWithResults.filter((tile) => tile.show));
+            this._subject.next(tilesWithResults.filter((tile) => tile.show));
         });
     }
 }

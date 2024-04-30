@@ -59,7 +59,8 @@ export const enUS: LanguageData = {
 
     // Location
     'location.addEdit.delete': 'Delete',
-    'location.addEdit.helpCoordinates': 'Locations can be entered using many common formats.',
+    'location.addEdit.helpCoordinates':
+        'Locations can be entered using many common formats.',
     'location.addEdit.helpSave': 'Changes are saved automatically.',
     'location.addEdit.location': 'Location:',
     'location.addEdit.name': 'Waypoint Name:',
@@ -89,7 +90,8 @@ export const enUS: LanguageData = {
     'location.navigation.DIRECTION_OF_TRAVEL': 'Direction of Travel',
     'location.navigation.NORTH_UP': 'North Up',
     'location.navigation.unknownValue': 'Unknown',
-    'location.positionDenied': 'Permission denied. This may have been denied by the operating system even though it was granted by the user.',
+    'location.positionDenied':
+        'Permission denied. This may have been denied by the operating system even though it was granted by the user.',
     'location.positionError': 'There was an error retrieving the location.',
     'location.positionUnavailable': 'Position unavailable.',
     'location.retrievingLocation': 'Retrieving location...',

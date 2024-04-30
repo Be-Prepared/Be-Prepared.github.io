@@ -72,18 +72,18 @@ import { TorchService } from '../services/torch.service';
     `,
 })
 export class MagnifierAppComponent {
-    #magnifierService = di(MagnifierService);
-    #pointerInitialDiff: number | null = null;
-    #pointerInitialZoom: number | null = null;
-    #pointerEventCache: PointerEvent[] = [];
-    #subject = new Subject();
-    #torchService = di(TorchService);
-    #track?: MediaStreamTrack;
-    #zoomCurrent: number | null = null;
-    #zoomMax: number | null = null;
-    #zoomMin: number | null = null;
-    #zoomScale: number | null = null;
-    #zoomStep: number | null = null;
+    private _magnifierService = di(MagnifierService);
+    private _pointerInitialDiff: number | null = null;
+    private _pointerInitialZoom: number | null = null;
+    private _pointerEventCache: PointerEvent[] = [];
+    private _subject = new Subject();
+    private _torchService = di(TorchService);
+    private _track?: MediaStreamTrack;
+    private _zoomCurrent: number | null = null;
+    private _zoomMax: number | null = null;
+    private _zoomMin: number | null = null;
+    private _zoomScale: number | null = null;
+    private _zoomStep: number | null = null;
     explainAsk = false;
     explainDeny = false;
     explainUnavailable = false;
@@ -94,9 +94,9 @@ export class MagnifierAppComponent {
     video?: HTMLVideoElement;
 
     onInit() {
-        this.#magnifierService
+        this._magnifierService
             .availabilityState(true)
-            .pipe(takeUntil(this.#subject))
+            .pipe(takeUntil(this._subject))
             .subscribe((value) => {
                 this.explainAsk = value === AvailabilityState.PROMPT;
                 this.explainDeny = value === AvailabilityState.DENIED;
@@ -108,115 +108,115 @@ export class MagnifierAppComponent {
                     this.showControls = showVideo;
 
                     if (this.showControls) {
-                        this.#startVideoStream();
+                        this._startVideoStream();
                     } else {
-                        this.#endVideoStream();
+                        this._endVideoStream();
                     }
                 }
             });
-        this.#torchService
+        this._torchService
             .availabilityState(true)
-            .pipe(takeUntil(this.#subject))
+            .pipe(takeUntil(this._subject))
             .subscribe((value) => {
                 this.torchAvailable = value === AvailabilityState.ALLOWED;
             });
     }
 
     onDestroy() {
-        this.#subject.next(null);
-        this.#subject.complete();
+        this._subject.next(null);
+        this._subject.complete();
     }
 
     grant() {
-        this.#magnifierService.prompt();
+        this._magnifierService.prompt();
     }
 
     pointerDown(event: PointerEvent) {
-        this.#pointerEventCache.push(event);
-        this.#pointerInitialDiff = this.#pointerDiff();
-        this.#pointerInitialZoom = this.#zoomCurrent;
+        this._pointerEventCache.push(event);
+        this._pointerInitialDiff = this._pointerDiff();
+        this._pointerInitialZoom = this._zoomCurrent;
     }
 
     pointerMove(event: PointerEvent) {
         // Update the cached pointer
-        for (let i = 0; i < this.#pointerEventCache.length; i += 1) {
-            if (this.#pointerEventCache[i].pointerId === event.pointerId) {
-                this.#pointerEventCache[i] = event;
+        for (let i = 0; i < this._pointerEventCache.length; i += 1) {
+            if (this._pointerEventCache[i].pointerId === event.pointerId) {
+                this._pointerEventCache[i] = event;
             }
         }
 
-        const diff = this.#pointerDiff();
+        const diff = this._pointerDiff();
 
         if (
             !diff ||
-            !this.#pointerInitialDiff ||
-            !this.#pointerInitialZoom ||
-            !this.#zoomScale ||
-            !this.#zoomMax ||
-            !this.#zoomMin ||
-            !this.#zoomStep
+            !this._pointerInitialDiff ||
+            !this._pointerInitialZoom ||
+            !this._zoomScale ||
+            !this._zoomMax ||
+            !this._zoomMin ||
+            !this._zoomStep
         ) {
             return;
         }
 
-        const change = diff - this.#pointerInitialDiff;
-        const scaled = change / this.#zoomScale;
-        const stepsTotal = (this.#zoomMax - this.#zoomMin) / this.#zoomStep;
+        const change = diff - this._pointerInitialDiff;
+        const scaled = change / this._zoomScale;
+        const stepsTotal = (this._zoomMax - this._zoomMin) / this._zoomStep;
         const stepsChange = scaled * stepsTotal;
         const endZoom =
-            this.#pointerInitialZoom + Math.floor(stepsChange) * this.#zoomStep;
+            this._pointerInitialZoom + Math.floor(stepsChange) * this._zoomStep;
 
-        this.#zoom(endZoom);
+        this._zoom(endZoom);
     }
 
     pointerUp(event: PointerEvent) {
-        this.#pointerEventCache = this.#pointerEventCache.filter(
+        this._pointerEventCache = this._pointerEventCache.filter(
             (previousEvent) => {
                 return previousEvent.pointerId !== event.pointerId;
-            }
+            },
         );
     }
 
     toggleTorch() {
         if (this.torchEnabled) {
-            this.#torchService.turnOff();
+            this._torchService.turnOff();
         } else {
-            this.#torchService.turnOn();
+            this._torchService.turnOn();
         }
 
-        this.#setupTorch();
+        this._setupTorch();
     }
 
-    #endVideoStream() {
-        this.#zoomCurrent = null;
-        this.#zoomMin = null;
-        this.#zoomMax = null;
-        this.#zoomStep = null;
+    private _endVideoStream() {
+        this._zoomCurrent = null;
+        this._zoomMin = null;
+        this._zoomMax = null;
+        this._zoomStep = null;
     }
 
-    #pointerDiff() {
-        if (this.#pointerEventCache.length === 2) {
-            const first = this.#pointerEventCache[0];
-            const second = this.#pointerEventCache[1];
+    private _pointerDiff() {
+        if (this._pointerEventCache.length === 2) {
+            const first = this._pointerEventCache[0];
+            const second = this._pointerEventCache[1];
 
             return Math.sqrt(
                 Math.pow(second.clientX - first.clientX, 2) +
-                    Math.pow(second.clientY - first.clientY, 2)
+                    Math.pow(second.clientY - first.clientY, 2),
             );
         }
 
         return null;
     }
 
-    #setupTorch() {
-        this.#torchService.currentStatus().then((enabled) => {
+    private _setupTorch() {
+        this._torchService.currentStatus().then((enabled) => {
             this.torchEnabled = enabled;
             this.torchClass = enabled ? 'enabled' : '';
         });
     }
 
-    #startVideoStream() {
-        this.#magnifierService.getStream().then((stream) => {
+    private _startVideoStream() {
+        this._magnifierService.getStream().then((stream) => {
             const track = stream.getVideoTracks()[0];
 
             if (!track) {
@@ -226,32 +226,32 @@ export class MagnifierAppComponent {
             const zoom = (track.getCapabilities() as any).zoom;
 
             if (zoom) {
-                this.#zoomMin = zoom.min;
-                this.#zoomMax = zoom.max;
-                this.#zoomStep = zoom.step;
-                this.#track = track;
-                this.#zoom(this.#zoomMax!);
+                this._zoomMin = zoom.min;
+                this._zoomMax = zoom.max;
+                this._zoomStep = zoom.step;
+                this._track = track;
+                this._zoom(this._zoomMax!);
             }
 
             if (this.video) {
                 this.video.srcObject = stream;
             }
 
-            this.#zoomScale =
+            this._zoomScale =
                 Math.min(window.screen.width + window.screen.height) / 2;
-            this.#setupTorch();
+            this._setupTorch();
         });
     }
 
-    #zoom(zoom: number) {
-        if (!this.#zoomMax || !this.#zoomMin || !this.#track) {
+    private _zoom(zoom: number) {
+        if (!this._zoomMax || !this._zoomMin || !this._track) {
             return;
         }
 
-        zoom = Math.min(this.#zoomMax, zoom);
-        zoom = Math.max(this.#zoomMin, zoom);
-        this.#zoomCurrent = zoom;
-        this.#track.applyConstraints({
+        zoom = Math.min(this._zoomMax, zoom);
+        zoom = Math.max(this._zoomMin, zoom);
+        this._zoomCurrent = zoom;
+        this._track.applyConstraints({
             advanced: [
                 {
                     zoom: zoom,

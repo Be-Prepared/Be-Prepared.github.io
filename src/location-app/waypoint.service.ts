@@ -9,26 +9,26 @@ export interface WaypointSaved {
 const LOCAL_STORAGE_KEY = 'points';
 
 export class WaypointService {
-    #maxId = 0;
-    #points: WaypointSaved[] = [];
+    private _maxId = 0;
+    private _points: WaypointSaved[] = [];
 
     constructor() {
-        this.#load();
+        this._load();
     }
 
     deletePoint(id: number) {
-        const index = this.#points.findIndex((point) => point.id === id);
+        const index = this._points.findIndex((point) => point.id === id);
 
         if (index === -1) {
             return;
         }
 
-        this.#points.splice(index, 1);
-        this.#save();
+        this._points.splice(index, 1);
+        this._save();
     }
 
     getPoint(id: number): WaypointSaved | null {
-        const point = this.#points.find((point) => point.id === id);
+        const point = this._points.find((point) => point.id === id);
 
         if (!point) {
             return null;
@@ -40,36 +40,36 @@ export class WaypointService {
     }
 
     getPoints() {
-        return this.#points;
+        return this._points;
     }
 
     newPoint(): WaypointSaved {
-        this.#maxId += 1;
+        this._maxId += 1;
         const point = {
-            id: this.#maxId,
+            id: this._maxId,
             name: '',
             lat: 0,
             lon: 0,
             created: Date.now(),
         };
-        this.#points.push(point);
-        this.#save();
+        this._points.push(point);
+        this._save();
 
         return point;
     }
 
     updatePoint(point: WaypointSaved) {
-        const index = this.#points.findIndex((p) => p.id === point.id);
+        const index = this._points.findIndex((p) => p.id === point.id);
 
         if (index >= 0) {
-            this.#points.splice(index, 1);
+            this._points.splice(index, 1);
         }
 
-        this.#points.push({ ...point });
-        this.#save();
+        this._points.push({ ...point });
+        this._save();
     }
 
-    #isValidPoint(point: any): boolean {
+    private _isValidPoint(point: any): boolean {
         if (typeof point !== 'object' || !point) {
             return false;
         }
@@ -86,7 +86,7 @@ export class WaypointService {
         return false;
     }
 
-    #load() {
+    private _load() {
         const pointsJson = localStorage.getItem(LOCAL_STORAGE_KEY);
 
         if (!pointsJson) {
@@ -104,17 +104,17 @@ export class WaypointService {
 
         if (
             Array.isArray(points) &&
-            points.every((point) => this.#isValidPoint(point))
+            points.every((point) => this._isValidPoint(point))
         ) {
             for (const point of points) {
                 maxId = Math.max(maxId, point.id);
             }
 
-            this.#points = points;
+            this._points = points;
         }
     }
 
-    #save() {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(this.#points));
+    private _save() {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(this._points));
     }
 }

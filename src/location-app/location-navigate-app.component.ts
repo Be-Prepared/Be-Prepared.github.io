@@ -161,8 +161,8 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
     `,
 })
 export class LocationNavigateAppComponent {
-    #wakeLockService = di(WakeLockService);
-    #waypointService = di(WaypointService);
+    private _wakeLockService = di(WakeLockService);
+    private _waypointService = di(WaypointService);
     id?: string;
     point: WaypointSaved | null = null;
 
@@ -170,18 +170,18 @@ export class LocationNavigateAppComponent {
         const id = this.id;
 
         if (id) {
-            this.point = this.#waypointService.getPoint(+id);
+            this.point = this._waypointService.getPoint(+id);
         }
 
         if (!this.point) {
             this.goBack();
         }
 
-        this.#wakeLockService.request();
+        this._wakeLockService.request();
     }
 
     onDestroy() {
-        this.#wakeLockService.release();
+        this._wakeLockService.release();
     }
 
     goBack() {

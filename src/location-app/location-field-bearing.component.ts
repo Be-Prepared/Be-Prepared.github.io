@@ -11,17 +11,17 @@ import { Subscription } from 'rxjs';
     template: html`{{value}}`,
 })
 export class LocationFieldBearingComponent {
-    #directionService = di(DirectionService);
-    #geolocationService = di(GeolocationService);
-    #i18nService = di(I18nService);
-    #subscription: Subscription | null = null;
+    private _directionService = di(DirectionService);
+    private _geolocationService = di(GeolocationService);
+    private _i18nService = di(I18nService);
+    private _subscription: Subscription | null = null;
     lat?: string;
     lon?: string;
     value: string;
 
     constructor() {
-        const unknownValue = this.#i18nService.get(
-            'location.field.unknownValue'
+        const unknownValue = this._i18nService.get(
+            'location.field.unknownValue',
         );
         this.value = unknownValue;
     }
@@ -31,21 +31,20 @@ export class LocationFieldBearingComponent {
         const lon = parseFloat(this.lon || '');
         const unknownValue = this.value;
 
-        this.#subscription = this.#geolocationService
+        this._subscription = this._geolocationService
             .getPosition()
             .subscribe((position) => {
                 if (position && position.success) {
                     const cheapRuler = new CheapRuler(
                         position.latitude,
-                        'meters'
+                        'meters',
                     );
                     const direction = cheapRuler.bearing(
                         [position.longitude, position.latitude],
-                        [lon, lat]
+                        [lon, lat],
                     );
-                    this.value = this.#directionService.toHeadingDirection(
-                        direction
-                    );
+                    this.value =
+                        this._directionService.toHeadingDirection(direction);
                 } else {
                     this.value = unknownValue;
                 }
@@ -53,6 +52,6 @@ export class LocationFieldBearingComponent {
     }
 
     onDestroy() {
-        this.#subscription && this.#subscription.unsubscribe();
+        this._subscription && this._subscription.unsubscribe();
     }
 }

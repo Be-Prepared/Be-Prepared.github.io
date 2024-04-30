@@ -13,7 +13,7 @@ import { goBack } from '../util/go-back';
             @click.stop.prevent="back()"
             href="/back.svg"
         ></scaling-icon>
-    `
+    `,
 })
 export class BackButtonComponent {
     back() {

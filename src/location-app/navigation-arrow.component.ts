@@ -50,7 +50,7 @@ import { switchMap, takeUntil } from 'rxjs/operators';
             height: 100%;
             padding: 30%;
             box-sizing: border-box;
-            color: #00e5e5;
+            color: private _00e5e5;
         }
     `,
     template: html`
@@ -63,87 +63,97 @@ import { switchMap, takeUntil } from 'rxjs/operators';
     `,
 })
 export class NavigationArrowComponent {
-    #geolocationService = di(GeolocationService);
-    #currentPosition: GeolocationCoordinateResultSuccess | null = null;
-    #currentBearing = 0;
-    #currentHeading = 0;
-    #currentNavigationType: NavigationType | null = null;
-    #lat = 0;
-    #lon = 0;
-    #navigationTypeService = di(NavigationTypeService);
-    #positionService = di(PositionService);
-    #subject = new Subject();
+    private _geolocationService = di(GeolocationService);
+    private _currentPosition: GeolocationCoordinateResultSuccess | null = null;
+    private _currentBearing = 0;
+    private _currentHeading = 0;
+    private _currentNavigationType: NavigationType | null = null;
+    private _lat = 0;
+    private _lon = 0;
+    private _navigationTypeService = di(NavigationTypeService);
+    private _positionService = di(PositionService);
+    private _subject = new Subject();
     compassRose: HTMLElement | null = null;
     lat?: string;
     lon?: string;
     directionArrow: HTMLElement | null = null;
 
     onInit() {
-        this.#lat = parseFloat(this.lat || '0');
-        this.#lon = parseFloat(this.lon || '0');
-        this.#geolocationService
+        this._lat = parseFloat(this.lat || '0');
+        this._lon = parseFloat(this.lon || '0');
+        this._geolocationService
             .getPosition()
-            .pipe(takeUntil(this.#subject))
+            .pipe(takeUntil(this._subject))
             .subscribe((position) => {
                 if (position && position.success) {
-                    this.#currentPosition = position;
+                    this._currentPosition = position;
 
                     if (!isNaN(position.heading)) {
-                        this.#currentHeading = position.heading;
+                        this._currentHeading = position.heading;
                     }
 
-                    this.#updateCompassRose();
+                    this._updateCompassRose();
                 }
             });
-        this.#navigationTypeService
+        this._navigationTypeService
             .getObservable()
-            .pipe(takeUntil(this.#subject))
+            .pipe(takeUntil(this._subject))
             .subscribe((navigationType) => {
-                this.#currentNavigationType = navigationType;
-                this.#updateCompassRose();
+                this._currentNavigationType = navigationType;
+                this._updateCompassRose();
             });
-        this.#positionService
+        this._positionService
             .availabilityState()
             .pipe(
                 switchMap((state) => {
                     if (state === AvailabilityState.ALLOWED) {
-                        return this.#positionService.getCompassBearing();
+                        return this._positionService.getCompassBearing();
                     }
 
                     return EMPTY;
                 }),
-                takeUntil(this.#subject)
+                takeUntil(this._subject),
             )
             .subscribe((bearing) => {
-                this.#currentBearing = bearing;
-                this.#updateCompassRose();
+                this._currentBearing = bearing;
+                this._updateCompassRose();
             });
     }
 
     ngOnDestroy() {
-        this.#subject.next(null);
-        this.#subject.complete();
+        this._subject.next(null);
+        this._subject.complete();
     }
 
-    #updateCompassRose() {
-        if (!this.#currentNavigationType || !this.#currentPosition) {
+    private _updateCompassRose() {
+        if (!this._currentNavigationType || !this._currentPosition) {
             return;
         }
 
         let compassRoseAngle = 0;
         let directionArrowAngle = 0;
-        const cheapRuler = new CheapRuler(this.#currentPosition.latitude, 'meters');
-        const bearingToDestination = cheapRuler.bearing([this.#currentPosition.longitude, this.#currentPosition.latitude], [this.#lon, this.#lat]);
+        const cheapRuler = new CheapRuler(
+            this._currentPosition.latitude,
+            'meters',
+        );
+        const bearingToDestination = cheapRuler.bearing(
+            [this._currentPosition.longitude, this._currentPosition.latitude],
+            [this._lon, this._lat],
+        );
 
-        switch (this.#currentNavigationType) {
+        switch (this._currentNavigationType) {
             case NavigationType.COMPASS:
-                compassRoseAngle = Math.round(this.#currentBearing);
-                directionArrowAngle = Math.round(bearingToDestination + this.#currentBearing);
+                compassRoseAngle = Math.round(this._currentBearing);
+                directionArrowAngle = Math.round(
+                    bearingToDestination + this._currentBearing,
+                );
                 break;
 
             case NavigationType.DIRECTION_OF_TRAVEL:
-                compassRoseAngle = -Math.round(this.#currentHeading);
-                directionArrowAngle = Math.round(bearingToDestination - this.#currentHeading);
+                compassRoseAngle = -Math.round(this._currentHeading);
+                directionArrowAngle = Math.round(
+                    bearingToDestination - this._currentHeading,
+                );
                 break;
 
             default:

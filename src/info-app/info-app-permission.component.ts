@@ -32,30 +32,30 @@ import { Subscription } from 'rxjs';
     `,
 })
 export class InfoAppPermissionComponent {
-    #permissionsService = di(PermissionsService);
-    #subscription?: Subscription;
+    private _permissionsService = di(PermissionsService);
+    private _subscription?: Subscription;
     permission?: PermissionsServiceName;
     stateStr = 'error';
 
     onChange(property: string) {
         if (property === 'permission') {
-            this.#unsub();
+            this._unsub();
 
-            if (this.permission && this.#permissionsService[this.permission]) {
-                this.#subscription = this.#permissionsService
-                    [this.permission]()
-                    .subscribe((state) => this.#setState(state));
+            if (this.permission && this._permissionsService[this.permission]) {
+                this._subscription = this._permissionsService[
+                    this.permission
+                ]().subscribe((state) => this._setState(state));
             } else {
-                this.#setState(PermissionsServiceState.ERROR);
+                this._setState(PermissionsServiceState.ERROR);
             }
         }
     }
 
     onDestroy() {
-        this.#unsub();
+        this._unsub();
     }
 
-    #setState(state: PermissionsServiceState) {
+    private _setState(state: PermissionsServiceState) {
         if (state === PermissionsServiceState.DENIED) {
             this.stateStr = 'denied';
         } else if (state === PermissionsServiceState.GRANTED) {
@@ -67,10 +67,10 @@ export class InfoAppPermissionComponent {
         }
     }
 
-    #unsub() {
-        if (this.#subscription) {
-            this.#subscription.unsubscribe();
-            this.#subscription = undefined;
+    private _unsub() {
+        if (this._subscription) {
+            this._subscription.unsubscribe();
+            this._subscription = undefined;
         }
     }
 }

@@ -137,26 +137,26 @@ import { takeUntil } from 'rxjs/operators';
     `,
 })
 export class LocationAppComponent {
-    #coordinateService = di(CoordinateService);
-    #distanceService = di(DistanceService);
-    #geolocationService = di(GeolocationService);
-    #subject = new Subject();
+    private _coordinateService = di(CoordinateService);
+    private _distanceService = di(DistanceService);
+    private _geolocationService = di(GeolocationService);
+    private _subject = new Subject();
     latLon: LatLon | null = null;
     position: GeolocationCoordinateResult | null = null;
 
     onInit() {
-        this.#geolocationService
+        this._geolocationService
             .getPosition()
-            .pipe(takeUntil(this.#subject))
+            .pipe(takeUntil(this._subject))
             .subscribe((position) => {
                 this.position = position;
-                this.#redraw();
+                this._redraw();
             });
     }
 
     onDestroy() {
-        this.#subject.next(null);
-        this.#subject.complete();
+        this._subject.next(null);
+        this._subject.complete();
     }
 
     goToList() {
@@ -164,16 +164,16 @@ export class LocationAppComponent {
     }
 
     toggleCoordinateSystem() {
-        this.#coordinateService.toggleSystem();
-        this.#redraw();
+        this._coordinateService.toggleSystem();
+        this._redraw();
     }
 
     toggleDistanceSystem() {
-        this.#distanceService.toggleSystem();
-        this.#redraw();
+        this._distanceService.toggleSystem();
+        this._redraw();
     }
 
-    #redraw() {
+    private _redraw() {
         if (this.position && this.position.success) {
             this.latLon = {
                 lat: this.position.latitude,

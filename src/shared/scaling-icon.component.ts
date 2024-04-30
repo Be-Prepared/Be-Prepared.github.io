@@ -26,9 +26,7 @@ import { Component, css, html } from 'fudgel';
             }
         }
     `,
-    template: html`
-        <load-svg class="icon" href="{{href}}"></load-svg>
-    `
+    template: html` <load-svg class="icon" href="{{href}}"></load-svg> `,
 })
 export class ScalingIconComponent {
     href?: string;

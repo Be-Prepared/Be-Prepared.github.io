@@ -13,38 +13,38 @@ export enum DistanceSystem {
 export const DistanceSystemDefault = DistanceSystem.IMPERIAL;
 
 export class DistanceService {
-    #currentSetting = new BehaviorSubject<DistanceSystem>(
-        DistanceSystemDefault
+    private _currentSetting = new BehaviorSubject<DistanceSystem>(
+        DistanceSystemDefault,
     );
 
     constructor() {
         if (localStorage.getItem('distanceSystem') === DistanceSystem.METRIC) {
-            this.#currentSetting.next(DistanceSystem.METRIC);
+            this._currentSetting.next(DistanceSystem.METRIC);
         }
     }
 
     getCurrentSetting() {
-        return this.#currentSetting.asObservable();
+        return this._currentSetting.asObservable();
     }
 
     metersToString(meters: number, options: DistanceOptions = {}): string {
-        if (this.#currentSetting.value === DistanceSystem.METRIC) {
-            return this.#toMetric(meters, options);
+        if (this._currentSetting.value === DistanceSystem.METRIC) {
+            return this._toMetric(meters, options);
         }
 
-        return this.#toImperial(meters, options);
+        return this._toImperial(meters, options);
     }
 
     toggleSystem() {
         const newValue =
-            this.#currentSetting.value === DistanceSystem.METRIC
+            this._currentSetting.value === DistanceSystem.METRIC
                 ? DistanceSystem.IMPERIAL
                 : DistanceSystem.METRIC;
-        this.#currentSetting.next(newValue);
+        this._currentSetting.next(newValue);
         localStorage.setItem('distanceSystem', newValue);
     }
 
-    #fixed(n: number): string {
+    private _fixed(n: number): string {
         const a = Math.abs(n);
         let digits = 0;
 
@@ -62,13 +62,13 @@ export class DistanceService {
         return result.toLocaleString();
     }
 
-    #toImperial(meters: number, options: DistanceOptions): string {
+    private _toImperial(meters: number, options: DistanceOptions): string {
         const feet = meters * 3.2808398950131;
 
         if (options.isSpeed) {
-            const mph = feet * 3600 / 5280;
+            const mph = (feet * 3600) / 5280;
 
-            return `${this.#fixed(mph)} mph`;
+            return `${this._fixed(mph)} mph`;
         }
 
         if (feet < 528 || options.useSmallUnits) {
@@ -77,20 +77,20 @@ export class DistanceService {
 
         const miles = feet / 5280;
 
-        return `${this.#fixed(miles)} mi`;
+        return `${this._fixed(miles)} mi`;
     }
 
-    #toMetric(meters: number, options: DistanceOptions): string {
+    private _toMetric(meters: number, options: DistanceOptions): string {
         if (options.isSpeed) {
-            return `${this.#fixed(3.6 * meters)} km/h`;
+            return `${this._fixed(3.6 * meters)} km/h`;
         }
 
         if (meters < 1000 || options.useSmallUnits) {
-            return `${this.#fixed(meters)} m`;
+            return `${this._fixed(meters)} m`;
         }
 
         const kilometers = meters / 1000;
 
-        return `${this.#fixed(kilometers)} km`;
+        return `${this._fixed(kilometers)} km`;
     }
 }

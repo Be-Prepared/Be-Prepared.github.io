@@ -62,10 +62,10 @@ import { WakeLockService } from '../services/wake-lock.service';
     `,
 })
 export class FlashlightAppComponent {
-    #permissionsService = di(PermissionsService);
-    #subject = new Subject();
-    #torchService = di(TorchService);
-    #wakeLockService = di(WakeLockService);
+    private _permissionsService = di(PermissionsService);
+    private _subject = new Subject();
+    private _torchService = di(TorchService);
+    private _wakeLockService = di(WakeLockService);
     buttonClass = '';
     enabled = false;
     explainAsk = false;
@@ -74,51 +74,52 @@ export class FlashlightAppComponent {
     showControls = false;
 
     onInit() {
-        this.#torchService
+        this._torchService
             .availabilityState(true)
-            .pipe(takeUntil(this.#subject))
+            .pipe(takeUntil(this._subject))
             .subscribe((value) => {
                 this.explainAsk = value === AvailabilityState.PROMPT;
                 this.explainDeny = value === AvailabilityState.DENIED;
-                this.explainUnavailable = value === AvailabilityState.UNAVAILABLE;
+                this.explainUnavailable =
+                    value === AvailabilityState.UNAVAILABLE;
                 this.showControls = value === AvailabilityState.ALLOWED;
 
                 if (this.showControls) {
-                    this.#getCurrentStatus();
+                    this._getCurrentStatus();
                 } else {
-                    this.#wakeLockService.release();
+                    this._wakeLockService.release();
                 }
             });
     }
 
     onDestroy() {
-        this.#subject.next(null);
-        this.#subject.complete();
-        this.#wakeLockService.release();
+        this._subject.next(null);
+        this._subject.complete();
+        this._wakeLockService.release();
     }
 
     grant() {
-        this.#permissionsService.camera(true);
+        this._permissionsService.camera(true);
     }
 
     toggle() {
         if (this.enabled) {
-            this.#torchService.turnOff();
+            this._torchService.turnOff();
         } else {
-            this.#torchService.turnOn();
+            this._torchService.turnOn();
         }
 
-        this.#setEnabled(!this.enabled);
+        this._setEnabled(!this.enabled);
     }
 
-    #getCurrentStatus() {
-        this.#wakeLockService.request();
-        this.#torchService.currentStatus().then((enabled) => {
-            this.#setEnabled(enabled);
+    private _getCurrentStatus() {
+        this._wakeLockService.request();
+        this._torchService.currentStatus().then((enabled) => {
+            this._setEnabled(enabled);
         });
     }
 
-    #setEnabled(enabled: boolean) {
+    private _setEnabled(enabled: boolean) {
         this.enabled = enabled;
         this.buttonClass = enabled ? 'enabled' : '';
     }

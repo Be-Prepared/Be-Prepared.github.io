@@ -1,3 +1,3 @@
 export interface LanguageData {
-    [key: string]: string
-};
+    [key: string]: string;
+}

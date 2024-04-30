@@ -18,22 +18,22 @@ import { WakeLockService } from '../services/wake-lock.service';
         }
     `,
     template: html`
-    <div class="full">
-        <div class="back">
-            <back-button></back-button>
+        <div class="full">
+            <div class="back">
+                <back-button></back-button>
+            </div>
         </div>
-    </div>
-    `
+    `,
 })
 export class FrontLightAppComponent {
-    #wakeLockService = di(WakeLockService);
+    private _wakeLockService = di(WakeLockService);
 
     onInit() {
-        this.#wakeLockService.request();
+        this._wakeLockService.request();
     }
 
     onDestroy() {
-        this.#wakeLockService.release();
+        this._wakeLockService.release();
     }
 
     back() {

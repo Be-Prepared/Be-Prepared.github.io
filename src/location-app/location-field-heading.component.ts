@@ -9,26 +9,26 @@ import { Subscription } from 'rxjs';
     template: html`{{value}}`,
 })
 export class LocationFieldHeadingComponent {
-    #directionService = di(DirectionService);
-    #geolocationService = di(GeolocationService);
-    #i18nService = di(I18nService);
-    #subscription: Subscription | null = null;
+    private _directionService = di(DirectionService);
+    private _geolocationService = di(GeolocationService);
+    private _i18nService = di(I18nService);
+    private _subscription: Subscription | null = null;
     value: string;
 
     constructor() {
-        const unknownValue = this.#i18nService.get(
-            'location.field.unknownValue'
+        const unknownValue = this._i18nService.get(
+            'location.field.unknownValue',
         );
         this.value = unknownValue;
-        this.#subscription = this.#geolocationService
+        this._subscription = this._geolocationService
             .getPosition()
             .subscribe((position) => {
                 if (position && position.success) {
                     if (isNaN(position.heading)) {
                         this.value = unknownValue;
                     } else {
-                        this.value = this.#directionService.toHeadingDirection(
-                            position.heading
+                        this.value = this._directionService.toHeadingDirection(
+                            position.heading,
                         );
                     }
                 } else {
@@ -38,6 +38,6 @@ export class LocationFieldHeadingComponent {
     }
 
     onDestroy() {
-        this.#subscription && this.#subscription.unsubscribe();
+        this._subscription && this._subscription.unsubscribe();
     }
 }

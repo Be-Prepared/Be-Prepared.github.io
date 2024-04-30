@@ -9,6 +9,6 @@ import { Component, css, html } from 'fudgel';
             white-space: nowrap;
         }
     `,
-    template: html`<div class="no-overflow">{{name}}</div>`
+    template: html`<div class="no-overflow">{{name}}</div>`,
 })
 export class LocationFieldDestinationComponent {}

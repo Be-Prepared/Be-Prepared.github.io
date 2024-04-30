@@ -5,7 +5,7 @@ import { PermissionsService } from './permissions.service';
 import { switchMap } from 'rxjs/operators';
 
 export class MagnifierService {
-    #permissionsService = di(PermissionsService);
+    private _permissionsService = di(PermissionsService);
 
     availabilityState(useLiveValue: boolean) {
         if (!navigator.mediaDevices) {
@@ -26,11 +26,11 @@ export class MagnifierService {
                     localStorage.setItem('magnifier', 'false');
 
                     return AvailabilityState.UNAVAILABLE;
-                })
+                }),
             );
         };
 
-        return this.#permissionsService.camera().pipe(
+        return this._permissionsService.camera().pipe(
             switchMap((state) => {
                 if (!useLiveValue) {
                     const cached = localStorage.getItem('magnifier');
@@ -44,11 +44,11 @@ export class MagnifierService {
                     }
                 }
 
-                return this.#permissionsService.toAvailability(
+                return this._permissionsService.toAvailability(
                     state,
-                    whenGranted
+                    whenGranted,
                 );
-            })
+            }),
         );
     }
 
@@ -61,6 +61,6 @@ export class MagnifierService {
     }
 
     prompt() {
-        return this.#permissionsService.camera(true);
+        return this._permissionsService.camera(true);
     }
 }

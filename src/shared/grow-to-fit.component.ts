@@ -21,31 +21,31 @@ import { Component, css, html } from 'fudgel';
             <div #ref="content"><slot #ref="slot"></slot></div>
         </div>
     `,
-    useShadow: true
+    useShadow: true,
 })
 export class GrowToFitComponent {
-    #mutationObserver?: MutationObserver;
-    #resizeObserver?: ResizeObserver;
+    private _mutationObserver?: MutationObserver;
+    private _resizeObserver?: ResizeObserver;
     content?: HTMLDivElement;
     slot?: HTMLSlotElement;
     wrapper?: HTMLDivElement;
 
     onViewInit() {
-        this.#findContentSize();
-        this.#monitorSizeChanges();
+        this._findContentSize();
+        this._monitorSizeChanges();
     }
 
     onDestroy() {
-        if (this.#resizeObserver) {
-            this.#resizeObserver.disconnect();
+        if (this._resizeObserver) {
+            this._resizeObserver.disconnect();
         }
 
-        if (this.#mutationObserver) {
-            this.#mutationObserver.disconnect();
+        if (this._mutationObserver) {
+            this._mutationObserver.disconnect();
         }
     }
 
-    #findContentSize() {
+    private _findContentSize() {
         const wrapper = this.wrapper!;
         const content = this.content!;
         let fz = 1;
@@ -91,15 +91,15 @@ export class GrowToFitComponent {
         }
     }
 
-    #monitorSizeChanges() {
-        this.#resizeObserver = new ResizeObserver(() =>
-            this.#findContentSize()
+    private _monitorSizeChanges() {
+        this._resizeObserver = new ResizeObserver(() =>
+            this._findContentSize(),
         );
-        this.#resizeObserver.observe(this.wrapper!);
-        this.#mutationObserver = new MutationObserver(() =>
-            this.#findContentSize()
+        this._resizeObserver.observe(this.wrapper!);
+        this._mutationObserver = new MutationObserver(() =>
+            this._findContentSize(),
         );
-        this.#mutationObserver.observe(this.slot!, {
+        this._mutationObserver.observe(this.slot!, {
             attributes: true,
             childList: true,
             characterData: true,

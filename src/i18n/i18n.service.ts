@@ -3,10 +3,10 @@ import { LanguageData } from './language-data';
 import { languages } from './languages';
 
 export class I18nService {
-    #data: LanguageData = enUS;
+    private _data: LanguageData = enUS;
 
     get(str: string) {
-        return this.#data[str] || str;
+        return this._data[str] || str;
     }
 
     set(language: string) {
@@ -14,7 +14,7 @@ export class I18nService {
             const data = languages[lang];
 
             if (data) {
-                this.#data = data;
+                this._data = data;
                 const html = document.getElementsByTagName('html')[0];
 
                 if (html) {

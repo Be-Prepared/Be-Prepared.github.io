@@ -4,10 +4,10 @@ import { I18nService } from './i18n.service';
 @Component('i18n-label', {
     attr: ['id', 'ws'],
     // Spaces are necessary because vite/esbuild removes them
-    template: '{{ws}}{{value}}{{ws}}'
+    template: '{{ws}}{{value}}{{ws}}',
 })
 export class I18nLabel {
-    #i18nService = di(I18nService);
+    private _i18nService = di(I18nService);
     id: string = '';
     ws: string = ' '; // Overwritten by attr
     value: string = '';
@@ -19,6 +19,6 @@ export class I18nLabel {
     }
 
     onChange() {
-        this.value = this.#i18nService.get(this.id);
+        this.value = this._i18nService.get(this.id);
     }
 }

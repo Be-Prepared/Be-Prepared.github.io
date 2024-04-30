@@ -89,11 +89,11 @@ import { WakeLockService } from '../services/wake-lock.service';
     `,
 })
 export class InfoAppComponent {
-    #geolocationService = di(GeolocationService);
-    #positionService = di(PositionService);
-    #subject = new Subject();
-    #torchService = di(TorchService);
-    #wakeLockService = di(WakeLockService);
+    private _geolocationService = di(GeolocationService);
+    private _positionService = di(PositionService);
+    private _subject = new Subject();
+    private _torchService = di(TorchService);
+    private _wakeLockService = di(WakeLockService);
     buildDate = __BUILD_DATE__;
     geolocation = AvailabilityState.ERROR;
     hostPlatform = __HOST_PLATFORM__;
@@ -106,34 +106,34 @@ export class InfoAppComponent {
     wakeLock = AvailabilityState.ERROR;
 
     constructor() {
-        this.#geolocationService
+        this._geolocationService
             .availabilityState()
-            .pipe(takeUntil(this.#subject))
+            .pipe(takeUntil(this._subject))
             .subscribe((status) => {
                 this.geolocation = status;
             });
-        this.#positionService
+        this._positionService
             .availabilityState()
-            .pipe(takeUntil(this.#subject))
+            .pipe(takeUntil(this._subject))
             .subscribe((status) => {
                 this.position = status;
             });
-        this.#torchService
+        this._torchService
             .availabilityState(false)
-            .pipe(takeUntil(this.#subject))
+            .pipe(takeUntil(this._subject))
             .subscribe((status) => {
                 this.torch = status;
             });
-        this.#wakeLockService
+        this._wakeLockService
             .availabilityState()
-            .pipe(takeUntil(this.#subject))
+            .pipe(takeUntil(this._subject))
             .subscribe((status) => {
                 this.wakeLock = status;
             });
     }
 
     onDestroy() {
-        this.#subject.next(null);
-        this.#subject.complete();
+        this._subject.next(null);
+        this._subject.complete();
     }
 }

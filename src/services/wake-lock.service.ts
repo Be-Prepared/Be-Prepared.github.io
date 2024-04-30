@@ -2,19 +2,19 @@ import { AvailabilityState } from '../datatypes/availability-state';
 import { from, of } from 'rxjs';
 
 export class WakeLockService {
-    #currentLock: WakeLockSentinel | null = null;
+    private _currentLock: WakeLockSentinel | null = null;
 
     availabilityState() {
         if (!window.navigator.wakeLock) {
             return of(AvailabilityState.UNAVAILABLE);
         }
 
-        if (this.#currentLock) {
+        if (this._currentLock) {
             return of(AvailabilityState.ALLOWED);
         }
 
         return from(
-            this.#getLock().then((waitLock) => {
+            this._getLock().then((waitLock) => {
                 if (waitLock) {
                     waitLock.release();
 
@@ -22,14 +22,14 @@ export class WakeLockService {
                 }
 
                 return AvailabilityState.DENIED;
-            })
+            }),
         );
     }
 
     release() {
-        if (this.#currentLock) {
-            this.#currentLock.release();
-            this.#currentLock = null;
+        if (this._currentLock) {
+            this._currentLock.release();
+            this._currentLock = null;
         }
     }
 
@@ -38,18 +38,18 @@ export class WakeLockService {
             return;
         }
 
-        if (this.#currentLock) {
+        if (this._currentLock) {
             return;
         }
 
-        return this.#getLock().then((waitLock) => {
+        return this._getLock().then((waitLock) => {
             if (waitLock) {
-                this.#currentLock = waitLock;
+                this._currentLock = waitLock;
             }
         });
     }
 
-    #getLock() {
+    private _getLock() {
         return window.navigator.wakeLock.request().catch(() => {});
     }
 }

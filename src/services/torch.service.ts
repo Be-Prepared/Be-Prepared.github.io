@@ -8,14 +8,14 @@ import {
 import { switchMap } from 'rxjs/operators';
 
 export class TorchService {
-    #permissionsService = di(PermissionsService);
+    private _permissionsService = di(PermissionsService);
 
     availabilityState(useLiveValue: boolean) {
         if (!window.navigator.mediaDevices) {
             return of(AvailabilityState.UNAVAILABLE);
         }
 
-        return this.#permissionsService.camera().pipe(
+        return this._permissionsService.camera().pipe(
             switchMap((state) => {
                 if (state === PermissionsServiceState.ERROR) {
                     return of(AvailabilityState.ERROR);
@@ -42,7 +42,7 @@ export class TorchService {
                 }
 
                 return from(
-                    this.#getAllTracksWithTorch().then((tracks) => {
+                    this._getAllTracksWithTorch().then((tracks) => {
                         if (tracks.length) {
                             localStorage.setItem('torch', 'true');
 
@@ -52,14 +52,14 @@ export class TorchService {
                         localStorage.setItem('torch', 'false');
 
                         return AvailabilityState.UNAVAILABLE;
-                    })
+                    }),
                 );
-            })
+            }),
         );
     }
 
     currentStatus() {
-        return this.#getAllTracksWithTorch().then((tracks) => {
+        return this._getAllTracksWithTorch().then((tracks) => {
             let enabled = false;
 
             for (const track of tracks) {
@@ -73,7 +73,7 @@ export class TorchService {
     }
 
     turnOff() {
-        return this.#getAllTracksWithTorch().then((tracks) => {
+        return this._getAllTracksWithTorch().then((tracks) => {
             const enabled = [];
 
             for (const track of tracks) {
@@ -83,20 +83,20 @@ export class TorchService {
             }
 
             for (const track of enabled) {
-                this.#setTorch(track, false);
+                this._setTorch(track, false);
             }
         });
     }
 
     turnOn() {
-        return this.#getAllTracksWithTorch().then((tracks) => {
+        return this._getAllTracksWithTorch().then((tracks) => {
             if (tracks.length) {
-                this.#setTorch(tracks[0], true);
+                this._setTorch(tracks[0], true);
             }
         });
     }
 
-    #getAllTracksWithTorch() {
+    private _getAllTracksWithTorch() {
         return window.navigator.mediaDevices
             .getUserMedia({
                 video: {
@@ -106,11 +106,11 @@ export class TorchService {
             .then((stream) =>
                 stream.getVideoTracks().filter((track) => {
                     return (track.getCapabilities() as any).torch;
-                })
+                }),
             );
     }
 
-    #setTorch(track: MediaStreamTrack, enabled: boolean) {
+    private _setTorch(track: MediaStreamTrack, enabled: boolean) {
         track.applyConstraints({
             advanced: [{ torch: enabled } as any],
         });

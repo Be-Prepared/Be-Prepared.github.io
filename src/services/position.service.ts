@@ -23,7 +23,7 @@ export interface PositionEventQuaternion {
 }
 
 export class PositionService {
-    #observable: Observable<PositionEvent> | null = null;
+    private _observable: Observable<PositionEvent> | null = null;
 
     availabilityState() {
         if (
@@ -35,18 +35,18 @@ export class PositionService {
             return of(AvailabilityState.UNAVAILABLE);
         }
 
-        return this.#checkAvailability();
+        return this._checkAvailability();
     }
 
     getCompassBearing() {
         return this.getLocationEvents().pipe(
             map((event: PositionEvent) => {
                 if ('alpha' in event) {
-                    return this.#convertDeviceOrientationToBearing(event);
+                    return this._convertDeviceOrientationToBearing(event);
                 }
 
                 if ('quaternion' in event) {
-                    return this.#convertQuaternionToBearing(event);
+                    return this._convertQuaternionToBearing(event);
                 }
 
                 return event.bearing;
@@ -54,32 +54,32 @@ export class PositionService {
             share({
                 connector: () => new ReplaySubject(1),
                 resetOnRefCountZero: true,
-            })
+            }),
         );
     }
 
     getLocationEvents() {
-        if (!this.#observable) {
+        if (!this._observable) {
             if ('AbsoluteOrientationSensor' in window) {
-                this.#listenAbsoluteOrientationSensor();
+                this._listenAbsoluteOrientationSensor();
             } else {
-                this.#listenDeviceOrientationAbsolute();
+                this._listenDeviceOrientationAbsolute();
             }
         }
 
-        return this.#observable!;
+        return this._observable!;
     }
 
-    #checkAvailability() {
+    private _checkAvailability() {
         return this.getLocationEvents().pipe(
             map(() => AvailabilityState.ALLOWED),
             catchError(() => of(AvailabilityState.UNAVAILABLE)),
-            first()
+            first(),
         );
     }
 
-    #convertDeviceOrientationToBearing(
-        event: PositionEventDeviceOrientation
+    private _convertDeviceOrientationToBearing(
+        event: PositionEventDeviceOrientation,
     ): number {
         // Convert degrees to radians
         const alphaRad = event.alpha * (Math.PI / 180);
@@ -113,12 +113,14 @@ export class PositionService {
         return bearing;
     }
 
-    #convertQuaternionToBearing(event: PositionEventQuaternion): number {
+    private _convertQuaternionToBearing(
+        event: PositionEventQuaternion,
+    ): number {
         const q = event.quaternion;
         const alpha =
             Math.atan2(
                 2 * q[0] * q[1] + 2 * q[2] * q[3],
-                1 - 2 * q[1] * q[1] - 2 * q[2] * q[2]
+                1 - 2 * q[1] * q[1] - 2 * q[2] * q[2],
             ) *
             (180 / Math.PI);
         const bearing = alpha < 0 ? alpha + 360 : alpha;
@@ -126,7 +128,7 @@ export class PositionService {
         return bearing;
     }
 
-    #listenAbsoluteOrientationSensor() {
+    private _listenAbsoluteOrientationSensor() {
         try {
             const sensor = new AbsoluteOrientationSensor({
                 frequency: 60,
@@ -155,22 +157,22 @@ export class PositionService {
                 subject.error(event);
             });
             sensor.start();
-            this.#observable = subject.asObservable().pipe(
+            this._observable = subject.asObservable().pipe(
                 finalize(() => {
                     sensor.stop();
-                    this.#observable = null;
+                    this._observable = null;
                 }),
                 share({
                     connector: () => new ReplaySubject(1),
                     resetOnRefCountZero: true,
-                })
+                }),
             );
         } catch (ignore) {
-            this.#observable = throwError(new Error('Unsupported'));
+            this._observable = throwError(new Error('Unsupported'));
         }
     }
 
-    #listenDeviceOrientationAbsolute() {
+    private _listenDeviceOrientationAbsolute() {
         const subject = new Subject<
             PositionEventBearing | PositionEventDeviceOrientation
         >();
@@ -218,15 +220,15 @@ export class PositionService {
             }
         };
         const eventName = 'deviceorientationabsolute';
-        this.#observable = subject.asObservable().pipe(
+        this._observable = subject.asObservable().pipe(
             finalize(() => {
                 window.removeEventListener(eventName, eventListener);
-                this.#observable = null;
+                this._observable = null;
             }),
             share({
                 connector: () => new ReplaySubject(1),
                 resetOnRefCountZero: true,
-            })
+            }),
         );
         window.addEventListener(eventName, eventListener);
     }

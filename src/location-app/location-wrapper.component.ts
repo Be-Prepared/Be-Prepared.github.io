@@ -86,9 +86,9 @@ import { takeUntil } from 'rxjs/operators';
     useShadow: true,
 })
 export class LocationWrapperComponent {
-    #geolocationService = di(GeolocationService);
-    #permissionsService = di(PermissionsService);
-    #subject = new Subject();
+    private _geolocationService = di(GeolocationService);
+    private _permissionsService = di(PermissionsService);
+    private _subject = new Subject();
     control = 'current';
     explainAsk = false;
     explainDeny = false;
@@ -97,9 +97,9 @@ export class LocationWrapperComponent {
     waypointId?: number;
 
     onInit() {
-        this.#geolocationService
+        this._geolocationService
             .availabilityState()
-            .pipe(takeUntil(this.#subject))
+            .pipe(takeUntil(this._subject))
             .subscribe((value) => {
                 this.explainAsk = value === AvailabilityState.PROMPT;
                 this.explainDeny = value === AvailabilityState.DENIED;
@@ -108,18 +108,18 @@ export class LocationWrapperComponent {
                 this.showControls = value === AvailabilityState.ALLOWED;
 
                 if (this.showControls) {
-                    this.#getCurrentStatus();
+                    this._getCurrentStatus();
                 }
             });
     }
 
     onDestroy() {
-        this.#subject.next(null);
-        this.#subject.complete();
+        this._subject.next(null);
+        this._subject.complete();
     }
 
     grant() {
-        this.#permissionsService.geolocation(true);
+        this._permissionsService.geolocation(true);
     }
 
     setControl(control: string, waypointId?: number) {
@@ -130,12 +130,12 @@ export class LocationWrapperComponent {
         this.control = control;
     }
 
-    #getCurrentStatus() {
+    private _getCurrentStatus() {
         // Add a subscriber to keep the service active no matter what route is
         // being shown.
-        this.#geolocationService
+        this._geolocationService
             .getPosition()
-            .pipe(takeUntil(this.#subject))
+            .pipe(takeUntil(this._subject))
             .subscribe(() => {});
     }
 }

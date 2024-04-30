@@ -60,7 +60,7 @@ import { UpdatePwaService } from './update-pwa.service';
     `,
 })
 export class UpdatePwaComponent {
-    #updatePwaService = di(UpdatePwaService);
+    private _updatePwaService = di(UpdatePwaService);
     drawer?: HTMLElement;
 
     onViewInit() {
@@ -70,11 +70,11 @@ export class UpdatePwaComponent {
     }
 
     reload() {
-        this.#updatePwaService.performUpdate();
-        this.#callDrawer('hide');
+        this._updatePwaService.performUpdate();
+        this._callDrawer('hide');
     }
 
-    #callDrawer(action: 'show' | 'hide') {
+    private _callDrawer(action: 'show' | 'hide') {
         if (this.drawer) {
             (this.drawer as any)[action]();
         }

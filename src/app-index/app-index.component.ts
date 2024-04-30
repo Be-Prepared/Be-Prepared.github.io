@@ -21,19 +21,19 @@ import { TileDefResolved, TileService } from '../services/tile.service';
     `,
 })
 export class AppIndex {
-    #subscription?: Subscription;
-    #tileService = di(TileService);
+    private _subscription?: Subscription;
+    private _tileService = di(TileService);
     tiles?: TileDefResolved[];
 
     constructor() {
-        this.#subscription = this.#tileService
-        .getAllowedTiles()
-        .subscribe((tiles) => (this.tiles = tiles));
+        this._subscription = this._tileService
+            .getAllowedTiles()
+            .subscribe((tiles) => (this.tiles = tiles));
     }
 
     onDestroy() {
-        if (this.#subscription) {
-            this.#subscription.unsubscribe();
+        if (this._subscription) {
+            this._subscription.unsubscribe();
         }
     }
 }

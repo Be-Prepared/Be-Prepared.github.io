@@ -16,8 +16,11 @@ export const enum PermissionsServiceState {
 export type PermissionsServiceName = 'camera';
 
 export class PermissionsService {
-    #observables = new Map<string, Observable<PermissionsServiceState>>();
-    #subjects = new Map<
+    private _observables = new Map<
+        string,
+        Observable<PermissionsServiceState>
+    >();
+    private _subjects = new Map<
         string,
         ReplaySubject<null | PermissionsServiceState>
     >();
@@ -28,7 +31,7 @@ export class PermissionsService {
         }
 
         const name = 'camera' as PermissionName;
-        const subject = this.#getSubject(name);
+        const subject = this._getSubject(name);
 
         if (prompt) {
             // Asking for `video: true` or `video: { facingMode: 'self' }` does
@@ -38,11 +41,11 @@ export class PermissionsService {
                 .getUserMedia({ video: { facingMode: 'environment' } })
                 .then(
                     () => subject.next(PermissionsServiceState.GRANTED),
-                    () => subject.next(PermissionsServiceState.DENIED)
+                    () => subject.next(PermissionsServiceState.DENIED),
                 );
         }
 
-        return this.#getPermission(name, subject);
+        return this._getPermission(name, subject);
     }
 
     geolocation(prompt = false) {
@@ -51,7 +54,7 @@ export class PermissionsService {
         }
 
         const name: PermissionName = 'geolocation';
-        const subject = this.#getSubject(name);
+        const subject = this._getSubject(name);
 
         if (prompt) {
             navigator.geolocation.getCurrentPosition(
@@ -63,16 +66,16 @@ export class PermissionsService {
                 },
                 {
                     timeout: 4000,
-                }
+                },
             );
         }
 
-        return this.#getPermission(name, subject);
+        return this._getPermission(name, subject);
     }
 
     toAvailability(
         state: PermissionsServiceState,
-        whenGranted: () => Observable<AvailabilityState>
+        whenGranted: () => Observable<AvailabilityState>,
     ) {
         if (state === PermissionsServiceState.ERROR) {
             return of(AvailabilityState.ERROR);
@@ -89,7 +92,7 @@ export class PermissionsService {
         return whenGranted();
     }
 
-    #checkPermission(name: PermissionName) {
+    private _checkPermission(name: PermissionName) {
         const subject = new ReplaySubject<PermissionState>(1);
 
         navigator.permissions.query({ name }).then(
@@ -100,17 +103,17 @@ export class PermissionsService {
                     subject.next(status.state);
                 };
             },
-            () => subject.next('denied' as PermissionState)
+            () => subject.next('denied' as PermissionState),
         );
 
         return subject.asObservable();
     }
 
-    #getPermission(
+    private _getPermission(
         name: PermissionName,
-        subject: ReplaySubject<null | PermissionsServiceState>
+        subject: ReplaySubject<null | PermissionsServiceState>,
     ): Observable<PermissionsServiceState> {
-        let observable = this.#observables.get(name);
+        let observable = this._observables.get(name);
 
         if (observable) {
             return observable;
@@ -122,33 +125,33 @@ export class PermissionsService {
                     return of(value);
                 }
 
-                return this.#checkPermission(name).pipe(
+                return this._checkPermission(name).pipe(
                     map((state: PermissionState) => {
-                        return this.#mapPermission(state);
-                    })
+                        return this._mapPermission(state);
+                    }),
                 );
             }),
             distinctUntilChanged(),
-            shareReplay(1)
+            shareReplay(1),
         );
-        this.#observables.set(name, observable);
+        this._observables.set(name, observable);
 
         return observable;
     }
 
-    #getSubject(name: PermissionName) {
-        let subject = this.#subjects.get(name);
+    private _getSubject(name: PermissionName) {
+        let subject = this._subjects.get(name);
 
         if (!subject) {
             subject = new ReplaySubject(1);
             subject.next(null);
-            this.#subjects.set(name, subject);
+            this._subjects.set(name, subject);
         }
 
         return subject;
     }
 
-    #mapPermission(state: PermissionState) {
+    private _mapPermission(state: PermissionState) {
         let mapped = PermissionsServiceState.DENIED;
 
         if (state === 'granted') {

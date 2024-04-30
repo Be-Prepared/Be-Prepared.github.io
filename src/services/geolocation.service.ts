@@ -34,16 +34,16 @@ export type GeolocationCoordinateResult =
     | GeolocationCoordinateResultError;
 
 export class GeolocationService {
-    #directionService = di(DirectionService);
-    #observable: Observable<GeolocationCoordinateResult> | null = null;
-    #permissionsService = di(PermissionsService);
+    private _directionService = di(DirectionService);
+    private _observable: Observable<GeolocationCoordinateResult> | null = null;
+    private _permissionsService = di(PermissionsService);
 
     availabilityState() {
         if (!('geolocation' in navigator)) {
             return of(AvailabilityState.UNAVAILABLE);
         }
 
-        return this.#permissionsService.geolocation().pipe(
+        return this._permissionsService.geolocation().pipe(
             switchMap((state) => {
                 if (state === PermissionsServiceState.ERROR) {
                     return of(AvailabilityState.ERROR);
@@ -58,13 +58,13 @@ export class GeolocationService {
                 }
 
                 return of(AvailabilityState.ALLOWED);
-            })
+            }),
         );
     }
 
     getPosition() {
-        if (this.#observable) {
-            return this.#observable;
+        if (this._observable) {
+            return this._observable;
         }
 
         const subject = new Subject<GeolocationCoordinateResult>();
@@ -85,8 +85,12 @@ export class GeolocationService {
 
             lastPositions.push(lastPosition);
 
-            if (isNaN(lastPosition.speed) || lastPosition.speed === null || lastPosition.heading === null) {
-                this.#calculateSpeedHeading(lastPositions);
+            if (
+                isNaN(lastPosition.speed) ||
+                lastPosition.speed === null ||
+                lastPosition.heading === null
+            ) {
+                this._calculateSpeedHeading(lastPositions);
             }
 
             subject.next(lastPosition);
@@ -103,26 +107,26 @@ export class GeolocationService {
                 error,
             });
         };
-        this.#observable = subject.asObservable().pipe(
+        this._observable = subject.asObservable().pipe(
             finalize(() => {
                 navigator.geolocation.clearWatch(watch);
-                this.#observable = null;
+                this._observable = null;
             }),
             share({
                 connector: () => new ReplaySubject(1),
                 resetOnRefCountZero: () => timer(5000),
-            })
+            }),
         );
         navigator.geolocation.getCurrentPosition(success, error);
         const watch = navigator.geolocation.watchPosition(success, error, {
             enableHighAccuracy: true,
         });
 
-        return this.#observable;
+        return this._observable;
     }
 
-    #calculateSpeedHeading(
-        lastPositions: GeolocationCoordinateResultSuccess[]
+    private _calculateSpeedHeading(
+        lastPositions: GeolocationCoordinateResultSuccess[],
     ) {
         const first = lastPositions[0];
         const last = lastPositions[lastPositions.length - 1];
@@ -159,18 +163,21 @@ export class GeolocationService {
         const cheapRuler = new CheapRuler(last.latitude, 'meters');
         const distance = cheapRuler.distance(
             [estimate[0][0], estimate[0][1]],
-            [last.longitude, last.latitude]
+            [last.longitude, last.latitude],
         );
-        const elapsedTime = (((last.timestamp + first.timestamp) / 2) - first.timestamp);
+        const elapsedTime =
+            (last.timestamp + first.timestamp) / 2 - first.timestamp;
         const speed = elapsedTime ? distance / elapsedTime : 0;
         let heading: number;
 
         if (speed > 0) {
             // Calculates the heading, not the bearing
-            heading = this.#directionService.standardize360(cheapRuler.bearing(
-                [estimate[0][0], estimate[0][1]],
-                [last.longitude, last.latitude]
-            ));
+            heading = this._directionService.standardize360(
+                cheapRuler.bearing(
+                    [estimate[0][0], estimate[0][1]],
+                    [last.longitude, last.latitude],
+                ),
+            );
         } else {
             heading = NaN;
         }

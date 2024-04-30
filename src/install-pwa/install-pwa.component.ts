@@ -62,19 +62,19 @@ import { InstallPwaService } from './install-pwa.service';
     `,
 })
 export class InstallPwaComponent {
-    #installPwaService = di(InstallPwaService);
+    private _installPwaService = di(InstallPwaService);
     drawer?: HTMLElement;
 
     logoLoaded() {
-        setTimeout(() => this.#callDrawer('show'), 400);
+        setTimeout(() => this._callDrawer('show'), 400);
     }
 
     install() {
-        this.#installPwaService.triggerSavedEvent();
-        this.#callDrawer('hide');
+        this._installPwaService.triggerSavedEvent();
+        this._callDrawer('hide');
     }
 
-    #callDrawer(action: 'show' | 'hide') {
+    private _callDrawer(action: 'show' | 'hide') {
         if (this.drawer) {
             (this.drawer as any)[action]();
         }

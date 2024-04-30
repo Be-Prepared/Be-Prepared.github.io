@@ -54,8 +54,8 @@ export interface UTMUPS {
 }
 
 export class CoordinateService {
-    #currentSetting = new BehaviorSubject<CoordinateSystem>(
-        CoordinateSystemDefault
+    private _currentSetting = new BehaviorSubject<CoordinateSystem>(
+        CoordinateSystemDefault,
     );
 
     constructor() {
@@ -65,7 +65,7 @@ export class CoordinateService {
             storedSetting &&
             COORDINATE_SYSTEMS.includes(storedSetting as CoordinateSystem)
         ) {
-            this.#currentSetting.next(storedSetting as CoordinateSystem);
+            this._currentSetting.next(storedSetting as CoordinateSystem);
         }
     }
 
@@ -80,16 +80,21 @@ export class CoordinateService {
             return { lat, lon };
         } catch (ignore) {}
 
-        const cleansed = str.toUpperCase().replace(/[^-0-9.ENSW]+/g, ' ').trim();
+        const cleansed = str
+            .toUpperCase()
+            .replace(/[^-0-9.ENSW]+/g, ' ')
+            .trim();
         let west = cleansed.indexOf('W') >= 0; // Force negative longitude
         let south = cleansed.indexOf('S') >= 0; // Force negative latitude
-        const coordinateStrings = this.#breakIntoCoordinateChunks(cleansed);
+        const coordinateStrings = this._breakIntoCoordinateChunks(cleansed);
 
         if (!coordinateStrings) {
             return null;
         }
 
-        const coordinates = coordinateStrings.map((item) => this.#parseCoordinateString(item));
+        const coordinates = coordinateStrings.map((item) =>
+            this._parseCoordinateString(item),
+        );
 
         if (coordinates[0] === null || coordinates[1] === null) {
             return null;
@@ -110,42 +115,47 @@ export class CoordinateService {
     }
 
     getCurrentSetting() {
-        return this.#currentSetting.asObservable();
+        return this._currentSetting.asObservable();
     }
 
     latLonToSystem(lat: number, lon: number): LL | MGRS | UTMUPS {
-        const currentSetting = this.#currentSetting.value;
+        const currentSetting = this._currentSetting.value;
 
         if (currentSetting === CoordinateSystem.DMS) {
-            return this.#toDMS(lat, lon);
+            return this._toDMS(lat, lon);
         }
 
         if (currentSetting === CoordinateSystem.DDM) {
-            return this.#toDDM(lat, lon);
+            return this._toDDM(lat, lon);
         }
 
         if (currentSetting === CoordinateSystem.DDD) {
-            return this.#toDDD(lat, lon);
+            return this._toDDD(lat, lon);
         }
 
         if (currentSetting === CoordinateSystem.UTMUPS) {
-            return this.#toUTMUPS(lat, lon);
+            return this._toUTMUPS(lat, lon);
         }
 
-        return this.#toMGRS(lat, lon);
+        return this._toMGRS(lat, lon);
     }
 
     toggleSystem() {
         const currentIndex = COORDINATE_SYSTEMS.indexOf(
-            this.#currentSetting.value
+            this._currentSetting.value,
         );
         const newIndex = (currentIndex + 1) % COORDINATE_SYSTEMS.length;
-        this.#currentSetting.next(COORDINATE_SYSTEMS[newIndex]);
+        this._currentSetting.next(COORDINATE_SYSTEMS[newIndex]);
         localStorage.setItem('coordinateSystem', COORDINATE_SYSTEMS[newIndex]);
     }
 
-    #breakIntoCoordinateChunks(cleansed: string): [string, string] | null {
-        const coordinates = cleansed.split(/[ENSW]/).map((item) => item.trim()).filter((item) => item !== '');
+    private _breakIntoCoordinateChunks(
+        cleansed: string,
+    ): [string, string] | null {
+        const coordinates = cleansed
+            .split(/[ENSW]/)
+            .map((item) => item.trim())
+            .filter((item) => item !== '');
 
         if (coordinates.length > 1) {
             return [coordinates[0], coordinates[1]];
@@ -171,7 +181,7 @@ export class CoordinateService {
         return [firstHalf.join(' '), secondHalf.join(' ')];
     }
 
-    #padLeading(str: string): string {
+    private _padLeading(str: string): string {
         if (str.length === 1 || str.charAt(1) === '.') {
             return `0${str}`;
         }
@@ -179,7 +189,7 @@ export class CoordinateService {
         return str;
     }
 
-    #parseCoordinateString(str: string): number | null {
+    private _parseCoordinateString(str: string): number | null {
         const parts = str.split(/ /).map((item) => parseFloat(item));
 
         for (const part of parts) {
@@ -188,7 +198,7 @@ export class CoordinateService {
             }
         }
 
-        let multiplier = 1/60;
+        let multiplier = 1 / 60;
         let result = parts.shift()!;
 
         while (parts.length) {
@@ -199,7 +209,7 @@ export class CoordinateService {
         return result;
     }
 
-    #toDDD(lat: number, lon: number): LL {
+    private _toDDD(lat: number, lon: number): LL {
         const latDir = lat >= 0 ? 'N' : 'S';
         const lonDir = lon >= 0 ? 'E' : 'W';
         const latAbs = Math.abs(lat).toFixed(6);
@@ -212,19 +222,19 @@ export class CoordinateService {
         };
     }
 
-    #toDDM(lat: number, lon: number): LL {
+    private _toDDM(lat: number, lon: number): LL {
         const latDir = lat >= 0 ? 'N' : 'S';
         const lonDir = lon >= 0 ? 'E' : 'W';
 
         lat = Math.abs(lat);
         const latDeg = Math.floor(lat);
         const latMin = (lat - latDeg) * 60;
-        const latMinFixed = this.#padLeading(latMin.toFixed(3));
+        const latMinFixed = this._padLeading(latMin.toFixed(3));
 
         lon = Math.abs(lon);
         const lonDeg = Math.floor(lon);
         const lonMin = (lon - lonDeg) * 60;
-        const lonMinFixed = this.#padLeading(lonMin.toFixed(3));
+        const lonMinFixed = this._padLeading(lonMin.toFixed(3));
 
         return {
             lat: `${latDir} ${latDeg}° ${latMinFixed}'`,
@@ -233,7 +243,7 @@ export class CoordinateService {
         };
     }
 
-    #toDMS(lat: number, lon: number): LL {
+    private _toDMS(lat: number, lon: number): LL {
         const latDir = lat >= 0 ? 'N' : 'S';
         const lonDir = lon >= 0 ? 'E' : 'W';
 
@@ -241,17 +251,17 @@ export class CoordinateService {
         const latDeg = Math.floor(lat);
         lat = (lat - latDeg) * 60;
         const latMin = Math.floor(lat);
-        const latMinFixed = this.#padLeading(latMin.toFixed(0));
+        const latMinFixed = this._padLeading(latMin.toFixed(0));
         const latSec = (lat - latMin) * 60;
-        const latSecFixed = this.#padLeading(latSec.toFixed(1));
+        const latSecFixed = this._padLeading(latSec.toFixed(1));
 
         lon = Math.abs(lon);
         const lonDeg = Math.floor(lon);
         lon = (lon - lonDeg) * 60;
         const lonMin = Math.floor(lon);
-        const lonMinFixed = this.#padLeading(lonMin.toFixed(0));
+        const lonMinFixed = this._padLeading(lonMin.toFixed(0));
         const lonSec = (lon - lonMin) * 60;
-        const lonSecFixed = this.#padLeading(lonSec.toFixed(1));
+        const lonSecFixed = this._padLeading(lonSec.toFixed(1));
 
         return {
             lat: `${latDir} ${latDeg}° ${latMinFixed}' ${latSecFixed}"`,
@@ -260,7 +270,7 @@ export class CoordinateService {
         };
     }
 
-    #toMGRS(lat: number, lon: number): MGRS {
+    private _toMGRS(lat: number, lon: number): MGRS {
         const mgrs = converter.LLtoUSNG(lat, lon, 6);
         const [zone, square, easting, northing] = mgrs.split(' ');
 
@@ -273,7 +283,7 @@ export class CoordinateService {
         };
     }
 
-    #toUTMUPS(lat: number, lon: number): UTMUPS {
+    private _toUTMUPS(lat: number, lon: number): UTMUPS {
         const utmups = converter.LLtoUTMUPS(lat, lon);
         const [zone, easting, northing] = utmups.split(' ');
 

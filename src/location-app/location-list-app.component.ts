@@ -154,28 +154,28 @@ interface WaypointAugmented extends WaypointSaved {
     `,
 })
 export class LocationListAppComponent {
-    #directionService = di(DirectionService);
-    #distanceService = di(DistanceService);
-    #geolocationService = di(GeolocationService);
-    #i18nService = di(I18nService);
-    #subscription?: Subscription;
-    #waypointService = di(WaypointService);
+    private _directionService = di(DirectionService);
+    private _distanceService = di(DistanceService);
+    private _geolocationService = di(GeolocationService);
+    private _i18nService = di(I18nService);
+    private _subscription?: Subscription;
+    private _waypointService = di(WaypointService);
     points: WaypointAugmented[] = [];
     position: GeolocationCoordinateResult | null = null;
 
     onInit() {
-        this.#subscription = this.#geolocationService
+        this._subscription = this._geolocationService
             .getPosition()
             .pipe(first())
             .subscribe((position) => {
                 this.position = position;
-                this.#updatePoints(this.points);
+                this._updatePoints(this.points);
             });
-        this.#updatePoints(this.#waypointService.getPoints());
+        this._updatePoints(this._waypointService.getPoints());
     }
 
     onDestroy() {
-        this.#subscription && this.#subscription.unsubscribe();
+        this._subscription && this._subscription.unsubscribe();
     }
 
     goToAdd() {
@@ -187,26 +187,26 @@ export class LocationListAppComponent {
     }
 
     sortByDistance() {
-        this.points = this.#sortByDistance(this.points);
+        this.points = this._sortByDistance(this.points);
     }
 
     sortByName() {
-        this.points = this.#sortByName(this.points);
+        this.points = this._sortByName(this.points);
     }
 
-    #sortByDistance(points: WaypointAugmented[]): WaypointAugmented[] {
+    private _sortByDistance(points: WaypointAugmented[]): WaypointAugmented[] {
         return points.sort((a, b) => a.meters - b.meters);
     }
 
-    #sortByName(points: WaypointAugmented[]): WaypointAugmented[] {
+    private _sortByName(points: WaypointAugmented[]): WaypointAugmented[] {
         return points.sort((a, b) => a.name.localeCompare(b.name));
     }
 
-    #updatePoints(points: WaypointSaved[]) {
+    private _updatePoints(points: WaypointSaved[]) {
         const position = this.position;
 
         if (!position || !position.success) {
-            this.#updatePointsNoPosition(points);
+            this._updatePointsNoPosition(points);
             return;
         }
 
@@ -219,10 +219,10 @@ export class LocationListAppComponent {
             ];
             const pointB: [number, number] = [point.lon, point.lat];
             const meters = cheapRuler.distance(pointA, pointB);
-            const distance = this.#distanceService.metersToString(meters);
+            const distance = this._distanceService.metersToString(meters);
             const direction = cheapRuler.bearing(pointA, pointB);
             const compassPoint =
-                this.#directionService.toCompassPoint(direction);
+                this._directionService.toCompassPoint(direction);
 
             return {
                 ...point,
@@ -231,20 +231,20 @@ export class LocationListAppComponent {
             };
         });
 
-        this.points = this.#sortByDistance(augmentedPoints);
+        this.points = this._sortByDistance(augmentedPoints);
     }
 
-    #updatePointsNoPosition(points: WaypointSaved[]) {
+    private _updatePointsNoPosition(points: WaypointSaved[]) {
         const emptyPoints = points.map((point) => {
             return {
                 ...point,
                 meters: 0,
-                location: this.#i18nService.get(
-                    'location.waypoints.unknownLocation'
+                location: this._i18nService.get(
+                    'location.waypoints.unknownLocation',
                 ),
             };
         });
 
-        this.points = this.#sortByName(emptyPoints);
+        this.points = this._sortByName(emptyPoints);
     }
 }

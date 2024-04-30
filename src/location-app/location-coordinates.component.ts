@@ -30,7 +30,10 @@ interface DataToDisplay {
         <div *if="dataToDisplay.mgrs" class="multi-line">
             <changeable-setting @click="toggleCoordinateSystem()">
                 <div>
-                    <i18n-label id="location.coordinates.mgrs" ws=""></i18n-label>
+                    <i18n-label
+                        id="location.coordinates.mgrs"
+                        ws=""
+                    ></i18n-label>
                 </div>
                 <div>{{ dataToDisplay.mgrs }}</div>
             </changeable-setting>
@@ -38,7 +41,10 @@ interface DataToDisplay {
         <div *if="dataToDisplay.utmups" class="multi-line">
             <changeable-setting @click="toggleCoordinateSystem()">
                 <div>
-                    <i18n-label id="location.coordinates.utmups" ws=""></i18n-label>
+                    <i18n-label
+                        id="location.coordinates.utmups"
+                        ws=""
+                    ></i18n-label>
                 </div>
                 <div>{{ dataToDisplay.utmups }}</div>
             </changeable-setting>
@@ -49,39 +55,41 @@ interface DataToDisplay {
     `,
 })
 export class LocationCoordinatesComponent {
-    #coordinateService = di(CoordinateService);
-    #subscription: Subscription | null = null;
+    private _coordinateService = di(CoordinateService);
+    private _subscription: Subscription | null = null;
     coords?: LatLon;
     dataToDisplay: DataToDisplay = { empty: true };
 
     constructor() {
-        this.#subscription = this.#coordinateService.getCurrentSetting().subscribe(() => this.#redraw());
+        this._subscription = this._coordinateService
+            .getCurrentSetting()
+            .subscribe(() => this._redraw());
     }
 
     onChange(prop: string) {
         if (prop === 'coords') {
-            this.#redraw();
+            this._redraw();
         }
     }
 
     onDestroy() {
-        this.#subscription && this.#subscription.unsubscribe();
+        this._subscription && this._subscription.unsubscribe();
     }
 
     toggleCoordinateSystem() {
-        this.#coordinateService.toggleSystem();
+        this._coordinateService.toggleSystem();
     }
 
-    #redraw() {
+    private _redraw() {
         if (!this.coords) {
             this.dataToDisplay = { empty: true };
 
             return;
         }
 
-        const system = this.#coordinateService.latLonToSystem(
+        const system = this._coordinateService.latLonToSystem(
             this.coords.lat,
-            this.coords.lon
+            this.coords.lon,
         );
 
         // Tie to a single property for faster updates

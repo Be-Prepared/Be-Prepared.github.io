@@ -52,7 +52,9 @@ interface FieldInfo {
         <div class="field-line">
             <div class="field-label-wrapper">
                 <div class="field-label">
-                    <changeable-setting>{{selectedField.heading}}</changeable-setting>
+                    <changeable-setting
+                        >{{selectedField.heading}}</changeable-setting
+                    >
                     <select
                         id="{{id}}"
                         #ref="select"
@@ -103,7 +105,7 @@ interface FieldInfo {
     `,
 })
 export class LocationFieldComponent {
-    #i18nService = di(I18nService);
+    private _i18nService = di(I18nService);
     allowedFields: FieldInfo[] = [];
     default?: string;
     id?: string;
@@ -129,9 +131,9 @@ export class LocationFieldComponent {
 
         for (const id of allowedFieldTypes) {
             this.allowedFields.push({
-                heading: this.#i18nService.get(`location.field.${id}.heading`),
+                heading: this._i18nService.get(`location.field.${id}.heading`),
                 id,
-                label: this.#i18nService.get(`location.field.${id}.label`),
+                label: this._i18nService.get(`location.field.${id}.label`),
             });
         }
 
@@ -143,8 +145,8 @@ export class LocationFieldComponent {
 
         const selectedFieldId = localStorage.getItem(`field.${this.id}`) || '';
         this.selectedField =
-            this.#findFieldById(selectedFieldId) ||
-            this.#findFieldById(this.default || '') ||
+            this._findFieldById(selectedFieldId) ||
+            this._findFieldById(this.default || '') ||
             this.allowedFields[0];
     }
 
@@ -155,7 +157,7 @@ export class LocationFieldComponent {
     }
 
     selectField(id: string) {
-        const field = this.#findFieldById(id);
+        const field = this._findFieldById(id);
 
         if (field) {
             this.selectedField = field;
@@ -163,7 +165,7 @@ export class LocationFieldComponent {
         }
     }
 
-    #findFieldById(id: string) {
+    private _findFieldById(id: string) {
         return this.allowedFields.find((item) => item.id === id);
     }
 }

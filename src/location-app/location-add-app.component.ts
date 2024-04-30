@@ -9,17 +9,17 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
     template: html`<location-wrapper></location-wrapper>`,
 })
 export class LocationAddAppComponent {
-    #geolocationService = di(GeolocationService);
-    #subscription?: Subscription;
-    #waypointService = di(WaypointService);
+    private _geolocationService = di(GeolocationService);
+    private _subscription?: Subscription;
+    private _waypointService = di(WaypointService);
     id?: string;
     location: string = '';
     point: WaypointSaved | null = null;
 
     onInit() {
-        const point = this.#waypointService.newPoint();
+        const point = this._waypointService.newPoint();
         point.name = `Unnamed Waypoint ${point.id}`;
-        this.#subscription = this.#geolocationService
+        this._subscription = this._geolocationService
             .getPosition()
             .pipe(timeout(2000), first())
             .subscribe((position) => {
@@ -28,16 +28,16 @@ export class LocationAddAppComponent {
                     point.lon = position.longitude;
                 }
 
-                this.#waypointService.updatePoint(point);
+                this._waypointService.updatePoint(point);
                 history.replaceState(
                     {},
                     document.title,
-                    `/location-edit/${point.id}`
+                    `/location-edit/${point.id}`,
                 );
             });
     }
 
     onDestroy() {
-        this.#subscription && this.#subscription.unsubscribe();
+        this._subscription && this._subscription.unsubscribe();
     }
 }

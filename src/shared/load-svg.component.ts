@@ -11,20 +11,20 @@ import { Component, css, emit, rootElement } from 'fudgel';
 })
 export class LoadSvgComponent {
     href?: string;
-    #svg: HTMLElement | null = null;
+    private _svg: HTMLElement | null = null;
 
     onChange() {
-        if (this.#svg) {
-            this.#clearImage();
-            this.#loadImage(this.href);
+        if (this._svg) {
+            this._clearImage();
+            this._loadImage(this.href);
         }
     }
 
     onViewInit() {
-        this.#loadImage(this.href);
+        this._loadImage(this.href);
     }
 
-    #apply(svgContent: HTMLElement) {
+    private _apply(svgContent: HTMLElement) {
         const svg = document.importNode(svgContent, true);
         const root = rootElement(this);
 
@@ -34,17 +34,17 @@ export class LoadSvgComponent {
 
         root.appendChild(svg);
         emit(this, 'loadsvg');
-        this.#svg = svg;
+        this._svg = svg;
     }
 
-    #clearImage() {
-        if (this.#svg) {
-            this.#svg.remove();
-            this.#svg = null;
+    private _clearImage() {
+        if (this._svg) {
+            this._svg.remove();
+            this._svg = null;
         }
     }
 
-    #loadImage(href: string | undefined) {
+    private _loadImage(href: string | undefined) {
         if (!href) {
             return;
         }
@@ -53,7 +53,7 @@ export class LoadSvgComponent {
         xhr.open('get', href, true);
         xhr.onreadystatechange = () => {
             if (xhr.readyState === 4 && xhr.responseXML) {
-                this.#apply(xhr.responseXML.documentElement);
+                this._apply(xhr.responseXML.documentElement);
             }
         };
         xhr.send();

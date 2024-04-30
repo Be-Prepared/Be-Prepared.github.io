@@ -21,11 +21,14 @@ import { Component, css, html } from 'fudgel';
     `,
     template: html`
         <div></div>
-        <div class="heading"><i18n-label id="location.unavailable"></i18n-label></div>
-        <div class="message"><i18n-label id="location.unavailableMessage"></i18n-label></div>
+        <div class="heading">
+            <i18n-label id="location.unavailable"></i18n-label>
+        </div>
+        <div class="message">
+            <i18n-label id="location.unavailableMessage"></i18n-label>
+        </div>
         <back-button></back-button>
         <div></div>
-    `
+    `,
 })
-export class LocationUnavailableComponent {
-}
+export class LocationUnavailableComponent {}
