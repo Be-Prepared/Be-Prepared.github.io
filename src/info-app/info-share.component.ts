@@ -1,113 +1,148 @@
 import { Component, css, html } from 'fudgel';
 import { default as QrCodeSvg } from 'qrcode-svg';
 
+const WEBSITE = 'https://be-prepared.github.io/';
+
 @Component('info-share', {
     style: css`
-        .wrapper {
+        :host {
             position: relative;
         }
 
-        load-svg {
-            max-width: 25vw;
-            margin: 0 auto;
+        .website {
+            text-align: center;
+            margin-bottom: 1em;
         }
 
-        .copied {
+        .buttons {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .copyButton {
+            padding: 0 1em;
+        }
+
+        .qrButton {
+            padding: 0;
+            position: relative;
+        }
+
+        .miniSvg {
+            width: 4em;
+            height: 4em;
+        }
+
+        .qrOuter {
+            position: absolute;
             top: 0;
-            left: 0;
             right: 0;
             bottom: 0;
+            left: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            position: absolute;
-            opacity: 0;
-            transition: opacity 1s;
         }
 
-        .copied.visible {
-            opacity: 1;
+        .qrInner {
+            background-color: white;
+            color: black;
+            padding: 0.25em;
         }
 
-        .copied div {
-            border: 3px solid var(--fg-color);
-            background-color: var(--bg-color);
-            padding: 1em;
-            border-radius: 1em;
-            text-align: center;
-        }
-
-        .qr-wrapper {
-            height: min(50vh, 50vw);
-        }
-
-        .qr-code {
-            position: absolute;
-            aspect-ratio: 1/1;
-            margin: auto;
+        .svgOuter {
+            position: fixed;
             top: 0;
-            left: 0;
             right: 0;
             bottom: 0;
-            max-width: 100%;
-            max-height: 100%;
+            left: 0;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        @media (max-width: 960px) {
-            load-svg {
-                max-width: 50vw;
-            }
+        .svgInner {
+            width: 90vmin;
+            height: 90vmin;
         }
 
-        @media (max-width: 480px) {
-            load-svg {
-                max-width: 100vw;
-            }
+        .svgHidden {
+            display: none;
+            position: relative;
         }
     `,
     template: html`
-        <div class="wrapper" @click.stop.prevent="clicked()">
-            <div class="qr-wrapper" #ref="svg">
-            </div>
-            <div class="copied" #ref="copied">
-                <div><i18n-label id="info.shareCopied"></i18n-label></div>
-            </div>
+        <div class="website">
+            {{website}}
+        </div>
+        <div class="buttons">
+            <button *if="allowCopy" @click="copyToClipboard()" class="copyButton">
+                <i18n-label *if="!showCopied" id="info.share.copy"></i18n-label>
+                <i18n-label *if="showCopied" id="info.share.copied"></i18n-label>
+            </button>
+            <button @click="openQrCode()" class="qrButton">
+                <div #ref="miniSvg" class="miniSvg"></div>
+                <div class="qrOuter"><div class="qrInner"><i18n-label id="info.share.qr"></i18n-label></div></div>
+            </button>
+        </div>
+        <div class="svgOuter svgHidden" #ref="svgOuter" @click.stop.prevent="closeQrCode()">
+            <div class="svgInner" #ref="svgInner"></div>
         </div>
     `,
 })
 export class InfoShareComponent {
-    copied?: HTMLDivElement;
-    svg?: HTMLDivElement;
+    allowCopy = false;
+    miniSvg?: HTMLButtonElement;
+    showCopied = false;
+    showQR = false;
+    svgInner?: HTMLDivElement;
+    svgOuter?: HTMLDivElement;
     timeout?: ReturnType<typeof setTimeout>;
+    website = WEBSITE;
+
+    onInit() {
+        this.allowCopy = !!navigator.clipboard;
+    }
 
     onViewInit() {
-        if (this.svg) {
-            const qr = new QrCodeSvg({
-                content: 'https://be-prepared.github.io/',
-                container: 'svg-viewbox',
-                join: true,
-            });
-            this.svg.innerHTML = qr.svg();
+        const svg = this._svgContent();
+
+        if (this.miniSvg) {
+            this.miniSvg.innerHTML = svg;
+        }
+
+        if (this.svgInner) {
+            this.svgInner.innerHTML = svg;
         }
     }
 
-    clicked() {
-        if (navigator.clipboard) {
-            navigator.clipboard.writeText('https://be-prepared.github.io/');
+    closeQrCode() {
+        this.svgOuter?.classList.add('svgHidden');
+    }
 
-            if (this.copied) {
-                this.copied.classList.add('visible');
+    copyToClipboard() {
+        navigator.clipboard.writeText(WEBSITE);
+        this.showCopied = true;
 
-                if (this.timeout) {
-                    clearTimeout(this.timeout);
-                }
-
-                this.timeout = setTimeout(() => {
-                    if (this.copied) {
-                        this.copied.classList.remove('visible');
-                    }
-                }, 3000);
-            }
+        if (this.timeout) {
+            clearTimeout(this.timeout);
         }
+
+        this.timeout = setTimeout(() => {
+            this.showCopied = false;
+        }, 3000);
+    }
+
+    openQrCode() {
+        this.svgOuter?.classList.remove('svgHidden');
+    }
+
+    _svgContent() {
+        return new QrCodeSvg({
+            content: WEBSITE,
+            container: 'svg-viewbox',
+            join: true,
+        }).svg();
     }
 }
