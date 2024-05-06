@@ -1,4 +1,4 @@
-import { default as QrCodeSvg } from 'qrcode-svg';
+import { default as QrCodeSvg } from '@tofandel/qrcode-svg';
 
 export class QrService {
     svg(content: string): string {
