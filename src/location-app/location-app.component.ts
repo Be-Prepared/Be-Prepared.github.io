@@ -1,6 +1,6 @@
+import { AvailabilityState } from '../datatypes/availability-state';
 import { Component, css, di, html } from 'fudgel';
-import { CoordinateService } from '../services/coordinate.service';
-import { DistanceService } from '../services/distance.service';
+import { filter, switchMap } from 'rxjs/operators';
 import {
     GeolocationCoordinateResult,
     GeolocationService,
@@ -137,17 +137,24 @@ import { takeUntil } from 'rxjs/operators';
     `,
 })
 export class LocationAppComponent {
-    private _coordinateService = di(CoordinateService);
-    private _distanceService = di(DistanceService);
     private _geolocationService = di(GeolocationService);
     private _subject = new Subject();
     latLon: LatLon | null = null;
     position: GeolocationCoordinateResult | null = null;
 
     onInit() {
-        this._geolocationService
-            .getPosition()
-            .pipe(takeUntil(this._subject))
+        this._geolocationService.availabilityState()
+            .pipe(
+                takeUntil(this._subject),
+                filter((state) => {
+                    console.log(state);
+                    return state === AvailabilityState.ALLOWED;
+                }),
+                switchMap(() => {
+                    console.log('switchmap');
+                    return this._geolocationService.getPosition();
+                })
+            )
             .subscribe((position) => {
                 this.position = position;
                 this._redraw();
@@ -161,16 +168,6 @@ export class LocationAppComponent {
 
     goToList() {
         history.pushState({}, document.title, '/location-list');
-    }
-
-    toggleCoordinateSystem() {
-        this._coordinateService.toggleSystem();
-        this._redraw();
-    }
-
-    toggleDistanceSystem() {
-        this._distanceService.toggleSystem();
-        this._redraw();
     }
 
     private _redraw() {
