@@ -1,4 +1,5 @@
 import { Component, css, html } from 'fudgel';
+import { default as QrCodeSvg } from 'qrcode-svg';
 
 @Component('info-share', {
     style: css`
@@ -66,8 +67,7 @@ import { Component, css, html } from 'fudgel';
     `,
     template: html`
         <div class="wrapper" @click.stop.prevent="clicked()">
-            <div class="qr-wrapper">
-                <load-svg class="qr-code" href="/qr-code.svg"></load-svg>
+            <div class="qr-wrapper" #ref="svg">
             </div>
             <div class="copied" #ref="copied">
                 <div><i18n-label id="info.shareCopied"></i18n-label></div>
@@ -77,7 +77,19 @@ import { Component, css, html } from 'fudgel';
 })
 export class InfoShareComponent {
     copied?: HTMLDivElement;
+    svg?: HTMLDivElement;
     timeout?: ReturnType<typeof setTimeout>;
+
+    onViewInit() {
+        if (this.svg) {
+            const qr = new QrCodeSvg({
+                content: 'https://be-prepared.github.io/',
+                container: 'svg-viewbox',
+                join: true,
+            });
+            this.svg.innerHTML = qr.svg();
+        }
+    }
 
     clicked() {
         if (navigator.clipboard) {
