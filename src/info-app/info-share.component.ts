@@ -1,5 +1,6 @@
 import { Component, css, di, html } from 'fudgel';
 import { QrService } from '../services/qr.service';
+import { ToastService } from '../services/toast.service';
 
 @Component('info-share', {
     style: css`
@@ -36,14 +37,11 @@ import { QrService } from '../services/qr.service';
         <div class="website">{{website}}</div>
         <div class="buttons">
             <pretty-labeled-button
-                *if="allowCopy && !showCopied"
+                *if="allowCopy"
                 @click="copyToClipboard()"
                 id="info.share.copy"
                 class="copyButton"
             ></pretty-labeled-button>
-            <div *if="showCopied">
-                <i18n-label id="info.share.copied"></i18n-label>
-            </div>
             <pretty-button @click="openQrCode()" padding="0px">
                 <mini-qr content="{{website}}"></mini-qr>
             </pretty-button>
@@ -52,9 +50,8 @@ import { QrService } from '../services/qr.service';
 })
 export class InfoShareComponent {
     _qrService = di(QrService);
+    _toastService = di(ToastService);
     allowCopy = false;
-    showCopied = false;
-    timeout?: ReturnType<typeof setTimeout>;
     website = __WEBSITE__;
 
     onInit() {
@@ -63,15 +60,7 @@ export class InfoShareComponent {
 
     copyToClipboard() {
         navigator.clipboard.writeText(__WEBSITE__);
-        this.showCopied = true;
-
-        if (this.timeout) {
-            clearTimeout(this.timeout);
-        }
-
-        this.timeout = setTimeout(() => {
-            this.showCopied = false;
-        }, 3000);
+        this._toastService.pop('info.share.copied');
     }
 
     openQrCode() {

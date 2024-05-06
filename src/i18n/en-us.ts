@@ -42,6 +42,7 @@ export const enUS: LanguageData = {
     'info.position': 'Position:',
     'info.preferences': 'Preferences:',
     'info.preferences.reset': 'Reset Preferences',
+    'info.preferences.resetComplete': 'Preferences Reset',
     'info.shareApp': 'Share This App:',
     'info.share.copied': 'Website Copied!',
     'info.share.copy': 'Copy URL',
@@ -117,6 +118,10 @@ export const enUS: LanguageData = {
     'shared.permissionPrompt.goBack': 'Not Right Now',
     'shared.permissionPrompt.grantPermission': 'Grant Permission',
     'shared.permissionPrompt.heading': 'Permission Required',
+
+    // Services
+    'service.wakeLock.released': 'Letting Screen Turn Off',
+    'service.wakeLock.obtained': 'Keeping Screen On',
 
     // Tile labels on index
     'tile.compass': 'Compass',

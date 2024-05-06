@@ -9,6 +9,7 @@ import {
 } from '../services/distance.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ToastService } from '../services/toast.service';
 
 @Component('info-preferences', {
     style: css``,
@@ -40,6 +41,7 @@ export class InfoPreferencesComponent {
     private _coordinateService = di(CoordinateService);
     private _distanceService = di(DistanceService);
     private _subject = new Subject();
+    private _toastService = di(ToastService);
     coordinates = CoordinateSystemDefault;
     distances = DistanceSystemDefault;
 
@@ -66,6 +68,7 @@ export class InfoPreferencesComponent {
     reset() {
         this._coordinateService.reset();
         this._distanceService.reset();
+        this._toastService.popI18n('info.preferences.resetComplete');
     }
 
     toggleCoordinates() {
