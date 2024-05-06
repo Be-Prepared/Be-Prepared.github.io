@@ -28,10 +28,7 @@ import { switchMap, takeUntil } from 'rxjs/operators';
             position: absolute;
             aspect-ratio: 1/1;
             margin: auto;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            inset: 0;
             max-width: 100%;
             max-height: 100%;
         }

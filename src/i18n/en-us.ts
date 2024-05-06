@@ -49,7 +49,6 @@ export const enUS: LanguageData = {
     'info.shareApp': 'Share This App:',
     'info.share.copied': 'Copied to Clipboard',
     'info.share.copy': 'Copy',
-    'info.share.qr': 'QR',
     'info.shareCopied': 'Website copied to clipboard',
     'info.sourceCode': 'source code',
     'info.svgCompression': 'SVG compression',
@@ -121,6 +120,9 @@ export const enUS: LanguageData = {
     'permissionPrompt.goBack': 'Not Right Now',
     'permissionPrompt.grantPermission': 'Grant Permission',
     'permissionPrompt.heading': 'Permission Required',
+
+    // Shared components
+    'shared.miniQr.qr': 'QR',
 
     // Tile labels on index
     'tile.compass': 'Compass',

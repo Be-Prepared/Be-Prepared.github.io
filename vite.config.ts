@@ -28,6 +28,7 @@ export default defineConfig({
         __NODE_VERSION__: JSON.stringify(process.version),
         __HOST_PLATFORM__: JSON.stringify(process.platform),
         __HOST_ARCH__: JSON.stringify(process.arch),
+        __WEBSITE__: "'https://be-prepared.github.io/'",
     },
     plugins: [
         vitePluginVersionMark({

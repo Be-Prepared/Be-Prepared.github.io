@@ -1,7 +1,5 @@
-import { Component, css, html } from 'fudgel';
-import { default as QrCodeSvg } from 'qrcode-svg';
-
-const WEBSITE = 'https://be-prepared.github.io/';
+import { Component, css, di, html } from 'fudgel';
+import { QrService } from '../services/qr.service';
 
 @Component('info-share', {
     style: css`
@@ -25,51 +23,6 @@ const WEBSITE = 'https://be-prepared.github.io/';
 
         .qrButton {
             padding: 0;
-            position: relative;
-        }
-
-        .miniSvg {
-            width: 4em;
-            height: 4em;
-        }
-
-        .qrOuter {
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .qrInner {
-            background-color: white;
-            color: black;
-            padding: 0.25em;
-        }
-
-        .svgOuter {
-            position: fixed;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            background-color: var(--bg-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .svgInner {
-            width: 90vmin;
-            height: 90vmin;
-        }
-
-        .svgHidden {
-            display: none;
-            position: relative;
         }
     `,
     template: html`
@@ -82,47 +35,24 @@ const WEBSITE = 'https://be-prepared.github.io/';
                 <i18n-label *if="showCopied" id="info.share.copied"></i18n-label>
             </button>
             <button @click="openQrCode()" class="qrButton">
-                <div #ref="miniSvg" class="miniSvg"></div>
-                <div class="qrOuter"><div class="qrInner"><i18n-label id="info.share.qr"></i18n-label></div></div>
+                <mini-qr content="{{website}}"></mini-qr>
             </button>
-        </div>
-        <div class="svgOuter svgHidden" #ref="svgOuter" @click.stop.prevent="closeQrCode()">
-            <div class="svgInner" #ref="svgInner"></div>
         </div>
     `,
 })
 export class InfoShareComponent {
+    _qrService = di(QrService);
     allowCopy = false;
-    miniSvg?: HTMLButtonElement;
     showCopied = false;
-    showQR = false;
-    svgInner?: HTMLDivElement;
-    svgOuter?: HTMLDivElement;
     timeout?: ReturnType<typeof setTimeout>;
-    website = WEBSITE;
+    website = __WEBSITE__;
 
     onInit() {
         this.allowCopy = !!navigator.clipboard;
     }
 
-    onViewInit() {
-        const svg = this._svgContent();
-
-        if (this.miniSvg) {
-            this.miniSvg.innerHTML = svg;
-        }
-
-        if (this.svgInner) {
-            this.svgInner.innerHTML = svg;
-        }
-    }
-
-    closeQrCode() {
-        this.svgOuter?.classList.add('svgHidden');
-    }
-
     copyToClipboard() {
-        navigator.clipboard.writeText(WEBSITE);
+        navigator.clipboard.writeText(__WEBSITE__);
         this.showCopied = true;
 
         if (this.timeout) {
@@ -135,14 +65,6 @@ export class InfoShareComponent {
     }
 
     openQrCode() {
-        this.svgOuter?.classList.remove('svgHidden');
-    }
-
-    _svgContent() {
-        return new QrCodeSvg({
-            content: WEBSITE,
-            container: 'svg-viewbox',
-            join: true,
-        }).svg();
+        history.pushState({}, document.title, '/info-qr');
     }
 }
