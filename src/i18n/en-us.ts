@@ -11,6 +11,7 @@ export const enUS: LanguageData = {
         'There is no camera available that this app can use for the selected tool. This tool will be removed from the starting menu.',
 
     // Flashlight
+    'flashlight.deviceIssue': 'There is an issue turning off the flashlight on this type of device. The app is reloading to work around this problem.',
     'flashlight.explainAsk':
         'In order to turn on the flashlight, the camera permission needs to be granted.',
     'flashlight.explainDeny':
@@ -104,6 +105,7 @@ export const enUS: LanguageData = {
     'location.waypoints.unknownLocation': 'Unknown',
 
     // Magnifier
+    'magnifier.deviceIssue': 'There is an issue turning off the flashlight on this type of device. The app is reloading to work around this problem.',
     'magnifier.explainAsk':
         'The magnifier requires the camera permission to function.',
 

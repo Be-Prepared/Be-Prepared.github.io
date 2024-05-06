@@ -14,7 +14,7 @@
         "rollup-plugin-minify-html-literals-v3": "^1.3.4",
         "rxjs": "^7.8.1",
         "typescript": "^5.4.5",
-        "vite": "^5.2.10",
+        "vite": "^5.2.11",
         "vite-plugin-pwa": "^0.20.0",
         "vite-plugin-simple-html": "^0.1.2",
         "vite-plugin-version-mark": "^0.0.13"
@@ -23,6 +23,7 @@
         "@bencevans/kalman-filter": "^1.0.0",
         "@types/w3c-generic-sensor": "^1.0.9",
         "cheap-ruler": "^3.0.2",
+        "qrcode-svg": "^1.1.0",
         "usng.js": "^0.4.5"
     }
 }

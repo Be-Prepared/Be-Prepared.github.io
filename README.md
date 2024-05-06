@@ -63,7 +63,7 @@ The server is started at `http://localhost:8080/` and is exposed to everyone on 
 
 ![Chrome Flags Screenshot](chrome-flags.jpg)
 
-**iOS & Safari:** Run the server and then run `npx localtunnel -p 8080` in another terminal. Go to the generated URL and enter your *public IP address* as the password. You can use Eruda (see below) and `console.log()` statements. To get access to the debugger, read [this article](https://www.closingtags.com/remote-debugging-web-apps-on-ios-from-linux/).
+**iOS & Safari:** Run the server and then run `npx localtunnel -p 8080` in another terminal. Go to the generated URL and enter your *public IP address* as the password. You can use Eruda (see below) and `console.log()` statements. To get access to the debugger, read [this article](https://www.closingtags.com/remote-debugging-web-apps-on-ios-from-linux/). I also have a [Dockerfile](ios-webkit-debugger/) that can help connect to Safari from Linux.
 
 **Debugging:** Add "?eruda" to the URL to automatically load [Eruda](https://github.com/liriliri/eruda), a console for mobile browsers. It will be configured to fully initialize before the application starts, allowing all messages and errors to get logged appropriately. This is extremely useful. Also, you may want to use `npx localtunnel -p 8080` to forward the app to a public address, allowing devices to more easily use your development build.
 

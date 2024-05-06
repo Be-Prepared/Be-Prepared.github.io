@@ -36,6 +36,12 @@ import { TorchService } from '../services/torch.service';
         .enabled {
             color: var(--button-fg-color-enabled);
         }
+
+        .deviceIssue {
+            padding: 10%;
+            text-align: center;
+            position: absolute;
+        }
     `,
     template: html`
         <permission-prompt
@@ -58,6 +64,9 @@ import { TorchService } from '../services/torch.service';
                 muted
                 playsinline
             ></video>
+            <div *if="deviceIssue" class="deviceIssue">
+                <i18n-label id="magnifier.deviceIssue"></i18n-label>
+            </div>
             <div class="bottom">
                 <back-button></back-button>
                 <div></div>
@@ -84,6 +93,7 @@ export class MagnifierAppComponent {
     private _zoomMin: number | null = null;
     private _zoomScale: number | null = null;
     private _zoomStep: number | null = null;
+    deviceIssue = false;
     explainAsk = false;
     explainDeny = false;
     explainUnavailable = false;
@@ -179,12 +189,27 @@ export class MagnifierAppComponent {
 
     toggleTorch() {
         if (this.torchEnabled) {
-            this._torchService.turnOff();
+            this._torchService.turnOff().then(() => {
+                this._checkIfStillEnabled();
+            });
         } else {
             this._torchService.turnOn();
         }
 
         this._setupTorch();
+    }
+
+    private _checkIfStillEnabled() {
+        this._torchService.currentStatus().then((enabled) => {
+            // Some devices just don't turn off the flash when asked.  Seems to
+            // be a problem with a paticular brand. If a workaround is found,
+            // that would be preferred to reloading the app.
+            console.log(enabled);
+            if (enabled) {
+                this.deviceIssue = true;
+                window.location.reload();
+            }
+        });
     }
 
     private _endVideoStream() {

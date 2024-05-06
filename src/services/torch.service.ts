@@ -82,17 +82,21 @@ export class TorchService {
                 }
             }
 
-            for (const track of enabled) {
-                this._setTorch(track, false);
+            if (!enabled.length) {
+                return Promise.reject();
             }
+
+            return Promise.all(enabled.map((track) => this._setTorch(track, false)));
         });
     }
 
     turnOn() {
         return this._getAllTracksWithTorch().then((tracks) => {
             if (tracks.length) {
-                this._setTorch(tracks[0], true);
+                return this._setTorch(tracks[0], true);
             }
+
+            return Promise.reject();
         });
     }
 
@@ -105,14 +109,26 @@ export class TorchService {
             })
             .then((stream) =>
                 stream.getVideoTracks().filter((track) => {
-                    return (track.getCapabilities() as any).torch;
-                }),
+                    const capabilities = track.getCapabilities() as any;
+
+                    if (capabilities.torch) {
+                        return true;
+                    }
+
+                    const fillLightMode = capabilities.fillLightMode;
+
+                    if (fillLightMode && fillLightMode.length > 0 && fillLightMode !== 'none') {
+                        return true;
+                    }
+
+                    return false;
+                })
             );
     }
 
     private _setTorch(track: MediaStreamTrack, enabled: boolean) {
-        track.applyConstraints({
-            advanced: [{ torch: enabled } as any],
+        return track.applyConstraints({
+            advanced: [{ fillLightMode: enabled ? 'flash' : 'off', torch: enabled } as any],
         });
     }
 }

@@ -22,8 +22,6 @@ import { switchMap, takeUntil } from 'rxjs/operators';
             justify-content: center;
             align-items: center;
             position: relative;
-            padding: 10px;
-            box-sizing: border-box;
         }
 
         .container {
@@ -50,7 +48,7 @@ import { switchMap, takeUntil } from 'rxjs/operators';
             height: 100%;
             padding: 30%;
             box-sizing: border-box;
-            color: private _00e5e5;
+            color: var(--navigate-color);
         }
     `,
     template: html`
@@ -112,7 +110,7 @@ export class NavigationArrowComponent {
 
                     return EMPTY;
                 }),
-                takeUntil(this._subject),
+                takeUntil(this._subject)
             )
             .subscribe((bearing) => {
                 this._currentBearing = bearing;
@@ -134,25 +132,25 @@ export class NavigationArrowComponent {
         let directionArrowAngle = 0;
         const cheapRuler = new CheapRuler(
             this._currentPosition.latitude,
-            'meters',
+            'meters'
         );
         const bearingToDestination = cheapRuler.bearing(
             [this._currentPosition.longitude, this._currentPosition.latitude],
-            [this._lon, this._lat],
+            [this._lon, this._lat]
         );
 
         switch (this._currentNavigationType) {
             case NavigationType.COMPASS:
                 compassRoseAngle = Math.round(this._currentBearing);
                 directionArrowAngle = Math.round(
-                    bearingToDestination + this._currentBearing,
+                    bearingToDestination + this._currentBearing
                 );
                 break;
 
             case NavigationType.DIRECTION_OF_TRAVEL:
                 compassRoseAngle = -Math.round(this._currentHeading);
                 directionArrowAngle = Math.round(
-                    bearingToDestination - this._currentHeading,
+                    bearingToDestination - this._currentHeading
                 );
                 break;
 

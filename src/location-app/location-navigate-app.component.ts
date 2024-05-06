@@ -32,6 +32,7 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
             align-items: center;
             box-sizing: border-box;
             overflow: hidden;
+            gap: 10px;
         }
 
         .type-and-arrow {

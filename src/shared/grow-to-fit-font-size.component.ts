@@ -1,6 +1,6 @@
 import { Component, css, html } from 'fudgel';
 
-@Component('grow-to-fit', {
+@Component('grow-to-fit-font-size', {
     style: css`
         :host {
             box-sizing: border-box;
@@ -23,7 +23,7 @@ import { Component, css, html } from 'fudgel';
     `,
     useShadow: true,
 })
-export class GrowToFitComponent {
+export class GrowToFitFontSizeComponent {
     private _mutationObserver?: MutationObserver;
     private _resizeObserver?: ResizeObserver;
     content?: HTMLDivElement;
