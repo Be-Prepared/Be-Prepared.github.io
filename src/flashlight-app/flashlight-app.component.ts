@@ -18,19 +18,6 @@ import { WakeLockService } from '../services/wake-lock.service';
             width: 100%;
         }
 
-        .toggle {
-            background-color: var(--button-bg-color);
-            border: 2px solid var(--fg-color);
-            border-radius: 30px;
-            color: inherit;
-            font-size: 3em;
-            padding: 15px;
-        }
-
-        .enabled {
-            background-color: var(--button-bg-color-enabled);
-        }
-
         .buttonBar {
             width: 100%;
             display: flex;
@@ -54,13 +41,13 @@ import { WakeLockService } from '../services/wake-lock.service';
         ></flashlight-unavailable>
         <div *if="showControls" class="wrapper">
             <div></div>
-            <button
+            <pretty-button
                 *if="!deviceIssue"
-                class="toggle {{buttonClass}}"
+                .enabled="enabled"
                 @click.stop.prevent="toggle()"
             >
                 <scaling-icon href="/flashlight.svg"></scaling-icon>
-            </button>
+            </pretty-button>
             <div *if="deviceIssue" class="deviceIssue">
                 <i18n-label id="flashlight.deviceIssue"></i18n-label>
             </div>
@@ -75,7 +62,6 @@ export class FlashlightAppComponent {
     private _subject = new Subject();
     private _torchService = di(TorchService);
     private _wakeLockService = di(WakeLockService);
-    buttonClass = '';
     deviceIssue = false;
     enabled = false;
     explainAsk = false;
@@ -121,7 +107,7 @@ export class FlashlightAppComponent {
             this._torchService.turnOn();
         }
 
-        this._setEnabled(!this.enabled);
+        this.enabled = !this.enabled;
     }
 
     private _checkIfStillEnabled() {
@@ -139,12 +125,7 @@ export class FlashlightAppComponent {
     private _getCurrentStatus() {
         this._wakeLockService.request();
         this._torchService.currentStatus().then((enabled) => {
-            this._setEnabled(enabled);
+            this.enabled = enabled;
         });
-    }
-
-    private _setEnabled(enabled: boolean) {
-        this.enabled = enabled;
-        this.buttonClass = enabled ? 'enabled' : '';
     }
 }

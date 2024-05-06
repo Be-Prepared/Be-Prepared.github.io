@@ -6,7 +6,7 @@ import { TileDefResolved, TileService } from '../services/tile.service';
     style: css`
         :host {
             display: flex;
-            justify-content: center;
+            justify-content: space-evenly;
             flex-wrap: wrap;
         }
     `,

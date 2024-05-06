@@ -27,10 +27,22 @@ import { goBack } from '../util/go-back';
     `,
     template: html`
         <div></div>
-        <div class="heading"><i18n-label id="permissionPrompt.heading"></i18n-label></div>
+        <div class="heading">
+            <i18n-label id="shared.permissionPrompt.heading"></i18n-label>
+        </div>
         <div class="message"><i18n-label id="{{messageId}}"></i18n-label></div>
-        <div class="bigger"><pretty-button @click.stop.prevent="grant()" id="permissionPrompt.grantPermission"></pretty-button></div>
-        <div class="bigger"><pretty-button @click.stop.prevent="goBack()" id="permissionPrompt.goBack"></prettybutton></div>
+        <div class="bigger">
+            <pretty-labeled-button
+                @click.stop.prevent="grant()"
+                id="shared.permissionPrompt.grantPermission"
+            ></pretty-labeled-button>
+        </div>
+        <div class="bigger">
+            <pretty-labeled-button
+                @click.stop.prevent="goBack()"
+                id="shared.permissionPrompt.goBack"
+            ></pretty-labeled-button>
+        </div>
         <div></div>
     `,
 })

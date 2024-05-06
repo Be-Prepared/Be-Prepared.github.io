@@ -9,35 +9,30 @@ import { Component, css, html } from 'fudgel';
             padding: 1vw;
         }
 
-        button {
+        .wrapperOuter {
             align-items: center;
             aspect-ratio: 1/1;
-            background-color: var(--button-bg-color);
-            border: var(--button-border);
-            border-radius: 16px;
-            box-sizing: border-box;
-            color: inherit;
-            cursor: pointer;
             display: flex;
             justify-content: center;
-            overflow: none;
-            padding: 8px;
-            user-select: none;
+            box-sizing: border-box;
+            padding: 0.5em;
         }
 
-        .wrapper {
+        .wrapperInner {
             display: flex;
             flex-direction: column;
             align-items: center;
         }
     `,
     template: html`
-        <button @click.stop.prevent="setActiveTool()">
-            <div class="wrapper">
-                <scaling-icon href="{{icon}}"></scaling-icon>
-                <div><i18n-label id="{{label}}"></i18n-label></div>
+        <pretty-button @click.stop.prevent="setActiveTool()">
+            <div class="wrapperOuter">
+                <div class="wrapperInner">
+                    <scaling-icon href="{{icon}}"></scaling-icon>
+                    <div><i18n-label id="{{label}}"></i18n-label></div>
+                </div>
             </div>
-        </button>
+        </pretty-button>
     `,
 })
 export class AppIndexTileComponent {

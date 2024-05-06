@@ -2,6 +2,7 @@ import { BehaviorSubject } from 'rxjs';
 import { Converter } from 'usng.js';
 
 // By default, usng uses NAD83 but doesn't support WGS84. This is a workaround.
+const STORAGE_SETTING = 'coordinateSystem';
 const converter = new (Converter as any)();
 converter.ECC_SQUARED = 0.00669437999014;
 converter.ECC_PRIME_SQUARED =
@@ -59,7 +60,7 @@ export class CoordinateService {
     );
 
     constructor() {
-        const storedSetting = localStorage.getItem('coordinateSystem');
+        const storedSetting = localStorage.getItem(STORAGE_SETTING);
 
         if (
             storedSetting &&
@@ -140,13 +141,18 @@ export class CoordinateService {
         return this._toMGRS(lat, lon);
     }
 
+    reset() {
+        localStorage.removeItem(STORAGE_SETTING);
+        this._currentSetting.next(CoordinateSystemDefault);
+    }
+
     toggleSystem() {
         const currentIndex = COORDINATE_SYSTEMS.indexOf(
             this._currentSetting.value,
         );
         const newIndex = (currentIndex + 1) % COORDINATE_SYSTEMS.length;
         this._currentSetting.next(COORDINATE_SYSTEMS[newIndex]);
-        localStorage.setItem('coordinateSystem', COORDINATE_SYSTEMS[newIndex]);
+        localStorage.setItem(STORAGE_SETTING , COORDINATE_SYSTEMS[newIndex]);
     }
 
     private _breakIntoCoordinateChunks(

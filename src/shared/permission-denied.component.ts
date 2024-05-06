@@ -24,10 +24,10 @@ import { goBack } from '../util/go-back';
     template: html`
         <div></div>
         <div class="heading">
-            <i18n-label id="permissionDenied.heading"></i18n-label>
+            <i18n-label id="shared.permissionDenied.heading"></i18n-label>
         </div>
         <div class="message">
-            <i18n-label id="permissionDenied.message"></i18n-label>
+            <i18n-label id="shared.permissionDenied.message"></i18n-label>
         </div>
         <div>
             <styled-link target="_blank" href="https://be-prepared.github.io"

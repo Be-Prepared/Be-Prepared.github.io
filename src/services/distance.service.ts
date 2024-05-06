@@ -11,6 +11,7 @@ export enum DistanceSystem {
 }
 
 export const DistanceSystemDefault = DistanceSystem.IMPERIAL;
+const STORAGE_SETTING = 'distanceSystem';
 
 export class DistanceService {
     private _currentSetting = new BehaviorSubject<DistanceSystem>(
@@ -18,7 +19,7 @@ export class DistanceService {
     );
 
     constructor() {
-        if (localStorage.getItem('distanceSystem') === DistanceSystem.METRIC) {
+        if (localStorage.getItem(STORAGE_SETTING) === DistanceSystem.METRIC) {
             this._currentSetting.next(DistanceSystem.METRIC);
         }
     }
@@ -35,13 +36,18 @@ export class DistanceService {
         return this._toImperial(meters, options);
     }
 
+    reset() {
+        localStorage.removeItem(STORAGE_SETTING);
+        this._currentSetting.next(DistanceSystemDefault);
+    }
+
     toggleSystem() {
         const newValue =
             this._currentSetting.value === DistanceSystem.METRIC
                 ? DistanceSystem.IMPERIAL
                 : DistanceSystem.METRIC;
         this._currentSetting.next(newValue);
-        localStorage.setItem('distanceSystem', newValue);
+        localStorage.setItem(STORAGE_SETTING, newValue);
     }
 
     private _fixed(n: number): string {

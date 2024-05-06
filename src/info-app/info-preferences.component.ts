@@ -28,6 +28,11 @@ import { takeUntil } from 'rxjs/operators';
                     <i18n-label id="info.distances.{{distances}}"></i18n-label>
                 </changeable-setting>
             </li>
+            <li>
+                <changeable-setting @click="reset()"
+                    ><i18n-label id="info.preferences.reset"></i18n-label
+                ></changeable-setting>
+            </li>
         </ul>
     `,
 })
@@ -56,6 +61,11 @@ export class InfoPreferencesComponent {
     onDestroy() {
         this._subject.next(null);
         this._subject.complete();
+    }
+
+    reset() {
+        this._coordinateService.reset();
+        this._distanceService.reset();
     }
 
     toggleCoordinates() {

@@ -5,11 +5,6 @@ export const enUS: LanguageData = {
     'app.title': 'Be Prepared',
     'app.currentPermissionStatus': 'Current permission status',
 
-    // Camera unavailable
-    'cameraUnavailable.heading': 'No Suitable Camera',
-    'cameraUnavailable.message':
-        'There is no camera available that this app can use for the selected tool. This tool will be removed from the starting menu.',
-
     // Flashlight
     'flashlight.deviceIssue': 'There is an issue turning off the flashlight on this type of device. The app is reloading to work around this problem.',
     'flashlight.explainAsk':
@@ -46,9 +41,10 @@ export const enUS: LanguageData = {
     'info.permissionsAndFeaturesHeader': 'Permissions and Features:',
     'info.position': 'Position:',
     'info.preferences': 'Preferences:',
+    'info.preferences.reset': 'Reset Preferences',
     'info.shareApp': 'Share This App:',
     'info.share.copied': 'Website Copied!',
-    'info.share.copy': 'Copy',
+    'info.share.copy': 'Copy URL',
     'info.sourceCode': 'source code',
     'info.svgCompression': 'SVG compression',
     'info.torch': 'Torch:',
@@ -110,18 +106,17 @@ export const enUS: LanguageData = {
     'magnifier.explainAsk':
         'The magnifier requires the camera permission to function.',
 
-    // Permission denied
-    'permissionDenied.heading': 'Permission Denied',
-    'permissionDenied.message':
-        'Because the necessary permission was denied, the button in the menu will be removed. If this was done by mistake, you will need to go load the site in a web browser and manually reset the permissions. It is not possible for this application to prompt you again.',
-
-    // Permission prompt
-    'permissionPrompt.goBack': 'Not Right Now',
-    'permissionPrompt.grantPermission': 'Grant Permission',
-    'permissionPrompt.heading': 'Permission Required',
-
     // Shared components
+    'shared.cameraUnavailable.heading': 'No Suitable Camera',
+    'shared.cameraUnavailable.message':
+        'There is no camera available that this app can use for the selected tool. This tool will be removed from the starting menu.',
     'shared.miniQr.qr': 'QR',
+    'shared.permissionDenied.heading': 'Denied or Unavailable',
+    'shared.permissionDenied.message':
+        'Because the necessary permission was denied or the hardware is unavailable, the button in the menu will be removed.',
+    'shared.permissionPrompt.goBack': 'Not Right Now',
+    'shared.permissionPrompt.grantPermission': 'Grant Permission',
+    'shared.permissionPrompt.heading': 'Permission Required',
 
     // Tile labels on index
     'tile.compass': 'Compass',

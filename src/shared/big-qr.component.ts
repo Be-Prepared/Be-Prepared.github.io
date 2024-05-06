@@ -20,7 +20,7 @@ import { QrService } from '../services/qr.service';
     `,
     template: html` <div class="svg" #ref="svg"></div> `,
 })
-export class InfoShareComponent {
+export class BigQrComponent {
     _qrService = di(QrService);
     content = '';
     svg?: HTMLDivElement;

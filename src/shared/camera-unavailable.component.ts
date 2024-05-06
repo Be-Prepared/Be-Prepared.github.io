@@ -22,10 +22,10 @@ import { Component, css, html } from 'fudgel';
     template: html`
         <div></div>
         <div class="heading">
-            <i18n-label id="cameraUnavailable.heading"></i18n-label>
+            <i18n-label id="shared.cameraUnavailable.heading"></i18n-label>
         </div>
         <div class="message">
-            <i18n-label id="cameraUnavailable.message"></i18n-label>
+            <i18n-label id="shared.cameraUnavailable.message"></i18n-label>
         </div>
         <back-button></back-button>
         <div></div>

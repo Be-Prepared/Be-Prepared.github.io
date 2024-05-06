@@ -98,10 +98,10 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
             <div class="wrapper" *if="point">
                 <div class="content">
                     <div class="delete">
-                        <pretty-button
+                        <pretty-labeled-button
                             @click="deletePoint()"
                             id="location.addEdit.delete"
-                        ></pretty-button>
+                        ></pretty-labeled-button>
                     </div>
                     <div class="detail">
                         <div class="landscape-side-by-side">
