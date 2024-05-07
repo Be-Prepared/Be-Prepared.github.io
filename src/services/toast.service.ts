@@ -1,6 +1,10 @@
 import { di, html } from 'fudgel';
 import { I18nService } from '../i18n/i18n.service';
 
+// Toast service based off of this example:
+// https://www.youtube.com/watch?v=EWveKYaX-P0
+// https://codepen.io/Coding-in-Public/pen/ZEaKENX
+
 document.body.insertAdjacentHTML(
     'afterbegin',
     html`<div class="toast-container"></div>
