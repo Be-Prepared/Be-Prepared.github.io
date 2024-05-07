@@ -121,13 +121,20 @@ export class SunMoonAppComponent {
         //     .subscribe((geolocation) => {
         //         console.log(geolocation);
         //     });
-        this._coordinatesUpdated();
+        const locationStr = localStorage.getItem('sunMoonLocation');
+
+        if (locationStr) {
+            this.locationUpdate(locationStr);
+        } else {
+            this._coordinatesUpdated();
+        }
     }
 
     locationUpdate(value: string) {
         const coordinates = this._coordinateService.fromString(value);
 
         if (coordinates) {
+            localStorage.setItem('sunMoonLocation', value);
             this.coordinates = coordinates;
             this._coordinatesUpdated();
         }
