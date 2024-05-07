@@ -204,7 +204,6 @@ export class MagnifierAppComponent {
             // Some devices just don't turn off the flash when asked.  Seems to
             // be a problem with a paticular brand. If a workaround is found,
             // that would be preferred to reloading the app.
-            console.log(enabled);
             if (enabled) {
                 this.deviceIssue = true;
                 window.location.reload();

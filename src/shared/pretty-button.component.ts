@@ -37,7 +37,6 @@ export class PrettyButtonComponent {
 
     onViewInit() {
         if (this.button) {
-            console.log(this.padding);
             this.button.style.padding = this.padding || '0.5em';
         }
     }

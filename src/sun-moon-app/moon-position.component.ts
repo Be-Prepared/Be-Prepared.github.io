@@ -27,7 +27,7 @@ export class MoonPositionComponent {
             );
             const bearing = this._directionService.radiansToDegreesSW(moonPosition.azimuth);
             const bearingStr = this._directionService.toHeadingDirection(bearing);
-            const altitude = this._directionService.radiansToDegreesNE(moonPosition.altitude);
+            const altitude = this._directionService.radiansToDegreesNW(moonPosition.altitude);
             const altitudeStr = this._directionService.toHeading(altitude);
             this.moonPosition = `${bearingStr}, +${altitudeStr}`;
         }

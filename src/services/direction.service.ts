@@ -1,12 +1,12 @@
 export class DirectionService {
-    // Measured from north to east, so 0 is north, Math.PI / 2 is east.
-    radiansToDegreesNE(azimuth: number): number {
+    // Measured from north to west, so 0 is north, Math.PI / 2 is west.
+    radiansToDegreesNW(azimuth: number): number {
         return this.standardize360((azimuth * 180) / Math.PI);
     }
 
     // Measured from south to west, so 0 is south, Math.PI / 2 is west.
     radiansToDegreesSW(azimuth: number): number {
-        return this.standardize360(180 + (azimuth * 180) / Math.PI);
+        return this.standardize360(180 - (azimuth * 180) / Math.PI);
     }
 
     // Direction is converted to [-180, 180).
@@ -47,7 +47,10 @@ export class DirectionService {
 
         const rounded = Math.round(direction);
 
-        return `${this.toHeading(rounded)} ${this.toCompassPoint(rounded, precision)}`;
+        return `${this.toHeading(rounded)} ${this.toCompassPoint(
+            rounded,
+            precision
+        )}`;
     }
 
     toCompassPoint(direction: number, precision = 2) {

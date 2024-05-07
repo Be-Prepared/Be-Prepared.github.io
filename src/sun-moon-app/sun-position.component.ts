@@ -27,7 +27,7 @@ export class SunPositionComponent {
             );
             const bearing = this._directionService.radiansToDegreesSW(sunPosition.azimuth);
             const bearingStr = this._directionService.toHeadingDirection(bearing);
-            const altitude = this._directionService.radiansToDegreesNE(sunPosition.altitude);
+            const altitude = this._directionService.radiansToDegreesNW(sunPosition.altitude);
             const altitudeStr = this._directionService.toHeading(altitude);
             this.sunPosition = `${bearingStr}, +${altitudeStr}`;
         }

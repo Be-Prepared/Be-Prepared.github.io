@@ -147,11 +147,9 @@ export class LocationAppComponent {
             .pipe(
                 takeUntil(this._subject),
                 filter((state) => {
-                    console.log(state);
                     return state === AvailabilityState.ALLOWED;
                 }),
                 switchMap(() => {
-                    console.log('switchmap');
                     return this._geolocationService.getPosition();
                 })
             )
