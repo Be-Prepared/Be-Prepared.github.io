@@ -55,10 +55,10 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
 
         .delete {
             box-sizing: border-box;
-            padding: 8px 8px 0 0;
+            padding: 8px 8px 0 8px;
             width: 100%;
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
         }
 
         @media (orientation: landscape) {
@@ -99,16 +99,19 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
             <div class="wrapper" *if="point">
                 <div class="content">
                     <div class="delete">
+                        <pretty-button @click="openQrCode()" padding="0px">
+                            <mini-qr content="geo:{{lat}},{{lon}}"></mini-qr>
+                        </pretty-button>
                         <pretty-labeled-button
                             @click="deletePoint()"
-                            id="location.addEdit.delete"
+                            id="location.edit.delete"
                         ></pretty-labeled-button>
                     </div>
                     <div class="detail">
                         <div class="landscape-side-by-side">
                             <div class="no-shrink">
                                 <i18n-label
-                                    id="location.addEdit.name"
+                                    id="location.edit.name"
                                 ></i18n-label>
                             </div>
                             <div class="fullWidth">
@@ -122,7 +125,7 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
                         <div class="landscape-side-by-side gapAbove">
                             <div class="no-shrink">
                                 <i18n-label
-                                    id="location.addEdit.location"
+                                    id="location.edit.location"
                                 ></i18n-label>
                             </div>
                             <div class="fullWidth">
@@ -136,12 +139,12 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
                         </div>
                         <div class="gapAbove centeredText">
                             <i18n-label
-                                id="location.addEdit.helpSave"
+                                id="location.edit.helpSave"
                             ></i18n-label>
                         </div>
                         <div class="gapAbove centeredText">
                             <i18n-label
-                                id="location.addEdit.helpCoordinates"
+                                id="location.edit.helpCoordinates"
                             ></i18n-label>
                         </div>
                     </div>
@@ -158,15 +161,17 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
         </location-wrapper>
     `,
 })
-export class LocationAddEditComponent {
+export class LocationEditComponent {
     private _coordinateService = di(CoordinateService);
     private _geolocationService = di(GeolocationService);
     private _subscription?: Subscription;
     private _toastService = di(ToastService);
     private _waypointService = di(WaypointService);
     id?: string;
+    lat?: number;
     location: string = '';
     locationInput?: HTMLInputElement;
+    lon?: number;
     point: WaypointSaved | null = null;
 
     onInit() {
@@ -188,6 +193,7 @@ export class LocationAddEditComponent {
         }
 
         this.point = point;
+        this._updateLatLon();
         this._updateLocation();
     }
 
@@ -206,10 +212,11 @@ export class LocationAddEditComponent {
         if (convertedLocation) {
             this.point!.lat = convertedLocation.lat;
             this.point!.lon = convertedLocation.lon;
+            this._updateLatLon();
             this._waypointService.updatePoint(this.point!);
             this._updateLocation();
         } else {
-            this._toastService.popI18n('location.addEdit.badLocation');
+            this._toastService.popI18n('location.edit.badLocation');
         }
     }
 
@@ -224,6 +231,19 @@ export class LocationAddEditComponent {
             document.title,
             `/location-navigate/${this.point!.id}`,
         );
+    }
+
+    openQrCode() {
+        history.pushState(
+            {},
+            document.title,
+            `/location-qr/${this.point!.id}`,
+        );
+    }
+
+    private _updateLatLon() {
+        this.lat = this.point!.lat;
+        this.lon = this.point!.lon;
     }
 
     private _updateLocation() {

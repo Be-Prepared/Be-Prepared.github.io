@@ -25,6 +25,7 @@ import { TileDefResolved, TileService } from '../services/tile.service';
                 path="/location-navigate/:id"
                 component="location-navigate-app"
             ></div>
+            <div path="/location-qr/:id" component="location-qr-app"></div>
             <div path="**" component="app-index"></div>
         </app-router>
     `,

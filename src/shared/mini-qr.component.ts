@@ -42,7 +42,15 @@ export class MiniQrComponent {
     content = '';
     miniSvg?: HTMLButtonElement;
 
+    onChange() {
+        this._update();
+    }
+
     onViewInit() {
+        this._update();
+    }
+
+    _update() {
         if (this.miniSvg) {
             this.miniSvg.innerHTML = this._qrService.svg(this.content || '');
         }

@@ -57,16 +57,16 @@ export const enUS: LanguageData = {
     'install.message': 'Install to Home Screen',
 
     // Location
-    'location.addEdit.badLocation': 'Invalid location',
-    'location.addEdit.delete': 'Delete',
-    'location.addEdit.helpCoordinates':
-        'Locations can be entered using many common formats or a major city name.',
-    'location.addEdit.helpSave': 'Changes are saved automatically.',
-    'location.addEdit.location': 'Location:',
-    'location.addEdit.name': 'Waypoint Name:',
     'location.coordinates.empty': 'No coordinates available.',
     'location.coordinates.mgrs': 'MGRS:',
     'location.coordinates.utmups': 'UTM/UPS:',
+    'location.edit.badLocation': 'Invalid location',
+    'location.edit.delete': 'Delete',
+    'location.edit.helpCoordinates':
+        'Locations can be entered using many common formats or a major city name.',
+    'location.edit.helpSave': 'Changes are saved automatically.',
+    'location.edit.location': 'Location:',
+    'location.edit.name': 'Waypoint Name:',
     'location.explainAsk':
         'To use the GPS, the geolocation permission is required.',
     'location.field.ACCURACY.heading': 'Accuracy:',
