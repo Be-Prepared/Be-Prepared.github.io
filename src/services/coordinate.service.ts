@@ -194,6 +194,13 @@ export class CoordinateService {
         this._currentSetting.next(CoordinateSystemDefault);
     }
 
+    standardizeCoordinates(latLon: LatLon): LatLon {
+        return {
+            lat: this._directionService.standardizeLatitude(latLon.lat),
+            lon: this._directionService.standardize180(latLon.lon),
+        };
+    }
+
     toggleSystem() {
         const currentIndex = COORDINATE_SYSTEMS.indexOf(
             this._currentSetting.value
@@ -307,10 +314,10 @@ export class CoordinateService {
             coordinates[1] = -Math.abs(coordinates[1]);
         }
 
-        return {
-            lat: this._directionService.standardizeLatitude(coordinates[0]),
-            lon: this._directionService.standardize180(coordinates[1]),
-        };
+        return this.standardizeCoordinates({
+            lat: coordinates[0],
+            lon: coordinates[1],
+        });
     }
 
     private _toDDD(lat: number, lon: number): LL {
