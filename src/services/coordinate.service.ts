@@ -2,6 +2,8 @@ import { BehaviorSubject } from 'rxjs';
 import CheapRuler from 'cheap-ruler';
 import { cities } from '../cities';
 import { Converter } from 'usng.js';
+import { di } from 'fudgel';
+import { DirectionService } from './direction.service';
 
 // By default, usng uses NAD83 but doesn't support WGS84. This is a workaround.
 const STORAGE_SETTING = 'coordinateSystem';
@@ -68,6 +70,7 @@ export class CoordinateService {
     private _currentSetting = new BehaviorSubject<CoordinateSystem>(
         CoordinateSystemDefault
     );
+    private _directionService = di(DirectionService);
 
     constructor() {
         const storedSetting = localStorage.getItem(STORAGE_SETTING);
@@ -305,8 +308,8 @@ export class CoordinateService {
         }
 
         return {
-            lat: coordinates[0],
-            lon: coordinates[1],
+            lat: this._directionService.standardizeLatitude(coordinates[0]),
+            lon: this._directionService.standardize180(coordinates[1]),
         };
     }
 

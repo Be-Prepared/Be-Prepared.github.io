@@ -30,6 +30,19 @@ export class DirectionService {
         return ((direction % 360) + 360) % 360;
     }
 
+    // Direction is converted to [-90, 90] for latitude.
+    standardizeLatitude(direction: number) {
+        while (direction < -90) {
+            direction = -180 - direction;
+        }
+
+        while (direction > 90) {
+            direction = 180 - direction;
+        }
+
+        return direction;
+    }
+
     toHeading(direction: number): string {
         if (isNaN(direction)) {
             return '';
