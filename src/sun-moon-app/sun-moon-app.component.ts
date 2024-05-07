@@ -1,9 +1,11 @@
+import { AvailabilityState } from '../datatypes/availability-state';
 import { Component, css, di, html } from 'fudgel';
 import { CoordinateService, LatLon } from '../services/coordinate.service';
-// import { first } from 'rxjs/operators';
-// import { GeolocationService } from '../services/geolocation.service';
+import { GeolocationService } from '../services/geolocation.service';
+import { first, takeUntil, tap } from 'rxjs/operators';
 import { I18nService } from '../i18n/i18n.service';
-import { default as SunCalc } from 'suncalc';
+import { Subject } from 'rxjs';
+import { ToastService } from '../services/toast.service';
 
 @Component('sun-moon-app', {
     style: css`
@@ -25,10 +27,18 @@ import { default as SunCalc } from 'suncalc';
 
         .location {
             padding: 1em 1em 0 1em;
+            display: flex;
+            align-items: center;
+            gap: 1em;
         }
 
-        .wide {
-            width: 100%;
+        .coordinates {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .grow {
+            flex-grow: 1;
         }
 
         .wrapper {
@@ -68,29 +78,48 @@ import { default as SunCalc } from 'suncalc';
                 flex-direction: column-reverse;
             }
         }
+
+        load-svg {
+            width: 3em;
+            height: 3em;
+        }
     `,
     template: html`
         <div class="content">
             <div class="location">
-                <div><i18n-label id="sunMoon.enterCoordinates"></i18n-label></div>
-                <input
-                    type="text"
-                    @change="locationUpdate($event.target.value)"
-                    #ref="input"
-                    class="wide"
-                />
+                <div class="grow coordinates">
+                    <div>
+                        <i18n-label id="sunMoon.enterCoordinates"></i18n-label>
+                    </div>
+                    <input
+                        type="text"
+                        @change="locationUpdate($event.target.value)"
+                        #ref="input"
+                        class="grow"
+                    />
+                </div>
+                <div *if="allowGetLocation">
+                    <load-svg
+                        href="/location.svg"
+                        @click.stop.prevent="getCurrentLocation()"
+                    ></load-svg>
+                </div>
             </div>
             <div class="wrapper">
                 <div class="wrapper-inner">
                     <div>{{location}}</div>
-                    <nearest-major-city .coordinates="coordinates"></nearest-major-city>
+                    <nearest-major-city
+                        .coordinates="coordinates"
+                    ></nearest-major-city>
                     <div class="gap"></div>
                     <sun-position .coordinates="coordinates"></sun-position>
                     <sun-times .coordinates="coordinates"></sun-times>
                     <div class="gap"></div>
                     <moon-position .coordinates="coordinates"></moon-position>
                     <moon-times .coordinates="coordinates"></moon-times>
-                    <moon-illumination .coordinates="coordinates"></moon-illumination>
+                    <moon-illumination
+                        .coordinates="coordinates"
+                    ></moon-illumination>
                 </div>
             </div>
         </div>
@@ -101,33 +130,45 @@ import { default as SunCalc } from 'suncalc';
 })
 export class SunMoonAppComponent {
     private _coordinateService = di(CoordinateService);
-    // private _geolocationService = di(GeolocationService);
+    private _geolocationService = di(GeolocationService);
     private _i18nService = di(I18nService);
+    private _toastService = di(ToastService);
+    allowGetLocation = false;
     coordinates: LatLon | null = null;
+    gettingLocation = false;
     input?: HTMLInputElement;
     location: string = '';
-    moonIllumination: SunCalc.GetMoonIlluminationResult | null = null;
-    moonPosition: SunCalc.GetMoonPositionResult | null = null;
-    moonTimes: SunCalc.GetMoonTimes | null = null;
-    nearestMajorCity: string | null = null;
-    sunPosition: SunCalc.GetSunPositionResult | null = null;
-    sunTimes: SunCalc.GetTimesResult | null = null;
+    subject = new Subject();
 
     constructor() {
-        // FIXME - if granted, pull current location
-        // this._geolocationService
-        //     .getPosition()
-        //     .pipe(first())
-        //     .subscribe((geolocation) => {
-        //         console.log(geolocation);
-        //     });
+        this._geolocationService
+            .availabilityState()
+            .pipe(takeUntil(this.subject))
+            .subscribe((state) => {
+                if (
+                    state === AvailabilityState.PROMPT ||
+                    state === AvailabilityState.ALLOWED
+                ) {
+                    this.allowGetLocation = true;
+                } else {
+                    this.allowGetLocation = false;
+                }
+            });
+    }
+
+    onViewInit() {
         const locationStr = localStorage.getItem('sunMoonLocation');
 
         if (locationStr) {
-            this.locationUpdate(locationStr);
+            this._setValue(locationStr);
         } else {
             this._coordinatesUpdated();
         }
+    }
+
+    onDestroy() {
+        this.subject.next(null);
+        this.subject.complete();
     }
 
     locationUpdate(value: string) {
@@ -140,6 +181,28 @@ export class SunMoonAppComponent {
         }
     }
 
+    getCurrentLocation() {
+        this.gettingLocation = true;
+        this._geolocationService
+            .getPosition()
+            .pipe(
+                takeUntil(this.subject),
+                first(),
+                tap(() => {
+                    this.gettingLocation = false;
+                })
+            )
+            .subscribe((geolocation) => {
+                if (geolocation.success) {
+                    this._setValue(`${geolocation.latitude} ${geolocation.longitude}`);
+                } else {
+                    this._geolocationError();
+                }
+            }, () => {
+                this._geolocationError();
+            });
+    }
+
     _coordinatesUpdated() {
         if (this.coordinates) {
             this.location = this._coordinateService.latLonToSystemString(
@@ -149,5 +212,17 @@ export class SunMoonAppComponent {
         } else {
             this.location = this._i18nService.get('sunMoon.locationUnknown');
         }
+    }
+
+    _geolocationError() {
+        this._toastService.pop('sunMoon.geolocationError');
+    }
+
+    _setValue(value: string) {
+        if (this.input) {
+            this.input.value = value;
+        }
+
+        this.locationUpdate(value);
     }
 }
