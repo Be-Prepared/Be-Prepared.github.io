@@ -1,4 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
+import CheapRuler from 'cheap-ruler';
+import { cities } from '../cities';
 import { Converter } from 'usng.js';
 
 // By default, usng uses NAD83 but doesn't support WGS84. This is a workaround.
@@ -28,6 +30,14 @@ const COORDINATE_SYSTEMS = [
     CoordinateSystem.MGRS,
 ];
 
+export interface NearestCity {
+    name: string;
+    lat: number;
+    lon: number;
+    distance: number;
+    bearing: number;
+}
+
 export interface LatLon {
     lat: number;
     lon: number;
@@ -56,7 +66,7 @@ export interface UTMUPS {
 
 export class CoordinateService {
     private _currentSetting = new BehaviorSubject<CoordinateSystem>(
-        CoordinateSystemDefault,
+        CoordinateSystemDefault
     );
 
     constructor() {
@@ -71,52 +81,73 @@ export class CoordinateService {
     }
 
     fromString(str: string): LatLon | null {
+        str = str.trim();
+
         if (converter.isUSNG(str)) {
             const [lat, lon] = converter.USNGtoLL(str);
+
             return { lat, lon };
         }
 
         try {
             const [lat, lon] = converter.UTMUPStoLL(str);
+
             return { lat, lon };
         } catch (ignore) {}
 
-        const cleansed = str
-            .toUpperCase()
-            .replace(/[^-0-9.ENSW]+/g, ' ')
-            .trim();
-        let west = cleansed.indexOf('W') >= 0; // Force negative longitude
-        let south = cleansed.indexOf('S') >= 0; // Force negative latitude
-        const coordinateStrings = this._breakIntoCoordinateChunks(cleansed);
+        const parsed = this._parseDegrees(str);
 
-        if (!coordinateStrings) {
-            return null;
+        if (parsed) {
+            return parsed;
         }
 
-        const coordinates = coordinateStrings.map((item) =>
-            this._parseCoordinateString(item),
-        );
+        const cityCoords = this._lookupCity(str);
 
-        if (coordinates[0] === null || coordinates[1] === null) {
-            return null;
+        if (cityCoords) {
+            return cityCoords;
         }
 
-        if (south) {
-            coordinates[0] = -Math.abs(coordinates[0]);
-        }
-
-        if (west) {
-            coordinates[1] = -Math.abs(coordinates[1]);
-        }
-
-        return {
-            lat: coordinates[0],
-            lon: coordinates[1],
-        };
+        return null;
     }
 
     getCurrentSetting() {
         return this._currentSetting.asObservable();
+    }
+
+    getNearestMajorCity(lat: number, lon: number): NearestCity {
+        const cheapRuler = new CheapRuler(lat, 'meters');
+        const entries = [...Object.entries(cities)];
+        const closest: NearestCity = entries.reduce<NearestCity>(
+            (closest: NearestCity, city): NearestCity => {
+                const cityName = city[0];
+                const cityLat = city[1][0];
+                const cityLon = city[1][1];
+                const distance = cheapRuler.distance(
+                    [lon, lat],
+                    [cityLon, cityLat]
+                );
+
+                if (distance < closest.distance) {
+                    const bearing = cheapRuler.bearing(
+                        [lon, lat],
+                        [cityLon, cityLat]
+                    );
+
+                    return {
+                        name: cityName,
+                        lat: cityLat,
+                        lon: cityLon,
+                        distance,
+                        bearing,
+                    };
+                }
+
+                return closest;
+            },
+            { name: '', lat: NaN, lon: NaN, distance: Infinity, bearing: NaN }
+        );
+
+        return closest;
     }
 
     latLonToSystem(lat: number, lon: number): LL | MGRS | UTMUPS {
@@ -141,6 +172,20 @@ export class CoordinateService {
         return this._toMGRS(lat, lon);
     }
 
+    latLonToSystemString(lat: number, lon: number): string {
+        const system = this.latLonToSystem(lat, lon);
+
+        if ('lat' in system) {
+            return `${system.lat} ${system.lon}`;
+        }
+
+        if ('mgrs' in system) {
+            return system.mgrs;
+        }
+
+        return system.utmups;
+    }
+
     reset() {
         localStorage.removeItem(STORAGE_SETTING);
         this._currentSetting.next(CoordinateSystemDefault);
@@ -148,15 +193,15 @@ export class CoordinateService {
 
     toggleSystem() {
         const currentIndex = COORDINATE_SYSTEMS.indexOf(
-            this._currentSetting.value,
+            this._currentSetting.value
         );
         const newIndex = (currentIndex + 1) % COORDINATE_SYSTEMS.length;
         this._currentSetting.next(COORDINATE_SYSTEMS[newIndex]);
-        localStorage.setItem(STORAGE_SETTING , COORDINATE_SYSTEMS[newIndex]);
+        localStorage.setItem(STORAGE_SETTING, COORDINATE_SYSTEMS[newIndex]);
     }
 
     private _breakIntoCoordinateChunks(
-        cleansed: string,
+        cleansed: string
     ): [string, string] | null {
         const coordinates = cleansed
             .split(/[ENSW]/)
@@ -187,6 +232,21 @@ export class CoordinateService {
         return [firstHalf.join(' '), secondHalf.join(' ')];
     }
 
+    private _lookupCity(str: string): LatLon | null {
+        str = str.toLowerCase().trim();;
+        const strLen = str.length;
+
+        for (const city of Object.keys(cities)) {
+            if (city.length === strLen && city.toLowerCase() === str) {
+                const [lat, lon] = cities[city];
+
+                return { lat, lon };
+            }
+        }
+
+        return null;
+    }
+
     private _padLeading(str: string): string {
         if (str.length === 1 || str.charAt(1) === '.') {
             return `0${str}`;
@@ -213,6 +273,41 @@ export class CoordinateService {
         }
 
         return result;
+    }
+
+    private _parseDegrees(str: string): LatLon | null {
+        const cleansed = str
+            .toUpperCase()
+            .replace(/[^-0-9.ENSW]+/g, ' ')
+            .trim();
+        let west = cleansed.indexOf('W') >= 0; // Force negative longitude
+        let south = cleansed.indexOf('S') >= 0; // Force negative latitude
+        const coordinateStrings = this._breakIntoCoordinateChunks(cleansed);
+
+        if (!coordinateStrings) {
+            return null;
+        }
+
+        const coordinates = coordinateStrings.map((item) =>
+            this._parseCoordinateString(item)
+        );
+
+        if (coordinates[0] === null || coordinates[1] === null) {
+            return null;
+        }
+
+        if (south) {
+            coordinates[0] = -Math.abs(coordinates[0]);
+        }
+
+        if (west) {
+            coordinates[1] = -Math.abs(coordinates[1]);
+        }
+
+        return {
+            lat: coordinates[0],
+            lon: coordinates[1],
+        };
     }
 
     private _toDDD(lat: number, lon: number): LL {

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+curl -O "https://download.geonames.org/export/dump/cities15000.zip"
+zcat cities15000.zip | node parse-cities.js > src/cities.ts

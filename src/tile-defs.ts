@@ -147,6 +147,13 @@ export const tileDefs: TileDef[] = [
         show: of(false),
     },
     {
+        id: 'sun-moon',
+        icon: '/sun-moon.svg',
+        label: 'tile.sunMoon',
+        component: 'sun-moon-app',
+        show: of(true),
+    },
+    {
         id: 'info',
         icon: '/info.svg',
         label: 'tile.info',

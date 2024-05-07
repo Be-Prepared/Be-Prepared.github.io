@@ -15,7 +15,6 @@ import { Component, css, html } from 'fudgel';
             display: flex;
             justify-content: center;
             box-sizing: border-box;
-            padding: 0.5em;
         }
 
         .wrapperInner {
