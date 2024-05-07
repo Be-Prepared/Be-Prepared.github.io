@@ -47,10 +47,10 @@ This PWA is also an example for how to use the following:
     * Moon's rise, moon's set, and the current moon location and phase.
 
 * Info
-    * Contains a QR code for easy sharing of the application. Tapping on the icon copies the website to your clipboard.
-    * Shows permission statuses that the application could use.
-    * Provides links to tools that are used to build the PWA.
+    * Contains a QR code for easy sharing of the application, or copy the URL to your clipboard.
+    * Shows permission statuses that the application could use and current preferences. Allow resetting of preferences..
     * Gives credit to the tooling that helped make this project.
+    * Shows the current build information.
 
 ## For Developers
 
