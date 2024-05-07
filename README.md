@@ -40,6 +40,12 @@ This PWA is also an example for how to use the following:
     * Ability to change field functions (especially for Geocaching and the Geocaching merit badge)
     * Keeps the screen enabled while navigating to a point.
 
+* Sun & Moon
+    * Look up information for any location (by coordinates or use a major city's name).
+    * Show location in current coordinate system, plus direction and distance to nearest major city.
+    * Shows sunrise, sunset, and current sun location.
+    * Moon's rise, moon's set, and the current moon location and phase.
+
 * Info
     * Contains a QR code for easy sharing of the application. Tapping on the icon copies the website to your clipboard.
     * Shows permission statuses that the application could use.
