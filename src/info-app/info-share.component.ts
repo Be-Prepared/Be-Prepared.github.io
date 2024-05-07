@@ -60,7 +60,7 @@ export class InfoShareComponent {
 
     copyToClipboard() {
         navigator.clipboard.writeText(__WEBSITE__);
-        this._toastService.pop('info.share.copied');
+        this._toastService.popI18n('info.share.copied');
     }
 
     openQrCode() {

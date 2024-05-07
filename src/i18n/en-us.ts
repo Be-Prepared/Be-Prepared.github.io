@@ -57,9 +57,10 @@ export const enUS: LanguageData = {
     'install.message': 'Install to Home Screen',
 
     // Location
+    'location.addEdit.badLocation': 'Invalid location',
     'location.addEdit.delete': 'Delete',
     'location.addEdit.helpCoordinates':
-        'Locations can be entered using many common formats.',
+        'Locations can be entered using many common formats or a major city name.',
     'location.addEdit.helpSave': 'Changes are saved automatically.',
     'location.addEdit.location': 'Location:',
     'location.addEdit.name': 'Waypoint Name:',

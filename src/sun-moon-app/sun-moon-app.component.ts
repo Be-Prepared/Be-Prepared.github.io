@@ -215,7 +215,7 @@ export class SunMoonAppComponent {
     }
 
     _geolocationError() {
-        this._toastService.pop('sunMoon.geolocationError');
+        this._toastService.popI18n('sunMoon.geolocationError');
     }
 
     _setValue(value: string) {

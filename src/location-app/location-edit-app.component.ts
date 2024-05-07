@@ -2,6 +2,7 @@ import { Component, css, di, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
 import { GeolocationService } from '../services/geolocation.service';
 import { Subscription } from 'rxjs';
+import { ToastService } from '../services/toast.service';
 import { WaypointSaved, WaypointService } from './waypoint.service';
 
 @Component('location-edit-app', {
@@ -129,6 +130,7 @@ import { WaypointSaved, WaypointService } from './waypoint.service';
                                     type="text"
                                     value="{{location}}"
                                     @change="locationChange($event.target.value)"
+                                    #ref="locationInput"
                                 />
                             </div>
                         </div>
@@ -160,9 +162,11 @@ export class LocationAddEditComponent {
     private _coordinateService = di(CoordinateService);
     private _geolocationService = di(GeolocationService);
     private _subscription?: Subscription;
+    private _toastService = di(ToastService);
     private _waypointService = di(WaypointService);
     id?: string;
     location: string = '';
+    locationInput?: HTMLInputElement;
     point: WaypointSaved | null = null;
 
     onInit() {
@@ -203,6 +207,9 @@ export class LocationAddEditComponent {
             this.point!.lat = convertedLocation.lat;
             this.point!.lon = convertedLocation.lon;
             this._waypointService.updatePoint(this.point!);
+            this._updateLocation();
+        } else {
+            this._toastService.popI18n('location.addEdit.badLocation');
         }
     }
 
@@ -231,6 +238,10 @@ export class LocationAddEditComponent {
             this.location = location.utmups;
         } else {
             this.location = location.latLon;
+        }
+
+        if (this.locationInput) {
+            this.locationInput.value = this.location;
         }
     }
 }
