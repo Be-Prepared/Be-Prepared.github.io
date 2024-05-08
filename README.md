@@ -40,6 +40,9 @@ This PWA is also an example for how to use the following:
     * Ability to change field functions (especially for Geocaching and the Geocaching merit badge)
     * Keeps the screen enabled while navigating to a point.
 
+* Barcode reader
+    * Reads all 1d and 2d barcodes that your device allows.
+
 * Sun & Moon
     * Look up information for any location (by coordinates or use a major city's name).
     * Show location in current coordinate system, plus direction and distance to nearest major city.

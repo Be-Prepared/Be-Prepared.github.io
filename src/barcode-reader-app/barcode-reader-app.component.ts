@@ -107,7 +107,7 @@ interface DetectedBarcode {
         </div>
     `,
 })
-export class MagnifierAppComponent {
+export class BarcodeReaderAppComponent {
     private _animationFrame: ReturnType<typeof requestAnimationFrame> | null =
         null;
     private _barcodeReaderService = di(BarcodeReaderService);
