@@ -5,6 +5,11 @@ export const enUS: LanguageData = {
     'app.title': 'Be Prepared',
     'app.currentPermissionStatus': 'Current permission status',
 
+    // Barcode reader
+    'barcodeReader.deviceIssue': 'There is an issue turning off the flashlight on this type of device. The app is reloading to work around this problem.',
+    'barcodeReader.explainAsk':
+        'To use the barcode reader, the camera permission is required.',
+
     // Flashlight
     'flashlight.deviceIssue': 'There is an issue turning off the flashlight on this type of device. The app is reloading to work around this problem.',
     'flashlight.explainAsk':
@@ -21,6 +26,8 @@ export const enUS: LanguageData = {
     'info.availability.error': 'Error',
     'info.availability.prompt': 'Prompt',
     'info.availability.unavailable': 'Unavailable',
+    'info.barcodes': 'Barcode support:',
+    'info.barcodesNotSupported': 'Barcodes are not supported on this device.',
     'info.buildInformationHeader': 'Build Information',
     'info.camera': 'Camera:',
     'info.coordinates': 'Coordinates:',
@@ -162,6 +169,7 @@ export const enUS: LanguageData = {
     'sunMoon.sunTimes.sunset': 'Sunset:',
 
     // Tile labels on index
+    'tile.barcodeReader': 'Barcode Reader',
     'tile.compass': 'Compass',
     'tile.flashlight': 'Flashlight',
     'tile.frontLight': 'Front Light',
@@ -172,7 +180,6 @@ export const enUS: LanguageData = {
     'tile.metalDetector': 'Metal Detector',
     'tile.mirror': 'Mirror',
     'tile.nfc': 'NFC',
-    'tile.qrCode': 'QR Code',
     'tile.ruler': 'Ruler',
     'tile.speed': 'Speed',
     'tile.stopwatch': 'Stopwatch',

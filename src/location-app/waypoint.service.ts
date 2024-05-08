@@ -1,16 +1,11 @@
-export interface WaypointSaved {
-    id: number;
-    lat: number;
-    lon: number;
-    name: string;
-    created: number;
-}
-
-const LOCAL_STORAGE_KEY = 'points';
+import { di } from 'fudgel';
+import { PreferenceService } from '../services/preference.service';
+import { WaypointSaved } from '../datatypes/waypoint-saved';
 
 export class WaypointService {
     private _maxId = 0;
     private _points: WaypointSaved[] = [];
+    private _preferenceService = di(PreferenceService);
 
     constructor() {
         this._load();
@@ -87,20 +82,8 @@ export class WaypointService {
     }
 
     private _load() {
-        const pointsJson = localStorage.getItem(LOCAL_STORAGE_KEY);
-
-        if (!pointsJson) {
-            return;
-        }
-
-        let points = [];
+        const points = this._preferenceService.points.getItem();
         let maxId = 0;
-
-        try {
-            points = JSON.parse(pointsJson);
-        } catch (ignore) {
-            return;
-        }
 
         if (
             Array.isArray(points) &&
@@ -115,6 +98,6 @@ export class WaypointService {
     }
 
     private _save() {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(this._points));
+        this._preferenceService.points.setItem(this._points);
     }
 }

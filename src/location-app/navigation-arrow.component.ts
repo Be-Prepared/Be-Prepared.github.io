@@ -6,10 +6,8 @@ import {
     GeolocationCoordinateResultSuccess,
     GeolocationService,
 } from '../services/geolocation.service';
-import {
-    NavigationType,
-    NavigationTypeService,
-} from './navigation-type.service';
+import { NavigationType } from '../datatypes/navigation-type';
+import { NavigationTypeService } from './navigation-type.service';
 import { PositionService } from '../services/position.service';
 import { switchMap, takeUntil } from 'rxjs/operators';
 

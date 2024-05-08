@@ -4,6 +4,7 @@ import { CoordinateService, LatLon } from '../services/coordinate.service';
 import { GeolocationService } from '../services/geolocation.service';
 import { first, takeUntil, tap } from 'rxjs/operators';
 import { I18nService } from '../i18n/i18n.service';
+import { PreferenceService } from '../services/preference.service';
 import { Subject } from 'rxjs';
 import { ToastService } from '../services/toast.service';
 
@@ -132,6 +133,7 @@ export class SunMoonAppComponent {
     private _coordinateService = di(CoordinateService);
     private _geolocationService = di(GeolocationService);
     private _i18nService = di(I18nService);
+    private _preferenceService = di(PreferenceService);
     private _toastService = di(ToastService);
     allowGetLocation = false;
     coordinates: LatLon | null = null;
@@ -157,7 +159,7 @@ export class SunMoonAppComponent {
     }
 
     onViewInit() {
-        const locationStr = localStorage.getItem('sunMoonLocation');
+        const locationStr = this._preferenceService.sunMoonLocation.getItem();
 
         if (locationStr) {
             this._setValue(locationStr);
@@ -175,7 +177,7 @@ export class SunMoonAppComponent {
         const coordinates = this._coordinateService.fromString(value);
 
         if (coordinates) {
-            localStorage.setItem('sunMoonLocation', value);
+            this._preferenceService.sunMoonLocation.setItem(value);
             this.coordinates = coordinates;
             this._coordinatesUpdated();
         }

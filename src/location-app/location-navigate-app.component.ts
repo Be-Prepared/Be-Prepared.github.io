@@ -1,6 +1,7 @@
 import { Component, css, di, emit, html } from 'fudgel';
 import { WakeLockService } from '../services/wake-lock.service';
-import { WaypointSaved, WaypointService } from './waypoint.service';
+import { WaypointSaved } from '../datatypes/waypoint-saved';
+import { WaypointService } from './waypoint.service';
 
 @Component('location-navigate-app', {
     attr: ['id'],

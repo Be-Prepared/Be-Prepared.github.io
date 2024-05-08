@@ -1,25 +1,23 @@
 import { BehaviorSubject } from 'rxjs';
+import { di } from 'fudgel';
+import { DistanceSystem } from '../datatypes/distance-system';
+import { PreferenceService } from './preference.service';
 
 export interface DistanceOptions {
     useSmallUnits?: boolean;
     isSpeed?: boolean;
 }
 
-export enum DistanceSystem {
-    IMPERIAL = 'imperial',
-    METRIC = 'metric',
-}
-
 export const DistanceSystemDefault = DistanceSystem.IMPERIAL;
-const STORAGE_SETTING = 'distanceSystem';
 
 export class DistanceService {
     private _currentSetting = new BehaviorSubject<DistanceSystem>(
         DistanceSystemDefault,
     );
+    private _preferenceService = di(PreferenceService);
 
     constructor() {
-        if (localStorage.getItem(STORAGE_SETTING) === DistanceSystem.METRIC) {
+        if (this._preferenceService.distanceSystem.getItem() === DistanceSystem.METRIC) {
             this._currentSetting.next(DistanceSystem.METRIC);
         }
     }
@@ -37,7 +35,7 @@ export class DistanceService {
     }
 
     reset() {
-        localStorage.removeItem(STORAGE_SETTING);
+        this._preferenceService.distanceSystem.reset();
         this._currentSetting.next(DistanceSystemDefault);
     }
 
@@ -47,7 +45,7 @@ export class DistanceService {
                 ? DistanceSystem.IMPERIAL
                 : DistanceSystem.METRIC;
         this._currentSetting.next(newValue);
-        localStorage.setItem(STORAGE_SETTING, newValue);
+        this._preferenceService.distanceSystem.setItem(newValue);
     }
 
     private _fixed(n: number): string {

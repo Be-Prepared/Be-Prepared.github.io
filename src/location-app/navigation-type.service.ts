@@ -1,10 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
+import { NavigationType } from '../datatypes/navigation-type';
+import { PreferenceService } from '../services/preference.service';
 
-export enum NavigationType {
-    COMPASS = 'COMPASS',
-    DIRECTION_OF_TRAVEL = 'DIRECTION_OF_TRAVEL',
-    NORTH_UP = 'NORTH_UP',
-}
 const allowedOptions = [
     NavigationType.COMPASS,
     NavigationType.DIRECTION_OF_TRAVEL,
@@ -12,14 +9,13 @@ const allowedOptions = [
 ];
 
 export class NavigationTypeService {
+    private _preferenceService = new PreferenceService();
     private _subject = new BehaviorSubject<NavigationType>(allowedOptions[0]);
 
     constructor() {
-        const savedValue = localStorage.getItem(
-            'navigationType',
-        ) as NavigationType;
+        const savedValue = this._preferenceService.navigationType.getItem();
 
-        if (allowedOptions.includes(savedValue)) {
+        if (savedValue) {
             this._subject.next(savedValue);
         }
     }
@@ -34,6 +30,6 @@ export class NavigationTypeService {
             allowedOptions.length;
         const value = allowedOptions[index];
         this._subject.next(value);
-        localStorage.setItem('navigationType', value);
+        this._preferenceService.navigationType.setItem(value);
     }
 }

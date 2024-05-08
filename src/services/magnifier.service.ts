@@ -2,10 +2,12 @@ import { AvailabilityState } from '../datatypes/availability-state';
 import { di } from 'fudgel';
 import { from, of } from 'rxjs';
 import { PermissionsService } from './permissions.service';
+import { PreferenceService } from './preference.service';
 import { switchMap } from 'rxjs/operators';
 
 export class MagnifierService {
     private _permissionsService = di(PermissionsService);
+    private _preferenceService = di(PreferenceService);
 
     availabilityState(useLiveValue: boolean) {
         if (!navigator.mediaDevices) {
@@ -18,12 +20,12 @@ export class MagnifierService {
                     const tracks = stream.getVideoTracks();
 
                     if (tracks.length) {
-                        localStorage.setItem('magnifier', 'true');
+                        this._preferenceService.magnifier.setItem(true);
 
                         return AvailabilityState.ALLOWED;
                     }
 
-                    localStorage.setItem('magnifier', 'false');
+                    this._preferenceService.magnifier.setItem(false);
 
                     return AvailabilityState.UNAVAILABLE;
                 }),
@@ -33,13 +35,13 @@ export class MagnifierService {
         return this._permissionsService.camera().pipe(
             switchMap((state) => {
                 if (!useLiveValue) {
-                    const cached = localStorage.getItem('magnifier');
+                    const cached = this._preferenceService.magnifier.getItem();
 
-                    if (cached === 'true') {
+                    if (cached === true) {
                         return of(AvailabilityState.ALLOWED);
                     }
 
-                    if (cached === 'false') {
+                    if (cached === false) {
                         return of(AvailabilityState.UNAVAILABLE);
                     }
                 }

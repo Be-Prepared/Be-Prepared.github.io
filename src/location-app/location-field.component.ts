@@ -1,5 +1,7 @@
 import { Component, css, di, html } from 'fudgel';
 import { I18nService } from '../i18n/i18n.service';
+import { LocalStorageInterface } from '../services/local-storage.service';
+import { PreferenceService } from '../services/preference.service';
 
 interface FieldInfo {
     heading: string;
@@ -103,6 +105,8 @@ interface FieldInfo {
 })
 export class LocationFieldComponent {
     private _i18nService = di(I18nService);
+    private _preferenceService = di(PreferenceService);
+    private _storage?: LocalStorageInterface<string>;
     allowedFields: FieldInfo[] = [];
     default?: string;
     id?: string;
@@ -126,6 +130,8 @@ export class LocationFieldComponent {
             allowedFieldTypes.push('DESTINATION', 'DISTANCE');
         }
 
+        this._storage = this._preferenceService.field(this.id || '', allowedFieldTypes);
+
         for (const id of allowedFieldTypes) {
             this.allowedFields.push({
                 heading: this._i18nService.get(`location.field.${id}.heading`),
@@ -140,9 +146,9 @@ export class LocationFieldComponent {
             return;
         }
 
-        const selectedFieldId = localStorage.getItem(`field.${this.id}`) || '';
+        const selectedFieldId = this._storage.getItem();
         this.selectedField =
-            this._findFieldById(selectedFieldId) ||
+            this._findFieldById(selectedFieldId || '') ||
             this._findFieldById(this.default || '') ||
             this.allowedFields[0];
     }
@@ -158,7 +164,7 @@ export class LocationFieldComponent {
 
         if (field) {
             this.selectedField = field;
-            localStorage.setItem(`field.${this.id}`, id);
+            this._storage!.setItem(id);
         }
     }
 

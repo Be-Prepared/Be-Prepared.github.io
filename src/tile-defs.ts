@@ -1,4 +1,5 @@
 import { AvailabilityState } from './datatypes/availability-state';
+import { BarcodeReaderService } from './services/barcode-reader.service';
 import { di } from 'fudgel';
 import { MagnifierService } from './services/magnifier.service';
 import { map } from 'rxjs/operators';
@@ -11,6 +12,7 @@ import { Observable, of } from 'rxjs';
 import { PositionService } from './services/position.service';
 import { TorchService } from './services/torch.service';
 
+const barcodeReaderService = di(BarcodeReaderService);
 const geolocationService = di(GeolocationService);
 const magnifierService = di(MagnifierService);
 // const permissionsService = di(PermissionsService);
@@ -84,11 +86,11 @@ export const tileDefs: TileDef[] = [
             .pipe(availabilityToBoolean),
     },
     {
-        id: 'qrCode',
-        icon: '/qr-code.svg',
-        label: 'tile.qrCode',
-        component: 'qr-code-app',
-        show: of(false),
+        id: 'barcode-reader',
+        icon: '/barcode-reader.svg',
+        label: 'tile.barcodeReader',
+        component: 'barcode-reader-app',
+        show: barcodeReaderService.availabilityState(false).pipe(availabilityToBoolean),
     },
     {
         id: 'nfc',

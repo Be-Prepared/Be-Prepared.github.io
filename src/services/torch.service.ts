@@ -5,10 +5,12 @@ import {
     PermissionsService,
     PermissionsServiceState,
 } from './permissions.service';
+import { PreferenceService } from './preference.service';
 import { switchMap } from 'rxjs/operators';
 
 export class TorchService {
     private _permissionsService = di(PermissionsService);
+    private _preferenceService = di(PreferenceService);
 
     availabilityState(useLiveValue: boolean) {
         if (!window.navigator.mediaDevices) {
@@ -30,13 +32,13 @@ export class TorchService {
                 }
 
                 if (!useLiveValue) {
-                    const cached = localStorage.getItem('torch');
+                    const cached = this._preferenceService.torch.getItem();
 
-                    if (cached === 'true') {
+                    if (cached === true) {
                         return of(AvailabilityState.ALLOWED);
                     }
 
-                    if (cached === 'false') {
+                    if (cached === false) {
                         return of(AvailabilityState.UNAVAILABLE);
                     }
                 }
@@ -44,12 +46,12 @@ export class TorchService {
                 return from(
                     this._getAllTracksWithTorch().then((tracks) => {
                         if (tracks.length) {
-                            localStorage.setItem('torch', 'true');
+                            this._preferenceService.torch.setItem(true);
 
                             return AvailabilityState.ALLOWED;
                         }
 
-                        localStorage.setItem('torch', 'false');
+                        this._preferenceService.torch.setItem(false);
 
                         return AvailabilityState.UNAVAILABLE;
                     }),

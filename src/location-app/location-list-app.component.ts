@@ -10,7 +10,8 @@ import {
 import { I18nService } from '../i18n/i18n.service';
 import { first } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
-import { WaypointSaved, WaypointService } from './waypoint.service';
+import { WaypointSaved } from '../datatypes/waypoint-saved';
+import { WaypointService } from './waypoint.service';
 
 interface WaypointAugmented extends WaypointSaved {
     meters: number;

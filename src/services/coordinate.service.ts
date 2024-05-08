@@ -2,11 +2,12 @@ import { BehaviorSubject } from 'rxjs';
 import CheapRuler from 'cheap-ruler';
 import { cities } from '../cities';
 import { Converter } from 'usng.js';
+import { CoordinateSystem } from '../datatypes/coordinate-system';
 import { di } from 'fudgel';
 import { DirectionService } from './direction.service';
+import { PreferenceService } from './preference.service';
 
 // By default, usng uses NAD83 but doesn't support WGS84. This is a workaround.
-const STORAGE_SETTING = 'coordinateSystem';
 const converter = new (Converter as any)();
 converter.ECC_SQUARED = 0.00669437999014;
 converter.ECC_PRIME_SQUARED =
@@ -15,13 +16,6 @@ converter.E1 =
     (1 - Math.sqrt(1 - converter.ECC_SQUARED)) /
     (1 + Math.sqrt(1 - converter.ECC_SQUARED));
 
-export enum CoordinateSystem {
-    DMS = 'DMS',
-    DDM = 'DDM',
-    DDD = 'DDD',
-    UTMUPS = 'UTM/UPS',
-    MGRS = 'MGRS',
-}
 export const CoordinateSystemDefault = CoordinateSystem.DMS;
 
 const COORDINATE_SYSTEMS = [
@@ -71,14 +65,13 @@ export class CoordinateService {
         CoordinateSystemDefault
     );
     private _directionService = di(DirectionService);
+    private _preferencesService = di(PreferenceService);
 
     constructor() {
-        const storedSetting = localStorage.getItem(STORAGE_SETTING);
+        const storedSetting =
+            this._preferencesService.coordinateSystem.getItem();
 
-        if (
-            storedSetting &&
-            COORDINATE_SYSTEMS.includes(storedSetting as CoordinateSystem)
-        ) {
+        if (storedSetting) {
             this._currentSetting.next(storedSetting as CoordinateSystem);
         }
     }
@@ -190,7 +183,7 @@ export class CoordinateService {
     }
 
     reset() {
-        localStorage.removeItem(STORAGE_SETTING);
+        this._preferencesService.coordinateSystem.reset();
         this._currentSetting.next(CoordinateSystemDefault);
     }
 
@@ -207,7 +200,9 @@ export class CoordinateService {
         );
         const newIndex = (currentIndex + 1) % COORDINATE_SYSTEMS.length;
         this._currentSetting.next(COORDINATE_SYSTEMS[newIndex]);
-        localStorage.setItem(STORAGE_SETTING, COORDINATE_SYSTEMS[newIndex]);
+        this._preferencesService.coordinateSystem.setItem(
+            COORDINATE_SYSTEMS[newIndex]
+        );
     }
 
     private _breakIntoCoordinateChunks(
@@ -243,7 +238,7 @@ export class CoordinateService {
     }
 
     private _lookupCity(str: string): LatLon | null {
-        str = str.toLowerCase().trim();;
+        str = str.toLowerCase().trim();
         const strLen = str.length;
 
         for (const city of Object.keys(cities)) {

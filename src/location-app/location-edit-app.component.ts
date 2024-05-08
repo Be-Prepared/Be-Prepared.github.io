@@ -3,7 +3,8 @@ import { CoordinateService } from '../services/coordinate.service';
 import { GeolocationService } from '../services/geolocation.service';
 import { Subscription } from 'rxjs';
 import { ToastService } from '../services/toast.service';
-import { WaypointSaved, WaypointService } from './waypoint.service';
+import { WaypointSaved } from '../datatypes/waypoint-saved';
+import { WaypointService } from './waypoint.service';
 
 @Component('location-edit-app', {
     attr: ['id'],

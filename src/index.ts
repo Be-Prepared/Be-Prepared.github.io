@@ -1,5 +1,6 @@
 export * from './app-index/app-index.module';
 export * from './app-root/app-root.module';
+export * from './barcode-reader-app/barcode-reader-app.module';
 export * from './compass-app/compass-app.module';
 export * from './flashlight-app/flashlight-app.module';
 export * from './front-light-app/front-light-app.module';

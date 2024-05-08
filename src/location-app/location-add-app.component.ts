@@ -2,7 +2,8 @@ import { Component, css, di, html } from 'fudgel';
 import { GeolocationService } from '../services/geolocation.service';
 import { Subscription } from 'rxjs';
 import { first, timeout } from 'rxjs/operators';
-import { WaypointSaved, WaypointService } from './waypoint.service';
+import { WaypointSaved } from '../datatypes/waypoint-saved';
+import { WaypointService } from './waypoint.service';
 
 @Component('location-add-app', {
     style: css``,

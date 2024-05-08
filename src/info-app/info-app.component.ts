@@ -69,6 +69,9 @@ import { WakeLockService } from '../services/wake-lock.service';
             <p><i18n-label id="info.preferences"></i18n-label></p>
             <info-preferences></info-preferences>
 
+            <p><i18n-label id="info.barcodes"></i18n-label></p>
+            <info-barcodes></info-barcodes>
+
             <p><i18n-label id="info.toolingHeader"></i18n-label></p>
             <ul>
                 <li><styled-link href="https://github.com/fidian/be-prepared">GitHub</styled-link> - <i18n-label id="info.sourceCode"></i18n-label></li>
