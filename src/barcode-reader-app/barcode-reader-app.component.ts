@@ -50,12 +50,17 @@ interface DetectedBarcode {
             position: absolute;
         }
 
+        .blur {
+            filter: blur(5px);
+        }
+
         .barcodeFound {
             position: absolute;
             inset: 0;
             display: flex;
             justify-content: center;
             align-items: center;
+            background-color: #7f7f7f7f;
         }
 
         .rawValue {
@@ -89,12 +94,7 @@ interface DetectedBarcode {
             <div *if="deviceIssue" class="deviceIssue">
                 <i18n-label id="barcodeReader.deviceIssue"></i18n-label>
             </div>
-            <div *if="barcodeFound" class="barcodeFound">
-                <div class="rawValue">
-                    {{barcodeFound.rawValue}}
-                </div>
-            </div>
-            <div class="bottom">
+            <div class="bottom" #ref="bottom">
                 <back-button></back-button>
                 <div></div>
                 <scaling-icon
@@ -103,6 +103,11 @@ interface DetectedBarcode {
                     class="{{torchClass}}"
                     href="/flashlight.svg"
                 ></scaling-icon>
+            </div>
+            <div *if="barcodeFound" class="barcodeFound" @click="resetFound()">
+                <div class="rawValue">
+                    {{barcodeFound.rawValue}}
+                </div>
             </div>
         </div>
     `,
@@ -114,6 +119,7 @@ export class BarcodeReaderAppComponent {
     private _subject = new Subject();
     private _torchService = di(TorchService);
     barcodeFound: DetectedBarcode | null = null;
+    bottom?: HTMLElement;
     deviceIssue = false;
     explainAsk = false;
     explainDeny = false;
@@ -161,6 +167,12 @@ export class BarcodeReaderAppComponent {
         this._barcodeReaderService.prompt();
     }
 
+    resetFound() {
+        this.barcodeFound = null;
+        this._updateBlur();
+        this._barcodeDetectionStart();
+    }
+
     toggleTorch() {
         if (this.torchEnabled) {
             this._torchService.turnOff().then(() => {
@@ -179,6 +191,7 @@ export class BarcodeReaderAppComponent {
                 if (result.length) {
                     this._barcodeDetectionStop();
                     this.barcodeFound = result[0];
+                    this._updateBlur();
                 } else {
                     this._animationFrame = requestAnimationFrame(performDetection);
                 }
@@ -230,5 +243,15 @@ export class BarcodeReaderAppComponent {
 
             this._setupTorch();
         });
+    }
+
+    private _updateBlur() {
+        if (this.barcodeFound) {
+            this.video?.classList.add('blur');
+            this.bottom?.classList.add('blur');
+        } else {
+            this.video?.classList.remove('blur');
+            this.bottom?.classList.remove('blur');
+        }
     }
 }
