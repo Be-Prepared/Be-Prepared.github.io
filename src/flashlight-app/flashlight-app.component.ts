@@ -82,8 +82,6 @@ export class FlashlightAppComponent {
 
                 if (this.showControls) {
                     this._getCurrentStatus();
-                } else {
-                    this._wakeLockService.release();
                 }
             });
     }
@@ -100,11 +98,13 @@ export class FlashlightAppComponent {
 
     toggle() {
         if (this.enabled) {
+            this._wakeLockService.release();
             this._torchService.turnOff().then(() => {
                 this._checkIfStillEnabled();
             })
         } else {
             this._torchService.turnOn();
+            this._wakeLockService.request();
         }
 
         this.enabled = !this.enabled;
@@ -123,7 +123,6 @@ export class FlashlightAppComponent {
     }
 
     private _getCurrentStatus() {
-        this._wakeLockService.request();
         this._torchService.currentStatus().then((enabled) => {
             this.enabled = enabled;
         });

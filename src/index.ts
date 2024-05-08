@@ -9,6 +9,7 @@ export * from './info-app/info-app.module';
 export * from './install-pwa/install-pwa.module';
 export * from './location-app/location-app.module';
 export * from './magnifier-app/magnifier-app.module';
+export * from './nfc-app/nfc-app.module';
 export * from './shared/shared.module';
 export * from './sun-moon-app/sun-moon-app.module';
 export * from './update-pwa/update-pwa.module';

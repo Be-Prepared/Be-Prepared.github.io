@@ -117,6 +117,9 @@ export const enUS: LanguageData = {
     'magnifier.explainAsk':
         'The magnifier requires the camera permission to function.',
 
+    // NFC
+    'nfc.scanning': 'Scanning for NFC tags...',
+
     // Shared components
     'shared.cameraUnavailable.heading': 'No Suitable Camera',
     'shared.cameraUnavailable.message':

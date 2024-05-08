@@ -1,6 +1,7 @@
 import { AvailabilityState } from '../datatypes/availability-state';
 import {
     distinctUntilChanged,
+    first,
     map,
     shareReplay,
     switchMap,
@@ -73,9 +74,36 @@ export class PermissionsService {
         return this._getPermission(name, subject);
     }
 
+    nfc(prompt = false) {
+        if (!(window as any).NDEFReader || !navigator.permissions) {
+            return of(PermissionsServiceState.ERROR);
+        }
+
+        const name: PermissionName = 'nfc' as PermissionName;
+        const subject = this._getSubject(name);
+
+        if (prompt) {
+            const abortController = new AbortController();
+            const reader = new NDEFReader();
+            reader.onreading = () => subject.next(PermissionsServiceState.GRANTED);
+            reader.onreadingerror = () => subject.next(PermissionsServiceState.ERROR);
+            reader.scan({
+                signal: abortController.signal,
+            }).then(() => {
+                subject.next(PermissionsServiceState.GRANTED);
+                abortController.abort();
+            }, () => {
+                subject.next(PermissionsServiceState.ERROR);
+                abortController.abort();
+            });
+        }
+
+        return this._getPermission(name, subject);
+    }
+
     toAvailability(
         state: PermissionsServiceState,
-        whenGranted: () => Observable<AvailabilityState>,
+        whenGranted?: () => Observable<AvailabilityState>,
     ) {
         if (state === PermissionsServiceState.ERROR) {
             return of(AvailabilityState.ERROR);
@@ -89,7 +117,11 @@ export class PermissionsService {
             return of(AvailabilityState.DENIED);
         }
 
-        return whenGranted();
+        if (whenGranted) {
+            return whenGranted();
+        }
+
+        return of(AvailabilityState.ALLOWED);
     }
 
     private _checkPermission(name: PermissionName) {

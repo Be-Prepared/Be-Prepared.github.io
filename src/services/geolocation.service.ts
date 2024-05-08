@@ -45,19 +45,7 @@ export class GeolocationService {
 
         return this._permissionsService.geolocation().pipe(
             switchMap((state) => {
-                if (state === PermissionsServiceState.ERROR) {
-                    return of(AvailabilityState.ERROR);
-                }
-
-                if (state === PermissionsServiceState.PROMPT) {
-                    return of(AvailabilityState.PROMPT);
-                }
-
-                if (state === PermissionsServiceState.DENIED) {
-                    return of(AvailabilityState.DENIED);
-                }
-
-                return of(AvailabilityState.ALLOWED);
+                return this._permissionsService.toAvailability(state);
             }),
         );
     }
