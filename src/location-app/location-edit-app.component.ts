@@ -153,6 +153,7 @@ import { WaypointService } from './waypoint.service';
                 <div class="buttons">
                     <back-button></back-button>
                     <scaling-icon
+                        *if="validPoint"
                         class="navigate"
                         @click.stop.prevent="navigate()"
                         href="/navigate.svg"
@@ -174,6 +175,7 @@ export class LocationEditComponent {
     locationInput?: HTMLInputElement;
     lon?: number;
     point: WaypointSaved | null = null;
+    validPoint = false;
 
     onInit() {
         this._subscription = this._geolocationService
@@ -196,6 +198,7 @@ export class LocationEditComponent {
         this.point = point;
         this._updateLatLon();
         this._updateLocation();
+        this.validPoint = true;
     }
 
     onDestroy() {
@@ -216,8 +219,10 @@ export class LocationEditComponent {
             this._updateLatLon();
             this._waypointService.updatePoint(this.point!);
             this._updateLocation();
+            this.validPoint = true;
         } else {
             this._toastService.popI18n('location.edit.badLocation');
+            this.validPoint = false;
         }
     }
 

@@ -95,6 +95,8 @@ export class WaypointService {
 
             this._points = points;
         }
+
+        this._maxId = maxId;
     }
 
     private _save() {

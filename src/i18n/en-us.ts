@@ -64,6 +64,8 @@ export const enUS: LanguageData = {
     'install.message': 'Install to Home Screen',
 
     // Location
+    'location.add.gettingCurrentLocation': 'Getting current location...',
+    'location.add.waypointName': 'Unnamed Waypoint {{id}}',
     'location.coordinates.empty': 'No coordinates available.',
     'location.coordinates.mgrs': 'MGRS:',
     'location.coordinates.utmups': 'UTM/UPS:',
