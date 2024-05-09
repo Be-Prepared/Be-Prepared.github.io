@@ -36,15 +36,15 @@ import { ToastService } from '../services/toast.service';
     template: html`
         <div class="website">{{website}}</div>
         <div class="buttons">
+            <pretty-button @click="openQrCode()" padding="0px">
+                <mini-qr content="{{website}}"></mini-qr>
+            </pretty-button>
             <pretty-labeled-button
                 *if="allowCopy"
                 @click="copyToClipboard()"
                 id="info.share.copy"
                 class="copyButton"
             ></pretty-labeled-button>
-            <pretty-button @click="openQrCode()" padding="0px">
-                <mini-qr content="{{website}}"></mini-qr>
-            </pretty-button>
         </div>
     `,
 })
