@@ -44,12 +44,6 @@ interface DetectedBarcode {
             color: var(--button-fg-color-enabled);
         }
 
-        .deviceIssue {
-            padding: 10%;
-            text-align: center;
-            position: absolute;
-        }
-
         .blur {
             filter: blur(5px);
         }
@@ -91,9 +85,6 @@ interface DetectedBarcode {
                 muted
                 playsinline
             ></video>
-            <div *if="deviceIssue" class="deviceIssue">
-                <i18n-label id="barcodeReader.deviceIssue"></i18n-label>
-            </div>
             <div class="bottom" #ref="bottom">
                 <back-button></back-button>
                 <div></div>
@@ -120,7 +111,6 @@ export class BarcodeReaderAppComponent {
     private _torchService = di(TorchService);
     barcodeFound: DetectedBarcode | null = null;
     bottom?: HTMLElement;
-    deviceIssue = false;
     explainAsk = false;
     explainDeny = false;
     explainUnavailable = false;
@@ -175,9 +165,7 @@ export class BarcodeReaderAppComponent {
 
     toggleTorch() {
         if (this.torchEnabled) {
-            this._torchService.turnOff().then(() => {
-                this._checkIfStillEnabled();
-            });
+            this._torchService.turnOff();
         } else {
             this._torchService.turnOn();
         }
@@ -205,18 +193,6 @@ export class BarcodeReaderAppComponent {
         if (this._animationFrame !== null) {
             cancelAnimationFrame(this._animationFrame);
         }
-    }
-
-    private _checkIfStillEnabled() {
-        this._torchService.currentStatus().then((enabled) => {
-            // Some devices just don't turn off the flash when asked.  Seems to
-            // be a problem with a paticular brand. If a workaround is found,
-            // that would be preferred to reloading the app.
-            if (enabled) {
-                this.deviceIssue = true;
-                window.location.reload();
-            }
-        });
     }
 
     private _setupTorch() {

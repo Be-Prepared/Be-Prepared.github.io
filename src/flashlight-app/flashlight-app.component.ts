@@ -23,11 +23,6 @@ import { WakeLockService } from '../services/wake-lock.service';
             display: flex;
             justify-content: space-between;
         }
-
-        .deviceIssue {
-            padding: 0 10%;
-            text-align: center;
-        }
     `,
     template: html`
         <permission-prompt
@@ -42,15 +37,11 @@ import { WakeLockService } from '../services/wake-lock.service';
         <div *if="showControls" class="wrapper">
             <div></div>
             <pretty-button
-                *if="!deviceIssue"
                 .enabled="enabled"
                 @click.stop.prevent="toggle()"
             >
                 <scaling-icon href="/flashlight.svg"></scaling-icon>
             </pretty-button>
-            <div *if="deviceIssue" class="deviceIssue">
-                <i18n-label id="flashlight.deviceIssue"></i18n-label>
-            </div>
             <div class="buttonBar">
                 <back-button></back-button>
             </div>
@@ -62,7 +53,6 @@ export class FlashlightAppComponent {
     private _subject = new Subject();
     private _torchService = di(TorchService);
     private _wakeLockService = di(WakeLockService);
-    deviceIssue = false;
     enabled = false;
     explainAsk = false;
     explainDeny = false;
@@ -99,27 +89,13 @@ export class FlashlightAppComponent {
     toggle() {
         if (this.enabled) {
             this._wakeLockService.release();
-            this._torchService.turnOff().then(() => {
-                this._checkIfStillEnabled();
-            })
+            this._torchService.turnOff();
         } else {
             this._torchService.turnOn();
             this._wakeLockService.request();
         }
 
         this.enabled = !this.enabled;
-    }
-
-    private _checkIfStillEnabled() {
-        this._torchService.currentStatus().then((enabled) => {
-            // Some devices just don't turn off the flash when asked.  Seems to
-            // be a problem with a paticular brand. If a workaround is found,
-            // that would be preferred to reloading the app.
-            if (enabled) {
-                this.deviceIssue = true;
-                window.location.reload();
-            }
-        });
     }
 
     private _getCurrentStatus() {

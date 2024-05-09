@@ -6,12 +6,10 @@ export const enUS: LanguageData = {
     'app.currentPermissionStatus': 'Current permission status',
 
     // Barcode reader
-    'barcodeReader.deviceIssue': 'There is an issue turning off the flashlight on this type of device. The app is reloading to work around this problem.',
     'barcodeReader.explainAsk':
         'To use the barcode reader, the camera permission is required.',
 
     // Flashlight
-    'flashlight.deviceIssue': 'There is an issue turning off the flashlight on this type of device. The app is reloading to work around this problem.',
     'flashlight.explainAsk':
         'In order to turn on the flashlight, the camera permission needs to be granted.',
     'flashlight.explainDeny':
@@ -113,7 +111,6 @@ export const enUS: LanguageData = {
     'location.waypoints.unknownLocation': 'Unknown',
 
     // Magnifier
-    'magnifier.deviceIssue': 'There is an issue turning off the flashlight on this type of device. The app is reloading to work around this problem.',
     'magnifier.explainAsk':
         'The magnifier requires the camera permission to function.',
 
@@ -133,6 +130,7 @@ export const enUS: LanguageData = {
     'shared.permissionPrompt.heading': 'Permission Required',
 
     // Services
+    'service.torch.deviceIssue': 'Flashlight issue - reload required',
     'service.wakeLock.released': 'Letting Screen Turn Off',
     'service.wakeLock.obtained': 'Keeping Screen On',
 

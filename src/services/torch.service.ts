@@ -7,10 +7,12 @@ import {
 } from './permissions.service';
 import { PreferenceService } from './preference.service';
 import { switchMap } from 'rxjs/operators';
+import { ToastService } from './toast.service';
 
 export class TorchService {
     private _permissionsService = di(PermissionsService);
     private _preferenceService = di(PreferenceService);
+    private _toastService = di(ToastService);
 
     availabilityState(useLiveValue: boolean) {
         if (!window.navigator.mediaDevices) {
@@ -54,9 +56,9 @@ export class TorchService {
                         this._preferenceService.torch.setItem(false);
 
                         return AvailabilityState.UNAVAILABLE;
-                    }),
+                    })
                 );
-            }),
+            })
         );
     }
 
@@ -75,21 +77,35 @@ export class TorchService {
     }
 
     turnOff() {
-        return this._getAllTracksWithTorch().then((tracks) => {
-            const enabled = [];
+        return this._getAllTracksWithTorch()
+            .then((tracks) => {
+                const enabled = [];
 
-            for (const track of tracks) {
-                if ((track.getSettings() as any).torch) {
-                    enabled.push(track);
+                for (const track of tracks) {
+                    if ((track.getSettings() as any).torch) {
+                        enabled.push(track);
+                    }
                 }
-            }
 
-            if (!enabled.length) {
-                return Promise.reject();
-            }
+                if (!enabled.length) {
+                    return Promise.reject();
+                }
 
-            return Promise.all(enabled.map((track) => this._setTorch(track, false)));
-        });
+                return Promise.all(
+                    enabled.map((track) => this._setTorch(track, false))
+                );
+            })
+            .then(() => this.currentStatus())
+            .then((enabled) => {
+                // Some devices just don't turn off the flash when asked.
+                // Seems to be a problem with a paticular brand. If a
+                // workaround is found, that would be preferred to reloading
+                // the app.
+                if (enabled) {
+                    this._toastService.popI18n('service.torch.deviceIssue');
+                    window.location.reload();
+                }
+            });
     }
 
     turnOn() {
@@ -119,7 +135,11 @@ export class TorchService {
 
                     const fillLightMode = capabilities.fillLightMode;
 
-                    if (fillLightMode && fillLightMode.length > 0 && fillLightMode !== 'none') {
+                    if (
+                        fillLightMode &&
+                        fillLightMode.length > 0 &&
+                        fillLightMode !== 'none'
+                    ) {
                         return true;
                     }
 
@@ -130,7 +150,12 @@ export class TorchService {
 
     private _setTorch(track: MediaStreamTrack, enabled: boolean) {
         return track.applyConstraints({
-            advanced: [{ fillLightMode: enabled ? 'flash' : 'off', torch: enabled } as any],
+            advanced: [
+                {
+                    fillLightMode: enabled ? 'flash' : 'off',
+                    torch: enabled,
+                } as any,
+            ],
         });
     }
 }
