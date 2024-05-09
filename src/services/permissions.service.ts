@@ -1,7 +1,6 @@
 import { AvailabilityState } from '../datatypes/availability-state';
 import {
     distinctUntilChanged,
-    first,
     map,
     shareReplay,
     switchMap,

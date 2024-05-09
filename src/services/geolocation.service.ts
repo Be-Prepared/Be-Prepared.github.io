@@ -6,10 +6,7 @@ import { finalize, share, switchMap } from 'rxjs/operators';
 import { KalmanFilterArray } from '@bencevans/kalman-filter';
 import { of, timer } from 'rxjs';
 import { Observable, ReplaySubject, Subject } from 'rxjs';
-import {
-    PermissionsService,
-    PermissionsServiceState,
-} from './permissions.service';
+import { PermissionsService } from './permissions.service';
 
 export interface GeolocationCoordinateResultSuccess {
     success: true;
@@ -46,7 +43,7 @@ export class GeolocationService {
         return this._permissionsService.geolocation().pipe(
             switchMap((state) => {
                 return this._permissionsService.toAvailability(state);
-            }),
+            })
         );
     }
 
@@ -103,7 +100,7 @@ export class GeolocationService {
             share({
                 connector: () => new ReplaySubject(1),
                 resetOnRefCountZero: () => timer(5000),
-            }),
+            })
         );
         navigator.geolocation.getCurrentPosition(success, error);
         const watch = navigator.geolocation.watchPosition(success, error, {
@@ -114,7 +111,7 @@ export class GeolocationService {
     }
 
     private _calculateSpeedHeading(
-        lastPositions: GeolocationCoordinateResultSuccess[],
+        lastPositions: GeolocationCoordinateResultSuccess[]
     ) {
         const first = lastPositions[0];
         const last = lastPositions[lastPositions.length - 1];
@@ -151,7 +148,7 @@ export class GeolocationService {
         const cheapRuler = new CheapRuler(last.latitude, 'meters');
         const distance = cheapRuler.distance(
             [estimate[0][0], estimate[0][1]],
-            [last.longitude, last.latitude],
+            [last.longitude, last.latitude]
         );
         const elapsedTime =
             (last.timestamp + first.timestamp) / 2 - first.timestamp;
@@ -163,8 +160,8 @@ export class GeolocationService {
             heading = this._directionService.standardize360(
                 cheapRuler.bearing(
                     [estimate[0][0], estimate[0][1]],
-                    [last.longitude, last.latitude],
-                ),
+                    [last.longitude, last.latitude]
+                )
             );
         } else {
             heading = NaN;
