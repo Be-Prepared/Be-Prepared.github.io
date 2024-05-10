@@ -1,4 +1,17 @@
 #!/usr/bin/env bash
 
-curl -O "https://download.geonames.org/export/dump/cities15000.zip"
-zcat cities15000.zip | node parse-cities.js > src/cities.ts
+SRC="cities15000.zip"
+
+# If older than one month, delete the file
+if [[ -f "$SRC" ]] && [[ "$(( $(date +"%s") - $(stat -c "%Z" "$SRC") ))" -gt 2678400 ]]; then
+    echo "File is too old; deleting $SRC"
+    rm -f "$SRC"
+fi
+
+if [[ ! -f "$SRC" ]]; then
+    echo "Downloading $SRC"
+    curl -O "https://download.geonames.org/export/dump/$SRC"
+fi
+
+echo "Parsing $SRC"
+zcat "$SRC" | node parse-cities.js > src/cities.ts

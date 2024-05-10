@@ -16,7 +16,7 @@ function processLine(name, lat, lon, population) {
         return;
     }
 
-    if (entries.has(name) && entries.get(name).population >= population) {
+    if (entries.has(nameLc) && entries.get(nameLc).population >= population) {
         return;
     }
 
@@ -59,16 +59,25 @@ createInterface({
         console.log('}');
         console.log('');
         let last = 'export const cities: CityCoords = {';
+        let highestPopulation = 0;
+        let lowestPopulation = Number.MAX_SAFE_INTEGER;
 
         for (const name of namesSorted) {
             console.log(last);
             const value = entries.get(name);
             const coords = [value.lat, value.lon];
             last = `    ${JSON.stringify(value.name)}: ${JSON.stringify(coords)},`;
+            highestPopulation = Math.max(highestPopulation, value.population);
+            lowestPopulation = Math.min(lowestPopulation, value.population);
         }
 
         console.log(last.substring(0, last.length - 1));
         console.log('}');
+        console.log('');
+        console.log(`// Total cities: ${namesTop.length}`);
+        console.log(`// Cities in this lis: ${namesSorted.length}`);
+        console.log(`// Highest population: ${highestPopulation}`);
+        console.log(`// Lowest population: ${lowestPopulation}`);
     });
 
 // geonameid         : integer id of record in geonames database
