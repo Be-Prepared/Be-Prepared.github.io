@@ -55,6 +55,12 @@ This PWA is also an example for how to use the following:
     * Gives credit to the tooling that helped make this project.
     * Shows the current build information.
 
+## Notes about Data
+
+* Major Cities
+    * The cities do not include state, so "Minneapolis" works and "Minneapolis, MN" does not.
+    * This list starts by downloading a list of all cities worldwide that have a population of 15,000 or more. Next, the cities are processed and if there are duplicate names, the one with the highest population is retained. After that, the top 10,000 cities worldwide are kept.
+
 ## For Developers
 
 This project runs like most other typical Node.js projects. First clone or download the repository, then install packages, and finally serve content.
