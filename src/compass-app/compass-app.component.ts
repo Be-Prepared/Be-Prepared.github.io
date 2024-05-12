@@ -78,7 +78,7 @@ export class CompassAppComponent {
                     this._directionService.toHeadingDirection(bearing);
 
                 if (this.compassRose) {
-                    this.compassRose.style.transform = `rotate(${rounded}deg)`;
+                    this.compassRose.style.transform = `rotate(-${rounded}deg)`;
                 }
             });
     }

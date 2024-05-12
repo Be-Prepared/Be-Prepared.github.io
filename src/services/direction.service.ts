@@ -1,25 +1,33 @@
 export class DirectionService {
     // Measured from north to west, so 0 is north, Math.PI / 2 is west.
     radiansToDegreesNW(azimuth: number): number {
-        return this.standardize360((azimuth * 180) / Math.PI);
+        return this.standardize360(360 - (azimuth * 180) / Math.PI);
     }
 
     // Measured from south to west, so 0 is south, Math.PI / 2 is west.
     radiansToDegreesSW(azimuth: number): number {
-        return this.standardize360(180 - (azimuth * 180) / Math.PI);
+        return this.standardize360(180 + (azimuth * 180) / Math.PI);
     }
 
-    // Direction is converted to [-180, 180).
+    // Direction is converted to [-180, 180) - used for longitude. -181 becomes
+    // 179 from wrapping around.
     standardize180(direction: number) {
         if (direction >= -180 && direction < 180) {
             return direction;
         }
 
-        if (direction >= 0 && direction < 360) {
-            return direction - 180;
+        // A lot of directions will fall into the [0-360) range.
+        if (direction >= 180 && direction < 360) {
+            return -360 + direction;
         }
 
-        return this.standardize360(direction) - 180;
+        const deg360 = this.standardize360(direction);
+
+        if (deg360 < 180) {
+            return deg360;
+        }
+
+        return -360 + deg360;
     }
 
     standardize360(direction: number) {

@@ -125,7 +125,7 @@ export class PositionService {
             (180 / Math.PI);
         const bearing = alpha < 0 ? alpha + 360 : alpha;
 
-        return bearing;
+        return 360 - bearing;
     }
 
     private _listenAbsoluteOrientationSensor() {
