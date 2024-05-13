@@ -51,7 +51,7 @@ export const enUS: LanguageData = {
     'info.shareApp': 'Share This App:',
     'info.share.copied': 'Website Copied!',
     'info.share.copy': 'Copy URL',
-    'info.sourceCode': 'source code',
+    'info.sourceCode': 'source code, bug reports, and feature requests',
     'info.svgCompression': 'SVG compression',
     'info.torch': 'Torch:',
     'info.toolingHeader': 'Tooling:',
