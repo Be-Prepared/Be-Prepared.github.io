@@ -39,6 +39,7 @@ export const enUS: LanguageData = {
     'info.distances.metric': 'Metric',
     'info.framework': 'the framework driving this app',
     'info.geolocation': 'Geolocation:',
+    'info.latestChangesHeader': 'Latest Changes:',
     'info.permission.denied': '✖ Denied',
     'info.permission.error': 'Error',
     'info.permission.granted': '✔ Granted',
@@ -182,7 +183,7 @@ export const enUS: LanguageData = {
     'sunMoon.sunTimes.sunset': 'Sunset:',
 
     // Tile labels on index
-    'tile.barcodeReader': 'Barcode Reader',
+    'tile.barcodeReader': 'Read Barcodes',
     'tile.compass': 'Compass',
     'tile.flashlight': 'Flashlight',
     'tile.frontLight': 'Front Light',
