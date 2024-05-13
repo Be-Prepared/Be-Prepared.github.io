@@ -1,24 +1,27 @@
 import { AvailabilityState } from '../datatypes/availability-state';
 import { Component, css, di, html } from 'fudgel';
-import { NfcService } from '../services/nfc.service';
+import { NfcScanResult, NfcService } from '../services/nfc.service';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component('nfc-app', {
     style: css`
-        :host,
-        .wrapper {
-            height: 100%;
-            width: 100%;
+        :host {
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            align-items: stretch;
+            font-size: 1.2em;
+            height: 100%;
+            width: 100%;
+            box-sizing: border-box;
         }
 
-        .bottom {
+        .wrapper {
+            padding: 1em;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
             display: flex;
-            justify-content: space-between;
+            box-sizing: border-box;
         }
 
         .enabled {
@@ -32,6 +35,28 @@ import { takeUntil } from 'rxjs/operators';
             align-items: center;
             font-size: 2em;
         }
+
+        .wrapperInner {
+            flex-grow: 1;
+            padding: 0.3em;
+            border-style: solid;
+            box-sizing: border-box;
+            border-width: 1px;
+            overflow-x: auto;
+            height: 100%;
+            width: 100%;
+        }
+
+        @media (orientation: landscape) {
+            :host,
+            .wrapper {
+                flex-direction: row-reverse;
+            }
+
+            .buttons {
+                flex-direction: column-reverse;
+            }
+        }
     `,
     template: html`
         <permission-prompt
@@ -42,12 +67,12 @@ import { takeUntil } from 'rxjs/operators';
         <permission-denied *if="explainDeny"></permission-denied>
         <camera-unavailable *if="explainUnavailable"></camera-unavailable>
         <div *if="showControls" class="wrapper">
-            <div *if="scanning" class="scanning">
-                <i18n-label id="nfc.scanning"></i18n-label>
+            <div class="wrapperInner">
+                <nfc-scan-result .scan-result="lastRead"></nfc-scan-result>
             </div>
-            <div class="bottom">
-                <back-button></back-button>
-            </div>
+        </div>
+        <div *if="showControls">
+            <back-button></back-button>
         </div>
     `,
 })
@@ -58,6 +83,7 @@ export class NfcAppComponent {
     explainAsk = false;
     explainDeny = false;
     explainUnavailable = false;
+    lastRead?: NfcScanResult;
     scanning = false;
     showControls = false;
 
@@ -83,7 +109,6 @@ export class NfcAppComponent {
     onDestroy() {
         this._subject.next(null);
         this._subject.complete();
-        this._stopScanning();
     }
 
     grant() {
@@ -96,9 +121,12 @@ export class NfcAppComponent {
         }
 
         this.scanning = true;
-        this._scanSubscription = this._nfcService.scan().subscribe((event) => {
-            console.log(event);
-        });
+        this._scanSubscription = this._nfcService
+            .scan()
+            .pipe(takeUntil(this._subject))
+            .subscribe((event) => {
+                this.lastRead = event;
+            });
     }
 
     private _stopScanning() {

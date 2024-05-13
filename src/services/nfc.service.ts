@@ -4,12 +4,13 @@ import { finalize, share, switchMap } from 'rxjs/operators';
 import { Observable, of, Subject } from 'rxjs';
 import { PermissionsService } from './permissions.service';
 
-interface NfcScanResult {
+export interface NfcScanResult {
     initializeError?: true;
     readError?: true;
     ready?: true;
     records?: ReadonlyArray<NDEFRecord>;
     serialNumber?: string;
+    timestamp: Date;
 }
 
 export class NfcService {
@@ -40,16 +41,20 @@ export class NfcService {
             subject.next({
                 records: event.message.records,
                 serialNumber: event.serialNumber,
+                timestamp: new Date(),
             });
         };
         instance.onreadingerror = () => {
-            subject.next({ readError: true });
+            subject.next({ readError: true, timestamp: new Date() });
         };
-        instance.scan({ signal: abortController.signal }).then(() => {
-            subject.next({ ready: true });
-        }, () => {
-            subject.next({ initializeError: true });
-        });
+        instance.scan({ signal: abortController.signal }).then(
+            () => {
+                subject.next({ ready: true, timestamp: new Date() });
+            },
+            () => {
+                subject.next({ initializeError: true, timestamp: new Date() });
+            }
+        );
         this._observable = subject.asObservable().pipe(
             finalize(() => {
                 abortController.abort();

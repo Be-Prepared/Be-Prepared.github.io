@@ -15,6 +15,7 @@ import { ToastService } from '../services/toast.service';
             flex-direction: column;
             font-size: 1.2em;
             height: 100%;
+            width: 100%;
             box-sizing: border-box;
         }
 

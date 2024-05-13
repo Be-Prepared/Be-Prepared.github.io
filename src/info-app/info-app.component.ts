@@ -14,6 +14,7 @@ import { WakeLockService } from '../services/wake-lock.service';
             flex-direction: column;
             font-size: 1.2em;
             height: 100%;
+            width: 100%;
             box-sizing: border-box;
         }
 
@@ -26,7 +27,7 @@ import { WakeLockService } from '../services/wake-lock.service';
             box-sizing: border-box;
         }
 
-        .wrapper-inner {
+        .wrapperInner {
             flex-grow: 1;
             padding: 0.3em;
             border-style: solid;
@@ -53,7 +54,7 @@ import { WakeLockService } from '../services/wake-lock.service';
     `,
     template: html`
     <div class="wrapper">
-        <div class="wrapper-inner">
+        <div class="wrapperInner">
             <p><i18n-label id="info.shareApp"></i18n-label></p>
             <info-share></info-share>
 
@@ -87,7 +88,7 @@ import { WakeLockService } from '../services/wake-lock.service';
         </div>
     </div>
     <div class="buttons">
-        <back-button class="paddingTop"></back-button>
+        <back-button></back-button>
     </div>
     `,
 })

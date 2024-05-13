@@ -3,7 +3,7 @@ import { BarcodeReaderService } from './services/barcode-reader.service';
 import { di } from 'fudgel';
 import { MagnifierService } from './services/magnifier.service';
 import { map } from 'rxjs/operators';
-// import { NfcService } from './services/nfc.service';
+import { NfcService } from './services/nfc.service';
 import { GeolocationService } from './services/geolocation.service';
 import { Observable, of } from 'rxjs';
 // import {
@@ -16,7 +16,7 @@ import { TorchService } from './services/torch.service';
 const barcodeReaderService = di(BarcodeReaderService);
 const geolocationService = di(GeolocationService);
 const magnifierService = di(MagnifierService);
-// const nfcService = di(NfcService);
+const nfcService = di(NfcService);
 // const permissionsService = di(PermissionsService);
 const positionService = di(PositionService);
 const torchService = di(TorchService);
@@ -101,8 +101,7 @@ export const tileDefs: TileDef[] = [
         icon: '/nfc.svg',
         label: 'tile.nfc',
         component: 'nfc-app',
-        show: of(false),
-        // show: nfcService.availabilityState().pipe(availabilityToBoolean),
+        show: nfcService.availabilityState().pipe(availabilityToBoolean),
     },
     {
         id: 'timer',

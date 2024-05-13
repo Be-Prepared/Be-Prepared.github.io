@@ -115,7 +115,17 @@ export const enUS: LanguageData = {
         'The magnifier requires the camera permission to function.',
 
     // NFC
-    'nfc.scanning': 'Scanning for NFC tags...',
+    'nfc.explainAsk': 'To use NFC, your permission is required.',
+    'nfc.readNumber': 'Read number:',
+    'nfc.record.encoding': 'Encoding:',
+    'nfc.record.id': 'ID:',
+    'nfc.record.lang': 'Language:',
+    'nfc.record.mediaType': 'Media type:',
+    'nfc.record.recordType': 'Record type:',
+    'nfc.scanResult.numberOfRecords': 'Number of records:',
+    'nfc.scanResult.scanning': 'Scanning for NFC tags...',
+    'nfc.scanResult.serialNumber': 'Serial number:',
+    'nfc.scanResult.timestamp': 'Timestamp:',
 
     // Shared components
     'shared.cameraUnavailable.heading': 'No Suitable Camera',
