@@ -73,7 +73,9 @@ export class CompassAppComponent {
         this._subscription = this._positionService
             .getCompassBearing()
             .subscribe((bearing: number) => {
-                const rounded = Math.round(bearing);
+                const rounded = this._directionService.standardize360(
+                    Math.round(bearing)
+                );
                 this.headingDirection =
                     this._directionService.toHeadingDirection(bearing);
 
