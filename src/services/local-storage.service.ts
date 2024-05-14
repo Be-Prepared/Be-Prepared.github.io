@@ -1,4 +1,19 @@
-const storage = localStorage;
+class LocalStorageMock {
+    private _store = new Map<string, string>();
+
+    getItem(key: string) {
+        return this._store.get(key) || null;
+    }
+
+    removeItem(key: string) {
+        this._store.delete(key);
+    }
+
+    setItem(key: string, value: string) {
+        this._store.set(key, value);
+    }
+};
+const storage = typeof localStorage === 'undefined' ? new LocalStorageMock : localStorage;
 
 export interface LocalStorageInterface<T> {
     getItem: () => T | null;

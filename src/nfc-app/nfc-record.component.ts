@@ -46,10 +46,6 @@ import { Component, css, html } from 'fudgel';
 export class NfcRecordComponent {
     record?: NDEFRecord;
 
-    onChange() {
-        console.log(this.record);
-    }
-
     decode() {
         const decoder = new TextDecoder(this.record?.encoding || 'utf-8');
 

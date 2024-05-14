@@ -3,7 +3,7 @@ import CheapRuler from 'cheap-ruler';
 import { cities } from '../cities';
 import { Converter } from 'usng.js';
 import { CoordinateSystem } from '../datatypes/coordinate-system';
-import { di } from 'fudgel';
+import { di } from 'fudgel/dist/only-di';
 import { DirectionService } from './direction.service';
 import { PreferenceService } from './preference.service';
 
@@ -79,31 +79,12 @@ export class CoordinateService {
     fromString(str: string): LatLon | null {
         str = str.trim();
 
-        if (converter.isUSNG(str)) {
-            const [lat, lon] = converter.USNGtoLL(str);
-
-            return { lat, lon };
-        }
-
-        try {
-            const [lat, lon] = converter.UTMUPStoLL(str);
-
-            return { lat, lon };
-        } catch (ignore) {}
-
-        const parsed = this._parseDegrees(str);
-
-        if (parsed) {
-            return parsed;
-        }
-
-        const cityCoords = this._lookupCity(str);
-
-        if (cityCoords) {
-            return cityCoords;
-        }
-
-        return null;
+        return (
+            this._fromStringDegrees(str) ||
+            this._fromStringCity(str) ||
+            this._fromStringMgrs(str) ||
+            this._fromStringUtmUps(str)
+        );
     }
 
     getCurrentSetting() {
@@ -237,7 +218,7 @@ export class CoordinateService {
         return [firstHalf.join(' '), secondHalf.join(' ')];
     }
 
-    private _lookupCity(str: string): LatLon | null {
+    private _fromStringCity(str: string): LatLon | null {
         str = str.toLowerCase().trim();
         const strLen = str.length;
 
@@ -252,35 +233,7 @@ export class CoordinateService {
         return null;
     }
 
-    private _padLeading(str: string): string {
-        if (str.length === 1 || str.charAt(1) === '.') {
-            return `0${str}`;
-        }
-
-        return str;
-    }
-
-    private _parseCoordinateString(str: string): number | null {
-        const parts = str.split(/ /).map((item) => parseFloat(item));
-
-        for (const part of parts) {
-            if (isNaN(part)) {
-                return null;
-            }
-        }
-
-        let multiplier = 1 / 60;
-        let result = parts.shift()!;
-
-        while (parts.length) {
-            result += parts.shift()! * multiplier;
-            multiplier /= 60;
-        }
-
-        return result;
-    }
-
-    private _parseDegrees(str: string): LatLon | null {
+    private _fromStringDegrees(str: string): LatLon | null {
         const cleansed = str
             .toUpperCase()
             .replace(/[^-0-9.ENSW]+/g, ' ')
@@ -309,10 +262,136 @@ export class CoordinateService {
             coordinates[1] = -Math.abs(coordinates[1]);
         }
 
-        return this.standardizeCoordinates({
+        if (
+            coordinates[0] < -90 ||
+            coordinates[0] > 90 ||
+            coordinates[1] < -180 ||
+            coordinates[1] > 180
+        ) {
+            return null;
+        }
+
+        return {
             lat: coordinates[0],
             lon: coordinates[1],
-        });
+        };
+    }
+
+    private _fromStringMgrs(str: string): LatLon | null {
+        str = str.toUpperCase().trim();
+
+        if (converter.isUSNG(str)) {
+            const result = converter.USNGtoLL(str);
+
+            return { lat: result.south, lon: result.west };
+        }
+
+        return null;
+    }
+
+    private _fromStringUtmUps(str: string): LatLon | null {
+        str = str.toUpperCase().trim();
+        const tryConvert = (cb: () => any) => {
+            let convertResult = null;
+
+            try {
+                convertResult = cb();
+            } catch (ignore) {}
+
+            if (convertResult) {
+                return { lat: convertResult.lat, lon: convertResult.lon };
+            }
+
+            return null;
+        };
+        let result = null;
+        const ups = str
+            .match(/^([ABYZ])\s*(\d+)(?:M?E?\s+|M?E)(\d+)M?N?$/);
+
+        if (ups) {
+            result = tryConvert(() =>
+                converter.UPStoLL({
+                    northPole: ups[1] > 'M',
+                    easting: parseFloat(ups[2]),
+                    northing: parseFloat(ups[3]),
+                })
+            );
+        }
+
+        const utm = str
+            .match(
+                /^(\d+)\s*([A-Z])\s*(\d+)(?:M?E?\s+|M?E)(\d+)M?N?$/
+            );
+
+        if (!result && utm) {
+            const northern = utm[2] > 'M';
+
+            if ('ABYZ'.indexOf(utm[2]) >= 0) {
+                // Polar = UPS
+                result = tryConvert(() =>
+                    converter.UPStoLL({
+                        northPole: northern,
+                        easting: parseFloat(utm[2]),
+                        northing: parseFloat(utm[3]),
+                    })
+                );
+            } else {
+                let northing = parseFloat(utm[4]);
+
+                // "northing" needs to be adjusted for southern hemisphere
+                if (!northern) {
+                    northing = northing - 10000000;
+                }
+
+                result = tryConvert(() =>
+                    converter.UTMtoLL(
+                        northing,
+                        parseFloat(utm[3]),
+                        parseInt(utm[1], 10)
+                    )
+                );
+            }
+        }
+
+        return result;
+    }
+
+    private _padLeading(str: string): string {
+        if (str.length === 1 || str.charAt(1) === '.') {
+            return `0${str}`;
+        }
+
+        return str;
+    }
+
+    private _parseCoordinateString(str: string): number | null {
+        const parts = str.split(/ /).map((item) => parseFloat(item));
+        let negative = false;
+
+        for (let i = 0; i < parts.length; i += 1) {
+            if (isNaN(parts[i])) {
+                return null;
+            }
+
+            if (parts[i] < 0) {
+                negative = true;
+                parts[i] = -parts[i];
+            }
+        }
+
+        let multiplier = 1 / 60;
+        let result = parts.shift()!;
+
+        while (parts.length) {
+            result += parts.shift()! * multiplier;
+            multiplier /= 60;
+        }
+
+        if (negative) {
+            result = -result;
+        }
+
+        return result;
     }
 
     private _toDDD(lat: number, lon: number): LL {
