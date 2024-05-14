@@ -121,13 +121,12 @@ export class LocationFieldComponent {
             'ACCURACY',
             'ALTITUDE',
             'ALTITUDE_ACCURACY',
-            'BEARING',
             'HEADING',
             'SPEED',
         ];
 
         if (typeof this.lat === 'string' && typeof this.lon === 'string') {
-            allowedFieldTypes.push('DESTINATION', 'DISTANCE');
+            allowedFieldTypes.push('BEARING', 'DESTINATION', 'DISTANCE');
         }
 
         this._storage = this._preferenceService.field(this.id || '', allowedFieldTypes);
