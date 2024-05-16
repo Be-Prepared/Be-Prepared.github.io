@@ -93,12 +93,12 @@ import { ToastService } from '../services/toast.service';
                     <div>
                         <i18n-label id="sunMoon.enterCoordinates"></i18n-label>
                     </div>
-                    <input
+                    <pretty-input
                         type="text"
-                        @change="locationUpdate($event.target.value)"
+                        @change.stop.prevent="locationUpdate($event.detail)"
                         #ref="input"
                         class="grow"
-                    />
+                    ></pretty-input>
                 </div>
                 <div *if="allowGetLocation">
                     <load-svg
@@ -139,7 +139,7 @@ export class SunMoonAppComponent {
     allowGetLocation = false;
     coordinates: LatLon | null = null;
     gettingLocation = false;
-    input?: HTMLInputElement;
+    input: any;
     location: string = '';
     subject = new Subject();
 

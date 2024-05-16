@@ -70,25 +70,10 @@ import { WaypointService } from './waypoint.service';
             .buttons {
                 flex-direction: column-reverse;
             }
-
-            .landscape-side-by-side {
-                display: flex;
-                flex-direction: row;
-                whitespace: no-wrap;
-                width: 100%;
-                gap: 10px;
-                align-items: center;
-            }
         }
 
         .no-shrink {
             flex-shrink: 0;
-        }
-
-        input {
-            font: inherit;
-            width: 100%;
-            text-align: center;
         }
 
         .fullWidth {
@@ -109,34 +94,30 @@ import { WaypointService } from './waypoint.service';
                         ></pretty-labeled-button>
                     </div>
                     <div class="detail">
-                        <div class="landscape-side-by-side">
+                        <div class="fullWidth">
                             <div class="no-shrink">
                                 <i18n-label
                                     id="location.edit.name"
                                 ></i18n-label>
                             </div>
-                            <div class="fullWidth">
-                                <input
-                                    type="text"
-                                    value="{{point.name}}"
-                                    @change="nameChange($event.target.value)"
-                                />
-                            </div>
+                            <pretty-input
+                                class="fullWidth"
+                                value="{{point.name}}"
+                                @change="nameChange($event.detail)"
+                            ></pretty-input>
                         </div>
-                        <div class="landscape-side-by-side gapAbove">
+                        <div class="fullWidth gapAbove">
                             <div class="no-shrink">
                                 <i18n-label
                                     id="location.edit.location"
                                 ></i18n-label>
                             </div>
-                            <div class="fullWidth">
-                                <input
-                                    type="text"
-                                    value="{{location}}"
-                                    @change="locationChange($event.target.value)"
-                                    #ref="locationInput"
-                                />
-                            </div>
+                            <pretty-input
+                                class="fullWidth"
+                                value="{{location}}"
+                                @change="locationChange($event.detail)"
+                                #ref="locationInput"
+                            ></pretty-input>
                         </div>
                         <div class="gapAbove centeredText">
                             <i18n-label
@@ -172,7 +153,7 @@ export class LocationEditComponent {
     id?: string;
     lat?: number;
     location: string = '';
-    locationInput?: HTMLInputElement;
+    locationInput: any;
     lon?: number;
     point: WaypointSaved | null = null;
     validPoint = false;
