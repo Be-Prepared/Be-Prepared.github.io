@@ -1,7 +1,7 @@
 import { Component, css, emit, html } from 'fudgel';
 import { goBack } from '../util/go-back';
 
-@Component('permission-denied', {
+@Component('permission-error', {
     attr: ['messageId'],
     style: css`
         :host {
@@ -24,23 +24,19 @@ import { goBack } from '../util/go-back';
     template: html`
         <div></div>
         <div class="heading">
-            <i18n-label id="shared.permissionDenied.heading"></i18n-label>
+            <i18n-label id="shared.permissionError.heading"></i18n-label>
         </div>
         <div class="message">
-            <i18n-label id="shared.permissionDenied.message"></i18n-label>
+            <i18n-label id="shared.permissionError.message"></i18n-label>
         </div>
         <back-button></back-button>
         <div></div>
     `,
 })
-export class PermissionDeniedComponent {
+export class PermissionErrorComponent {
     messageId: string = '';
 
     goBack() {
         goBack();
-    }
-
-    grant() {
-        emit(this, 'grant');
     }
 }

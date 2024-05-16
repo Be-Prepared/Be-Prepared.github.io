@@ -1,53 +1,50 @@
 import { Component, css, di, html } from 'fudgel';
-import { CoordinateService } from '../services/coordinate.service';
+import {
+    CoordinateService,
+    CoordinateSystemDefault,
+    COORDINATE_SYSTEMS,
+    SystemCoordinates,
+} from '../services/coordinate.service';
+import { CoordinateSystem } from '../datatypes/coordinate-system';
 import { LatLon } from '../services/coordinate.service';
 import { Subscription } from 'rxjs';
 
-interface DataToDisplay {
-    lat?: string | null;
-    lon?: string | null;
-    mgrs?: string | null;
-    utmups?: string | null;
-    empty?: boolean;
+interface EmptyData {
+    empty: boolean;
 }
 
 @Component('location-coordinates', {
     prop: ['coords'],
     style: css`
+        :host {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
         .multi-line {
             display: flex;
             flex-direction: column;
+            align-items: center;
             text-align: center;
         }
     `,
     template: html`
+        <pretty-select
+            i18n-base="location.coordinates"
+            value="{{coordinateSystem}}"
+            .options="coordinateSystems"
+            @change="changeCoordinateSystem($event.detail)"
+        ></pretty-select>
         <div *if="dataToDisplay.lat" class="multi-line">
-            <changeable-setting @click="toggleCoordinateSystem()">
-                <div>{{ dataToDisplay.lat }}</div>
-                <div>{{ dataToDisplay.lon }}</div>
-            </changeable-setting>
+            <div>{{ dataToDisplay.lat }}</div>
+            <div>{{ dataToDisplay.lon }}</div>
         </div>
         <div *if="dataToDisplay.mgrs" class="multi-line">
-            <changeable-setting @click="toggleCoordinateSystem()">
-                <div>
-                    <i18n-label
-                        id="location.coordinates.mgrs"
-                        ws=""
-                    ></i18n-label>
-                </div>
-                <div>{{ dataToDisplay.mgrs }}</div>
-            </changeable-setting>
+            <div>{{ dataToDisplay.mgrs }}</div>
         </div>
         <div *if="dataToDisplay.utmups" class="multi-line">
-            <changeable-setting @click="toggleCoordinateSystem()">
-                <div>
-                    <i18n-label
-                        id="location.coordinates.utmups"
-                        ws=""
-                    ></i18n-label>
-                </div>
-                <div>{{ dataToDisplay.utmups }}</div>
-            </changeable-setting>
+            <div>{{ dataToDisplay.utmups }}</div>
         </div>
         <div *if="dataToDisplay.empty">
             <i18n-label id="location.coordinates.empty"></i18n-label>
@@ -57,13 +54,18 @@ interface DataToDisplay {
 export class LocationCoordinatesComponent {
     private _coordinateService = di(CoordinateService);
     private _subscription: Subscription | null = null;
+    coordinateSystem: CoordinateSystem = CoordinateSystemDefault;
+    coordinateSystems = COORDINATE_SYSTEMS;
     coords?: LatLon;
-    dataToDisplay: DataToDisplay = { empty: true };
+    dataToDisplay: SystemCoordinates | EmptyData = { empty: true };
 
     constructor() {
         this._subscription = this._coordinateService
             .getCurrentSetting()
-            .subscribe(() => this._redraw());
+            .subscribe((coordinateSystem) => {
+                this.coordinateSystem = coordinateSystem;
+                this._redraw();
+            });
     }
 
     onChange(prop: string) {
@@ -76,8 +78,8 @@ export class LocationCoordinatesComponent {
         this._subscription && this._subscription.unsubscribe();
     }
 
-    toggleCoordinateSystem() {
-        this._coordinateService.toggleSystem();
+    changeCoordinateSystem(value: CoordinateSystem) {
+        this._coordinateService.setCoordinateSystem(value);
     }
 
     private _redraw() {
@@ -87,17 +89,9 @@ export class LocationCoordinatesComponent {
             return;
         }
 
-        const system = this._coordinateService.latLonToSystem(
+        this.dataToDisplay = this._coordinateService.latLonToSystem(
             this.coords.lat,
-            this.coords.lon,
+            this.coords.lon
         );
-
-        // Tie to a single property for faster updates
-        this.dataToDisplay = {
-            lat: 'lat' in system ? system.lat : null,
-            lon: 'lon' in system ? system.lon : null,
-            mgrs: 'mgrs' in system ? system.mgrs : null,
-            utmups: 'utmups' in system ? system.utmups : null,
-        };
     }
 }

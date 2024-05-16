@@ -18,7 +18,7 @@ converter.E1 =
 
 export const CoordinateSystemDefault = CoordinateSystem.DMS;
 
-const COORDINATE_SYSTEMS = [
+export const COORDINATE_SYSTEMS = [
     CoordinateSystem.DMS,
     CoordinateSystem.DDM,
     CoordinateSystem.DDD,
@@ -59,6 +59,8 @@ export interface UTMUPS {
     northing: string;
     utmups: string;
 }
+
+export type SystemCoordinates = LL | MGRS | UTMUPS;
 
 export class CoordinateService {
     private _currentSetting = new BehaviorSubject<CoordinateSystem>(
@@ -127,7 +129,7 @@ export class CoordinateService {
         return closest;
     }
 
-    latLonToSystem(lat: number, lon: number): LL | MGRS | UTMUPS {
+    latLonToSystem(lat: number, lon: number): SystemCoordinates {
         const currentSetting = this._currentSetting.value;
 
         if (currentSetting === CoordinateSystem.DMS) {
@@ -168,22 +170,18 @@ export class CoordinateService {
         this._currentSetting.next(CoordinateSystemDefault);
     }
 
+    setCoordinateSystem(system: CoordinateSystem) {
+        if (COORDINATE_SYSTEMS.includes(system as CoordinateSystem)) {
+            this._currentSetting.next(system as CoordinateSystem);
+            this._preferencesService.coordinateSystem.setItem(system);
+        }
+    }
+
     standardizeCoordinates(latLon: LatLon): LatLon {
         return {
             lat: this._directionService.standardizeLatitude(latLon.lat),
             lon: this._directionService.standardize180(latLon.lon),
         };
-    }
-
-    toggleSystem() {
-        const currentIndex = COORDINATE_SYSTEMS.indexOf(
-            this._currentSetting.value
-        );
-        const newIndex = (currentIndex + 1) % COORDINATE_SYSTEMS.length;
-        this._currentSetting.next(COORDINATE_SYSTEMS[newIndex]);
-        this._preferencesService.coordinateSystem.setItem(
-            COORDINATE_SYSTEMS[newIndex]
-        );
     }
 
     private _breakIntoCoordinateChunks(

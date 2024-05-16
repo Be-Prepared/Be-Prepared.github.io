@@ -8,6 +8,11 @@ export interface DistanceOptions {
     isSpeed?: boolean;
 }
 
+export const DISTANCE_SYSTEMS = [
+    DistanceSystem.METRIC,
+    DistanceSystem.IMPERIAL,
+];
+
 export const DistanceSystemDefault = DistanceSystem.IMPERIAL;
 
 export class DistanceService {
@@ -39,13 +44,11 @@ export class DistanceService {
         this._currentSetting.next(DistanceSystemDefault);
     }
 
-    toggleSystem() {
-        const newValue =
-            this._currentSetting.value === DistanceSystem.METRIC
-                ? DistanceSystem.IMPERIAL
-                : DistanceSystem.METRIC;
-        this._currentSetting.next(newValue);
-        this._preferenceService.distanceSystem.setItem(newValue);
+    setDistanceSystem(value: DistanceSystem) {
+        if (DISTANCE_SYSTEMS.includes(value)) {
+            this._currentSetting.next(value);
+            this._preferenceService.distanceSystem.setItem(value);
+        }
     }
 
     private _fixed(n: number): string {

@@ -1,5 +1,4 @@
 import { Component, css, di, html } from 'fudgel';
-import { I18nService } from '../i18n/i18n.service';
 import { LocalStorageInterface } from '../services/local-storage.service';
 import { PreferenceService } from '../services/preference.service';
 
@@ -50,74 +49,61 @@ interface FieldInfo {
     template: html`
         <div class="field-line">
             <div class="field-label-wrapper">
-                <div class="field-label">
-                    <changeable-setting
-                        >{{selectedField.heading}}</changeable-setting
-                    >
-                    <select
-                        id="{{id}}"
-                        #ref="select"
-                        class="hidden-select"
-                        @change="selectField($event.target.value)"
-                    >
-                        <option
-                            *for="field of allowedFields"
-                            value="{{field.id}}"
-                        >
-                            {{field.label}}
-                        </option>
-                    </select>
-                </div>
+                <pretty-select
+                    i18n-base="location.field"
+                    value="{{selectedValue}}"
+                    .options="allowedFields"
+                    @change="selectValue($event.detail)"
+                ></pretty-select>
             </div>
             <div class="field-value-wrapper">
                 <location-field-accuracy
-                    *if="selectedField.id === 'ACCURACY'"
+                    *if="selectedValue === 'ACCURACY'"
                 ></location-field-accuracy>
                 <location-field-altitude
-                    *if="selectedField.id === 'ALTITUDE'"
+                    *if="selectedValue === 'ALTITUDE'"
                 ></location-field-altitude>
                 <location-field-altitude-accuracy
-                    *if="selectedField.id === 'ALTITUDE_ACCURACY'"
+                    *if="selectedValue === 'ALTITUDE_ACCURACY'"
                 ></location-field-altitude-accuracy>
                 <location-field-distance
-                    *if="selectedField.id === 'BEARING'"
+                    *if="selectedValue === 'BEARING'"
                     lat="{{lat}}"
                     lon="{{lon}}"
                 ></location-field-distance>
                 <location-field-destination
-                    *if="selectedField.id === 'DESTINATION'"
+                    *if="selectedValue === 'DESTINATION'"
                     name="{{name}}"
                 ></location-field-destination>
                 <location-field-distance
-                    *if="selectedField.id === 'DISTANCE'"
+                    *if="selectedValue === 'DISTANCE'"
                     lat="{{lat}}"
                     lon="{{lon}}"
                 ></location-field-distance>
                 <location-field-heading
-                    *if="selectedField.id === 'HEADING'"
+                    *if="selectedValue === 'HEADING'"
                 ></location-field-heading>
                 <location-field-speed
-                    *if="selectedField.id === 'SPEED'"
+                    *if="selectedValue === 'SPEED'"
                 ></location-field-speed>
             </div>
         </div>
     `,
 })
 export class LocationFieldComponent {
-    private _i18nService = di(I18nService);
     private _preferenceService = di(PreferenceService);
     private _storage?: LocalStorageInterface<string>;
-    allowedFields: FieldInfo[] = [];
+    allowedFields: string[] = [];
     default?: string;
     id?: string;
     lat?: string;
     lon?: string;
     name?: string;
     select?: HTMLSelectElement;
-    selectedField?: FieldInfo;
+    selectedValue = '';
 
     onInit() {
-        const allowedFieldTypes = [
+        const allowedFields = [
             'ACCURACY',
             'ALTITUDE',
             'ALTITUDE_ACCURACY',
@@ -126,48 +112,19 @@ export class LocationFieldComponent {
         ];
 
         if (typeof this.lat === 'string' && typeof this.lon === 'string') {
-            allowedFieldTypes.push('BEARING', 'DESTINATION', 'DISTANCE');
+            allowedFields.push('BEARING', 'DESTINATION', 'DISTANCE');
         }
 
-        this._storage = this._preferenceService.field(this.id || '', allowedFieldTypes);
-
-        for (const id of allowedFieldTypes) {
-            this.allowedFields.push({
-                heading: this._i18nService.get(`location.field.${id}.heading`),
-                id,
-                label: this._i18nService.get(`location.field.${id}.label`),
-            });
-        }
-
-        this.allowedFields.sort((a, b) => a.label.localeCompare(b.label));
-
-        if (!this.id) {
-            return;
-        }
-
-        const selectedFieldId = this._storage.getItem();
-        this.selectedField =
-            this._findFieldById(selectedFieldId || '') ||
-            this._findFieldById(this.default || '') ||
-            this.allowedFields[0];
+        this._storage = this._preferenceService.field(
+            this.id || '',
+            allowedFields
+        );
+        this.allowedFields = allowedFields;
+        this.selectedValue = this._storage.getItem() || this.default || 'UNKNOWN';
     }
 
-    onViewInit() {
-        if (this.select && this.selectedField) {
-            this.select.value = this.selectedField.id;
-        }
-    }
-
-    selectField(id: string) {
-        const field = this._findFieldById(id);
-
-        if (field) {
-            this.selectedField = field;
-            this._storage!.setItem(id);
-        }
-    }
-
-    private _findFieldById(id: string) {
-        return this.allowedFields.find((item) => item.id === id);
+    selectValue(value: string) {
+        this.selectedValue = value;
+        this._storage!.setItem(value);
     }
 }

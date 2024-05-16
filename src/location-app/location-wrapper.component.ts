@@ -79,6 +79,7 @@ import { takeUntil } from 'rxjs/operators';
         ></permission-prompt>
         <permission-denied *if="explainDeny"></permission-denied>
         <location-unavailable *if="explainUnavailable"></location-unavailable>
+        <permission-error *if="explainError"></permission-error>
         <div *if="showControls" class="full">
             <slot></slot>
         </div>
@@ -92,6 +93,7 @@ export class LocationWrapperComponent {
     control = 'current';
     explainAsk = false;
     explainDeny = false;
+    explainError = false;
     explainUnavailable = false;
     showControls = false;
     waypointId?: number;
@@ -105,6 +107,7 @@ export class LocationWrapperComponent {
                 this.explainDeny = value === AvailabilityState.DENIED;
                 this.explainUnavailable =
                     value === AvailabilityState.UNAVAILABLE;
+                this.explainError = value === AvailabilityState.ERROR;
                 this.showControls = value === AvailabilityState.ALLOWED;
 
                 if (this.showControls) {

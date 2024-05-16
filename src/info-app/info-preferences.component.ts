@@ -1,12 +1,16 @@
 import { Component, css, di, html } from 'fudgel';
 import {
     CoordinateService,
+    COORDINATE_SYSTEMS,
     CoordinateSystemDefault,
 } from '../services/coordinate.service';
+import { CoordinateSystem } from '../datatypes/coordinate-system';
 import {
     DistanceService,
+    DISTANCE_SYSTEMS,
     DistanceSystemDefault,
 } from '../services/distance.service';
+import { DistanceSystem } from '../datatypes/distance-system';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ToastService } from '../services/toast.service';
@@ -17,17 +21,21 @@ import { ToastService } from '../services/toast.service';
         <ul>
             <li>
                 <i18n-label id="info.coordinates"></i18n-label>
-                <changeable-setting @click="toggleCoordinates()">
-                    <i18n-label
-                        id="info.coordinates.{{coordinates}}"
-                    ></i18n-label>
-                </changeable-setting>
+                <pretty-select
+                    i18n-base="location.coordinates"
+                    value="{{coordinateSystem}}"
+                    .options="coordinateSystems"
+                    @change="changeCoordinateSystem($event.detail)"
+                ></pretty-select>
             </li>
             <li>
                 <i18n-label id="info.distances"></i18n-label>
-                <changeable-setting @click="toggleDistances()">
-                    <i18n-label id="info.distances.{{distances}}"></i18n-label>
-                </changeable-setting>
+                <pretty-select
+                    i18n-base="info.distances"
+                    value="{{distanceSystem}}"
+                    .options="distanceSystems"
+                    @change="changeDistanceSystem($event.detail)"
+                ></pretty-select>
             </li>
             <li>
                 <changeable-setting @click="reset()"
@@ -42,21 +50,23 @@ export class InfoPreferencesComponent {
     private _distanceService = di(DistanceService);
     private _subject = new Subject();
     private _toastService = di(ToastService);
-    coordinates = CoordinateSystemDefault;
-    distances = DistanceSystemDefault;
+    coordinateSystem: CoordinateSystem = CoordinateSystemDefault;
+    coordinateSystems = COORDINATE_SYSTEMS;
+    distanceSystem: DistanceSystem = DistanceSystemDefault;
+    distanceSystems = DISTANCE_SYSTEMS;
 
     onInit() {
         this._coordinateService
             .getCurrentSetting()
             .pipe(takeUntil(this._subject))
-            .subscribe((value) => {
-                this.coordinates = value;
+            .subscribe((coordinateSystem) => {
+                this.coordinateSystem = coordinateSystem;
             });
         this._distanceService
             .getCurrentSetting()
             .pipe(takeUntil(this._subject))
             .subscribe((value) => {
-                this.distances = value;
+                this.distanceSystem = value;
             });
     }
 
@@ -65,17 +75,17 @@ export class InfoPreferencesComponent {
         this._subject.complete();
     }
 
+    changeCoordinateSystem(value: CoordinateSystem) {
+        this._coordinateService.setCoordinateSystem(value);
+    }
+
+    changeDistanceSystem(value: DistanceSystem) {
+        this._distanceService.setDistanceSystem(value);
+    }
+
     reset() {
         this._coordinateService.reset();
         this._distanceService.reset();
         this._toastService.popI18n('info.preferences.resetComplete');
-    }
-
-    toggleCoordinates() {
-        this._coordinateService.toggleSystem();
-    }
-
-    toggleDistances() {
-        this._distanceService.toggleSystem();
     }
 }

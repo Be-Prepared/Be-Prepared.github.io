@@ -1,4 +1,4 @@
 export enum DistanceSystem {
-    IMPERIAL = 'imperial',
-    METRIC = 'metric',
+    IMPERIAL = 'IMPERIAL',
+    METRIC = 'METRIC',
 }
