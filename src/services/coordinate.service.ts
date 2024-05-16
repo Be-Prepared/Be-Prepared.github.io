@@ -3,7 +3,7 @@ import CheapRuler from 'cheap-ruler';
 import { cities } from '../cities';
 import { Converter } from 'usng.js';
 import { CoordinateSystem } from '../datatypes/coordinate-system';
-import { di } from 'fudgel/dist/only-di';
+import { di } from 'fudgel/dist/di';
 import { DirectionService } from './direction.service';
 import { PreferenceService } from './preference.service';
 
