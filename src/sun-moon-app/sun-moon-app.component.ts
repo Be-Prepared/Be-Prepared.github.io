@@ -2,7 +2,7 @@ import { AvailabilityState } from '../datatypes/availability-state';
 import { Component, css, di, html } from 'fudgel';
 import { CoordinateService, LatLon } from '../services/coordinate.service';
 import { GeolocationService } from '../services/geolocation.service';
-import { first, takeUntil, tap } from 'rxjs/operators';
+import { finalize, first, takeUntil } from 'rxjs/operators';
 import { I18nService } from '../i18n/i18n.service';
 import { PreferenceService } from '../services/preference.service';
 import { Subject } from 'rxjs';
@@ -91,6 +91,12 @@ import { ToastService } from '../services/toast.service';
             justify-content: space-between;
             align-items: flex-end;
         }
+
+        .getting-location {
+            display: flex;
+            padding: 0.5em;
+            border: 1px solid var(--fg-color);
+        }
     `,
     template: html`
         <div class="content">
@@ -136,6 +142,11 @@ import { ToastService } from '../services/toast.service';
         <div class="buttons">
             <back-button class="paddingTop"></back-button>
         </div>
+        <show-modal *if="gettingLocation">
+            <div class="getting-location">
+                <i18n-label id="sunMoon.geolocation"></i18n-label>
+            </div>
+        </show-modal>
     `,
 })
 export class SunMoonAppComponent {
@@ -199,7 +210,7 @@ export class SunMoonAppComponent {
             .pipe(
                 takeUntil(this.subject),
                 first(),
-                tap(() => {
+                finalize(() => {
                     this.gettingLocation = false;
                 })
             )
