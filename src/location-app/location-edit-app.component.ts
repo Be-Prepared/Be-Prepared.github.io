@@ -160,6 +160,7 @@ export class LocationEditComponent {
     lon?: number;
     nameUrlEncode: string = '';
     point: WaypointSaved | null = null;
+    showQr = false;
     validPoint = false;
 
     onInit() {
