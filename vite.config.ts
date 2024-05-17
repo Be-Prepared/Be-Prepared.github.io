@@ -72,6 +72,10 @@ export default defineConfig({
                         protocol: 'geo',
                         url: '/location-add?location=%s',
                     },
+                    {
+                        protocol: 'web+geo',
+                        url: '/location-add?location=%s',
+                    },
                 ],
                 theme_color: '#000000',
             },
