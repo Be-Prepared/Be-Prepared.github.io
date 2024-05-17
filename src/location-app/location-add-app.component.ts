@@ -1,4 +1,5 @@
 import { catchError, first, tap, timeout } from 'rxjs/operators';
+import { CoordinateService } from '../services/coordinate.service';
 import { Component, css, di, html } from 'fudgel';
 import { GeolocationService } from '../services/geolocation.service';
 import { I18nService } from '../i18n/i18n.service';
@@ -23,18 +24,27 @@ import { WaypointService } from './waypoint.service';
     </location-wrapper>`,
 })
 export class LocationAddAppComponent {
+    private _coordinateService = di(CoordinateService);
     private _geolocationService = di(GeolocationService);
     private _i18nService = di(I18nService);
     private _miniMustacheService = di(MiniMustacheService);
     private _subscription?: Subscription;
     private _waypointService = di(WaypointService);
-    id?: string;
-    location: string = '';
-    point: WaypointSaved | null = null;
 
     onInit() {
+        const params = new URLSearchParams(window.location.search);
         const point = this._waypointService.newPoint();
         point.name = this._makeName(point);
+        const parsedLocation = this._coordinateService.fromString(
+            params.get('location') || ''
+        );
+
+        if (parsedLocation) {
+            point.lat = parsedLocation.lat;
+            point.lon = parsedLocation.lon;
+            this._proceed(point);
+        }
+
         this._subscription = this._geolocationService
             .getPosition()
             .pipe(
@@ -49,12 +59,7 @@ export class LocationAddAppComponent {
                 catchError(() => of(null))
             )
             .subscribe(() => {
-                this._waypointService.updatePoint(point);
-                history.replaceState(
-                    {},
-                    document.title,
-                    `/location-edit/${point.id}`
-                );
+                this._proceed(point);
             });
     }
 
@@ -69,5 +74,10 @@ export class LocationAddAppComponent {
         });
 
         return name;
+    }
+
+    _proceed(point: WaypointSaved) {
+        this._waypointService.updatePoint(point);
+        history.replaceState({}, document.title, `/location-edit/${point.id}`);
     }
 }

@@ -14,4 +14,5 @@ export * from './pretty-input.component';
 export * from './pretty-labeled-button.component';
 export * from './pretty-select.component';
 export * from './scaling-icon.component';
+export * from './show-modal.component';
 export * from './styled-link.component';

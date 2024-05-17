@@ -4,6 +4,7 @@ import { Component, css, di, html } from 'fudgel';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { TorchService } from '../services/torch.service';
+import { UrlService } from '../services/url.service';
 
 interface DetectedBarcode {
     boundingBox: DOMRectReadOnly;
@@ -44,24 +45,12 @@ interface DetectedBarcode {
             color: var(--button-fg-color-enabled);
         }
 
-        .blur {
-            filter: blur(5px);
-        }
-
-        .barcodeFound {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #7f7f7f7f;
-        }
-
         .rawValue {
             background-color: var(--bg-color);
             padding: 1em;
             border-radius: 0.5em;
             font-size: 1.4em;
+            word-wrap: break-word;
         }
     `,
     template: html`
@@ -95,11 +84,17 @@ interface DetectedBarcode {
                     href="/flashlight.svg"
                 ></scaling-icon>
             </div>
-            <div *if="barcodeFound" class="barcodeFound" @click="resetFound()">
-                <div class="rawValue">
-                    {{barcodeFound.rawValue}}
+            <show-modal *if="barcodeFound" @clickoutside="resetFound()">
+                <div class="rawValue" @click="resetFound()">
+                    <styled-link
+                        *if="isUrl"
+                        href="{{barcodeFound.rawValue}}"
+                        target="_blank"
+                        >{{barcodeFound.rawValue}}</styled-link
+                    >
+                    <span *if="!isUrl"> {{barcodeFound.rawValue}} </span>
                 </div>
-            </div>
+            </show-modal>
         </div>
     `,
 })
@@ -109,11 +104,13 @@ export class BarcodeReaderAppComponent {
     private _barcodeReaderService = di(BarcodeReaderService);
     private _subject = new Subject();
     private _torchService = di(TorchService);
+    private _urlService = di(UrlService);
     barcodeFound: DetectedBarcode | null = null;
     bottom?: HTMLElement;
     explainAsk = false;
     explainDeny = false;
     explainUnavailable = false;
+    isUrl = false;
     showControls = false;
     torchAvailable = false;
     torchClass = '';
@@ -159,7 +156,7 @@ export class BarcodeReaderAppComponent {
 
     resetFound() {
         this.barcodeFound = null;
-        this._updateBlur();
+        this.isUrl = false;
         this._barcodeDetectionStart();
     }
 
@@ -179,9 +176,10 @@ export class BarcodeReaderAppComponent {
                 if (result.length) {
                     this._barcodeDetectionStop();
                     this.barcodeFound = result[0];
-                    this._updateBlur();
+                    this.isUrl = this._urlService.isUrl(result[0].rawValue);
                 } else {
-                    this._animationFrame = requestAnimationFrame(performDetection);
+                    this._animationFrame =
+                        requestAnimationFrame(performDetection);
                 }
             });
         };
@@ -219,15 +217,5 @@ export class BarcodeReaderAppComponent {
 
             this._setupTorch();
         });
-    }
-
-    private _updateBlur() {
-        if (this.barcodeFound) {
-            this.video?.classList.add('blur');
-            this.bottom?.classList.add('blur');
-        } else {
-            this.video?.classList.remove('blur');
-            this.bottom?.classList.remove('blur');
-        }
     }
 }

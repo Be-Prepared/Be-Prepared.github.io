@@ -4,6 +4,10 @@ import { NfcScanResult } from '../services/nfc.service';
 @Component('nfc-scan-result', {
     prop: ['scanResult'],
     style: css`
+        .breakWord {
+            word-break: break-word;
+        }
+
         .gapAbove {
             padding-top: 0.3em;
         }
@@ -16,7 +20,7 @@ import { NfcScanResult } from '../services/nfc.service';
             <i18n-label id="nfc.scanResult.timestamp"></i18n-label>
             {{ scanResult.timestamp.toLocaleString() }}
         </div>
-        <div *if="scanResult && scanResult.serialNumber">
+        <div *if="scanResult && scanResult.serialNumber" class="breakWord">
             <i18n-label id="nfc.scanResult.serialNumber"></i18n-label>
             {{ scanResult.serialNumber }}
         </div>

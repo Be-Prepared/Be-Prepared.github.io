@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import minifyLiterals from 'rollup-plugin-minify-html-literals-v3';
 import { resolve } from 'path';
 import simpleHtmlPlugin from 'vite-plugin-simple-html';
-import { vitePluginVersionMark } from 'vite-plugin-version-mark'
+import { vitePluginVersionMark } from 'vite-plugin-version-mark';
 import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
@@ -13,14 +13,14 @@ export default defineConfig({
         rollupOptions: {
             input: {
                 index: resolve(__dirname, 'site/index.html'),
-                404: resolve(__dirname, 'site/404.html')
-            }
+                404: resolve(__dirname, 'site/404.html'),
+            },
         },
         target: 'es6',
         minify: 'esbuild',
     },
     esbuild: {
-        mangleProps: /^_/
+        mangleProps: /^_/,
     },
     clearScreen: false,
     define: {
@@ -39,7 +39,7 @@ export default defineConfig({
         }),
         minifyLiterals(),
         simpleHtmlPlugin({
-            minify: true
+            minify: true,
         }),
         VitePWA({
             manifest: {
@@ -66,8 +66,14 @@ export default defineConfig({
                         purpose: 'maskable',
                     },
                 ],
-                name: "Be Prepared",
-                theme_color: "#000000",
+                name: 'Be Prepared',
+                protocol_handlers: [
+                    {
+                        protocol: 'geo',
+                        url: '/location-add?location=%s',
+                    },
+                ],
+                theme_color: '#000000',
             },
             registerType: 'prompt',
             workbox: {
