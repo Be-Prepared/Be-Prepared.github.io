@@ -112,7 +112,7 @@ import { WakeLockService } from '../services/wake-lock.service';
                 <ul>
                     <li>
                         <styled-link
-                            href="https://github.com/fidian/be-prepared"
+                            href="https://github.com/be-Prepared/Be-Prepared.github.io/"
                             >GitHub</styled-link
                         >
                         - <i18n-label id="info.sourceCode"></i18n-label>
