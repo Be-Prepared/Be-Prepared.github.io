@@ -2,12 +2,6 @@ import { Component, css, di, html } from 'fudgel';
 import { LocalStorageInterface } from '../services/local-storage.service';
 import { PreferenceService } from '../services/preference.service';
 
-interface FieldInfo {
-    heading: string;
-    id: string;
-    label: string;
-}
-
 @Component('location-field', {
     attr: ['default', 'id', 'lat', 'lon', 'name'],
     style: css`

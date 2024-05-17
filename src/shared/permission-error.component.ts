@@ -1,4 +1,4 @@
-import { Component, css, emit, html } from 'fudgel';
+import { Component, css, html } from 'fudgel';
 import { goBack } from '../util/go-back';
 
 @Component('permission-error', {

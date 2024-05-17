@@ -51,6 +51,14 @@ export class DistanceService {
         }
     }
 
+    toggleSystem() {
+        const newValue =
+            this._currentSetting.value === DistanceSystem.METRIC
+                ? DistanceSystem.IMPERIAL
+                : DistanceSystem.METRIC;
+        this.setDistanceSystem(newValue);
+    }
+
     private _fixed(n: number): string {
         const a = Math.abs(n);
         let digits = 0;

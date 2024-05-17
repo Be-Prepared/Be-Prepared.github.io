@@ -55,7 +55,7 @@ import { I18nService } from '../i18n/i18n.service';
         </div>
     `,
 })
-export class InfoAppComponent {
+export class LocationHelpAppComponent {
     private _i18nService = di(I18nService);
     container?: HTMLElement;
 
