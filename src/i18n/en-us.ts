@@ -91,7 +91,7 @@ export const enUS: LanguageData = {
     'location.field.UNKNOWN': 'Unknown',
     'location.field.unknownValue': 'Unknown',
     'location.help.html': html`
-        <p>Locations may be entered using a variety of common formats. Most symbols can be ignored and often spaces can be skipped as well. The examples listed here are not comprehensive, but should be able to illustrate many possibilities.</p>
+        <p>Locations may be entered using a variety of common formats. Capitalization does not matter, most symbols can be ignored, and often spaces can be skipped as well. The examples listed here are not comprehensive, but should be able to illustrate many possibilities.</p>
         <p>City names:</p>
         <ul>
             <li>Paris</li>
