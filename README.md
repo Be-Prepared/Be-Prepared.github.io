@@ -106,6 +106,3 @@ Pull requests for additional functionality are welcome. Please make sure you mai
 * No access to local files; using `localStorage` is acceptable.
 * No sending data off the application.
 * Most animations and extra frills are limited to conserve battery and space.
-
-<!-- This is so the README file is indexed -->
-<meta name="google-site-verification" content="bYY36AiBe33EDKZIcVwF1oId3ntbhQWZxZ-J2_BAXyg" />
