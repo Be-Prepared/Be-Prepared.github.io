@@ -85,13 +85,20 @@ import { ToastService } from '../services/toast.service';
             width: 3em;
             height: 3em;
         }
+
+        .space-between-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
     `,
     template: html`
         <div class="content">
             <div class="location">
                 <div class="grow coordinates">
-                    <div>
+                    <div class="space-between-bottom">
                         <i18n-label id="sunMoon.enterCoordinates"></i18n-label>
+                        <location-coordinate-info></location-coordinate-info>
                     </div>
                     <pretty-input
                         type="text"

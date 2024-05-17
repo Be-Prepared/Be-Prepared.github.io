@@ -76,6 +76,12 @@ import { WaypointService } from './waypoint.service';
             flex-shrink: 0;
         }
 
+        .space-between-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
         .fullWidth {
             width: 100%;
         }
@@ -107,10 +113,11 @@ import { WaypointService } from './waypoint.service';
                             ></pretty-input>
                         </div>
                         <div class="fullWidth gapAbove">
-                            <div class="no-shrink">
+                            <div class="no-shrink space-between-bottom">
                                 <i18n-label
                                     id="location.edit.location"
                                 ></i18n-label>
+                                <location-coordinate-info></location-coordinate-info>
                             </div>
                             <pretty-input
                                 class="fullWidth"
@@ -122,11 +129,6 @@ import { WaypointService } from './waypoint.service';
                         <div class="gapAbove centeredText">
                             <i18n-label
                                 id="location.edit.helpSave"
-                            ></i18n-label>
-                        </div>
-                        <div class="gapAbove centeredText">
-                            <i18n-label
-                                id="location.edit.helpCoordinates"
                             ></i18n-label>
                         </div>
                     </div>

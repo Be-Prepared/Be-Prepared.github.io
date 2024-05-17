@@ -34,8 +34,8 @@ const fromStringScenarios = {
     '17N 630084 4833438': '43.6425618,-79.3871429', // Tricky conversion
     '17G 630084 4833438': '-46.6399918,-79.3003131', // Tricky conversion
     '21K 216524 7452328': '-23.0133344,-59.7656388',
-    // '216525 7452329': null, // Possible future shorthand
-    // 'G216525 7452329': null, // Possible future shorthand
+    '216525 7452329': null, // Possible future shorthand
+    'G216525 7452329': null, // Possible future shorthand
     '25X 521873 9289265': '83.6491739,-31.2285870', // Polar area
 
     // Unknown

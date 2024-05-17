@@ -1,5 +1,6 @@
 export * from './location-add-app.component.ts';
 export * from './location-app.component.ts';
+export * from './location-coordinate-info.component.ts';
 export * from './location-coordinates.component.ts';
 export * from './location-edit-app.component.ts';
 export * from './location-field-accuracy.component.ts';
@@ -11,6 +12,7 @@ export * from './location-field-destination.component.ts';
 export * from './location-field-distance.component.ts';
 export * from './location-field-heading.component.ts';
 export * from './location-field-speed.component.ts';
+export * from './location-help-app.component.ts';
 export * from './location-list-app.component.ts';
 export * from './location-navigate-app.component.ts';
 export * from './location-qr-app.component.ts';

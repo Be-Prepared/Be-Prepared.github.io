@@ -1,3 +1,4 @@
+import { html } from 'fudgel';
 import type { LanguageData } from './language-data';
 
 export const enUS: LanguageData = {
@@ -72,9 +73,8 @@ export const enUS: LanguageData = {
     'location.coordinates.MGRS': 'MGRS',
     'location.coordinates.UTMUPS': 'UTM/UPS',
     'location.edit.badLocation': 'Invalid location',
+    'location.coordinateInfo': 'More Info',
     'location.edit.delete': 'Delete',
-    'location.edit.helpCoordinates':
-        'Locations can be entered using many common formats or a major city name.',
     'location.edit.helpSave': 'Changes are saved automatically.',
     'location.edit.location': 'Location:',
     'location.edit.name': 'Waypoint Name:',
@@ -90,6 +90,47 @@ export const enUS: LanguageData = {
     'location.field.SPEED': 'Speed',
     'location.field.UNKNOWN': 'Unknown',
     'location.field.unknownValue': 'Unknown',
+    'location.help.html': html`
+        <p>Locations may be entered using a variety of common formats. Most symbols can be ignored and often spaces can be skipped as well. The examples listed here are not comprehensive, but should be able to illustrate many possibilities.</p>
+        <p>City names:</p>
+        <ul>
+            <li>Paris</li>
+            <li>NEW YORK CITY</li>
+            <li>los angeles</li>
+        </ul>
+        <p>Decimal degrees:</p>
+        <ul>
+            <li>N 40° 26' 118.432" W 79° 58' 18.110"</li>
+            <li>40 26 118.432 N 79 58 18.110 W</li>
+            <li>40 26 118.432 -79 58 18.110</li>
+        </ul>
+        <p>Degrees decimal minutes:</p>
+        <ul>
+            <li>N 40° 26.123' W 79° 58.301'</li>
+            <li>40 26.123 N 79 58.301 W</li>
+            <li>40 26.123 -79 58.301</li>
+        </ul>
+        <p>Degrees minutes seconds:</p>
+        <ul>
+            <li>N 40° 26' 07.443" W 79° 58' 18.671"</li>
+            <li>40 26 7.443 N 79 58 18.671 W</li>
+            <li>40 26 7.443 -79 58 18.671</li>
+        </ul>
+        <p>MGRS:</p>
+        <ul>
+            <li>21K TQ 16525 52329</li>
+            <li>18SUJ2337106519</li>
+            <li>25X EN 21872 89264</li>
+        </ul>
+        <p>UTM/UPS:</p>
+        <ul>
+            <li>17 T 582561mE 4478883mN</li>
+            <li>17T 582561 4478883</li>
+            <li>17T582561 4478883</li>
+            <li>B 2226827 2818270</li>
+            <li>25x 521873 9289265</li>
+        </ul>
+    `,
     'location.navigation.COMPASS': 'Compass',
     'location.navigation.DIRECTION_OF_TRAVEL': 'Direction of Travel',
     'location.navigation.NORTH_UP': 'North Up',
@@ -145,9 +186,9 @@ export const enUS: LanguageData = {
     'service.wakeLock.obtained': 'Keeping Screen On',
 
     // Sun & Moon
-    'sunMoon.enterCoordinates': 'Enter coordinates or major city name:',
+    'sunMoon.enterCoordinates': 'Enter location:',
     'sunMoon.geolocationError': 'Error getting current position',
-    'sunMoon.locationUnknown': 'Enter a location',
+    'sunMoon.locationUnknown': 'Location needed',
     'sunMoon.nearestMajorCity.label': 'Nearest major city:',
     'sunMoon.moonIllumination.firstQuarter': 'First quarter',
     'sunMoon.moonIllumination.fullMoon': 'Full moon',
