@@ -1,4 +1,4 @@
-import { Component, css, di, html } from 'fudgel';
+import { Component, css, di, emit, html } from 'fudgel';
 import { QrService } from '../services/qr.service';
 import { ToastService } from '../services/toast.service';
 
@@ -64,6 +64,6 @@ export class InfoShareComponent {
     }
 
     openQrCode() {
-        history.pushState({}, document.title, '/info-qr');
+        emit(this, 'qr');
     }
 }

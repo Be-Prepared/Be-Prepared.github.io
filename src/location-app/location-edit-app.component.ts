@@ -1,6 +1,5 @@
 import { Component, css, di, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
-import { GeolocationService } from '../services/geolocation.service';
 import { Subscription } from 'rxjs';
 import { ToastService } from '../services/toast.service';
 import { WaypointSaved } from '../datatypes/waypoint-saved';
@@ -92,7 +91,7 @@ import { WaypointService } from './waypoint.service';
                 <div class="content">
                     <div class="delete">
                         <pretty-button @click="openQrCode()" padding="0px">
-                            <mini-qr content="geo:{{lat}},{{lon}}"></mini-qr>
+                            <mini-qr content="geo:{{lat}},{{lon}}?q={{nameUrlEncode}}"></mini-qr>
                         </pretty-button>
                         <pretty-labeled-button
                             @click="deletePoint()"
@@ -143,6 +142,9 @@ import { WaypointService } from './waypoint.service';
                     ></scaling-icon>
                 </div>
             </div>
+            <show-modal *if="showQr" @clickoutside="closeQrCode()">
+                <big-qr @click="closeQrCode()" content="geo:{{lat}},{{lon}}?q={{nameUrlEncode}}"></big-qr>
+            </show-modal>
         </location-wrapper>
     `,
 })
@@ -156,6 +158,7 @@ export class LocationEditComponent {
     location: string = '';
     locationInput: any;
     lon?: number;
+    nameUrlEncode: string = '';
     point: WaypointSaved | null = null;
     validPoint = false;
 
@@ -173,13 +176,17 @@ export class LocationEditComponent {
         }
 
         this.point = point;
-        this._updateLatLon();
+        this._updatePointProperties();
         this._updateLocation();
         this.validPoint = true;
     }
 
     onDestroy() {
         this._subscription && this._subscription.unsubscribe();
+    }
+
+    closeQrCode() {
+        this.showQr = false;
     }
 
     deletePoint() {
@@ -193,7 +200,7 @@ export class LocationEditComponent {
         if (convertedLocation) {
             this.point!.lat = convertedLocation.lat;
             this.point!.lon = convertedLocation.lon;
-            this._updateLatLon();
+            this._updatePointProperties();
             this._waypointService.updatePoint(this.point!);
             this._updateLocation();
             this.validPoint = true;
@@ -217,16 +224,13 @@ export class LocationEditComponent {
     }
 
     openQrCode() {
-        history.pushState(
-            {},
-            document.title,
-            `/location-qr/${this.point!.id}`,
-        );
+        this.showQr = true;
     }
 
-    private _updateLatLon() {
+    private _updatePointProperties() {
         this.lat = this.point!.lat;
         this.lon = this.point!.lon;
+        this.nameUrlEncode = encodeURIComponent(this.point!.name);
     }
 
     private _updateLocation() {

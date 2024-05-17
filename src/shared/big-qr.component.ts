@@ -5,9 +5,6 @@ import { QrService } from '../services/qr.service';
     attr: ['content'],
     style: css`
         :host {
-            position: fixed;
-            background-color: var(--bg-color);
-            inset: 0;
             display: flex;
             justify-content: center;
             align-items: center;

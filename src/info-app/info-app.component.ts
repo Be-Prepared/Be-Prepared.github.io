@@ -57,7 +57,7 @@ import { WakeLockService } from '../services/wake-lock.service';
         <div class="wrapper">
             <div class="wrapperInner">
                 <p><i18n-label id="info.shareApp"></i18n-label></p>
-                <info-share></info-share>
+                <info-share @qr="openQrCode()"></info-share>
 
                 <p><i18n-label id="info.latestChangesHeader"></i18n-label></p>
                 <ul>
@@ -151,6 +151,9 @@ import { WakeLockService } from '../services/wake-lock.service';
         <div class="buttons">
             <back-button></back-button>
         </div>
+        <show-modal *if="showQr" @clickoutside="closeQrCode()">
+            <big-qr @click="closeQrCode()" content="{{website}}"></big-qr>
+        </show-modal>
     `,
 })
 export class InfoAppComponent {
@@ -167,9 +170,11 @@ export class InfoAppComponent {
     nodeVersion = __NODE_VERSION__;
     position = AvailabilityState.ERROR;
     shortVersion = __BE_PREPARED_VERSION__.substr(0, 7);
+    showQr = false;
     torch = AvailabilityState.ERROR;
     version = __BE_PREPARED_VERSION__;
     wakeLock = AvailabilityState.ERROR;
+    website = __WEBSITE__;
 
     constructor() {
         this._geolocationService
@@ -201,5 +206,13 @@ export class InfoAppComponent {
     onDestroy() {
         this._subject.next(null);
         this._subject.complete();
+    }
+
+    closeQrCode() {
+        this.showQr = false;
+    }
+
+    openQrCode() {
+        this.showQr = true;
     }
 }
