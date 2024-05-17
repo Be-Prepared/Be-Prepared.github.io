@@ -63,12 +63,6 @@ interface DetectedBarcode {
         <camera-unavailable *if="explainUnavailable"></camera-unavailable>
         <div *if="showControls" class="wrapper">
             <video
-                @pointerdown.stop.prevent="pointerDown($event)"
-                @pointermove.stop.prevent="pointerMove($event)"
-                @pointerup.stop.prevent="pointerUp($event)"
-                @pointercancel.stop.prevent="pointerUp($event)"
-                @pointerout.stop.prevent="pointerUp($event)"
-                @pointerleave.stop.prevent="pointerUp($event)"
                 #ref="video"
                 autoplay
                 muted

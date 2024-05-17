@@ -9,6 +9,7 @@ import { WaypointSaved } from '../datatypes/waypoint-saved';
 import { WaypointService } from './waypoint.service';
 
 @Component('location-add-app', {
+    attr: ['geo'],
     style: css`
         .full {
             display: flex;
@@ -17,11 +18,15 @@ import { WaypointService } from './waypoint.service';
             height: 100%;
         }
     `,
-    template: html` <location-wrapper>
-        <div class="full">
-            <i18n-label id="location.add.gettingCurrentLocation"></i18n-label>
-        </div>
-    </location-wrapper>`,
+    template: html`
+        <location-wrapper>
+            <div class="full">
+                <i18n-label
+                    id="location.add.gettingCurrentLocation"
+                ></i18n-label>
+            </div>
+        </location-wrapper>
+    `,
 })
 export class LocationAddAppComponent {
     private _coordinateService = di(CoordinateService);
@@ -30,37 +35,14 @@ export class LocationAddAppComponent {
     private _miniMustacheService = di(MiniMustacheService);
     private _subscription?: Subscription;
     private _waypointService = di(WaypointService);
+    geo?: string;
 
     onInit() {
-        const params = new URLSearchParams(window.location.search);
-        const point = this._waypointService.newPoint();
-        point.name = this._makeName(point);
-        const parsedLocation = this._coordinateService.fromString(
-            params.get('location') || ''
-        );
-
-        if (parsedLocation) {
-            point.lat = parsedLocation.lat;
-            point.lon = parsedLocation.lon;
-            this._proceed(point);
+        if (this.geo) {
+            this._useGeo();
+        } else {
+            this._useLocation();
         }
-
-        this._subscription = this._geolocationService
-            .getPosition()
-            .pipe(
-                timeout(2000),
-                first(),
-                tap((position) => {
-                    if (position && position.success) {
-                        point.lat = position.latitude;
-                        point.lon = position.longitude;
-                    }
-                }),
-                catchError(() => of(null))
-            )
-            .subscribe(() => {
-                this._proceed(point);
-            });
     }
 
     onDestroy() {
@@ -79,5 +61,47 @@ export class LocationAddAppComponent {
     _proceed(point: WaypointSaved) {
         this._waypointService.updatePoint(point);
         history.replaceState({}, document.title, `/location-edit/${point.id}`);
+    }
+
+    _useGeo() {
+        const point = this._waypointService.newPoint();
+        point.name = this._makeName(point);
+        const parsedLocation = this._coordinateService.fromString(this.geo || '');
+
+        if (parsedLocation) {
+            point.lat = parsedLocation.lat;
+            point.lon = parsedLocation.lon;
+            const params = new URLSearchParams(
+                `?${window.location.search.slice(1).replace(/\?/g, '&')}`
+            );
+            const name = params.get('q');
+
+            if (name) {
+                point.name = name;
+            }
+        }
+
+        this._proceed(point);
+    }
+
+    _useLocation() {
+        const point = this._waypointService.newPoint();
+        point.name = this._makeName(point);
+        this._subscription = this._geolocationService
+            .getPosition()
+            .pipe(
+                timeout(2000),
+                first(),
+                tap((position) => {
+                    if (position && position.success) {
+                        point.lat = position.latitude;
+                        point.lon = position.longitude;
+                    }
+                }),
+                catchError(() => of(null))
+            )
+            .subscribe(() => {
+                this._proceed(point);
+            });
     }
 }

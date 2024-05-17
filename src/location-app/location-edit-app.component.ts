@@ -148,7 +148,6 @@ import { WaypointService } from './waypoint.service';
 })
 export class LocationEditComponent {
     private _coordinateService = di(CoordinateService);
-    private _geolocationService = di(GeolocationService);
     private _subscription?: Subscription;
     private _toastService = di(ToastService);
     private _waypointService = di(WaypointService);
@@ -161,11 +160,6 @@ export class LocationEditComponent {
     validPoint = false;
 
     onInit() {
-        this._subscription = this._geolocationService
-            .getPosition()
-            .subscribe(() => {
-                // Empty, but keeps the GPS active
-            });
         const id = this.id;
         let point;
 

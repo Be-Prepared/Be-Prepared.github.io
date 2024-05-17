@@ -114,6 +114,12 @@ export class LocationWrapperComponent {
                     this._getCurrentStatus();
                 }
             });
+
+        // Keep the GPS active
+        this._geolocationService
+            .getPosition()
+            .pipe(takeUntil(this._subject))
+            .subscribe(() => {});
     }
 
     onDestroy() {

@@ -1,4 +1,4 @@
-import { Component, css } from 'fudgel';
+import { Component, css, html } from 'fudgel';
 
 @Component('styled-link', {
     attr: ['href', 'target'],
@@ -15,12 +15,18 @@ import { Component, css } from 'fudgel';
     // The spaces at the ends are important because this is an inline element,
     // but vite/esbuild doesn't treat it as such and will remove surrounding
     // spaces.
-    template: ' <a href="{{hrefHijacked}}" target="{{target}}"><slot></slot></a> ',
+    template: html`
+        <a *if="hijackGeo" href="/location-add/{{hrefGeo}}"><slot></slot></a>
+        <a *if="!hijackGeo" href="{{href}}" target="{{target}}"
+            ><slot></slot
+        ></a>
+    `,
     useShadow: true,
 })
 export class StyledLinkComponent {
+    hrefGeo?: string;
+    hijackGeo = false;
     href?: string = '#';
-    hrefHijacked = '#';
     target?: string;
 
     onChange(prop: string) {
@@ -31,9 +37,10 @@ export class StyledLinkComponent {
 
     private _setHref(href: string) {
         if (href.startsWith('geo:')) {
-            this.hrefHijacked = `/location-add?location=${href.slice(4)}`
+            this.hrefGeo = href.slice(4);
+            this.hijackGeo = true;
+        } else {
+            this.hijackGeo = false;
         }
-
-        this.hrefHijacked = this.href || '#';
     }
 }
