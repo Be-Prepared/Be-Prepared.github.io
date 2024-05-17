@@ -4,6 +4,8 @@ A toolbox filled with offline-only tools. Useful for your everyday life and can 
 
 Use this application at [Be-Prepared.github.io](https://be-prepared.github.io). It's a PWA and is installable as an application or you can run it from your web browser. Because it's a PWA, it can only auto-update itself when you are online. This can happen in the background or when you launch the application. You can detect if a new version is available by a drawer that opens on the bottom after the update is downloaded. An easy way to ensure you have the latest version is to make sure you are on the internet and run the app, wait a minute, close the app, then open it again.
 
+![Index](screenshots/index.png)
+
 This PWA is also an example for how to use the following:
     * [Fudgel](https://github.com/fidian/fudgel), an extremely lightweight web component library.
     * Vite to make a PWA.
@@ -13,25 +15,35 @@ This PWA is also an example for how to use the following:
 
 ## What's included
 
+![Flashlight](screenshots/flashlight.gif)
+
 * Flashlight
     * Simply turns on the camera's flashlight.
     * Uses the `camera` permission.
     * Sets the `torch` capability on a video track. If the capability is not there or the device doesn't report any video devices, the status moves to "unavailable". This information is cached so it isn't queried the next time you start the app.
     * Keeps the screen on, otherwise the flashlight will turn off.
 
-* Front screen
+![Front Light](screenshots/front-light.png)
+
+* Front light
     * Makes the screen white. Useful for devices without a flashlight on the camera.
     * Keeps the screen on, otherwise this would be pretty pointless.
+
+![Magnifier](screenshots/magnifier.gif)
 
 * Magnifier
     * Uses the camera and starts it at maximum zoom.
     * Requires the `camera` permission. This permission and the results of probing for a camera are cached so it isn't queried the next time you start the app.
     * Can turn on and off the camera's light, if one exists.
 
+![Compass](screenshots/compass.gif)
+
 * Compass
     * A simple compass that shows your bearing.
     * Requires a magnetometer (compass) in the device. Can work from being laid flat and up to vertical by using a 3D sensor.
     * Your compass is likely not calibrated and calibration detection is disabled in PWAs. To increase accuracy, slowly turn your device around in all axis several times.
+
+![Location](screenshots/location.gif) ![Location List](screenshots/location-list.png) ![Location Edit](screenshots/location-edit.png) ![Location Navigate](screenshots/location-navigate.png)
 
 * Location
     * Show your current location using DMS, DDM, or DDD formats for coordinates as well as UTM/UPS and MGRS by tapping on the coordinates.
@@ -40,14 +52,20 @@ This PWA is also an example for how to use the following:
     * Ability to change field functions (especially for Geocaching and the Geocaching merit badge)
     * Keeps the screen enabled while navigating to a point.
 
+![Barcode Reader](screenshots/barcode-reader.png)
+
 * Barcode reader
     * Reads all 1d and 2d barcodes that your device allows.
+
+![Sun and Moon](screenshots/sun-moon.png)
 
 * Sun & Moon
     * Look up information for any location (by coordinates or use a major city's name).
     * Show location in current coordinate system, plus direction and distance to nearest major city.
     * Shows sunrise, sunset, and current sun location.
     * Moon's rise, moon's set, and the current moon location and phase.
+
+![Info](screenshots/info.png)
 
 * Info
     * Contains a QR code for easy sharing of the application, or copy the URL to your clipboard.
