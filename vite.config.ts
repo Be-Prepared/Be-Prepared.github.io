@@ -69,10 +69,12 @@ export default defineConfig({
                 name: 'Be Prepared',
                 protocol_handlers: [
                     {
+                        // This one should work because it is safelisted, but ...
                         protocol: 'geo',
                         url: '/location-add?location=%s',
                     },
                     {
+                        // ... this one is what actually works. No harm in both existing.
                         protocol: 'web+geo',
                         url: '/location-add?location=%s',
                     },
