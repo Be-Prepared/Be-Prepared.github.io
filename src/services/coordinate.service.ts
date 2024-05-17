@@ -303,49 +303,36 @@ export class CoordinateService {
             return null;
         };
         let result = null;
-        const ups = str
-            .match(/^([ABYZ])\s*(\d+)(?:M?E?\s+|M?E)(\d+)M?N?$/);
 
-        if (ups) {
-            result = tryConvert(() =>
-                converter.UPStoLL({
-                    northPole: ups[1] > 'M',
-                    easting: parseFloat(ups[2]),
-                    northing: parseFloat(ups[3]),
-                })
-            );
-        }
+        const numbers = str.replace(/[^0-9.]+/g, ' ').trim().split(' ');
+        const letter = str.replace(/[^A-Z]+/g, '').charAt(0);
 
-        const utm = str
-            .match(
-                /^(\d+)\s*([A-Z])\s*(\d+)(?:M?E?\s+|M?E)(\d+)M?N?$/
-            );
+        if (numbers.length >= 2 && numbers.length <= 3 && letter.length) {
+            const easting = parseFloat(numbers[numbers.length - 2]);
+            let northing = parseFloat(numbers[numbers.length - 1]);
+            const isNorth = letter > 'M';
 
-        if (!result && utm) {
-            const northern = utm[2] > 'M';
-
-            if ('ABYZ'.indexOf(utm[2]) >= 0) {
+            if (letter === 'A' || letter === 'B' || letter === 'Y' || letter === 'Z') {
                 // Polar = UPS
                 result = tryConvert(() =>
                     converter.UPStoLL({
-                        northPole: northern,
-                        easting: parseFloat(utm[2]),
-                        northing: parseFloat(utm[3]),
+                        easting,
+                        northing,
+                        northPole: isNorth,
                     })
                 );
-            } else {
-                let northing = parseFloat(utm[4]);
-
+            } else if (numbers.length === 3) {
+                // UTM
                 // "northing" needs to be adjusted for southern hemisphere
-                if (!northern) {
+                if (!isNorth) {
                     northing = northing - 10000000;
                 }
 
                 result = tryConvert(() =>
                     converter.UTMtoLL(
                         northing,
-                        parseFloat(utm[3]),
-                        parseInt(utm[1], 10)
+                        easting,
+                        parseInt(numbers[0], 10)
                     )
                 );
             }
