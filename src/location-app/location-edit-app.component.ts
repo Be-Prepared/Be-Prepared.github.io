@@ -30,7 +30,7 @@ import { WaypointService } from './waypoint.service';
             padding-top: 0.7em;
         }
 
-        .centeredText {
+        .centered-text {
             text-align: center;
         }
 
@@ -82,7 +82,7 @@ import { WaypointService } from './waypoint.service';
             align-items: flex-end;
         }
 
-        .fullWidth {
+        .full-width {
             width: 100%;
         }
     `,
@@ -100,33 +100,33 @@ import { WaypointService } from './waypoint.service';
                         ></pretty-labeled-button>
                     </div>
                     <div class="detail">
-                        <div class="fullWidth">
+                        <div class="full-width">
                             <div class="no-shrink">
                                 <i18n-label
                                     id="location.edit.name"
                                 ></i18n-label>
                             </div>
                             <pretty-input
-                                class="fullWidth"
+                                class="full-width"
                                 value="{{point.name}}"
                                 @change="nameChange($event.detail)"
                             ></pretty-input>
                         </div>
-                        <div class="fullWidth gapAbove">
+                        <div class="full-width gapAbove">
                             <div class="no-shrink space-between-bottom">
                                 <i18n-label
                                     id="location.edit.location"
                                 ></i18n-label>
-                                <location-coordinate-info></location-coordinate-info>
                             </div>
                             <pretty-input
-                                class="fullWidth"
+                                class="full-width"
                                 value="{{location}}"
                                 @change="locationChange($event.detail)"
                                 #ref="locationInput"
+                                help-html="location.help.html"
                             ></pretty-input>
                         </div>
-                        <div class="gapAbove centeredText">
+                        <div class="gapAbove centered-text">
                             <i18n-label
                                 id="location.edit.helpSave"
                             ></i18n-label>

@@ -6,7 +6,7 @@ import { I18nService } from './i18n.service';
     // Spaces are necessary because vite/esbuild removes them
     template: '{{ws}}{{value}}{{ws}}',
 })
-export class I18nLabel {
+export class I18nLabelComponent {
     private _i18nService = di(I18nService);
     id: string = '';
     ws: string = ' '; // Overwritten by attr

@@ -20,7 +20,6 @@ import { TileDefResolved, TileService } from '../services/tile.service';
             <div path="/info-qr" component="info-qr-app"></div>
             <div path="/location-add" component="location-add-app"></div>
             <div path="/location-edit/:id" component="location-edit-app"></div>
-            <div path="/location-help" component="location-help-app"></div>
             <div path="/location-list" component="location-list-app"></div>
             <div
                 path="/location-navigate/:id"

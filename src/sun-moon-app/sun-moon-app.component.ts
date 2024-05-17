@@ -105,6 +105,7 @@ import { ToastService } from '../services/toast.service';
                         @change.stop.prevent="locationUpdate($event.detail)"
                         #ref="input"
                         class="grow"
+                        help-html="location.help.html"
                     ></pretty-input>
                 </div>
                 <div *if="allowGetLocation">

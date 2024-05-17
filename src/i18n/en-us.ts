@@ -73,7 +73,6 @@ export const enUS: LanguageData = {
     'location.coordinates.MGRS': 'MGRS',
     'location.coordinates.UTMUPS': 'UTM/UPS',
     'location.edit.badLocation': 'Invalid location',
-    'location.coordinateInfo': 'More Info',
     'location.edit.delete': 'Delete',
     'location.edit.helpSave': 'Changes are saved automatically.',
     'location.edit.location': 'Location:',
@@ -179,6 +178,7 @@ export const enUS: LanguageData = {
     'shared.permissionPrompt.goBack': 'Not Right Now',
     'shared.permissionPrompt.grantPermission': 'Grant Permission',
     'shared.permissionPrompt.heading': 'Permission Required',
+    'shared.prettyInput.close': 'Close Help',
 
     // Services
     'service.torch.deviceIssue': 'Flashlight issue - reload required',
