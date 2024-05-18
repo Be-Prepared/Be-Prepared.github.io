@@ -156,11 +156,11 @@ export class NavigationArrowComponent {
         }
 
         if (this.compassRose) {
-            this.compassRose.style.transform = `rotate(${compassRoseAngle}deg)`;
+            this.compassRose.style.transform = `rotate(-${compassRoseAngle}deg)`;
         }
 
         if (this.directionArrow) {
-            this.directionArrow.style.transform = `rotate(${directionArrowAngle}deg)`;
+            this.directionArrow.style.transform = `rotate(-${directionArrowAngle}deg)`;
         }
     }
 }
