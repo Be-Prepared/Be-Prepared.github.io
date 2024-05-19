@@ -21,7 +21,7 @@ export class MoonIlluminationComponent {
     onChange(prop: string) {
         if (prop === 'coordinates' && this.coordinates) {
             const moonIllumination = SunCalc.getMoonIllumination(new Date());
-            this.fraction = Math.round(moonIllumination.fraction);
+            this.fraction = Math.round(moonIllumination.fraction * 100);
             const phase = moonIllumination.phase;
 
             if (phase < 0.0625) {
