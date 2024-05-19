@@ -8,7 +8,7 @@ import { Component, css, html } from 'fudgel';
         }
 
         .breakWord {
-            word-break: break-anywhere;
+            word-wrap: break-word;
         }
 
         .data {

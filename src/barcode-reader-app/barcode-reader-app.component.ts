@@ -50,7 +50,7 @@ interface DetectedBarcode {
             padding: 1em;
             border-radius: 0.5em;
             font-size: 1.4em;
-            word-wrap: break-anywhere;
+            word-wrap: break-word;
         }
     `,
     template: html`

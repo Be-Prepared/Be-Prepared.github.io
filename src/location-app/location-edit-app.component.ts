@@ -213,6 +213,7 @@ export class LocationEditComponent {
 
     nameChange(name: string) {
         this.point!.name = name;
+        this._updatePointProperties();
         this._waypointService.updatePoint(this.point!);
     }
 

@@ -15,7 +15,7 @@ import { Component, css, emit, html } from 'fudgel';
         .inner {
             max-width: 90%;
             max-height: 90%;
-            display: flex;
+            display: block;
         }
 
         slot {

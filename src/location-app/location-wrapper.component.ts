@@ -1,9 +1,9 @@
 import { AvailabilityState } from '../datatypes/availability-state';
 import { Component, css, di, html } from 'fudgel';
 import { GeolocationService } from '../services/geolocation.service';
+import { of, Subject } from 'rxjs';
 import { PermissionsService } from '../services/permissions.service';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { switchMap, takeUntil } from 'rxjs/operators';
 
 @Component('location-wrapper', {
     style: css`
@@ -101,25 +101,24 @@ export class LocationWrapperComponent {
     onInit() {
         this._geolocationService
             .availabilityState()
-            .pipe(takeUntil(this._subject))
-            .subscribe((value) => {
-                this.explainAsk = value === AvailabilityState.PROMPT;
-                this.explainDeny = value === AvailabilityState.DENIED;
-                this.explainUnavailable =
-                    value === AvailabilityState.UNAVAILABLE;
-                this.explainError = value === AvailabilityState.ERROR;
-                this.showControls = value === AvailabilityState.ALLOWED;
+            .pipe(
+                takeUntil(this._subject),
+                switchMap((value) => {
+                    this.explainAsk = value === AvailabilityState.PROMPT;
+                    this.explainDeny = value === AvailabilityState.DENIED;
+                    this.explainUnavailable =
+                        value === AvailabilityState.UNAVAILABLE;
+                    this.explainError = value === AvailabilityState.ERROR;
+                    this.showControls = value === AvailabilityState.ALLOWED;
 
-                if (this.showControls) {
-                    this._getCurrentStatus();
-                }
-            });
+                    if (this.showControls) {
+                        return this._geolocationService.getPosition();
+                    }
 
-        // Keep the GPS active
-        this._geolocationService
-            .getPosition()
-            .pipe(takeUntil(this._subject))
-            .subscribe(() => {});
+                    return of(null);
+                })
+            )
+            .subscribe();
     }
 
     onDestroy() {
@@ -137,14 +136,5 @@ export class LocationWrapperComponent {
 
         // Next, update the control
         this.control = control;
-    }
-
-    private _getCurrentStatus() {
-        // Add a subscriber to keep the service active no matter what route is
-        // being shown.
-        this._geolocationService
-            .getPosition()
-            .pipe(takeUntil(this._subject))
-            .subscribe(() => {});
     }
 }

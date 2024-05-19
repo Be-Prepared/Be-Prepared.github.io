@@ -60,7 +60,10 @@ export class LocationAddAppComponent {
 
     _proceed(point: WaypointSaved) {
         this._waypointService.updatePoint(point);
-        history.replaceState({}, document.title, `/location-edit/${point.id}`);
+        // This doesn't work when called during onInit()
+        setTimeout(() => {
+            history.replaceState({}, document.title, `/location-edit/${point.id}`);
+        });
     }
 
     _useGeo() {
