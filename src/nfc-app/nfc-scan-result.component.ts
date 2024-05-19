@@ -5,7 +5,7 @@ import { NfcScanResult } from '../services/nfc.service';
     prop: ['scanResult'],
     style: css`
         .breakWord {
-            word-break: break-word;
+            word-break: break-anywhere;
         }
 
         .gapAbove {
