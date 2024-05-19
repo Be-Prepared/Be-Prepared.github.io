@@ -18,6 +18,7 @@ import { ToastService } from '../services/toast.service';
 @Component('info-preferences', {
     style: css``,
     template: html`
+        <info-header id="info.preferences"></info-header>
         <ul>
             <li>
                 <i18n-label id="info.coordinates"></i18n-label>

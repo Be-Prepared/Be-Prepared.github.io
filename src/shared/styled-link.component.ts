@@ -16,10 +16,10 @@ import { Component, css, html } from 'fudgel';
     // but vite/esbuild doesn't treat it as such and will remove surrounding
     // spaces.
     template: html`
+        {{ws}}
         <a *if="hijackGeo" href="/location-add/{{hrefGeo}}"><slot></slot></a>
-        <a *if="!hijackGeo" href="{{href}}" target="{{target}}"
-            ><slot></slot
-        ></a>
+        <a *if="!hijackGeo" href="{{href}}" target="{{target}}"><slot></slot></a
+        >{{ws}}
     `,
     useShadow: true,
 })
@@ -28,6 +28,7 @@ export class StyledLinkComponent {
     hijackGeo = false;
     href?: string = '#';
     target?: string;
+    ws = ' ';
 
     onChange(prop: string) {
         if (prop === 'href') {

@@ -34,6 +34,7 @@ import { ToastService } from '../services/toast.service';
         }
     `,
     template: html`
+        <info-header id="info.shareApp"></info-header>
         <div class="website">{{website}}</div>
         <div class="buttons">
             <pretty-button @click="openQrCode()" padding="0px">

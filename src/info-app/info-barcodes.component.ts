@@ -5,6 +5,7 @@ import { Component, css, di, html } from 'fudgel';
     style: css`
     `,
     template: html`
+        <info-header id="info.barcodes"></info-header>
         <span *if="barcodes">{{barcodes}}</span>
         <i18n-label *if="!barcodes" id="info.barcodesNotSupported"></i18n-label>
     `,
