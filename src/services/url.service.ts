@@ -25,9 +25,13 @@ const SAFELISTED_SCHEMES = [
     'wtai',
     'xmpp',
 ];
+const OTHER_ALLOWED_SCHEMS = [
+    'http',
+    'https'
+];
 export class UrlService {
     isUrl(url: string) {
-        for (const protocol of SAFELISTED_SCHEMES) {
+        for (const protocol of [...SAFELISTED_SCHEMES, ...OTHER_ALLOWED_SCHEMS]) {
             if (url.startsWith(`${protocol}:`)) {
                 return true;
             }
