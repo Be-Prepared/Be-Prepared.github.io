@@ -202,6 +202,19 @@ export class BarcodeReaderAppComponent {
                 return;
             }
 
+            const zoom = (track.getCapabilities() as any).zoom;
+
+            if (zoom) {
+                const desiredZoom = Math.min(Math.max(1, zoom.min), zoom.max);
+                track.applyConstraints({
+                    advanced: [
+                        {
+                            zoom: desiredZoom,
+                        } as any,
+                    ],
+                });
+            }
+
             if (this.video) {
                 this.video.srcObject = stream;
                 this.video.addEventListener('loadedmetadata', () => {

@@ -123,6 +123,7 @@ export class MagnifierAppComponent {
     }
 
     onDestroy() {
+        this._zoom(1);
         this._subject.next(null);
         this._subject.complete();
     }
