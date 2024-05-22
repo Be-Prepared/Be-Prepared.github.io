@@ -56,6 +56,7 @@ This PWA is also an example for how to use the following:
 
 * Barcode reader
     * Reads all 1d and 2d barcodes that your device allows.
+    * Falls back to WASM module if the device doesn't have a barcode scanning library built-in.
 
 ![Sun and Moon](screenshots/sun-moon.png)
 
@@ -96,9 +97,9 @@ The server is started at `http://localhost:8080/` and is exposed to everyone on 
 
 ![Chrome Flags Screenshot](chrome-flags.jpg)
 
-**iOS & Safari:** Run the server and then run `npx localtunnel -p 8080` in another terminal. Go to the generated URL and enter your *public IP address* as the password. You can use Eruda (see below) and `console.log()` statements. To get access to the debugger, read [this article](https://www.closingtags.com/remote-debugging-web-apps-on-ios-from-linux/). I also have a [Dockerfile](ios-webkit-debugger/) that can help connect to Safari from Linux.
+**iOS & Safari:** Run the server in one terminal and then run `npm run tunnel` in another terminal. Go to the generated URL and enter your *public IP address* as the password. You can use Eruda (see below) and `console.log()` statements. To get access to the debugger, read [this article](https://www.closingtags.com/remote-debugging-web-apps-on-ios-from-linux/). I also have a [Dockerfile](ios-webkit-debugger/) that can help connect to Safari from Linux.
 
-**Debugging:** Add "?eruda" to the URL to automatically load [Eruda](https://github.com/liriliri/eruda), a console for mobile browsers. It will be configured to fully initialize before the application starts, allowing all messages and errors to get logged appropriately. This is extremely useful. Also, you may want to use `npx localtunnel -p 8080` to forward the app to a public address, allowing devices to more easily use your development build.
+**Debugging:** Add "?eruda" to the URL to automatically load [Eruda](https://github.com/liriliri/eruda), a console for mobile browsers. It will be configured to fully initialize before the application starts, allowing all messages and errors to get logged appropriately. This is extremely useful. Also, you may want to use `npm run tunnel` to forward the app to a public address, allowing devices to more easily use your development build.
 
 Pull requests for additional functionality are welcome. Please make sure you maintain the intent of this code.
 
