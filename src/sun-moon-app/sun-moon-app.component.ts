@@ -194,13 +194,13 @@ export class SunMoonAppComponent {
     }
 
     locationUpdate(value: string) {
-        const coordinates = this._coordinateService.fromString(value);
-
-        if (coordinates) {
-            this._preferenceService.sunMoonLocation.setItem(value);
-            this.coordinates = coordinates;
-            this._coordinatesUpdated();
-        }
+        this._coordinateService.fromString(value).subscribe((coordinates) => {
+            if (coordinates) {
+                this._preferenceService.sunMoonLocation.setItem(value);
+                this.coordinates = coordinates;
+                this._coordinatesUpdated();
+            }
+        });
     }
 
     getCurrentLocation() {

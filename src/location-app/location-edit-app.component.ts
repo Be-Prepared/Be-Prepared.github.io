@@ -196,19 +196,19 @@ export class LocationEditComponent {
     }
 
     locationChange(location: string) {
-        const convertedLocation = this._coordinateService.fromString(location);
-
-        if (convertedLocation) {
-            this.point!.lat = convertedLocation.lat;
-            this.point!.lon = convertedLocation.lon;
-            this._updatePointProperties();
-            this._waypointService.updatePoint(this.point!);
-            this._updateLocation();
-            this.validPoint = true;
-        } else {
-            this._toastService.popI18n('location.edit.badLocation');
-            this.validPoint = false;
-        }
+        this._coordinateService.fromString(location).subscribe((convertedLocation) => {
+            if (convertedLocation) {
+                this.point!.lat = convertedLocation.lat;
+                this.point!.lon = convertedLocation.lon;
+                this._updatePointProperties();
+                this._waypointService.updatePoint(this.point!);
+                this._updateLocation();
+                this.validPoint = true;
+            } else {
+                this._toastService.popI18n('location.edit.badLocation');
+                this.validPoint = false;
+            }
+        });
     }
 
     nameChange(name: string) {

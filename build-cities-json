@@ -14,4 +14,4 @@ if [[ ! -f "$SRC" ]]; then
 fi
 
 echo "Parsing $SRC"
-zcat "$SRC" | node parse-cities.js > src/cities.ts
+zcat "$SRC" | node parse-cities.js > site/public/cities.json

@@ -1,10 +1,11 @@
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, forkJoin, Observable, of, ReplaySubject } from 'rxjs';
 import CheapRuler from 'cheap-ruler';
-import { cities } from '../cities';
+import { CityCoords } from '../datatypes/city-coords';
 import { Converter } from 'usng.js';
 import { CoordinateSystem } from '../datatypes/coordinate-system';
 import { di } from 'fudgel/dist/di';
 import { DirectionService } from './direction.service';
+import { first, map } from 'rxjs/operators';
 import { PreferenceService } from './preference.service';
 
 // By default, usng uses NAD83 but doesn't support WGS84. This is a workaround.
@@ -63,6 +64,7 @@ export interface UTMUPS {
 export type SystemCoordinates = LL | MGRS | UTMUPS;
 
 export class CoordinateService {
+    private _citiesSubject: ReplaySubject<CityCoords> | null = null;
     private _currentSetting = new BehaviorSubject<CoordinateSystem>(
         CoordinateSystemDefault
     );
@@ -78,55 +80,59 @@ export class CoordinateService {
         }
     }
 
-    fromString(str: string): LatLon | null {
+    fromString(str: string): Observable<LatLon | null> {
         str = str.trim();
 
-        return (
-            this._fromStringDegrees(str) ||
-            this._fromStringCity(str) ||
-            this._fromStringMgrs(str) ||
-            this._fromStringUtmUps(str)
-        );
+        return forkJoin(
+            this._fromStringDegrees(str),
+            this._fromStringMgrs(str),
+            this._fromStringUtmUps(str),
+            this._fromStringCity(str)
+        ).pipe(map(([degrees, mgrs, utmUps, city]) => {
+            return degrees || mgrs || utmUps || city;
+        }));
     }
 
     getCurrentSetting() {
         return this._currentSetting.asObservable();
     }
 
-    getNearestMajorCity(lat: number, lon: number): NearestCity {
-        const cheapRuler = new CheapRuler(lat, 'meters');
-        const entries = [...Object.entries(cities)];
-        const closest: NearestCity = entries.reduce<NearestCity>(
-            (closest: NearestCity, city): NearestCity => {
-                const cityName = city[0];
-                const cityLat = city[1][0];
-                const cityLon = city[1][1];
-                const distance = cheapRuler.distance(
-                    [lon, lat],
-                    [cityLon, cityLat]
-                );
-
-                if (distance < closest.distance) {
-                    const bearing = cheapRuler.bearing(
+    getNearestMajorCity(lat: number, lon: number): Observable<NearestCity> {
+        return this._getCitiesObservable().pipe(first(), map((cities) => {
+            const cheapRuler = new CheapRuler(lat, 'meters');
+            const entries = [...Object.entries(cities)];
+            const closest: NearestCity = entries.reduce<NearestCity>(
+                (closest: NearestCity, city): NearestCity => {
+                    const cityName = city[0];
+                    const cityLat = city[1][0];
+                    const cityLon = city[1][1];
+                    const distance = cheapRuler.distance(
                         [lon, lat],
                         [cityLon, cityLat]
                     );
 
-                    return {
-                        name: cityName,
-                        lat: cityLat,
-                        lon: cityLon,
-                        distance,
-                        bearing,
-                    };
-                }
+                    if (distance < closest.distance) {
+                        const bearing = cheapRuler.bearing(
+                            [lon, lat],
+                            [cityLon, cityLat]
+                        );
 
-                return closest;
-            },
-            { name: '', lat: NaN, lon: NaN, distance: Infinity, bearing: NaN }
-        );
+                        return {
+                            name: cityName,
+                            lat: cityLat,
+                            lon: cityLon,
+                            distance,
+                            bearing,
+                        };
+                    }
 
-        return closest;
+                    return closest;
+                },
+                { name: '', lat: NaN, lon: NaN, distance: Infinity, bearing: NaN }
+            );
+
+            return closest;
+        }));
     }
 
     latLonToSystem(lat: number, lon: number): SystemCoordinates {
@@ -216,22 +222,40 @@ export class CoordinateService {
         return [firstHalf.join(' '), secondHalf.join(' ')];
     }
 
-    private _fromStringCity(str: string): LatLon | null {
-        str = str.toLowerCase().trim();
-        const strLen = str.length;
+    private _getCitiesObservable() {
+        if (!this._citiesSubject) {
+            this._citiesSubject = new ReplaySubject(1);
 
-        for (const city of Object.keys(cities)) {
-            if (city.length === strLen && city.toLowerCase() === str) {
-                const [lat, lon] = cities[city];
-
-                return { lat, lon };
-            }
+            fetch('/cities.json').then((response) => {
+                response.json().then((data) => {
+                    this._citiesSubject!.next(data);
+                });
+            });
         }
 
-        return null;
+        return this._citiesSubject.asObservable();
     }
 
-    private _fromStringDegrees(str: string): LatLon | null {
+    private _fromStringCity(str: string): Observable<LatLon | null> {
+        return this._getCitiesObservable().pipe(
+            map((cities) => {
+                str = str.toLowerCase().trim();
+                const strLen = str.length;
+
+                for (const city of Object.keys(cities)) {
+                    if (city.length === strLen && city.toLowerCase() === str) {
+                        const [lat, lon] = cities[city];
+
+                        return { lat, lon };
+                    }
+                }
+
+                return null;
+            })
+        );
+    }
+
+    private _fromStringDegrees(str: string): Observable<LatLon | null> {
         const cleansed = str
             .toUpperCase()
             .replace(/[^-0-9.ENSW]+/g, ' ')
@@ -241,7 +265,7 @@ export class CoordinateService {
         const coordinateStrings = this._breakIntoCoordinateChunks(cleansed);
 
         if (!coordinateStrings) {
-            return null;
+            return of(null);
         }
 
         const coordinates = coordinateStrings.map((item) =>
@@ -249,7 +273,7 @@ export class CoordinateService {
         );
 
         if (coordinates[0] === null || coordinates[1] === null) {
-            return null;
+            return of(null);
         }
 
         if (south) {
@@ -266,28 +290,28 @@ export class CoordinateService {
             coordinates[1] < -180 ||
             coordinates[1] > 180
         ) {
-            return null;
+            return of(null);
         }
 
-        return {
+        return of({
             lat: coordinates[0],
             lon: coordinates[1],
-        };
+        });
     }
 
-    private _fromStringMgrs(str: string): LatLon | null {
+    private _fromStringMgrs(str: string): Observable<LatLon | null> {
         str = str.toUpperCase().trim();
 
         if (converter.isUSNG(str)) {
             const result = converter.USNGtoLL(str);
 
-            return { lat: result.south, lon: result.west };
+            return of({ lat: result.south, lon: result.west });
         }
 
-        return null;
+        return of(null);
     }
 
-    private _fromStringUtmUps(str: string): LatLon | null {
+    private _fromStringUtmUps(str: string): Observable<LatLon | null> {
         str = str.toUpperCase().trim();
         const tryConvert = (cb: () => any) => {
             let convertResult = null;
@@ -303,7 +327,6 @@ export class CoordinateService {
             return null;
         };
         let result = null;
-
         const numbers = str.replace(/[^0-9.]+/g, ' ').trim().split(' ');
         const letter = str.replace(/[^A-Z]+/g, '').charAt(0);
 
@@ -338,7 +361,7 @@ export class CoordinateService {
             }
         }
 
-        return result;
+        return of(result);
     }
 
     private _padLeading(str: string): string {

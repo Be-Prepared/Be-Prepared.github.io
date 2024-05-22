@@ -69,22 +69,22 @@ export class LocationAddAppComponent {
     _useGeo() {
         const point = this._waypointService.newPoint();
         point.name = this._makeName(point);
-        const parsedLocation = this._coordinateService.fromString(this.geo || '');
+        this._coordinateService.fromString(this.geo || '').subscribe((parsedLocation) => {
+            if (parsedLocation) {
+                point.lat = parsedLocation.lat;
+                point.lon = parsedLocation.lon;
+                const params = new URLSearchParams(
+                    `?${window.location.search.slice(1).replace(/\?/g, '&')}`
+                );
+                const name = params.get('q');
 
-        if (parsedLocation) {
-            point.lat = parsedLocation.lat;
-            point.lon = parsedLocation.lon;
-            const params = new URLSearchParams(
-                `?${window.location.search.slice(1).replace(/\?/g, '&')}`
-            );
-            const name = params.get('q');
-
-            if (name) {
-                point.name = name;
+                if (name) {
+                    point.name = name;
+                }
             }
-        }
 
-        this._proceed(point);
+            this._proceed(point);
+        });
     }
 
     _useLocation() {

@@ -19,7 +19,13 @@ export class PreferenceService {
     torch: LocalStorageInterface<boolean>;
 
     constructor() {
-        this.barcodeReader = LocalStorageService.boolean('barcodeReader');
+        // Clean up old preferences
+        for (const name of ['barcodeReader']) {
+            const x = LocalStorageService.string(name);
+            x.reset();
+        }
+
+        this.barcodeReader = LocalStorageService.boolean('barcodeReader2');
         this.coordinateSystem = LocalStorageService.enum<CoordinateSystem>(
             'coordinateSystem',
             CoordinateSystem
@@ -38,10 +44,7 @@ export class PreferenceService {
         this.torch = LocalStorageService.boolean('torch');
     }
 
-    field<T>(
-        id: string,
-        allowedValues: T[]
-    ): LocalStorageInterface<T> {
+    field<T>(id: string, allowedValues: T[]): LocalStorageInterface<T> {
         return LocalStorageService.list(`field.${id}`, allowedValues);
     }
 }

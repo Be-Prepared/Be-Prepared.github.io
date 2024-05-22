@@ -54,30 +54,23 @@ createInterface({
 
         // Keep the most populated cities and sort by name
         const namesSorted = namesTop.slice(0, 10000).sort((a, b) => a.localeCompare(b));
-        console.log('interface CityCoords {');
-        console.log('    [name: string]: [number, number];');
-        console.log('}');
-        console.log('');
-        let last = 'export const cities: CityCoords = {';
+        const result = {};
         let highestPopulation = 0;
         let lowestPopulation = Number.MAX_SAFE_INTEGER;
 
         for (const name of namesSorted) {
-            console.log(last);
             const value = entries.get(name);
-            const coords = [value.lat, value.lon];
-            last = `    ${JSON.stringify(value.name)}: ${JSON.stringify(coords)},`;
+            result[name] = [value.lat, value.lon];
             highestPopulation = Math.max(highestPopulation, value.population);
             lowestPopulation = Math.min(lowestPopulation, value.population);
         }
 
-        console.log(last.substring(0, last.length - 1));
-        console.log('}');
-        console.log('');
-        console.log(`// Total cities: ${namesTop.length}`);
-        console.log(`// Cities in this lis: ${namesSorted.length}`);
-        console.log(`// Highest population: ${highestPopulation}`);
-        console.log(`// Lowest population: ${lowestPopulation}`);
+        process.stdout.write(JSON.stringify(result));
+        process.stderr.write(`Total cities: ${namesTop.length}
+Cities in this list: ${namesSorted.length}
+Highest population: ${highestPopulation}
+Lowest population: ${lowestPopulation}
+`);
     });
 
 // geonameid         : integer id of record in geonames database

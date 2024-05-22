@@ -4,6 +4,7 @@ import { resolve } from 'path';
 import simpleHtmlPlugin from 'vite-plugin-simple-html';
 import { vitePluginVersionMark } from 'vite-plugin-version-mark';
 import { VitePWA } from 'vite-plugin-pwa';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -36,6 +37,14 @@ export default defineConfig({
             ifLog: false,
             ifGlobal: true,
             ifMeta: false,
+        }),
+        viteStaticCopy({
+            targets: [
+                {
+                    src: '../node_modules/@undecaf/zbar-wasm/dist/zbar.wasm',
+                    dest: '',
+                },
+            ]
         }),
         minifyLiterals(),
         simpleHtmlPlugin({

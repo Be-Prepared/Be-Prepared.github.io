@@ -22,18 +22,19 @@ export class NearestMajorCityComponent {
 
     onChange(prop: string) {
         if (prop === 'coordinates' && this.coordinates) {
-            const nearest = this._coordinateService.getNearestMajorCity(
+            this._coordinateService.getNearestMajorCity(
                 this.coordinates.lat,
                 this.coordinates.lon
-            );
-            const distance = this._distanceService.metersToString(
-                nearest.distance
-            );
-            const direction = this._directionService.toHeadingDirection(
-                nearest.bearing
-            );
+            ).subscribe((nearest) => {
+                const distance = this._distanceService.metersToString(
+                    nearest.distance
+                );
+                const direction = this._directionService.toHeadingDirection(
+                    nearest.bearing
+                );
 
-            this.nearestMajorCity = `${nearest.name} (${distance}, ${direction})`;
+                this.nearestMajorCity = `${nearest.name} (${distance}, ${direction})`;
+            });
         }
     }
 }

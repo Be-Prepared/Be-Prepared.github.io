@@ -46,14 +46,14 @@ const fromStringScenarios = {
 
 for (const scenario of Object.entries(fromStringScenarios)) {
     test(`fromString: ${scenario[0]}`, (t) => {
-        const result = coordinateService.fromString(scenario[0]);
-
-        if (result) {
-            const lat = result.lat.toFixed(7);
-            const lon = result.lon.toFixed(7);
-            t.is<string | null, string | null>(`${lat},${lon}`, scenario[1]);
-        } else {
-            t.is<string | null, string | null>(result, scenario[1]);
-        }
+        coordinateService.fromString(scenario[0]).subscribe((result) => {
+            if (result) {
+                const lat = result.lat.toFixed(7);
+                const lon = result.lon.toFixed(7);
+                t.is<string | null, string | null>(`${lat},${lon}`, scenario[1]);
+            } else {
+                t.is<string | null, string | null>(result, scenario[1]);
+            }
+        });
     });
 }

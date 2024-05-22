@@ -1,17 +1,10 @@
 import { AvailabilityState } from '../datatypes/availability-state';
-import { BarcodeReaderService } from '../services/barcode-reader.service';
+import { BarcodeReaderService, DetectedBarcodeData } from '../services/barcode-reader.service';
 import { Component, css, di, html } from 'fudgel';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { TorchService } from '../services/torch.service';
 import { UrlService } from '../services/url.service';
-
-interface DetectedBarcode {
-    boundingBox: DOMRectReadOnly;
-    cornerPoints: DOMPointReadOnly[];
-    format: string;
-    rawValue: string;
-}
 
 @Component('barcode-reader-app', {
     style: css`
@@ -62,12 +55,7 @@ interface DetectedBarcode {
         <permission-denied *if="explainDeny"></permission-denied>
         <camera-unavailable *if="explainUnavailable"></camera-unavailable>
         <div *if="showControls" class="wrapper">
-            <video
-                #ref="video"
-                autoplay
-                muted
-                playsinline
-            ></video>
+            <video #ref="video" autoplay muted playsinline></video>
             <div class="bottom" #ref="bottom">
                 <back-button></back-button>
                 <div></div>
@@ -99,7 +87,7 @@ export class BarcodeReaderAppComponent {
     private _subject = new Subject();
     private _torchService = di(TorchService);
     private _urlService = di(UrlService);
-    barcodeFound: DetectedBarcode | null = null;
+    barcodeFound: DetectedBarcodeData | null = null;
     bottom?: HTMLElement;
     explainAsk = false;
     explainDeny = false;
