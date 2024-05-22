@@ -530,27 +530,27 @@ var zbarWasm = (() => {
             a: _fd_write,
         };
         createWasm();
-        Module['_ImageScanner_create'] = () =>
-            (Module['_ImageScanner_create'] = wasmExports['i'])();
-        Module['_ImageScanner_destory'] = (a0) =>
-            (Module['_ImageScanner_destory'] = wasmExports['j'])(a0);
-        Module['_ImageScanner_set_config'] = (a0, a1, a2, a3) =>
-            (Module['_ImageScanner_set_config'] = wasmExports['k'])(
+        Module['ImageScanner_create'] = () =>
+            (Module['ImageScanner_create'] = wasmExports['i'])();
+        Module['ImageScanner_destory'] = (a0) =>
+            (Module['ImageScanner_destory'] = wasmExports['j'])(a0);
+        Module['ImageScanner_set_config'] = (a0, a1, a2, a3) =>
+            (Module['ImageScanner_set_config'] = wasmExports['k'])(
                 a0,
                 a1,
                 a2,
                 a3
             );
-        Module['_ImageScanner_enable_cache'] = (a0, a1) =>
-            (Module['_ImageScanner_enable_cache'] = wasmExports['l'])(a0, a1);
-        Module['_ImageScanner_recycle_image'] = (a0, a1) =>
-            (Module['_ImageScanner_recycle_image'] = wasmExports['m'])(a0, a1);
-        Module['_ImageScanner_get_results'] = (a0) =>
-            (Module['_ImageScanner_get_results'] = wasmExports['n'])(a0);
-        Module['_ImageScanner_scan'] = (a0, a1) =>
-            (Module['_ImageScanner_scan'] = wasmExports['o'])(a0, a1);
-        Module['_Image_create'] = (a0, a1, a2, a3, a4, a5) =>
-            (Module['_Image_create'] = wasmExports['p'])(
+        Module['ImageScanner_enable_cache'] = (a0, a1) =>
+            (Module['ImageScanner_enable_cache'] = wasmExports['l'])(a0, a1);
+        Module['ImageScanner_recycleimage'] = (a0, a1) =>
+            (Module['ImageScanner_recycle_image'] = wasmExports['m'])(a0, a1);
+        Module['ImageScanner_get_results'] = (a0) =>
+            (Module['ImageScanner_get_results'] = wasmExports['n'])(a0);
+        Module['ImageScanner_scan'] = (a0, a1) =>
+            (Module['ImageScanner_scan'] = wasmExports['o'])(a0, a1);
+        Module['Image_create'] = (a0, a1, a2, a3, a4, a5) =>
+            (Module['Image_create'] = wasmExports['p'])(
                 a0,
                 a1,
                 a2,
@@ -558,12 +558,12 @@ var zbarWasm = (() => {
                 a4,
                 a5
             );
-        Module['_Image_destory'] = (a0) =>
-            (Module['_Image_destory'] = wasmExports['q'])(a0);
-        Module['_Image_get_symbols'] = (a0) =>
-            (Module['_Image_get_symbols'] = wasmExports['r'])(a0);
-        Module['_free'] = (a0) => (Module['_free'] = wasmExports['t'])(a0);
-        Module['_malloc'] = (a0) => (Module['_malloc'] = wasmExports['u'])(a0);
+        Module['Image_destory'] = (a0) =>
+            (Module['Image_destory'] = wasmExports['q'])(a0);
+        Module['Image_get_symbols'] = (a0) =>
+            (Module['Image_get_symbols'] = wasmExports['r'])(a0);
+        Module['free'] = (a0) => (Module['free'] = wasmExports['t'])(a0);
+        Module['malloc'] = (a0) => (Module['malloc'] = wasmExports['u'])(a0);
         var calledRun;
         dependenciesFulfilled = function runCaller() {
             if (!calledRun) run();
@@ -825,10 +825,10 @@ class ZBarImage extends CppObject {
                     `data length (${data.byteLength} bytes) does not match width and height (${len} bytes)`
                 );
             }
-            const buf = inst._malloc(len),
+            const buf = inst.malloc(len),
                 heap = inst.HEAPU8;
             heap.set(data, buf);
-            const ptr = inst._Image_create(
+            const ptr = inst.Image_create(
                 width,
                 height,
                 0x30303859 /* Y800 */,
@@ -851,7 +851,7 @@ class ZBarImage extends CppObject {
                     } bytes) does not match width and height (${len * 4} bytes)`
                 );
             }
-            const buf = inst._malloc(len),
+            const buf = inst.malloc(len),
                 bufEnd = buf + len,
                 heap = inst.HEAPU8;
             for (let i = buf, j = 0; i < bufEnd; i++, j += 4) {
@@ -861,7 +861,7 @@ class ZBarImage extends CppObject {
                         data[j + 2] * 7472) >>
                     16;
             }
-            const ptr = inst._Image_create(
+            const ptr = inst.Image_create(
                 width,
                 height,
                 0x30303859 /* Y800 */,
@@ -874,12 +874,12 @@ class ZBarImage extends CppObject {
     }
     destroy() {
         this.checkAlive();
-        this.inst._Image_destory(this.ptr);
+        this.inst.Image_destory(this.ptr);
         this.ptr = 0;
     }
     getSymbols() {
         this.checkAlive();
-        const res = this.inst._Image_get_symbols(this.ptr);
+        const res = this.inst.Image_get_symbols(this.ptr);
         return ZBarSymbol.createSymbolsFromPtr(res, this.inst.HEAPU8.buffer);
     }
 }
@@ -888,35 +888,35 @@ class ZBarScanner extends CppObject {
     static create() {
         return __awaiter(this, void 0, void 0, function* () {
             const inst = yield getInstance(),
-                ptr = inst._ImageScanner_create();
+                ptr = inst.ImageScanner_create();
             return new this(ptr, inst);
         });
     }
     destroy() {
         this.checkAlive();
-        this.inst._ImageScanner_destory(this.ptr);
+        this.inst.ImageScanner_destory(this.ptr);
         this.ptr = 0;
     }
     setConfig(sym, conf, value) {
         this.checkAlive();
-        return this.inst._ImageScanner_set_config(this.ptr, sym, conf, value);
+        return this.inst.ImageScanner_set_config(this.ptr, sym, conf, value);
     }
     enableCache(enable = true) {
         this.checkAlive();
-        this.inst._ImageScanner_enable_cache(this.ptr, enable);
+        this.inst.ImageScanner_enable_cache(this.ptr, enable);
     }
     recycleImage(image) {
         this.checkAlive();
-        this.inst._ImageScanner_recycle_image(this.ptr, image.getPointer());
+        this.inst.ImageScanner_recycle_image(this.ptr, image.getPointer());
     }
     getResults() {
         this.checkAlive();
-        const res = this.inst._ImageScanner_get_results(this.ptr);
+        const res = this.inst.ImageScanner_get_results(this.ptr);
         return ZBarSymbol.createSymbolsFromPtr(res, this.inst.HEAPU8.buffer);
     }
     scan(image) {
         this.checkAlive();
-        return this.inst._ImageScanner_scan(this.ptr, image.getPointer());
+        return this.inst.ImageScanner_scan(this.ptr, image.getPointer());
     }
 }
 
@@ -1002,4 +1002,3 @@ export {
     scanImageData,
     scanRGBABuffer,
 };
-//# sourceMappingURL=index.mjs.map
