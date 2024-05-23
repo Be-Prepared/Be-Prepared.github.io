@@ -1,5 +1,6 @@
+import { CitiesService } from '../services/cities.service';
 import { Component, css, di, html } from 'fudgel';
-import { CoordinateService, LatLon } from '../services/coordinate.service';
+import { LatLon } from '../services/coordinate.service';
 import { DirectionService } from '../services/direction.service';
 import { DistanceService } from '../services/distance.service';
 
@@ -14,7 +15,7 @@ import { DistanceService } from '../services/distance.service';
     `,
 })
 export class NearestMajorCityComponent {
-    private _coordinateService = di(CoordinateService);
+    private _citiesService = di(CitiesService);
     private _directionService = di(DirectionService);
     private _distanceService = di(DistanceService);
     coordinates: LatLon | null = null;
@@ -22,7 +23,7 @@ export class NearestMajorCityComponent {
 
     onChange(prop: string) {
         if (prop === 'coordinates' && this.coordinates) {
-            this._coordinateService.getNearestMajorCity(
+            this._citiesService.getNearestCityByCoords(
                 this.coordinates.lat,
                 this.coordinates.lon
             ).subscribe((nearest) => {

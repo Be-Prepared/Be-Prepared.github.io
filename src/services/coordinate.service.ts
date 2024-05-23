@@ -1,11 +1,10 @@
-import { BehaviorSubject, forkJoin, Observable, of, ReplaySubject } from 'rxjs';
-import CheapRuler from 'cheap-ruler';
-import { CityCoords } from '../datatypes/city-coords';
+import { BehaviorSubject, forkJoin, Observable, of } from 'rxjs';
+import { CitiesService } from './cities.service'
 import { Converter } from 'usng.js';
 import { CoordinateSystem } from '../datatypes/coordinate-system';
 import { di } from 'fudgel/dist/di';
 import { DirectionService } from './direction.service';
-import { first, map } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { PreferenceService } from './preference.service';
 
 // By default, usng uses NAD83 but doesn't support WGS84. This is a workaround.
@@ -64,7 +63,7 @@ export interface UTMUPS {
 export type SystemCoordinates = LL | MGRS | UTMUPS;
 
 export class CoordinateService {
-    private _citiesSubject: ReplaySubject<CityCoords> | null = null;
+    private _citiesService = di(CitiesService);
     private _currentSetting = new BehaviorSubject<CoordinateSystem>(
         CoordinateSystemDefault
     );
@@ -95,44 +94,6 @@ export class CoordinateService {
 
     getCurrentSetting() {
         return this._currentSetting.asObservable();
-    }
-
-    getNearestMajorCity(lat: number, lon: number): Observable<NearestCity> {
-        return this._getCitiesObservable().pipe(first(), map((cities) => {
-            const cheapRuler = new CheapRuler(lat, 'meters');
-            const entries = [...Object.entries(cities)];
-            const closest: NearestCity = entries.reduce<NearestCity>(
-                (closest: NearestCity, city): NearestCity => {
-                    const cityName = city[0];
-                    const cityLat = city[1][0];
-                    const cityLon = city[1][1];
-                    const distance = cheapRuler.distance(
-                        [lon, lat],
-                        [cityLon, cityLat]
-                    );
-
-                    if (distance < closest.distance) {
-                        const bearing = cheapRuler.bearing(
-                            [lon, lat],
-                            [cityLon, cityLat]
-                        );
-
-                        return {
-                            name: cityName,
-                            lat: cityLat,
-                            lon: cityLon,
-                            distance,
-                            bearing,
-                        };
-                    }
-
-                    return closest;
-                },
-                { name: '', lat: NaN, lon: NaN, distance: Infinity, bearing: NaN }
-            );
-
-            return closest;
-        }));
     }
 
     latLonToSystem(lat: number, lon: number): SystemCoordinates {
@@ -222,37 +183,8 @@ export class CoordinateService {
         return [firstHalf.join(' '), secondHalf.join(' ')];
     }
 
-    private _getCitiesObservable() {
-        if (!this._citiesSubject) {
-            this._citiesSubject = new ReplaySubject(1);
-
-            fetch('/cities.json').then((response) => {
-                response.json().then((data) => {
-                    this._citiesSubject!.next(data);
-                });
-            });
-        }
-
-        return this._citiesSubject.asObservable().pipe(first());
-    }
-
     private _fromStringCity(str: string): Observable<LatLon | null> {
-        return this._getCitiesObservable().pipe(
-            map((cities) => {
-                str = str.toLowerCase().trim();
-                const strLen = str.length;
-
-                for (const city of Object.keys(cities)) {
-                    if (city.length === strLen && city.toLowerCase() === str) {
-                        const [lat, lon] = cities[city];
-
-                        return { lat, lon };
-                    }
-                }
-
-                return null;
-            })
-        );
+        return this._citiesService.getCityByName(str);
     }
 
     private _fromStringDegrees(str: string): Observable<LatLon | null> {
