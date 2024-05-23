@@ -3,12 +3,8 @@ import { di } from 'fudgel';
 import { from, of } from 'rxjs';
 import { PermissionsService } from './permissions.service';
 import { PreferenceService } from './preference.service';
-import { scanImageData, setModuleArgs } from '@undecaf/zbar-wasm';
+import { scanImageData } from '@undecaf/zbar-wasm';
 import { switchMap } from 'rxjs/operators';
-
-setModuleArgs({
-    locateFile: () => '/zbar.wasm'
-});
 
 export interface DetectedBarcodeData {
     boundingBox?: DOMRectReadOnly; // Native only
