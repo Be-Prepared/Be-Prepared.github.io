@@ -58,9 +58,9 @@ createInterface({
         let highestPopulation = 0;
         let lowestPopulation = Number.MAX_SAFE_INTEGER;
 
-        for (const name of namesSorted) {
-            const value = entries.get(name);
-            result[name] = [value.lat, value.lon];
+        for (const nameLc of namesSorted) {
+            const value = entries.get(nameLc);
+            result[value.name] = [value.lat, value.lon];
             highestPopulation = Math.max(highestPopulation, value.population);
             lowestPopulation = Math.min(lowestPopulation, value.population);
         }

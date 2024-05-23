@@ -1,3 +1,0 @@
-Patched "zbar.wasm" to "/zbar.wasm" to fix the path in the URL.
-
-This was done by building zbar-wasm without terser, copying dist/index.mjs, then making minor changes to ensure "/zbar.wasm" was used.

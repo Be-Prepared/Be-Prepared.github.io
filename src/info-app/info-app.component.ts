@@ -66,6 +66,7 @@ import { Component, css, html } from 'fudgel';
 })
 export class InfoAppComponent {
     showQr = false;
+    website = __WEBSITE__;
 
     closeQrCode() {
         this.showQr = false;

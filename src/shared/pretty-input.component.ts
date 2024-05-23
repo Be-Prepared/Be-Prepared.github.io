@@ -44,7 +44,7 @@ import { Component, css, emit, html } from 'fudgel';
 
         .help {
             flex-grow: 1;
-            overflow: scroll;
+            overflow: auto;
             background-color: var(--bg-color);
             border: 1px solid var(--fg-color);
             padding: 0 0.5em;

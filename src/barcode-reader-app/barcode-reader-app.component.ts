@@ -38,12 +38,14 @@ import { UrlService } from '../services/url.service';
             color: var(--button-fg-color-enabled);
         }
 
-        .rawValue {
+        .raw-value {
             background-color: var(--bg-color);
             padding: 1em;
             border-radius: 0.5em;
             font-size: 1.4em;
             word-wrap: break-word;
+            box-sizing: border-box;
+            max-width: 100%;
         }
     `,
     template: html`
@@ -67,7 +69,7 @@ import { UrlService } from '../services/url.service';
                 ></scaling-icon>
             </div>
             <show-modal *if="barcodeFound" @clickoutside="resetFound()">
-                <div class="rawValue" @click="resetFound()">
+                <div class="raw-value" @click="resetFound()">
                     <styled-link
                         *if="isUrl"
                         href="{{barcodeFound.rawValue}}"

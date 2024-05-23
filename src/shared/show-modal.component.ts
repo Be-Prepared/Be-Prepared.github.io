@@ -13,19 +13,18 @@ import { Component, css, emit, html } from 'fudgel';
         }
 
         .inner {
-            max-width: 90%;
-            max-height: 90%;
-            display: block;
-        }
-
-        slot {
-            display: block;
+            width: 90%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
         }
     `,
     template: html`
         <div class="outer" @click.stop.prevent="clickOutside()">
-            <div class="inner" @click.stop="ignore()">
-                <slot></slot>
+            <div class="inner">
+                <slot @click.stop="ignore"></slot>
             </div>
         </div>
     `,

@@ -83,12 +83,12 @@ export class CoordinateService {
     fromString(str: string): Observable<LatLon | null> {
         str = str.trim();
 
-        return forkJoin(
+        return forkJoin([
             this._fromStringDegrees(str),
             this._fromStringMgrs(str),
             this._fromStringUtmUps(str),
             this._fromStringCity(str)
-        ).pipe(map(([degrees, mgrs, utmUps, city]) => {
+        ]).pipe(map(([degrees, mgrs, utmUps, city]) => {
             return degrees || mgrs || utmUps || city;
         }));
     }
@@ -233,7 +233,7 @@ export class CoordinateService {
             });
         }
 
-        return this._citiesSubject.asObservable();
+        return this._citiesSubject.asObservable().pipe(first());
     }
 
     private _fromStringCity(str: string): Observable<LatLon | null> {
