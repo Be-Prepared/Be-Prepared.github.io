@@ -9,21 +9,25 @@ import { Subscription } from 'rxjs';
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: space-evenly;
             height: 100%;
             width: 100%;
+            overflow: hidden;
         }
+
         @media (orientation: landscape) {
             .wrapper {
-                flex-direction: row-reverse;
+                flex-direction: row;
             }
         }
-        .compassRose {
+
+        .compass-rose {
             padding: 2em;
             height: min(80vh, 80vw);
             width: min(80vh, 80vw);
             aspect-ratio: 1/1;
         }
+
         .info {
             display: flex;
             align-items: center;
@@ -32,33 +36,27 @@ import { Subscription } from 'rxjs';
             width: 100%;
             height: 100%;
         }
-        .infoDegrees {
+
+        .info-degrees {
             flex-grow: 1;
             display: flex;
             font-size: 3em;
             align-items: center;
         }
-        .buttons {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-        }
     `,
     template: html`
-        <div class="wrapper">
-            <load-svg
-                class="compassRose"
-                href="/compass-rose.svg"
-                #ref="compassRose"
-            ></load-svg>
-            <div class="info">
-                <div class="infoDegrees">{{headingDirection}}</div>
-
-                <div class="buttons">
-                    <back-button></back-button>
+        <default-layout>
+            <div class="wrapper">
+                <load-svg
+                    class="compass-rose"
+                    href="/compass-rose.svg"
+                    #ref="compassRose"
+                ></load-svg>
+                <div class="info">
+                    <div class="info-degrees">{{headingDirection}}</div>
                 </div>
             </div>
-        </div>
+        </default-layout>
     `,
 })
 export class CompassAppComponent {

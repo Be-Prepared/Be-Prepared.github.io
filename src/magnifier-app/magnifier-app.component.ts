@@ -7,30 +7,11 @@ import { TorchService } from '../services/torch.service';
 
 @Component('magnifier-app', {
     style: css`
-        :host,
-        .wrapper {
-            height: 100%;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-        }
-
         video {
             height: 100%;
             width: 100%;
             object-fit: cover;
             touch-action: none;
-        }
-
-        .bottom {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            display: flex;
-            width: 100%;
-            justify-content: space-between;
         }
 
         .enabled {
@@ -45,30 +26,28 @@ import { TorchService } from '../services/torch.service';
         ></permission-prompt>
         <permission-denied *if="explainDeny"></permission-denied>
         <camera-unavailable *if="explainUnavailable"></camera-unavailable>
-        <div *if="showControls" class="wrapper">
-            <video
-                @pointerdown.stop.prevent="pointerDown($event)"
-                @pointermove.stop.prevent="pointerMove($event)"
-                @pointerup.stop.prevent="pointerUp($event)"
-                @pointercancel.stop.prevent="pointerUp($event)"
-                @pointerout.stop.prevent="pointerUp($event)"
-                @pointerleave.stop.prevent="pointerUp($event)"
-                #ref="video"
-                autoplay
-                muted
-                playsinline
-            ></video>
-            <div class="bottom">
-                <back-button></back-button>
-                <div></div>
-                <scaling-icon
-                    *if="torchAvailable"
-                    @click.stop.prevent="toggleTorch()"
-                    class="{{torchClass}}"
-                    href="/flashlight.svg"
-                ></scaling-icon>
-            </div>
-        </div>
+        <video
+            *if="showControls"
+            @pointerdown.stop.prevent="pointerDown($event)"
+            @pointermove.stop.prevent="pointerMove($event)"
+            @pointerup.stop.prevent="pointerUp($event)"
+            @pointercancel.stop.prevent="pointerUp($event)"
+            @pointerout.stop.prevent="pointerUp($event)"
+            @pointerleave.stop.prevent="pointerUp($event)"
+            #ref="video"
+            autoplay
+            muted
+            playsinline
+        ></video>
+        <default-layout *if="showControls">
+            <scaling-icon
+                slot="more-buttons"
+                *if="torchAvailable"
+                @click.stop.prevent="toggleTorch()"
+                class="{{torchClass}}"
+                href="/flashlight.svg"
+            ></scaling-icon>
+        </default-layout>
     `,
 })
 export class MagnifierAppComponent {
@@ -174,7 +153,7 @@ export class MagnifierAppComponent {
         this._pointerEventCache = this._pointerEventCache.filter(
             (previousEvent) => {
                 return previousEvent.pointerId !== event.pointerId;
-            },
+            }
         );
     }
 
@@ -202,7 +181,7 @@ export class MagnifierAppComponent {
 
             return Math.sqrt(
                 Math.pow(second.clientX - first.clientX, 2) +
-                    Math.pow(second.clientY - first.clientY, 2),
+                    Math.pow(second.clientY - first.clientY, 2)
             );
         }
 

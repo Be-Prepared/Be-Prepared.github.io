@@ -20,17 +20,12 @@ interface WaypointAugmented extends WaypointSaved {
 
 @Component('location-list-app', {
     style: css`
-        .wrapper {
+        .full-flex {
             display: flex;
-            flex-direction: column;
             height: 100%;
             width: 100%;
-        }
-
-        .buttons {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
+            justify-content: center;
+            align-items: center;
         }
 
         .add {
@@ -49,7 +44,7 @@ interface WaypointAugmented extends WaypointSaved {
             overflow: hidden;
         }
 
-        .pointListWrapper {
+        .point-list-wrapper {
             width: 100%;
             max-height: 100%;
             border: var(--table-border);
@@ -57,7 +52,7 @@ interface WaypointAugmented extends WaypointSaved {
             flex-direction: column;
         }
 
-        .pointListHeader {
+        .point-list-weader {
             flex-shrink: 0;
             width: 100%;
             padding: 0.5em;
@@ -69,11 +64,11 @@ interface WaypointAugmented extends WaypointSaved {
             overflow: hidden;
         }
 
-        .pointList {
+        .point-list {
             overflow: auto;
         }
 
-        .pointListLine {
+        .point-list-line {
             width: 100%;
             justify-content: space-between;
             display: flex;
@@ -95,23 +90,13 @@ interface WaypointAugmented extends WaypointSaved {
             white-space: nowrap;
             padding: 0 0.2em 0 0.8em;
         }
-
-        @media (orientation: landscape) {
-            .wrapper {
-                flex-direction: row-reverse;
-            }
-
-            .buttons {
-                flex-direction: column-reverse;
-            }
-        }
     `,
     template: html`
         <location-wrapper>
-            <div class="wrapper">
-                <div class="content">
-                    <div *if="points.length" class="pointListWrapper">
-                        <div class="pointListHeader">
+            <default-layout>
+                <div class="full-flex">
+                    <div *if="points.length" class="point-list-wrapper">
+                        <div class="point-list-weader">
                             <div class="name" @click="sortByName()">
                                 <i18n-label
                                     id="location.waypoints.name"
@@ -123,10 +108,10 @@ interface WaypointAugmented extends WaypointSaved {
                                 ></i18n-label>
                             </div>
                         </div>
-                        <div class="pointList">
+                        <div class="point-list">
                             <div
                                 *for="waypoint of points"
-                                class="pointListLine"
+                                class="point-list-line"
                                 @click.stop.prevent="goToEdit(waypoint)"
                             >
                                 <div class="name">{{ waypoint.name }}</div>
@@ -142,15 +127,13 @@ interface WaypointAugmented extends WaypointSaved {
                         ></i18n-label>
                     </div>
                 </div>
-                <div class="buttons">
-                    <back-button></back-button>
-                    <scaling-icon
-                        class="add"
-                        @click.stop.prevent="goToAdd()"
-                        href="/add.svg"
-                    ></scaling-icon>
-                </div>
-            </div>
+                <scaling-icon
+                    slot="more-buttons"
+                    class="add"
+                    @click.stop.prevent="goToAdd()"
+                    href="/add.svg"
+                ></scaling-icon>
+            </default-layout>
         </location-wrapper>
     `,
 })
@@ -241,7 +224,7 @@ export class LocationListAppComponent {
                 ...point,
                 meters: 0,
                 location: this._i18nService.get(
-                    'location.waypoints.unknownLocation',
+                    'location.waypoints.unknownLocation'
                 ),
             };
         });

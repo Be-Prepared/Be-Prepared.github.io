@@ -11,26 +11,6 @@ import { Component, css, html } from 'fudgel';
             box-sizing: border-box;
         }
 
-        .wrapper {
-            padding: 1em;
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-            display: flex;
-            box-sizing: border-box;
-        }
-
-        .wrapperInner {
-            flex-grow: 1;
-            padding: 0.3em;
-            border-style: solid;
-            box-sizing: border-box;
-            border-width: 1px;
-            overflow-x: auto;
-            height: 100%;
-            width: 100%;
-        }
-
         .buttons {
             display: flex;
         }
@@ -46,19 +26,14 @@ import { Component, css, html } from 'fudgel';
         }
     `,
     template: html`
-        <div class="wrapper">
-            <div class="wrapperInner">
-                <info-share @qr="openQrCode()"></info-share>
-                <info-permissions></info-permissions>
-                <info-preferences></info-preferences>
-                <info-barcodes></info-barcodes>
-                <info-tooling></info-tooling>
-                <info-build></info-build>
-            </div>
-        </div>
-        <div class="buttons">
-            <back-button></back-button>
-        </div>
+        <default-layout frame>
+            <info-share @qr="openQrCode()"></info-share>
+            <info-permissions></info-permissions>
+            <info-preferences></info-preferences>
+            <info-barcodes></info-barcodes>
+            <info-tooling></info-tooling>
+            <info-build></info-build>
+        </default-layout>
         <show-modal *if="showQr" @clickoutside="closeQrCode()">
             <big-qr @click="closeQrCode()" content="{{website}}"></big-qr>
         </show-modal>

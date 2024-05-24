@@ -6,24 +6,6 @@ import { takeUntil } from 'rxjs/operators';
 
 @Component('nfc-app', {
     style: css`
-        :host {
-            display: flex;
-            flex-direction: column;
-            font-size: 1.2em;
-            height: 100%;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .wrapper {
-            padding: 1em;
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-            display: flex;
-            box-sizing: border-box;
-        }
-
         .enabled {
             color: var(--button-fg-color-enabled);
         }
@@ -35,28 +17,6 @@ import { takeUntil } from 'rxjs/operators';
             align-items: center;
             font-size: 2em;
         }
-
-        .wrapperInner {
-            flex-grow: 1;
-            padding: 0.3em;
-            border-style: solid;
-            box-sizing: border-box;
-            border-width: 1px;
-            overflow-x: auto;
-            height: 100%;
-            width: 100%;
-        }
-
-        @media (orientation: landscape) {
-            :host,
-            .wrapper {
-                flex-direction: row-reverse;
-            }
-
-            .buttons {
-                flex-direction: column-reverse;
-            }
-        }
     `,
     template: html`
         <permission-prompt
@@ -66,14 +26,9 @@ import { takeUntil } from 'rxjs/operators';
         ></permission-prompt>
         <permission-denied *if="explainDeny"></permission-denied>
         <camera-unavailable *if="explainUnavailable"></camera-unavailable>
-        <div *if="showControls" class="wrapper">
-            <div class="wrapperInner">
-                <nfc-scan-result .scan-result="lastRead"></nfc-scan-result>
-            </div>
-        </div>
-        <div *if="showControls">
-            <back-button></back-button>
-        </div>
+        <default-layout *if="showControls" frame>
+            <nfc-scan-result .scan-result="lastRead"></nfc-scan-result>
+        </default-layout>
     `,
 })
 export class NfcAppComponent {

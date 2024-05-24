@@ -3,6 +3,7 @@ export * from './big-qr.component';
 export * from './bottom-drawer.component';
 export * from './camera-unavailable.component';
 export * from './changeable-setting.component';
+export * from './default-layout.component';
 export * from './grow-to-fit-font-size.component';
 export * from './load-svg.component';
 export * from './mini-qr.component';

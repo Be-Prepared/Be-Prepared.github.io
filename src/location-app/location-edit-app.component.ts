@@ -44,7 +44,6 @@ import { WaypointService } from './waypoint.service';
         .detail {
             height: 100%;
             width: 100%;
-            padding: 1em;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -53,12 +52,17 @@ import { WaypointService } from './waypoint.service';
             overflow: hidden;
         }
 
-        .delete {
+        .actions {
             box-sizing: border-box;
-            padding: 8px 8px 0 8px;
             width: 100%;
             display: flex;
             justify-content: space-between;
+        }
+
+        @media (orientation: portrait) {
+            .landscape {
+                display: none;
+            }
         }
 
         @media (orientation: landscape) {
@@ -68,6 +72,10 @@ import { WaypointService } from './waypoint.service';
 
             .buttons {
                 flex-direction: column-reverse;
+            }
+
+            .portrait {
+                display: none;
             }
         }
 
@@ -87,12 +95,20 @@ import { WaypointService } from './waypoint.service';
     `,
     template: html`
         <location-wrapper>
-            <div class="wrapper" *if="point">
+            <default-layout *if="point">
                 <div class="content">
-                    <div class="delete">
+                    <div class="actions">
                         <pretty-button @click="openQrCode()" padding="0px">
-                            <mini-qr content="geo:{{lat}},{{lon}}?q={{nameUrlEncode}}"></mini-qr>
+                            <mini-qr
+                                content="geo:{{lat}},{{lon}}?q={{nameUrlEncode}}"
+                            ></mini-qr>
                         </pretty-button>
+                        <div class="centered-text">
+                            <i18n-label
+                                class="landscape"
+                                id="location.edit.helpSave"
+                            ></i18n-label>
+                        </div>
                         <pretty-labeled-button
                             @click="deletePoint()"
                             id="location.edit.delete"
@@ -128,22 +144,24 @@ import { WaypointService } from './waypoint.service';
                         <div class="gapAbove centered-text">
                             <i18n-label
                                 id="location.edit.helpSave"
+                                class="portrait"
                             ></i18n-label>
                         </div>
                     </div>
                 </div>
-                <div class="buttons">
-                    <back-button></back-button>
-                    <scaling-icon
-                        *if="validPoint"
-                        class="navigate"
-                        @click.stop.prevent="navigate()"
-                        href="/navigate.svg"
-                    ></scaling-icon>
-                </div>
-            </div>
+                <scaling-icon
+                    slot="more-buttons"
+                    *if="validPoint"
+                    class="navigate"
+                    @click.stop.prevent="navigate()"
+                    href="/navigate.svg"
+                ></scaling-icon>
+            </default-layout>
             <show-modal *if="showQr" @clickoutside="closeQrCode()">
-                <big-qr @click="closeQrCode()" content="geo:{{lat}},{{lon}}?q={{nameUrlEncode}}"></big-qr>
+                <big-qr
+                    @click="closeQrCode()"
+                    content="geo:{{lat}},{{lon}}?q={{nameUrlEncode}}"
+                ></big-qr>
             </show-modal>
         </location-wrapper>
     `,
@@ -196,19 +214,21 @@ export class LocationEditComponent {
     }
 
     locationChange(location: string) {
-        this._coordinateService.fromString(location).subscribe((convertedLocation) => {
-            if (convertedLocation) {
-                this.point!.lat = convertedLocation.lat;
-                this.point!.lon = convertedLocation.lon;
-                this._updatePointProperties();
-                this._waypointService.updatePoint(this.point!);
-                this._updateLocation();
-                this.validPoint = true;
-            } else {
-                this._toastService.popI18n('location.edit.badLocation');
-                this.validPoint = false;
-            }
-        });
+        this._coordinateService
+            .fromString(location)
+            .subscribe((convertedLocation) => {
+                if (convertedLocation) {
+                    this.point!.lat = convertedLocation.lat;
+                    this.point!.lon = convertedLocation.lon;
+                    this._updatePointProperties();
+                    this._waypointService.updatePoint(this.point!);
+                    this._updateLocation();
+                    this.validPoint = true;
+                } else {
+                    this._toastService.popI18n('location.edit.badLocation');
+                    this.validPoint = false;
+                }
+            });
     }
 
     nameChange(name: string) {
@@ -221,7 +241,7 @@ export class LocationEditComponent {
         history.pushState(
             {},
             document.title,
-            `/location-navigate/${this.point!.id}`,
+            `/location-navigate/${this.point!.id}`
         );
     }
 
@@ -238,7 +258,7 @@ export class LocationEditComponent {
     private _updateLocation() {
         const location = this._coordinateService.latLonToSystem(
             this.point!.lat,
-            this.point!.lon,
+            this.point!.lon
         );
 
         if ('mgrs' in location) {

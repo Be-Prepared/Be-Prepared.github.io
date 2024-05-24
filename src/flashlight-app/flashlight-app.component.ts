@@ -8,20 +8,17 @@ import { WakeLockService } from '../services/wake-lock.service';
 
 @Component('flashlight-app', {
     style: css`
-        :host,
-        .wrapper {
+        :host {
             height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
             width: 100%;
         }
 
-        .buttonBar {
+        .wrapper {
+            height: 100%;
             width: 100%;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
+            align-items: center;
         }
     `,
     template: html`
@@ -34,18 +31,16 @@ import { WakeLockService } from '../services/wake-lock.service';
         <flashlight-unavailable
             *if="explainUnavailable"
         ></flashlight-unavailable>
-        <div *if="showControls" class="wrapper">
-            <div></div>
-            <pretty-button
-                .enabled="enabled"
-                @click.stop.prevent="toggle()"
-            >
-                <scaling-icon href="/flashlight.svg"></scaling-icon>
-            </pretty-button>
-            <div class="buttonBar">
-                <back-button></back-button>
+        <default-layout *if="showControls">
+            <div class="wrapper">
+                <pretty-button
+                    .enabled="enabled"
+                    @click.stop.prevent="toggle()"
+                >
+                    <scaling-icon href="/flashlight.svg"></scaling-icon>
+                </pretty-button>
             </div>
-        </div>
+        </default-layout>
     `,
 })
 export class FlashlightAppComponent {

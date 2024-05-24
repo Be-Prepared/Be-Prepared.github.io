@@ -12,10 +12,6 @@ import { UrlService } from '../services/url.service';
         .wrapper {
             height: 100%;
             width: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
         }
 
         video {
@@ -23,15 +19,6 @@ import { UrlService } from '../services/url.service';
             width: 100%;
             object-fit: cover;
             touch-action: none;
-        }
-
-        .bottom {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            display: flex;
-            width: 100%;
-            justify-content: space-between;
         }
 
         .enabled {
@@ -58,16 +45,15 @@ import { UrlService } from '../services/url.service';
         <camera-unavailable *if="explainUnavailable"></camera-unavailable>
         <div *if="showControls" class="wrapper">
             <video #ref="video" autoplay muted playsinline></video>
-            <div class="bottom" #ref="bottom">
-                <back-button></back-button>
-                <div></div>
+            <default-layout>
                 <scaling-icon
+                    slot="more-buttons"
                     *if="torchAvailable"
                     @click.stop.prevent="toggleTorch()"
                     class="{{torchClass}}"
                     href="/flashlight.svg"
                 ></scaling-icon>
-            </div>
+            </default-layout>
             <show-modal *if="barcodeFound" @clickoutside="resetFound()">
                 <div class="raw-value" @click="resetFound()">
                     <styled-link
@@ -90,7 +76,6 @@ export class BarcodeReaderAppComponent {
     private _torchService = di(TorchService);
     private _urlService = di(UrlService);
     barcodeFound: DetectedBarcodeData | null = null;
-    bottom?: HTMLElement;
     explainAsk = false;
     explainDeny = false;
     explainUnavailable = false;

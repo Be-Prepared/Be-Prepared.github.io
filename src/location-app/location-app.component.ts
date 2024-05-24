@@ -11,19 +11,6 @@ import { takeUntil } from 'rxjs/operators';
 
 @Component('location-app', {
     style: css`
-        .wrapper {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            width: 100%;
-        }
-
-        .buttons {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-        }
-
         .list {
             padding: 5px;
         }
@@ -40,7 +27,7 @@ import { takeUntil } from 'rxjs/operators';
             overflow: hidden;
         }
 
-        .gapAbove {
+        .gap-above {
             padding-top: 0.4em;
         }
 
@@ -50,52 +37,42 @@ import { takeUntil } from 'rxjs/operators';
             text-align: center;
         }
 
-        @media (orientation: landscape) {
-            .wrapper {
-                flex-direction: row-reverse;
-            }
-
-            .buttons {
-                flex-direction: column-reverse;
-            }
-        }
-
-        .fullWidth {
+        .full-width {
             width: 100%;
         }
     `,
     template: html`
         <location-wrapper>
-            <div class="wrapper">
+            <default-layout>
                 <div *if="latLon" class="content">
                     <location-coordinates
                         .coords="latLon"
                     ></location-coordinates>
-                    <div class="gapAbove fullWidth">
+                    <div class="gap-above full-width">
                         <location-field
                             id="current.1"
                             default="ACCURACY"
                         ></location-field>
                     </div>
-                    <div class="fullWidth">
+                    <div class="full-width">
                         <location-field
                             id="current.2"
                             default="SPEED"
                         ></location-field>
                     </div>
-                    <div class="fullWidth">
+                    <div class="full-width">
                         <location-field
                             id="current.3"
                             default="HEADING"
                         ></location-field>
                     </div>
-                    <div class="fullWidth">
+                    <div class="full-width">
                         <location-field
                             id="current.4"
                             default="ALTITUDE"
                         ></location-field>
                     </div>
-                    <div class="fullWidth">
+                    <div class="full-width">
                         <location-field
                             id="current.5"
                             default="ALTITUDE_ACCURACY"
@@ -103,7 +80,9 @@ import { takeUntil } from 'rxjs/operators';
                     </div>
                 </div>
                 <div *if="position && position.error" class="content">
-                    <p><i18n-label id="location.positionError"></i18n-label></p>
+                    <p>
+                        <i18n-label id="location.positionError"></i18n-label>
+                    </p>
                     <p
                         *if="position.error.code === position.error.PERMISSION_DENIED"
                     >
@@ -124,15 +103,13 @@ import { takeUntil } from 'rxjs/operators';
                         ></i18n-label>
                     </p>
                 </div>
-                <div class="buttons">
-                    <back-button></back-button>
-                    <scaling-icon
-                        class="list"
-                        @click="goToList()"
-                        href="/list.svg"
-                    ></scaling-icon>
-                </div>
-            </div>
+                <scaling-icon
+                    slot="more-buttons"
+                    class="list"
+                    @click="goToList()"
+                    href="/list.svg"
+                ></scaling-icon>
+            </default-layout>
         </location-wrapper>
     `,
 })
@@ -143,7 +120,8 @@ export class LocationAppComponent {
     position: GeolocationCoordinateResult | null = null;
 
     onInit() {
-        this._geolocationService.availabilityState()
+        this._geolocationService
+            .availabilityState()
             .pipe(
                 takeUntil(this._subject),
                 filter((state) => {

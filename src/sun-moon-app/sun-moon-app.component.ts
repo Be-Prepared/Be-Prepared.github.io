@@ -10,25 +10,14 @@ import { ToastService } from '../services/toast.service';
 
 @Component('sun-moon-app', {
     style: css`
-        :host {
+        .flex-full {
             display: flex;
             flex-direction: column;
-            font-size: 1.2em;
             height: 100%;
             width: 100%;
-            box-sizing: border-box;
-        }
-
-        .content {
-            height: 100%;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
         }
 
         .location {
-            padding: 1em 1em 0 1em;
             display: flex;
             align-items: center;
             gap: 1em;
@@ -44,7 +33,7 @@ import { ToastService } from '../services/toast.service';
         }
 
         .wrapper {
-            padding: 1em;
+            padding-top: 1em;
             height: 100%;
             width: 100%;
             overflow: hidden;
@@ -67,20 +56,6 @@ import { ToastService } from '../services/toast.service';
             height: 0.5em;
         }
 
-        .buttons {
-            display: flex;
-        }
-
-        @media (orientation: landscape) {
-            :host {
-                flex-direction: row-reverse;
-            }
-
-            .buttons {
-                flex-direction: column-reverse;
-            }
-        }
-
         load-svg {
             width: 3em;
             height: 3em;
@@ -99,49 +74,48 @@ import { ToastService } from '../services/toast.service';
         }
     `,
     template: html`
-        <div class="content">
-            <div class="location">
-                <div class="grow coordinates">
-                    <div class="space-between-bottom">
-                        <i18n-label id="sunMoon.enterCoordinates"></i18n-label>
-                        <location-coordinate-info></location-coordinate-info>
+        <default-layout frameless>
+            <div class="flex-full">
+                <div class="location">
+                    <div class="grow coordinates">
+                        <div class="space-between-bottom">
+                            <i18n-label id="sunMoon.enterCoordinates"></i18n-label>
+                            <location-coordinate-info></location-coordinate-info>
+                        </div>
+                        <pretty-input
+                            type="text"
+                            @change.stop.prevent="locationUpdate($event.detail)"
+                            #ref="input"
+                            class="grow"
+                            help-html="location.help.html"
+                        ></pretty-input>
                     </div>
-                    <pretty-input
-                        type="text"
-                        @change.stop.prevent="locationUpdate($event.detail)"
-                        #ref="input"
-                        class="grow"
-                        help-html="location.help.html"
-                    ></pretty-input>
+                    <div *if="allowGetLocation">
+                        <load-svg
+                            href="/location.svg"
+                            @click.stop.prevent="getCurrentLocation()"
+                        ></load-svg>
+                    </div>
                 </div>
-                <div *if="allowGetLocation">
-                    <load-svg
-                        href="/location.svg"
-                        @click.stop.prevent="getCurrentLocation()"
-                    ></load-svg>
-                </div>
-            </div>
-            <div class="wrapper">
-                <div class="wrapper-inner">
-                    <div>{{location}}</div>
-                    <nearest-major-city
-                        .coordinates="coordinates"
-                    ></nearest-major-city>
-                    <div class="gap"></div>
-                    <sun-position .coordinates="coordinates"></sun-position>
-                    <sun-times .coordinates="coordinates"></sun-times>
-                    <div class="gap"></div>
-                    <moon-position .coordinates="coordinates"></moon-position>
-                    <moon-times .coordinates="coordinates"></moon-times>
-                    <moon-illumination
-                        .coordinates="coordinates"
-                    ></moon-illumination>
+                <div class="wrapper">
+                    <div class="wrapper-inner">
+                        <div>{{location}}</div>
+                        <nearest-major-city
+                            .coordinates="coordinates"
+                        ></nearest-major-city>
+                        <div class="gap"></div>
+                        <sun-position .coordinates="coordinates"></sun-position>
+                        <sun-times .coordinates="coordinates"></sun-times>
+                        <div class="gap"></div>
+                        <moon-position .coordinates="coordinates"></moon-position>
+                        <moon-times .coordinates="coordinates"></moon-times>
+                        <moon-illumination
+                            .coordinates="coordinates"
+                        ></moon-illumination>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="buttons">
-            <back-button class="paddingTop"></back-button>
-        </div>
+        </default-layout>
         <show-modal *if="gettingLocation">
             <div class="getting-location">
                 <i18n-label id="sunMoon.geolocation"></i18n-label>

@@ -6,19 +6,6 @@ import { WaypointService } from './waypoint.service';
 @Component('location-navigate-app', {
     attr: ['id'],
     style: css`
-        .wrapper {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            width: 100%;
-        }
-
-        .buttons {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-        }
-
         .navigate {
             padding: 5px;
         }
@@ -83,28 +70,28 @@ import { WaypointService } from './waypoint.service';
             max-width: 100%;
         }
 
-        .navigationArrow {
+        .navigation-arrow {
             flex-grow: 1;
             width: 100%;
         }
 
-        .gapAbove {
+        .gap-above {
             padding-top: 0.4em;
         }
     `,
     template: html`
         <location-wrapper>
-            <div class="wrapper">
+            <default-layout>
                 <div class="content">
                     <div class="type-and-arrow">
                         <navigation-type></navigation-type>
                         <navigation-arrow
-                            class="navigationArrow"
+                            class="navigation-arrow"
                             lat="{{point.lat}}"
                             lon="{{point.lon}}"
                         ></navigation-arrow>
                     </div>
-                    <div class="gapAbove fields">
+                    <div class="gap-above fields">
                         <div class="field">
                             <location-field
                                 id="navigate.1"
@@ -152,13 +139,7 @@ import { WaypointService } from './waypoint.service';
                         </div>
                     </div>
                 </div>
-                <div class="buttons">
-                    <back-button
-                        @back.stop.prevent="goBack()"
-                        emit="back"
-                    ></back-button>
-                </div>
-            </div>
+            </default-layout>
         </location-wrapper>
     `,
 })
