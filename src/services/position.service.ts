@@ -1,5 +1,7 @@
 import { AvailabilityState } from '../datatypes/availability-state';
 import { catchError, finalize, first, map, share } from 'rxjs/operators';
+import { di } from 'fudgel';
+import { DirectionService } from './direction.service';
 import { of, throwError } from 'rxjs';
 import { Observable, ReplaySubject, Subject } from 'rxjs';
 
@@ -23,6 +25,7 @@ export interface PositionEventQuaternion {
 }
 
 export class PositionService {
+    private _directionService = di(DirectionService);
     private _observable: Observable<PositionEvent> | null = null;
 
     availabilityState() {
@@ -51,10 +54,11 @@ export class PositionService {
 
                 return event.bearing;
             }),
+            map((bearing) => this._directionService.standardize360(bearing)),
             share({
                 connector: () => new ReplaySubject(1),
                 resetOnRefCountZero: true,
-            }),
+            })
         );
     }
 
@@ -74,12 +78,12 @@ export class PositionService {
         return this.getLocationEvents().pipe(
             map(() => AvailabilityState.ALLOWED),
             catchError(() => of(AvailabilityState.UNAVAILABLE)),
-            first(),
+            first()
         );
     }
 
     private _convertDeviceOrientationToBearing(
-        event: PositionEventDeviceOrientation,
+        event: PositionEventDeviceOrientation
     ): number {
         // Convert degrees to radians
         const alphaRad = event.alpha * (Math.PI / 180);
@@ -114,13 +118,13 @@ export class PositionService {
     }
 
     private _convertQuaternionToBearing(
-        event: PositionEventQuaternion,
+        event: PositionEventQuaternion
     ): number {
         const q = event.quaternion;
         const alpha =
             Math.atan2(
                 2 * q[0] * q[1] + 2 * q[2] * q[3],
-                1 - 2 * q[1] * q[1] - 2 * q[2] * q[2],
+                1 - 2 * q[1] * q[1] - 2 * q[2] * q[2]
             ) *
             (180 / Math.PI);
         const bearing = alpha < 0 ? alpha + 360 : alpha;
@@ -165,7 +169,7 @@ export class PositionService {
                 share({
                     connector: () => new ReplaySubject(1),
                     resetOnRefCountZero: true,
-                }),
+                })
             );
         } catch (ignore) {
             this._observable = throwError(new Error('Unsupported'));
@@ -228,7 +232,7 @@ export class PositionService {
             share({
                 connector: () => new ReplaySubject(1),
                 resetOnRefCountZero: true,
-            }),
+            })
         );
         window.addEventListener(eventName, eventListener);
     }

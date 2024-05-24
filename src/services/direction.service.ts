@@ -66,7 +66,7 @@ export class DirectionService {
             return '';
         }
 
-        const rounded = Math.round(direction);
+        const rounded = this.standardize360(Math.round(direction));
 
         return `${this.toHeading(rounded)} ${this.toCompassPoint(
             rounded,
