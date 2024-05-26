@@ -17,12 +17,15 @@ export const DistanceSystemDefault = DistanceSystem.IMPERIAL;
 
 export class DistanceService {
     private _currentSetting = new BehaviorSubject<DistanceSystem>(
-        DistanceSystemDefault,
+        DistanceSystemDefault
     );
     private _preferenceService = di(PreferenceService);
 
     constructor() {
-        if (this._preferenceService.distanceSystem.getItem() === DistanceSystem.METRIC) {
+        if (
+            this._preferenceService.distanceSystem.getItem() ===
+            DistanceSystem.METRIC
+        ) {
             this._currentSetting.next(DistanceSystem.METRIC);
         }
     }

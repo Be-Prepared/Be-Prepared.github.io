@@ -6,6 +6,7 @@ import {
 } from './local-storage.service';
 import { NavigationType } from '../datatypes/navigation-type';
 import { WaypointSaved } from '../datatypes/waypoint-saved';
+import { TimeSystem } from '../datatypes/time-system';
 
 export class PreferenceService {
     barcodeReader: LocalStorageInterface<boolean>;
@@ -16,6 +17,7 @@ export class PreferenceService {
     navigationType: LocalStorageInterface<NavigationType>;
     points: LocalStorageInterface<WaypointSaved[]>;
     sunMoonLocation: LocalStorageInterface<string>;
+    timeSystem: LocalStorageInterface<TimeSystem>;
     torch: LocalStorageInterface<boolean>;
 
     constructor() {
@@ -41,6 +43,7 @@ export class PreferenceService {
         );
         this.points = LocalStorageService.json('points');
         this.sunMoonLocation = LocalStorageService.string('sunMoonLocation');
+        this.timeSystem = LocalStorageService.enum<TimeSystem>('time', TimeSystem);
         this.torch = LocalStorageService.boolean('torch');
     }
 

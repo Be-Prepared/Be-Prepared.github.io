@@ -80,6 +80,29 @@ import { PreferenceService } from '../services/preference.service';
                 <location-field-speed
                     *if="selectedValue === 'SPEED'"
                 ></location-field-speed>
+                <location-field-time
+                    *if="selectedValue === 'TIME'"
+                ></location-field-time>
+                <location-field-time-arrival
+                    *if="selectedValue === 'TIME_ARRIVAL'"
+                    lat="{{lat}}"
+                    lon="{{lon}}"
+                ></location-field-time-arrival>
+                <location-field-time-elapsed
+                    startTime="{{startTime}}"
+                    *if="selectedValue === 'TIME_ELAPSED'"
+                ></location-field-time-elapsed>
+                <location-field-time-moving
+                    *if="selectedValue === 'TIME_MOVING'"
+                ></location-field-time-moving>
+                <location-field-time-remaining
+                    *if="selectedValue === 'TIME_REMAINING'"
+                    lat="{{lat}}"
+                    lon="{{lon}}"
+                ></location-field-time-remaining>
+                <location-field-time-stopped
+                    *if="selectedValue === 'TIME_STOPPED'"
+                ></location-field-time-stopped>
             </div>
         </div>
     `,
@@ -95,6 +118,7 @@ export class LocationFieldComponent {
     name?: string;
     select?: HTMLSelectElement;
     selectedValue = '';
+    startTime = Date.now();
 
     onInit() {
         const allowedFields = [
@@ -103,10 +127,20 @@ export class LocationFieldComponent {
             'ALTITUDE_ACCURACY',
             'HEADING',
             'SPEED',
+            'TIME',
+            'TIME_MOVING',
+            'TIME_STOPPED',
         ];
 
         if (typeof this.lat === 'string' && typeof this.lon === 'string') {
-            allowedFields.push('BEARING', 'DESTINATION', 'DISTANCE');
+            allowedFields.push(
+                'BEARING',
+                'DESTINATION',
+                'DISTANCE',
+                'TIME_ARRIVAL',
+                'TIME_ELAPSED',
+                'TIME_REMAINING'
+            );
         }
 
         this._storage = this._preferenceService.field(
@@ -114,7 +148,8 @@ export class LocationFieldComponent {
             allowedFields
         );
         this.allowedFields = allowedFields;
-        this.selectedValue = this._storage.getItem() || this.default || 'UNKNOWN';
+        this.selectedValue =
+            this._storage.getItem() || this.default || 'UNKNOWN';
     }
 
     selectValue(value: string) {
