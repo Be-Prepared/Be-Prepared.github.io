@@ -19,12 +19,6 @@ import { Component, css, html } from 'fudgel';
                 >
                 - <i18n-label id="info.framework"></i18n-label>
             </li>
-            <li>
-                <styled-link href="https://vecta.io/nano" target="_blank"
-                    >Vecta.io</styled-link
-                >
-                - <i18n-label id="info.svgCompression"></i18n-label>
-            </li>
         </ul>
     `,
 })
