@@ -86,10 +86,10 @@ The Location app can show a number of different fields. The majority can be used
 * Current Time: The current time, in either 24-hour or 12-hour format.
 * Destination (Navigation only): Destination waypoint's name.
 * Distance (Navigation only): How much distance is between you and your destination.
-* Heading: When available, this is the heading reported by your GPS. If not available, this will equal "Heading (Smoothed)".
-* Heading (Smoothed): Your current direction of travel, averaged over the last five successful readings. This is much more accurate if you move in a straight line for several seconds. It uses a [Kalman filter](https://en.wikipedia.org/wiki/Kalman_filter), which takes into account the GPS accuracy figures.
-* Speed: The speed reported by your GPS. If not available, this uses the figure calculated for "Speed (Smoothed)".
-* Speed (Smoothed): An exponential moving average based on the last five successful speed readings.
+* Heading: When available, this is the heading reported by your GPS. If not available, this will be calculated.
+* Heading (Smoothed): Your current direction of travel, averaged over the last five successful readings. It uses a [Kalman filter](https://en.wikipedia.org/wiki/Kalman_filter), which takes into account the GPS accuracy figures and helps eliminate jumps and spikes.
+* Speed: The speed reported by your GPS. If not available, this value is calculated.
+* Speed (Smoothed): An exponential moving average based on the last five successful speed readings or the last five calculated speeds. The average helps eliminate spikes and dips in the speed.
 * Time Elapsed (Navigation only): How long you've been navigating towards a destination.
 * Time Moving: The amount of time where "Speed" is at or greater than 0.35 m/s (just under 0.8 mph). This timer accumulates the entire time you are in any Location screen and reset if you leave for more than a few seconds.
 * Time Remaining (Navigation only): The estimated amount of time you need to travel until you arrive at your waypoint.
