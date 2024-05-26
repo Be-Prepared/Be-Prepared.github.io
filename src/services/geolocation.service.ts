@@ -2,7 +2,7 @@ import { AvailabilityState } from '../datatypes/availability-state';
 import { DirectionService } from './direction.service';
 import CheapRuler from 'cheap-ruler';
 import { di } from 'fudgel';
-import { finalize, share, switchMap } from 'rxjs/operators';
+import { filter, finalize, share, switchMap } from 'rxjs/operators';
 import { KalmanFilterArray } from '@bencevans/kalman-filter';
 import { of, timer } from 'rxjs';
 import { Observable, ReplaySubject, Subject } from 'rxjs';
@@ -29,8 +29,9 @@ export interface GeolocationCoordinateResultSuccess {
     timeStopped: number;
     timeTotal: number;
     firstPosition: GeolocationCoordinateResultSuccess | null;
-    smoothedSpeed: number;
-    smoothedMoving: boolean;
+    headingSmoothed: number;
+    speedSmoothed: number;
+    isMovingSmoothed: boolean;
 }
 
 export interface GeolocationCoordinateResultError {
@@ -85,15 +86,16 @@ export class GeolocationService {
                 timeMoving: 0,
                 timeStopped: 0,
                 timeTotal: 0,
-                smoothedSpeed: 0,
-                smoothedMoving: false,
+                speedSmoothed: 0,
+                isMovingSmoothed: false,
+                headingSmoothed: NaN
             };
 
             lastPositions.push(thisPosition);
             this._calculateAttributes(lastPositions);
             subject.next(thisPosition);
 
-            if (lastPositions.length > 5) {
+            if (lastPositions.length > 4) {
                 lastPositions.shift();
             }
         };
@@ -123,6 +125,12 @@ export class GeolocationService {
         return this._observable;
     }
 
+    getPositionSuccess(): Observable<GeolocationCoordinateResultSuccess> {
+        return this.getPosition().pipe(
+            filter((result) => result && result.success)
+        ) as Observable<GeolocationCoordinateResultSuccess>;
+    }
+
     private _calculateAttributes(
         lastPositions: GeolocationCoordinateResultSuccess[]
     ) {
@@ -138,8 +146,9 @@ export class GeolocationService {
             heading = result.heading;
         }
 
-        current.smoothedSpeed = this._exponentialMovingAverage(previous.smoothedSpeed);
-        current.smoothedMoving = current.smoothedSpeed >= SPEED_THRESHOLD;
+        current.speedSmoothed = this._exponentialMovingAverage(previous.speedSmoothed, speed);
+        current.isMovingSmoothed = current.speedSmoothed >= SPEED_THRESHOLD;
+        current.headingSmoothed = heading;
 
         if (isNotSet(current.speed)) {
             current.speed = speed;

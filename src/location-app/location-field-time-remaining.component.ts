@@ -1,12 +1,16 @@
 import CheapRuler from 'cheap-ruler';
-import { combineLatest, Subscription } from 'rxjs';
 import { Component, css, di, html } from 'fudgel';
-import { GeolocationService } from '../services/geolocation.service';
+import {
+    GeolocationCoordinateResultSuccess,
+    GeolocationService,
+} from '../services/geolocation.service';
 import { I18nService } from '../i18n/i18n.service';
+import { Subscription } from 'rxjs';
 import { TimeService } from '../services/time.service';
 
 @Component('location-field-time-remaining', {
-    attr: ['lat', 'lon'],
+    attr: ['lat', 'lon', 'startTime'],
+    prop: ['startPosition'],
     style: css``,
     template: html`{{value}}`,
 })
@@ -17,45 +21,58 @@ export class LocationFieldTimeRemainingComponent {
     private _timeService = di(TimeService);
     lat?: string;
     lon?: string;
-    value: string;
-
-    constructor() {
-        const unknownValue = this._i18nService.get(
-            'location.field.unknownValue',
-        );
-        this.value = unknownValue;
-    }
+    startPosition?: GeolocationCoordinateResultSuccess;
+    startTime?: string;
+    value: string = '';
 
     onInit() {
-        const lat = parseFloat(this.lat || '')
-        const lon = parseFloat(this.lon || '')
-        const unknownValue = this.value;
+        const unknownValue = this._i18nService.get(
+            'location.field.unknownValue'
+        );
+        const lat = parseFloat(this.lat || '');
+        const lon = parseFloat(this.lon || '');
+        const startTime = parseInt(this.startTime || '', 10);
+        this.value = unknownValue;
 
-        this._subscription = combineLatest([
-            this._geolocationService.getPosition(),
-        ]).subscribe(([position]) => {
-            this.value = unknownValue;
+        this._subscription = this._geolocationService
+            .getPositionSuccess()
+            .subscribe((position) => {
+                if (
+                    position &&
+                    position.success &&
+                    this.startPosition &&
+                    position !== this.startPosition
+                ) {
+                    const cheapRuler = new CheapRuler(
+                        position.latitude,
+                        'meters'
+                    );
+                    const distanceAchieved = cheapRuler.distance(
+                        [
+                            this.startPosition.longitude,
+                            this.startPosition.latitude,
+                        ],
+                        [position.longitude, position.latitude]
+                    );
+                    const distanceRemaining = cheapRuler.distance(
+                        [
+                            this.startPosition.longitude,
+                            this.startPosition.latitude,
+                        ],
+                        [lon, lat]
+                    );
+                    const timeElapsed = position.timestamp - startTime;
+                    const overallSpeed = distanceAchieved / timeElapsed;
 
-            if (position && position.success && position.firstPosition) {
-                const cheapRuler = new CheapRuler(position.latitude, 'meters');
-                const startingPosition = position.firstPosition;
-                const distanceAchieved = cheapRuler.distance(
-                    [startingPosition.longitude, startingPosition.latitude],
-                    [position.longitude, position.latitude],
-                );
-                const distanceRemaining = cheapRuler.distance(
-                    [startingPosition.longitude, startingPosition.latitude],
-                    [lon, lat],
-                );
-                const timeElapsed = position.timestamp - position.firstPosition.timestamp;
-                const overallSpeed = distanceAchieved / timeElapsed;
-
-                if (overallSpeed > 0) {
-                    const timeRemaining = distanceRemaining / overallSpeed;
-                    this.value = this._timeService.formatTime(timeRemaining);
+                    if (overallSpeed > 0) {
+                        const timeRemaining = distanceRemaining / overallSpeed;
+                        this.value =
+                            this._timeService.formatTime(timeRemaining);
+                    }
+                } else {
+                    this.value = unknownValue;
                 }
-            }
-        });
+            });
     }
 
     onDestroy() {

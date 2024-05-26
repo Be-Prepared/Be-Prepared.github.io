@@ -49,7 +49,7 @@ This PWA is also an example for how to use the following:
     * Show your current location using DMS, DDM, or DDD formats for coordinates as well as UTM/UPS and MGRS by tapping on the coordinates.
     * List your speed and accuracy using imperial (feet/miles) or metric (meters/kilometers) by tapping on the relevant fields.
     * Automatically will use high resolution locations (GPS) and will calculate your speed and heading even when the device doesn't support these fields.
-    * Ability to change field functions (especially for Geocaching and the Geocaching merit badge)
+    * Ability to change field functions (especially for Geocaching and the Geocaching merit badge). See field functions section (below) for more information.
     * Keeps the screen enabled while navigating to a point.
 
 ![Barcode Reader](screenshots/barcode-reader.png)
@@ -73,6 +73,27 @@ This PWA is also an example for how to use the following:
     * Shows permission statuses that the application could use and current preferences. Allow resetting of preferences..
     * Gives credit to the tooling that helped make this project.
     * Shows the current build information.
+
+## Field Functions
+
+The Location app can show a number of different fields. The majority can be used at any time and a select few are available only during navigation to a waypoint. Any figures that indicate "Navigation only" will all reset if you leave the navigation screen.
+
+* Accuracy: The GPS's accuracy with regard to longitude and latitude. This is how far off you could be from the actual location. Keep in mind that whomever gave you coordinates also could have been off by some distance; you should be close to the right spot but probably not exactly at the right spot.
+* Altitude Accuracy: How accurate the GPS's altitude measurement is. Not often available.
+* Altitude: Your position above (or below) sea level.
+* Arrival Time (Navigation only): The estimated time for when you will arrive at your destination.
+* Bearing (Navigation only): The direction of the waypoint from your location.
+* Current Time: The current time, in either 24-hour or 12-hour format.
+* Destination (Navigation only): Destination waypoint's name.
+* Distance (Navigation only): How much distance is between you and your destination.
+* Heading: When available, this is the heading reported by your GPS. If not available, this will equal "Heading (Smoothed)".
+* Heading (Smoothed): Your current direction of travel, averaged over the last five successful readings. This is much more accurate if you move in a straight line for several seconds. It uses a [Kalman filter](https://en.wikipedia.org/wiki/Kalman_filter), which takes into account the GPS accuracy figures.
+* Speed: The speed reported by your GPS. If not available, this uses the figure calculated for "Speed (Smoothed)".
+* Speed (Smoothed): An exponential moving average based on the last five successful speed readings.
+* Time Elapsed (Navigation only): How long you've been navigating towards a destination.
+* Time Moving: The amount of time where "Speed" is at or greater than 0.35 m/s (just under 0.8 mph). This timer accumulates the entire time you are in any Location screen and reset if you leave for more than a few seconds.
+* Time Remaining (Navigation only): The estimated amount of time you need to travel until you arrive at your waypoint.
+* Time Stopped: The amount of time where "Speed" is less than the threshold; this is the opposite of "Time Moving".
 
 ## Notes about Data
 

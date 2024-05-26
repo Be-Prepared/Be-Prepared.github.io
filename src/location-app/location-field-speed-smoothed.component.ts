@@ -4,7 +4,7 @@ import { GeolocationService } from '../services/geolocation.service';
 import { I18nService } from '../i18n/i18n.service';
 import { Subscription } from 'rxjs';
 
-@Component('location-field-speed', {
+@Component('location-field-speed-smoothed', {
     style: css``,
     template: html`
         <changeable-setting @click="toggleDistanceSystem()"
@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
         >
     `,
 })
-export class LocationFieldSpeedComponent {
+export class LocationFieldSpeedSmoothedComponent {
     private _distanceService = di(DistanceService);
     private _geolocationService = di(GeolocationService);
     private _i18nService = di(I18nService);
@@ -21,16 +21,17 @@ export class LocationFieldSpeedComponent {
 
     constructor() {
         const unknownValue = this._i18nService.get(
-            'location.field.unknownValue'
+            'location.field.unknownValue',
         );
         this.value = unknownValue;
-        this._geolocationService.getPosition().subscribe((position) => {
+        this._geolocationService.getPosition()
+        .subscribe((position) => {
             if (position && position.success) {
                 this.value = this._distanceService.metersToString(
-                    position.speed,
+                    position.speedSmoothed,
                     {
                         isSpeed: true,
-                    }
+                    },
                 );
             } else {
                 this.value = unknownValue;

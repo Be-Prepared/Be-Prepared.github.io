@@ -1,9 +1,11 @@
 import { Component, css, di, html } from 'fudgel';
+import { GeolocationCoordinateResultSuccess } from '../services/geolocation.service';
 import { LocalStorageInterface } from '../services/local-storage.service';
 import { PreferenceService } from '../services/preference.service';
 
 @Component('location-field', {
-    attr: ['default', 'id', 'lat', 'lon', 'name'],
+    attr: ['default', 'id', 'lat', 'lon', 'name', 'startTime'],
+    prop: ['startPosition'],
     style: css`
         :host {
             max-width: 100%;
@@ -77,9 +79,15 @@ import { PreferenceService } from '../services/preference.service';
                 <location-field-heading
                     *if="selectedValue === 'HEADING'"
                 ></location-field-heading>
+                <location-field-heading-smoothed
+                    *if="selectedValue === 'HEADING_SMOOTHED'"
+                ></location-field-heading-smoothed>
                 <location-field-speed
                     *if="selectedValue === 'SPEED'"
                 ></location-field-speed>
+                <location-field-speed-smoothed
+                    *if="selectedValue === 'SPEED_SMOOTHED'"
+                ></location-field-speed-smoothed>
                 <location-field-time
                     *if="selectedValue === 'TIME'"
                 ></location-field-time>
@@ -87,10 +95,12 @@ import { PreferenceService } from '../services/preference.service';
                     *if="selectedValue === 'TIME_ARRIVAL'"
                     lat="{{lat}}"
                     lon="{{lon}}"
+                    .start-position="{{startPosition}}"
+                    start-time="{{startTime}}"
                 ></location-field-time-arrival>
                 <location-field-time-elapsed
-                    startTime="{{startTime}}"
                     *if="selectedValue === 'TIME_ELAPSED'"
+                    start-time="{{startTime}}"
                 ></location-field-time-elapsed>
                 <location-field-time-moving
                     *if="selectedValue === 'TIME_MOVING'"
@@ -99,6 +109,7 @@ import { PreferenceService } from '../services/preference.service';
                     *if="selectedValue === 'TIME_REMAINING'"
                     lat="{{lat}}"
                     lon="{{lon}}"
+                    start-time="{{startTime}}"
                 ></location-field-time-remaining>
                 <location-field-time-stopped
                     *if="selectedValue === 'TIME_STOPPED'"
@@ -112,13 +123,14 @@ export class LocationFieldComponent {
     private _storage?: LocalStorageInterface<string>;
     allowedFields: string[] = [];
     default?: string;
+    startPosition?: GeolocationCoordinateResultSuccess | null = null;
     id?: string;
     lat?: string;
     lon?: string;
     name?: string;
     select?: HTMLSelectElement;
     selectedValue = '';
-    startTime = Date.now();
+    startTime?: string;
 
     onInit() {
         const allowedFields = [
@@ -126,7 +138,9 @@ export class LocationFieldComponent {
             'ALTITUDE',
             'ALTITUDE_ACCURACY',
             'HEADING',
+            'HEADING_SMOOTHED',
             'SPEED',
+            'SPEED_SMOOTHED',
             'TIME',
             'TIME_MOVING',
             'TIME_STOPPED',
