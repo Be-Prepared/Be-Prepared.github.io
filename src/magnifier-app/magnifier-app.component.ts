@@ -11,6 +11,10 @@ import { TorchService } from '../services/torch.service';
             height: 100%;
             width: 100%;
             object-fit: cover;
+        }
+
+        /* Do not convert pointer events to touch events after 0.3 seconds */
+        default-layout {
             touch-action: none;
         }
 
@@ -28,18 +32,20 @@ import { TorchService } from '../services/torch.service';
         <camera-unavailable *if="explainUnavailable"></camera-unavailable>
         <video
             *if="showControls"
+            #ref="video"
+            autoplay
+            muted
+            playsinline
+        ></video>
+        <default-layout
+            *if="showControls"
             @pointerdown.stop.prevent="pointerDown($event)"
             @pointermove.stop.prevent="pointerMove($event)"
             @pointerup.stop.prevent="pointerUp($event)"
             @pointercancel.stop.prevent="pointerUp($event)"
             @pointerout.stop.prevent="pointerUp($event)"
             @pointerleave.stop.prevent="pointerUp($event)"
-            #ref="video"
-            autoplay
-            muted
-            playsinline
-        ></video>
-        <default-layout *if="showControls">
+        >
             <scaling-icon
                 slot="more-buttons"
                 *if="torchAvailable"
