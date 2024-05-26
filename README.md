@@ -78,7 +78,7 @@ This PWA is also an example for how to use the following:
 
 * Major Cities
     * The cities do not include state, so "Minneapolis" works and "Minneapolis, MN" does not.
-    * This list starts by downloading a list of all cities worldwide that have a population of 15,000 or more. Next, the cities are processed and if there are duplicate names, the one with the highest population is retained. After that, the top 10,000 cities worldwide are kept.
+    * This list starts by downloading a list of all cities worldwide that have a population of 15,000 or more. Next, duplicate city names are eliminated by preserving the more populated city. After that, the top 10,000 cities worldwide are kept and the coordinates are encoded using a base 92-inspired system.
 
 ## For Developers
 
