@@ -1,119 +1,17 @@
 import { AvailabilityState } from '../datatypes/availability-state';
+import { BarcodeReaderInterface } from './barcode-reader/barcode-reader-interface';
+import { BarcodeReaderNative } from './barcode-reader/barcode-reader-native';
+import { BarcodeReaderZBar } from './barcode-reader/barcode-reader-z-bar';
 import { di } from 'fudgel';
 import { from, of } from 'rxjs';
 import { PermissionsService } from './permissions.service';
 import { PreferenceService } from './preference.service';
-import { scanImageData } from '@undecaf/zbar-wasm';
 import { switchMap } from 'rxjs/operators';
-
-export interface DetectedBarcodeData {
-    boundingBox?: DOMRectReadOnly; // Native only
-    cornerPoints?: DOMPointReadOnly[]; // Native only
-    format: string;
-    points?: { x: number; y: number }[];
-    rawValue: string;
-}
-
-interface BarcodeReader {
-    detect(
-        canvas: HTMLCanvasElement,
-        context: CanvasRenderingContext2D
-    ): Promise<DetectedBarcodeData[]>;
-    supportedFormats(): Promise<string[]>;
-}
-
-class BarcodeReaderNative implements BarcodeReader {
-    private _instance: any;
-
-    constructor(formats: string[]) {
-        this._instance = new (BarcodeReaderNative._getDetector() as any)({
-            formats,
-        });
-    }
-
-    static create() {
-        return BarcodeReaderNative._supportedFormats().then((formats) => {
-            return new BarcodeReaderNative(formats);
-        });
-    }
-
-    static isSupported() {
-        return !!BarcodeReaderNative._getDetector();
-    }
-
-    static _getDetector() {
-        return (window as any).BarcodeDetector;
-    }
-
-    static _supportedFormats(): Promise<string[]> {
-        return BarcodeReaderNative._getDetector().getSupportedFormats();
-    }
-
-    detect(canvas: HTMLCanvasElement) {
-        return this._instance.detect(canvas);
-    }
-
-    supportedFormats(): Promise<string[]> {
-        return BarcodeReaderNative._supportedFormats();
-    }
-}
-
-class BarcodeReaderZBar implements BarcodeReader {
-    static create() {
-        return Promise.resolve(new BarcodeReaderZBar);
-    }
-
-    static isSupported() {
-        return true;
-    }
-
-    detect(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
-        const imageData = context.getImageData(
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
-
-        return scanImageData(imageData).then((symbols) => {
-            return symbols.map((symbol) => {
-                const detectedBarcode: DetectedBarcodeData = {
-                    points: symbol.points,
-                    format: symbol.typeName,
-                    rawValue: symbol.decode(),
-                };
-
-                return detectedBarcode;
-            });
-        });
-    }
-
-    supportedFormats() {
-        return Promise.resolve([
-            'code_39',
-            'code_93',
-            'code_128',
-            'codabar',
-            'databar/expanded',
-            'ean_5',
-            'ean_8',
-            'ean_13',
-            'isbn_10',
-            'isbn_13',
-            'isbn_13+2',
-            'isbn_13+5',
-            'itf',
-            'qr_code',
-            'upc_a',
-            'upc_e',
-        ]);
-    }
-}
 
 export class BarcodeReaderService {
     private _canvas: HTMLCanvasElement | null = null;
     private _context: CanvasRenderingContext2D | null = null;
-    private _instancePromise: Promise<BarcodeReader>;
+    private _instancePromise: Promise<BarcodeReaderInterface>;
     private _permissionsService = di(PermissionsService);
     private _preferenceService = di(PreferenceService);
 
@@ -221,5 +119,9 @@ export class BarcodeReaderService {
         return this._instancePromise.then((instance) =>
             instance.supportedFormats()
         );
+    }
+
+    type() {
+        return this._instancePromise.then((instance) => instance.type());
     }
 }

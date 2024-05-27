@@ -9,6 +9,8 @@ export const enUS: LanguageData = {
     // Barcode reader
     'barcodeReader.explainAsk':
         'To use the barcode reader, the camera permission is required.',
+    'barcodeReader.NATIVE': 'Native',
+    'barcodeReader.Z_BAR': 'ZBar',
 
     // Flashlight
     'flashlight.explainAsk':
