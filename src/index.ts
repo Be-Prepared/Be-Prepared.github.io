@@ -8,6 +8,7 @@ export * from './i18n/i18n.module';
 export * from './info-app/info-app.module';
 export * from './install-pwa/install-pwa.module';
 export * from './location-app/location-app.module';
+export * from './location-field/location-field.module';
 export * from './magnifier-app/magnifier-app.module';
 export * from './nfc-app/nfc-app.module';
 export * from './shared/shared.module';
