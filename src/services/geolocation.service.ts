@@ -32,6 +32,10 @@ export interface GeolocationCoordinateResultSuccess {
     headingSmoothed: number;
     speedSmoothed: number;
     isMovingSmoothed: boolean;
+    altitudeSum: number;
+    altitudeCount: number;
+    altitudeMinimum: number;
+    altitudeMaximum: number;
 }
 
 export interface GeolocationCoordinateResultError {
@@ -88,7 +92,11 @@ export class GeolocationService {
                 timeTotal: 0,
                 speedSmoothed: 0,
                 isMovingSmoothed: false,
-                headingSmoothed: NaN
+                headingSmoothed: NaN,
+                altitudeSum: 0,
+                altitudeCount: 0,
+                altitudeMinimum: NaN,
+                altitudeMaximum: NaN,
             };
 
             lastPositions.push(thisPosition);
@@ -146,7 +154,10 @@ export class GeolocationService {
             heading = result.heading;
         }
 
-        current.speedSmoothed = this._exponentialMovingAverage(previous.speedSmoothed, speed);
+        current.speedSmoothed = this._exponentialMovingAverage(
+            previous.speedSmoothed,
+            speed
+        );
         current.isMovingSmoothed = current.speedSmoothed >= SPEED_THRESHOLD;
         current.headingSmoothed = heading;
 
@@ -164,6 +175,23 @@ export class GeolocationService {
         current.timeMoving = previous.timeMoving;
         current.timeStopped = previous.timeStopped;
 
+        if (typeof current.altitude === 'number') {
+            current.altitudeSum =
+                previous.altitudeSum + (current.altitude || 0);
+            current.altitudeCount = previous.altitudeCount + 1;
+            current.altitudeMinimum = isNaN(previous.altitudeMinimum)
+                ? current.altitude
+                : Math.min(previous.altitudeMinimum, current.altitude);
+            current.altitudeMaximum = isNaN(previous.altitudeMaximum)
+                ? current.altitude
+                : Math.max(previous.altitudeMaximum, current.altitude);
+        } else {
+            current.altitudeSum = previous.altitudeSum;
+            current.altitudeCount = previous.altitudeCount;
+            current.altitudeMinimum = previous.altitudeMinimum;
+            current.altitudeMaximum = previous.altitudeMaximum;
+        }
+
         if (current.isMoving) {
             current.timeMoving += current.timestamp - previous.timestamp;
         } else {
@@ -171,7 +199,9 @@ export class GeolocationService {
         }
     }
 
-    private _calculateAverages(lastPositions: GeolocationCoordinateResultSuccess[]) {
+    private _calculateAverages(
+        lastPositions: GeolocationCoordinateResultSuccess[]
+    ) {
         const first = lastPositions[0];
         const back1 = lastPositions[lastPositions.length - 2];
         const current = lastPositions[lastPositions.length - 1];
@@ -199,7 +229,7 @@ export class GeolocationService {
         );
         const elapsedTime = current.timestamp - back1.timestamp;
         const speed = elapsedTime ? distance / elapsedTime : 0;
-            (current.timestamp + first.timestamp) / 2 - first.timestamp;
+        (current.timestamp + first.timestamp) / 2 - first.timestamp;
         let heading = NaN;
 
         if (speed > 0) {
@@ -214,7 +244,7 @@ export class GeolocationService {
 
         return {
             heading,
-            speed
+            speed,
         };
     }
 

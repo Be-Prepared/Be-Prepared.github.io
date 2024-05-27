@@ -4,7 +4,7 @@ import { GeolocationService } from '../services/geolocation.service';
 import { I18nService } from '../i18n/i18n.service';
 import { Subscription } from 'rxjs';
 
-@Component('location-field-altitude', {
+@Component('location-field-altitude-minimum', {
     style: css``,
     template: html`
         <changeable-setting @click="toggleDistanceSystem()"
@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
         >
     `,
 })
-export class LocationFieldAltitudeComponent {
+export class LocationFieldAltitudeMinimumComponent {
     private _distanceService = di(DistanceService);
     private _geolocationService = di(GeolocationService);
     private _i18nService = di(I18nService);
@@ -27,9 +27,13 @@ export class LocationFieldAltitudeComponent {
         this._subscription = this._geolocationService
             .getPosition()
             .subscribe((position) => {
-                if (position && position.success && position.altitude !== null) {
+                if (
+                    position &&
+                    position.success &&
+                    !isNaN(position.altitudeMinimum)
+                ) {
                     this.value = this._distanceService.metersToString(
-                        position.altitude,
+                        position.altitudeMinimum,
                         {
                             useSmallUnits: true,
                         }

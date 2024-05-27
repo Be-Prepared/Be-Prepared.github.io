@@ -62,6 +62,15 @@ import { PreferenceService } from '../services/preference.service';
                 <location-field-altitude-accuracy
                     *if="selectedValue === 'ALTITUDE_ACCURACY'"
                 ></location-field-altitude-accuracy>
+                <location-field-altitude-average
+                    *if="selectedValue === 'ALTITUDE_AVERAGE'"
+                ></location-field-altitude-average>
+                <location-field-altitude-maximum
+                    *if="selectedValue === 'ALTITUDE_MAXIMUM'"
+                ></location-field-altitude-maximum>
+                <location-field-altitude-minimum
+                    *if="selectedValue === 'ALTITUDE_MINIMUM'"
+                ></location-field-altitude-minimum>
                 <location-field-distance
                     *if="selectedValue === 'BEARING'"
                     lat="{{lat}}"
@@ -137,6 +146,9 @@ export class LocationFieldComponent {
             'ACCURACY',
             'ALTITUDE',
             'ALTITUDE_ACCURACY',
+            'ALTITUDE_AVERAGE',
+            'ALTITUDE_MAXIMUM',
+            'ALTITUDE_MINIMUM',
             'HEADING',
             'HEADING_SMOOTHED',
             'SPEED',
