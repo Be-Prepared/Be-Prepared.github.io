@@ -4,6 +4,7 @@ import {
     GeolocationCoordinateResultSuccess,
     GeolocationService,
 } from '../services/geolocation.service';
+import { PreferenceService } from '../services/preference.service';
 import { Subscription } from 'rxjs';
 import { WakeLockService } from '../services/wake-lock.service';
 import { WaypointSaved } from '../datatypes/waypoint-saved';
@@ -167,6 +168,7 @@ import { WaypointService } from './waypoint.service';
 })
 export class LocationNavigateAppComponent {
     private _geolocationService = di(GeolocationService);
+    private _preferenceService = di(PreferenceService);
     private _subscription: Subscription | null = null;
     private _wakeLockService = di(WakeLockService);
     private _waypointService = di(WaypointService);
@@ -190,6 +192,10 @@ export class LocationNavigateAppComponent {
             return;
         }
 
+        if (this._preferenceService.navigationWakeLock.getItem()) {
+            this.toggleWakeLock();
+        }
+
         this._subscription = this._geolocationService
             .getPositionSuccess()
             .pipe(first())
@@ -206,6 +212,7 @@ export class LocationNavigateAppComponent {
 
     toggleWakeLock() {
         this.enabled = !this.enabled;
+        this._preferenceService.navigationWakeLock.setItem(this.enabled);
 
         if (this.enabled) {
             this.wakeLockClass = 'enabled';

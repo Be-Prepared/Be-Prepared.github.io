@@ -15,6 +15,7 @@ export class PreferenceService {
     // fields are not stored here
     magnifier: LocalStorageInterface<boolean>;
     navigationType: LocalStorageInterface<NavigationType>;
+    navigationWakeLock: LocalStorageInterface<boolean>;
     points: LocalStorageInterface<WaypointSaved[]>;
     sunMoonLocation: LocalStorageInterface<string>;
     timeSystem: LocalStorageInterface<TimeSystem>;
@@ -41,6 +42,7 @@ export class PreferenceService {
             'navigationType',
             NavigationType
         );
+        this.navigationWakeLock = LocalStorageService.boolean('navigationWakeLock');
         this.points = LocalStorageService.json('points');
         this.sunMoonLocation = LocalStorageService.string('sunMoonLocation');
         this.timeSystem = LocalStorageService.enum<TimeSystem>(
