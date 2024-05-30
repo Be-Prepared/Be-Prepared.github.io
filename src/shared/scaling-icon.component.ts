@@ -9,21 +9,11 @@ import { Component, css, html } from 'fudgel';
 
         .icon {
             height: 128px;
+            height: 25vmin;
+            max-height: 128px;
             width: 128px;
-        }
-
-        @media (max-width: 960px) {
-            .icon {
-                height: 96px;
-                width: 96px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .icon {
-                height: 25vw;
-                width: 25vw;
-            }
+            width: 25vmin;
+            max-width: 128px;
         }
     `,
     template: html` <load-svg class="icon" href="{{href}}"></load-svg> `,

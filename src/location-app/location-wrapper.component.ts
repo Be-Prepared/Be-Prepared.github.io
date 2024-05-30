@@ -38,6 +38,12 @@ import { switchMap, takeUntil } from 'rxjs/operators';
         }
 
         @media (orientation: landscape) {
+            @media (max-height: 720px) {
+                .full {
+                    font-size: 2em;
+                }
+            }
+
             .wrapper {
                 flex-direction: row-reverse;
             }
