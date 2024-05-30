@@ -137,9 +137,9 @@ export class NavigationArrowComponent {
 
         switch (this._currentNavigationType) {
             case NavigationType.COMPASS:
-                compassRoseAngle = Math.round(this._currentBearing);
+                compassRoseAngle = Math.round(-this._currentBearing);
                 directionArrowAngle = Math.round(
-                    bearingToDestination + this._currentBearing
+                    -this._currentBearing + bearingToDestination
                 );
                 break;
 
@@ -157,7 +157,7 @@ export class NavigationArrowComponent {
         }
 
         if (this.compassRose) {
-            this.compassRose.style.transform = `rotate(-${compassRoseAngle}deg)`;
+            this.compassRose.style.transform = `rotate(${compassRoseAngle}deg)`;
         }
 
         if (this.directionArrow) {
