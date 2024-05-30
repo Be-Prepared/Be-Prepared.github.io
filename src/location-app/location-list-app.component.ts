@@ -50,6 +50,7 @@ interface WaypointAugmented extends WaypointSaved {
             border: var(--table-border);
             display: flex;
             flex-direction: column;
+            box-sizing: border-box;
         }
 
         .point-list-weader {

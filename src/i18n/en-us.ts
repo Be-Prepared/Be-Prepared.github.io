@@ -202,7 +202,6 @@ export const enUS: LanguageData = {
     'shared.cameraUnavailable.heading': 'No Suitable Camera',
     'shared.cameraUnavailable.message':
         'There is no camera available that this app can use for the selected tool. This tool will be removed from the starting menu.',
-    'shared.miniQr.qr': 'QR',
     'shared.permissionDenied.heading': 'Denied or Unavailable',
     'shared.permissionDenied.message':
         'Because the necessary permission was denied or the hardware is unavailable, the button in the menu will be removed.',

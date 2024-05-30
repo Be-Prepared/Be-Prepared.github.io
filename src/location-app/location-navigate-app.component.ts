@@ -84,6 +84,10 @@ import { WaypointService } from './waypoint.service';
         .gap-above {
             padding-top: 0.4em;
         }
+
+        .enabled {
+            color: var(--button-fg-color-enabled);
+        }
     `,
     template: html`
         <location-wrapper>
@@ -150,6 +154,13 @@ import { WaypointService } from './waypoint.service';
                         </div>
                     </div>
                 </div>
+                <div slot="more-buttons">
+                    <scaling-icon
+                        class="{{wakeLockClass}}"
+                        @click.stop.prevent="toggleWakeLock()"
+                        href="/wake-lock.svg"
+                    ></scaling-icon>
+                </div>
             </default-layout>
         </location-wrapper>
     `,
@@ -159,10 +170,12 @@ export class LocationNavigateAppComponent {
     private _subscription: Subscription | null = null;
     private _wakeLockService = di(WakeLockService);
     private _waypointService = di(WaypointService);
+    enabled = false;
     id?: string;
     startPosition: GeolocationCoordinateResultSuccess | null = null;
     startTime = Date.now();
     point: WaypointSaved | null = null;
+    wakeLockClass = '';
 
     onInit() {
         const id = this.id;
@@ -172,10 +185,10 @@ export class LocationNavigateAppComponent {
         }
 
         if (!this.point) {
-            this.goBack();
-        }
+            emit(this, 'edit', this.id);
 
-        this._wakeLockService.request();
+            return;
+        }
 
         this._subscription = this._geolocationService
             .getPositionSuccess()
@@ -184,11 +197,22 @@ export class LocationNavigateAppComponent {
     }
 
     onDestroy() {
-        this._wakeLockService.release();
+        if (this.enabled) {
+            this._wakeLockService.release();
+        }
+
         this._subscription && this._subscription.unsubscribe();
     }
 
-    goBack() {
-        emit(this, 'edit', this.id);
+    toggleWakeLock() {
+        this.enabled = !this.enabled;
+
+        if (this.enabled) {
+            this.wakeLockClass = 'enabled';
+            this._wakeLockService.request();
+        } else {
+            this.wakeLockClass = '';
+            this._wakeLockService.release();
+        }
     }
 }
