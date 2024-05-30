@@ -5,7 +5,7 @@ import {
     GeolocationCoordinateResult,
     GeolocationService,
 } from '../services/geolocation.service';
-import { LatLon } from '../services/coordinate.service';
+import { LatLon } from '../datatypes/lat-lon';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -149,8 +149,8 @@ export class LocationAppComponent {
     private _redraw() {
         if (this.position && this.position.success) {
             this.latLon = {
-                lat: this.position.latitude,
-                lon: this.position.longitude,
+                lat: this.position.lat,
+                lon: this.position.lon,
             };
         } else {
             this.latLon = null;

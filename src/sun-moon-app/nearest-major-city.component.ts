@@ -1,6 +1,6 @@
-import { CitiesService } from '../services/cities.service';
 import { Component, css, di, html } from 'fudgel';
-import { LatLon } from '../services/coordinate.service';
+import { CoordinateService } from '../services/coordinate.service';
+import { LatLon } from '../datatypes/lat-lon';
 import { DirectionService } from '../services/direction.service';
 import { DistanceService } from '../services/distance.service';
 
@@ -15,7 +15,7 @@ import { DistanceService } from '../services/distance.service';
     `,
 })
 export class NearestMajorCityComponent {
-    private _citiesService = di(CitiesService);
+    private _coordinateService = di(CoordinateService);
     private _directionService = di(DirectionService);
     private _distanceService = di(DistanceService);
     coordinates: LatLon | null = null;
@@ -23,19 +23,21 @@ export class NearestMajorCityComponent {
 
     onChange(prop: string) {
         if (prop === 'coordinates' && this.coordinates) {
-            this._citiesService.getNearestCityByCoords(
-                this.coordinates.lat,
-                this.coordinates.lon
-            ).subscribe((nearest) => {
-                const distance = this._distanceService.metersToString(
-                    nearest.distance
-                );
-                const direction = this._directionService.toHeadingDirection(
-                    nearest.bearing
-                );
+            this._coordinateService
+                .getNearestCityByCoords(
+                    this.coordinates.lat,
+                    this.coordinates.lon
+                )
+                .subscribe((nearest) => {
+                    const distance = this._distanceService.metersToString(
+                        nearest.distance
+                    );
+                    const direction = this._directionService.toHeadingDirection(
+                        nearest.bearing
+                    );
 
-                this.nearestMajorCity = `${nearest.name} (${distance}, ${direction})`;
-            });
+                    this.nearestMajorCity = `${nearest.name} (${distance}, ${direction})`;
+                });
         }
     }
 }

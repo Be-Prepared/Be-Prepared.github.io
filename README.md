@@ -86,6 +86,7 @@ The Location app can show a number of different fields. The majority can be used
 * Current Time: The current time, in either 24-hour or 12-hour format.
 * Destination (Navigation only): Destination waypoint's name.
 * Distance (Navigation only): How much distance is between you and your destination.
+* Distance Traveled: How far you've traveled while having the GPS enabled.
 * Heading: When available, this is the heading reported by your GPS. If not available, this will be calculated.
 * Heading (Smoothed): Your current direction of travel, averaged over the last five successful readings. It uses a [Kalman filter](https://en.wikipedia.org/wiki/Kalman_filter), which takes into account the GPS accuracy figures and helps eliminate jumps and spikes.
 * Speed: The speed reported by your GPS. If not available, this value is calculated.

@@ -114,6 +114,7 @@ export class MagnifierAppComponent {
     }
 
     grant() {
+        this.explainAsk = false;
         this._magnifierService.prompt();
     }
 

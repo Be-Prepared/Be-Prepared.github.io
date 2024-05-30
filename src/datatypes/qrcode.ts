@@ -30,7 +30,7 @@ declare module '@tofandel/qrcode-svg' {
          * @param  opt Set the container. Defaults to `{ container: "svg" }`.
          * @return The svg string.
          */
-        svg(opt?: { container: "svg" | "g" | "none" }): string;
+        svg(opt?: { container: 'svg' | 'g' | 'none' }): string;
     }
 
     namespace QRCode {
@@ -48,7 +48,7 @@ declare module '@tofandel/qrcode-svg' {
             /** Color of background, color name or hex string. Default is `#fffff`. */
             background?: string | undefined;
             /** Error correction level. Default is `"M"`. */
-            ecl?: "L" | "M" | "H" | "Q" | undefined;
+            ecl?: 'L' | 'M' | 'H' | 'Q' | undefined;
             /** Join modules (squares) into one shape, into the SVG path element, **recommended** for web and responsive use. Default is `false`. */
             join?: boolean | undefined;
             /** To create a squares as pattern, then populate the canvas. Default is `false`. */
@@ -69,7 +69,7 @@ declare module '@tofandel/qrcode-svg' {
              * Useful when you need to put multiple QR Codes in a single SVG document \
              * `none`: No wrapper.
              */
-            container?: "svg" | "svg-viewbox" | "g" | "none" | undefined;
+            container?: 'svg' | 'svg-viewbox' | 'g' | 'none' | undefined;
         }
 
         interface Model {
@@ -115,4 +115,4 @@ declare module '@tofandel/qrcode-svg' {
     }
 
     export = QRCode;
-    }
+}

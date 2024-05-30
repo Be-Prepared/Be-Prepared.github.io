@@ -44,7 +44,9 @@ import { Component, css, html } from 'fudgel';
             <div class="wrapperOuter">
                 <div class="wrapperInner">
                     <scaling-icon href="{{icon}}"></scaling-icon>
-                    <div class="label"><i18n-label id="{{label}}"></i18n-label></div>
+                    <div class="label">
+                        <i18n-label id="{{label}}"></i18n-label>
+                    </div>
                 </div>
             </div>
         </pretty-button>

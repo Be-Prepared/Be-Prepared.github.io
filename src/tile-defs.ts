@@ -1,5 +1,6 @@
 import { AvailabilityState } from './datatypes/availability-state';
 import { BarcodeReaderService } from './services/barcode-reader.service';
+import { CompassService } from './services/compass.service';
 import { di } from 'fudgel';
 import { MagnifierService } from './services/magnifier.service';
 import { map } from 'rxjs/operators';
@@ -10,15 +11,14 @@ import { Observable, of } from 'rxjs';
 //     PermissionsService,
 //     PermissionsServiceState,
 // } from './services/permissions.service';
-import { PositionService } from './services/position.service';
 import { TorchService } from './services/torch.service';
 
 const barcodeReaderService = di(BarcodeReaderService);
+const compassService = di(CompassService);
 const geolocationService = di(GeolocationService);
 const magnifierService = di(MagnifierService);
 const nfcService = di(NfcService);
 // const permissionsService = di(PermissionsService);
-const positionService = di(PositionService);
 const torchService = di(TorchService);
 
 const availabilityToBoolean = map(
@@ -76,7 +76,7 @@ export const tileDefs: TileDef[] = [
         icon: '/compass.svg',
         label: 'tile.compass',
         component: 'compass-app',
-        show: positionService.availabilityState().pipe(availabilityToBoolean),
+        show: compassService.availabilityState().pipe(availabilityToBoolean),
     },
     {
         id: 'location',

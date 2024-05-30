@@ -85,6 +85,9 @@ import { PreferenceService } from '../services/preference.service';
                     lat="{{lat}}"
                     lon="{{lon}}"
                 ></location-field-distance>
+                <location-field-distance-traveled
+                    *if="selectedValue === 'DISTANCE_TRAVELED'"
+                ></location-field-distance-traveled>
                 <location-field-heading
                     *if="selectedValue === 'HEADING'"
                 ></location-field-heading>
@@ -149,6 +152,7 @@ export class LocationFieldComponent {
             'ALTITUDE_AVERAGE',
             'ALTITUDE_MAXIMUM',
             'ALTITUDE_MINIMUM',
+            'DISTANCE_TRAVELED',
             'HEADING',
             'HEADING_SMOOTHED',
             'SPEED',

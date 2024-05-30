@@ -27,7 +27,11 @@ export class LocationFieldAltitudeComponent {
         this._subscription = this._geolocationService
             .getPosition()
             .subscribe((position) => {
-                if (position && position.success && position.altitude !== null) {
+                if (
+                    position &&
+                    position.success &&
+                    position.altitude !== null
+                ) {
                     this.value = this._distanceService.metersToString(
                         position.altitude,
                         {

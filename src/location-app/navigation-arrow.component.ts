@@ -1,6 +1,7 @@
 import { AvailabilityState } from '../datatypes/availability-state';
-import CheapRuler from 'cheap-ruler';
+import { CompassService } from '../services/compass.service';
 import { Component, css, di, html } from 'fudgel';
+import { CoordinateService } from '../services/coordinate.service';
 import { EMPTY, Subject } from 'rxjs';
 import {
     GeolocationCoordinateResultSuccess,
@@ -8,7 +9,6 @@ import {
 } from '../services/geolocation.service';
 import { NavigationType } from '../datatypes/navigation-type';
 import { NavigationTypeService } from './navigation-type.service';
-import { PositionService } from '../services/position.service';
 import { switchMap, takeUntil } from 'rxjs/operators';
 
 @Component('navigation-arrow', {
@@ -56,15 +56,16 @@ import { switchMap, takeUntil } from 'rxjs/operators';
     `,
 })
 export class NavigationArrowComponent {
-    private _geolocationService = di(GeolocationService);
+    private _compassService = di(CompassService);
+    private _coordinateService = di(CoordinateService);
     private _currentPosition: GeolocationCoordinateResultSuccess | null = null;
     private _currentBearing = 0;
     private _currentHeading = 0;
     private _currentNavigationType: NavigationType | null = null;
+    private _geolocationService = di(GeolocationService);
     private _lat = 0;
     private _lon = 0;
     private _navigationTypeService = di(NavigationTypeService);
-    private _positionService = di(PositionService);
     private _subject = new Subject();
     compassRose: HTMLElement | null = null;
     lat?: string;
@@ -95,12 +96,12 @@ export class NavigationArrowComponent {
                 this._currentNavigationType = navigationType;
                 this._updateCompassRose();
             });
-        this._positionService
+        this._compassService
             .availabilityState()
             .pipe(
                 switchMap((state) => {
                     if (state === AvailabilityState.ALLOWED) {
-                        return this._positionService.getCompassBearing();
+                        return this._compassService.getCompassBearing();
                     }
 
                     return EMPTY;
@@ -125,13 +126,13 @@ export class NavigationArrowComponent {
 
         let compassRoseAngle = 0;
         let directionArrowAngle = 0;
-        const cheapRuler = new CheapRuler(
-            this._currentPosition.latitude,
-            'meters'
-        );
-        const bearingToDestination = cheapRuler.bearing(
-            [this._currentPosition.longitude, this._currentPosition.latitude],
-            [this._lon, this._lat]
+        const bearingToDestination = this._coordinateService.bearing(
+            this._currentPosition,
+            {
+                lat: this._lat,
+                lon: this._lon,
+            },
+            true
         );
 
         switch (this._currentNavigationType) {
@@ -160,7 +161,7 @@ export class NavigationArrowComponent {
         }
 
         if (this.directionArrow) {
-            this.directionArrow.style.transform = `rotate(-${directionArrowAngle}deg)`;
+            this.directionArrow.style.transform = `rotate(${directionArrowAngle}deg)`;
         }
     }
 }

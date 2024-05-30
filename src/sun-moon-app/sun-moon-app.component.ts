@@ -1,9 +1,10 @@
 import { AvailabilityState } from '../datatypes/availability-state';
 import { Component, css, di, html } from 'fudgel';
-import { CoordinateService, LatLon } from '../services/coordinate.service';
+import { CoordinateService } from '../services/coordinate.service';
 import { GeolocationService } from '../services/geolocation.service';
 import { finalize, first, takeUntil } from 'rxjs/operators';
 import { I18nService } from '../i18n/i18n.service';
+import { LatLon } from '../datatypes/lat-lon';
 import { PreferenceService } from '../services/preference.service';
 import { Subject } from 'rxjs';
 import { ToastService } from '../services/toast.service';
@@ -79,7 +80,9 @@ import { ToastService } from '../services/toast.service';
                 <div class="location">
                     <div class="grow coordinates">
                         <div class="space-between-bottom">
-                            <i18n-label id="sunMoon.enterCoordinates"></i18n-label>
+                            <i18n-label
+                                id="sunMoon.enterCoordinates"
+                            ></i18n-label>
                             <location-coordinate-info></location-coordinate-info>
                         </div>
                         <pretty-input
@@ -107,7 +110,9 @@ import { ToastService } from '../services/toast.service';
                         <sun-position .coordinates="coordinates"></sun-position>
                         <sun-times .coordinates="coordinates"></sun-times>
                         <div class="gap"></div>
-                        <moon-position .coordinates="coordinates"></moon-position>
+                        <moon-position
+                            .coordinates="coordinates"
+                        ></moon-position>
                         <moon-times .coordinates="coordinates"></moon-times>
                         <moon-illumination
                             .coordinates="coordinates"
@@ -188,15 +193,18 @@ export class SunMoonAppComponent {
                     this.gettingLocation = false;
                 })
             )
-            .subscribe((geolocation) => {
-                if (geolocation.success) {
-                    this._setValue(`${geolocation.latitude} ${geolocation.longitude}`);
-                } else {
+            .subscribe(
+                (geolocation) => {
+                    if (geolocation.success) {
+                        this._setValue(`${geolocation.lat} ${geolocation.lon}`);
+                    } else {
+                        this._geolocationError();
+                    }
+                },
+                () => {
                     this._geolocationError();
                 }
-            }, () => {
-                this._geolocationError();
-            });
+            );
     }
 
     _coordinatesUpdated() {

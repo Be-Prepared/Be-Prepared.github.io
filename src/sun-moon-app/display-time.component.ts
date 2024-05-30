@@ -3,8 +3,7 @@ import { Component, css, html } from 'fudgel';
 @Component('display-time', {
     attr: ['id', 'failId'],
     prop: ['time'],
-    style: css`
-    `,
+    style: css``,
     template: html`
         <div *if="time">
             <i18n-label id="{{id}}"></i18n-label>
@@ -18,7 +17,11 @@ export class DisplayTimeComponent {
 
     onChange(prop: string) {
         if (prop === 'time') {
-            if (this.time && this.time instanceof Date && !isNaN(this.time.getTime())) {
+            if (
+                this.time &&
+                this.time instanceof Date &&
+                !isNaN(this.time.getTime())
+            ) {
                 this.timeStr = this.time.toLocaleTimeString();
             } else {
                 this.timeStr = '';

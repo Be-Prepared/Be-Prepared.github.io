@@ -27,11 +27,7 @@ export class LocationFieldAltitudeAverageComponent {
         this._subscription = this._geolocationService
             .getPosition()
             .subscribe((position) => {
-                if (
-                    position &&
-                    position.success &&
-                    position.altitudeCount
-                ) {
+                if (position && position.success && position.altitudeCount) {
                     this.value = this._distanceService.metersToString(
                         position.altitudeSum / position.altitudeCount,
                         {

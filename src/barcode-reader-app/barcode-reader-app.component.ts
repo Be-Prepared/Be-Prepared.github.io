@@ -1,6 +1,7 @@
 import { AvailabilityState } from '../datatypes/availability-state';
-import { BarcodeReaderService, DetectedBarcodeData } from '../services/barcode-reader.service';
+import { BarcodeReaderService } from '../services/barcode-reader.service';
 import { Component, css, di, html } from 'fudgel';
+import { DetectedBarcodeData } from '../services/barcode-reader/barcode-reader-interface';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { TorchService } from '../services/torch.service';
@@ -120,6 +121,7 @@ export class BarcodeReaderAppComponent {
     }
 
     grant() {
+        this.explainAsk = false;
         this._barcodeReaderService.prompt();
     }
 

@@ -93,7 +93,7 @@ export class BarcodeReaderService {
 
             if (!context) {
                 this._context = context = canvas.getContext('2d', {
-                    willReadFrequently: true
+                    willReadFrequently: true,
                 })! as CanvasRenderingContext2D;
             }
 

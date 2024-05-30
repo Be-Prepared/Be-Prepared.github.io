@@ -1,6 +1,9 @@
 import { Component, css, di, emit, html } from 'fudgel';
 import { first } from 'rxjs/operators';
-import { GeolocationCoordinateResultSuccess, GeolocationService } from '../services/geolocation.service';
+import {
+    GeolocationCoordinateResultSuccess,
+    GeolocationService,
+} from '../services/geolocation.service';
 import { Subscription } from 'rxjs';
 import { WakeLockService } from '../services/wake-lock.service';
 import { WaypointSaved } from '../datatypes/waypoint-saved';
@@ -174,9 +177,10 @@ export class LocationNavigateAppComponent {
 
         this._wakeLockService.request();
 
-        this._subscription = this._geolocationService.getPositionSuccess()
+        this._subscription = this._geolocationService
+            .getPositionSuccess()
             .pipe(first())
-            .subscribe((position) => this.startPosition = position);
+            .subscribe((position) => (this.startPosition = position));
     }
 
     onDestroy() {

@@ -16,9 +16,13 @@ export class LocationFieldTimeElapsedComponent {
 
     onInit() {
         const startTime = parseInt(this.startTime || '', 10);
-        this._cancelEverySecond = this._everySecondService.callEverySecond(() => {
-            this.value = this._timeService.formatTime(Date.now() - startTime);
-        });
+        this._cancelEverySecond = this._everySecondService.callEverySecond(
+            () => {
+                this.value = this._timeService.formatTime(
+                    Date.now() - startTime
+                );
+            }
+        );
     }
 
     onDestroy() {

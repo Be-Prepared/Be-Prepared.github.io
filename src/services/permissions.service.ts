@@ -25,6 +25,10 @@ export class PermissionsService {
         ReplaySubject<null | PermissionsServiceState>
     >();
 
+    accelerometer(prompt = false) {
+        return this._genericSensor('Accelerometer', 'accelerometer', prompt);
+    }
+
     camera(prompt = false) {
         if (!navigator.mediaDevices || !navigator.permissions) {
             return of(PermissionsServiceState.ERROR);
@@ -41,11 +45,27 @@ export class PermissionsService {
                 .getUserMedia({ video: { facingMode: 'environment' } })
                 .then(
                     () => subject.next(PermissionsServiceState.GRANTED),
-                    () => subject.next(PermissionsServiceState.DENIED),
+                    () => subject.next(PermissionsServiceState.DENIED)
                 );
         }
 
         return this._getPermission(name, subject);
+    }
+
+    combineStates(states: PermissionsServiceState[]) {
+        if (states.includes(PermissionsServiceState.ERROR)) {
+            return AvailabilityState.ERROR;
+        }
+
+        if (states.includes(PermissionsServiceState.DENIED)) {
+            return AvailabilityState.DENIED;
+        }
+
+        if (states.includes(PermissionsServiceState.PROMPT)) {
+            return AvailabilityState.PROMPT;
+        }
+
+        return AvailabilityState.ALLOWED;
     }
 
     geolocation(prompt = false) {
@@ -66,11 +86,26 @@ export class PermissionsService {
                 },
                 {
                     timeout: 4000,
-                },
+                }
             );
         }
 
         return this._getPermission(name, subject);
+    }
+
+    gyroscope(prompt = false) {
+        return this._genericSensor('Gyroscope', 'gyroscope', prompt);
+    }
+
+    magnetometer(prompt = false) {
+        // "Magnetometer" is not supported in browsers.
+        // "AbsoluteOrientationSensor" relies on magnetometer and is the
+        // safeste way to trigger the prompt.
+        return this._genericSensor(
+            'AbsoluteOrientationSensor',
+            'magnetometer',
+            prompt
+        );
     }
 
     nfc(prompt = false) {
@@ -84,17 +119,24 @@ export class PermissionsService {
         if (prompt) {
             const abortController = new AbortController();
             const reader = new NDEFReader();
-            reader.onreading = () => subject.next(PermissionsServiceState.GRANTED);
-            reader.onreadingerror = () => subject.next(PermissionsServiceState.ERROR);
-            reader.scan({
-                signal: abortController.signal,
-            }).then(() => {
+            reader.onreading = () =>
                 subject.next(PermissionsServiceState.GRANTED);
-                abortController.abort();
-            }, () => {
+            reader.onreadingerror = () =>
                 subject.next(PermissionsServiceState.ERROR);
-                abortController.abort();
-            });
+            reader
+                .scan({
+                    signal: abortController.signal,
+                })
+                .then(
+                    () => {
+                        subject.next(PermissionsServiceState.GRANTED);
+                        abortController.abort();
+                    },
+                    () => {
+                        subject.next(PermissionsServiceState.ERROR);
+                        abortController.abort();
+                    }
+                );
         }
 
         return this._getPermission(name, subject);
@@ -102,7 +144,7 @@ export class PermissionsService {
 
     toAvailability(
         state: PermissionsServiceState,
-        whenGranted?: () => Observable<AvailabilityState>,
+        whenGranted?: () => Observable<AvailabilityState>
     ) {
         if (state === PermissionsServiceState.ERROR) {
             return of(AvailabilityState.ERROR);
@@ -134,15 +176,45 @@ export class PermissionsService {
                     subject.next(status.state);
                 };
             },
-            () => subject.next('denied' as PermissionState),
+            () => subject.next('denied' as PermissionState)
         );
 
         return subject.asObservable();
     }
 
+    private _genericSensor(
+        className: string,
+        permissionName: string,
+        prompt: boolean
+    ) {
+        if (!(className in window) || !navigator.permissions) {
+            return of(PermissionsServiceState.ERROR);
+        }
+
+        const name = permissionName as PermissionName;
+        const subject = this._getSubject(name);
+
+        if (prompt) {
+            const sensor = new (window as any)[className]({ frequency: 10 });
+            sensor.onerror = (event: any) => {
+                if (event.error.name === 'NotAllowedError') {
+                    subject.next(PermissionsServiceState.DENIED);
+                } else {
+                    subject.next(PermissionsServiceState.ERROR);
+                }
+            };
+            sensor.onreading = () => {
+                subject.next(PermissionsServiceState.GRANTED);
+                sensor.stop();
+            };
+        }
+
+        return this._getPermission(name, subject);
+    }
+
     private _getPermission(
         name: PermissionName,
-        subject: ReplaySubject<null | PermissionsServiceState>,
+        subject: ReplaySubject<null | PermissionsServiceState>
     ): Observable<PermissionsServiceState> {
         let observable = this._observables.get(name);
 
@@ -159,11 +231,11 @@ export class PermissionsService {
                 return this._checkPermission(name).pipe(
                     map((state: PermissionState) => {
                         return this._mapPermission(state);
-                    }),
+                    })
                 );
             }),
             distinctUntilChanged(),
-            shareReplay(1),
+            shareReplay(1)
         );
         this._observables.set(name, observable);
 

@@ -17,7 +17,10 @@ const radiansToDegreesNWScenarios = [
 
 for (const scenario of radiansToDegreesNWScenarios) {
     test(`radiansToDegreesNW: ${scenario.radians}`, (t) => {
-        t.is(directionService.radiansToDegreesNW(scenario.radians), scenario.expected);
+        t.is(
+            directionService.radiansToDegreesNW(scenario.radians),
+            scenario.expected
+        );
     });
 }
 
@@ -30,7 +33,10 @@ const radiansToDegreesSWScenarios = [
 
 for (const scenario of radiansToDegreesSWScenarios) {
     test(`radiansToDegreesSW: ${scenario.radians}`, (t) => {
-        t.is(directionService.radiansToDegreesSW(scenario.radians), scenario.expected);
+        t.is(
+            directionService.radiansToDegreesSW(scenario.radians),
+            scenario.expected
+        );
     });
 }
 
@@ -47,7 +53,10 @@ const standardize180Scenarios = [
 
 for (const scenario of standardize180Scenarios) {
     test(`standardize180: ${scenario.degrees}`, (t) => {
-        t.is(directionService.standardize180(scenario.degrees), scenario.expected);
+        t.is(
+            directionService.standardize180(scenario.degrees),
+            scenario.expected
+        );
     });
 }
 
@@ -64,7 +73,10 @@ const standardize360Scenarios = [
 
 for (const scenario of standardize360Scenarios) {
     test(`standardize360: ${scenario.degrees}`, (t) => {
-        t.is(directionService.standardize360(scenario.degrees), scenario.expected);
+        t.is(
+            directionService.standardize360(scenario.degrees),
+            scenario.expected
+        );
     });
 }
 
@@ -80,7 +92,10 @@ const standardizeLatitudeScenarios = [
 
 for (const scenario of standardizeLatitudeScenarios) {
     test(`standardizeLatitude: ${scenario.latitude}`, (t) => {
-        t.is(directionService.standardizeLatitude(scenario.latitude), scenario.expected);
+        t.is(
+            directionService.standardizeLatitude(scenario.latitude),
+            scenario.expected
+        );
     });
 }
 
@@ -93,6 +108,9 @@ const toCompassPointScenarios = [
 
 for (const scenario of toCompassPointScenarios) {
     test(`toCompassPoint: ${scenario.degrees}`, (t) => {
-        t.is(directionService.toCompassPoint(scenario.degrees), scenario.expected);
+        t.is(
+            directionService.toCompassPoint(scenario.degrees),
+            scenario.expected
+        );
     });
 }

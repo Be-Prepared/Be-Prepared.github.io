@@ -5,4 +5,3 @@ export interface WaypointSaved {
     name: string;
     created: number;
 }
-

@@ -3,8 +3,7 @@ import { Component, css, di, html } from 'fudgel';
 import { I18nService } from '../i18n/i18n.service';
 
 @Component('info-barcodes', {
-    style: css`
-    `,
+    style: css``,
     template: html`
         <info-header id="info.barcodes"></info-header>
         <span *if="barcodes">{{type}}: {{barcodes}}</span>

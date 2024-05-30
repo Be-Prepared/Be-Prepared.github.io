@@ -29,7 +29,7 @@ import { Component, css, html } from 'fudgel';
             <slot></slot>
         </button>
     `,
-    useShadow: true
+    useShadow: true,
 })
 export class PrettyButtonComponent {
     button?: HTMLButtonElement;

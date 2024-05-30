@@ -7,6 +7,7 @@ export * from './altitude-minimum.component.ts';
 export * from './bearing.component.ts';
 export * from './destination.component.ts';
 export * from './distance.component.ts';
+export * from './distance-traveled.component.ts';
 export * from './heading.component.ts';
 export * from './heading-smoothed.component.ts';
 export * from './speed.component.ts';

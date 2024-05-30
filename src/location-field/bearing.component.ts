@@ -1,4 +1,4 @@
-import CheapRuler from 'cheap-ruler';
+import { CoordinateService } from '../services/coordinate.service';
 import { Component, css, di, html } from 'fudgel';
 import { DirectionService } from '../services/direction.service';
 import { GeolocationService } from '../services/geolocation.service';
@@ -11,6 +11,7 @@ import { Subscription } from 'rxjs';
     template: html`{{value}}`,
 })
 export class LocationFieldBearingComponent {
+    private _coordinateService = di(CoordinateService);
     private _directionService = di(DirectionService);
     private _geolocationService = di(GeolocationService);
     private _i18nService = di(I18nService);
@@ -21,7 +22,7 @@ export class LocationFieldBearingComponent {
 
     constructor() {
         const unknownValue = this._i18nService.get(
-            'location.field.unknownValue',
+            'location.field.unknownValue'
         );
         this.value = unknownValue;
     }
@@ -35,13 +36,9 @@ export class LocationFieldBearingComponent {
             .getPosition()
             .subscribe((position) => {
                 if (position && position.success) {
-                    const cheapRuler = new CheapRuler(
-                        position.latitude,
-                        'meters',
-                    );
-                    const direction = cheapRuler.bearing(
-                        [position.longitude, position.latitude],
-                        [lon, lat],
+                    const direction = this._coordinateService.bearing(
+                        position,
+                        { lat, lon }
                     );
                     this.value =
                         this._directionService.toHeadingDirection(direction);

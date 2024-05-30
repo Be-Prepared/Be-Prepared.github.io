@@ -127,6 +127,7 @@ export class LocationWrapperComponent {
     }
 
     grant() {
+        this.explainAsk = false;
         this._permissionsService.geolocation(true);
     }
 

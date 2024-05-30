@@ -1,11 +1,31 @@
+import { CitiesService, City } from './cities.service';
 import { CoordinateService } from './coordinate.service';
+import { diOverride } from 'fudgel/dist/di';
+import { Observable, of } from 'rxjs';
 import test from 'ava';
 
+class CitiesServiceMock {
+    getCityByName(str: string): Observable<City | null> {
+        if (str === 'New York City') {
+            return of({
+                ascii: 'New York City',
+                lat: 40.71427,
+                lon: -74.00597,
+                name: 'New York City',
+            });
+        }
+
+        return of(null);
+    }
+}
+
+diOverride(CitiesService, new CitiesServiceMock() as unknown as CitiesService);
 const coordinateService = new CoordinateService();
 
 const fromStringScenarios = {
     // City
     'New York City': '40.7142700,-74.0059700',
+    'Fake City': null,
 
     // DDD
     '-42.51687397191149, 172.7156638498528': '-42.5168740,172.7156638',
@@ -46,14 +66,57 @@ const fromStringScenarios = {
 
 for (const scenario of Object.entries(fromStringScenarios)) {
     test(`fromString: ${scenario[0]}`, (t) => {
-        coordinateService.fromString(scenario[0]).subscribe((result) => {
-            if (result) {
-                const lat = result.lat.toFixed(7);
-                const lon = result.lon.toFixed(7);
-                t.is<string | null, string | null>(`${lat},${lon}`, scenario[1]);
-            } else {
-                t.is<string | null, string | null>(result, scenario[1]);
+        coordinateService.fromString(scenario[0]).subscribe(
+            (result) => {
+                if (result) {
+                    const lat = result.lat.toFixed(7);
+                    const lon = result.lon.toFixed(7);
+                    t.is<string | null, string | null>(
+                        `${lat},${lon}`,
+                        scenario[1]
+                    );
+                } else {
+                    t.is<string | null, string | null>(result, scenario[1]);
+                }
+            },
+            (error) => {
+                t.fail(error);
             }
-        });
+        );
     });
 }
+
+test(`bearing`, (t) => {
+    const bearing = coordinateService.bearing(
+        {
+            lat: 43.17699373293893,
+            lon: -113.53392007855338,
+        },
+        {
+            lat: 41.26164428594633,
+            lon: -110.3390909060057,
+        }
+    );
+    t.is(bearing.toFixed(7), `129.3233098`);
+
+    const bearing2 = coordinateService.bearing(
+        {
+            lat: 77.36583699498966,
+            lon: -112.04878967571625,
+        },
+        { lat: 78.55234791058881, lon: -111.80324056660511 }
+    );
+    t.is(bearing2.toFixed(7), '2.5925751');
+
+    const bearing3 = coordinateService.bearing(
+        {
+            lat: -38.06745199584473,
+            lon: 178.22269437196405,
+        },
+        {
+            lat: -43.29553450657438,
+            lon: 146.22486843038413,
+        }
+    );
+    t.is(bearing3.toFixed(7), '258.3230285');
+});

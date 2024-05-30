@@ -12,6 +12,11 @@ export const enUS: LanguageData = {
     'barcodeReader.NATIVE': 'Native',
     'barcodeReader.Z_BAR': 'ZBar',
 
+    // Compass
+    'compass.compassUnavailable.heading': 'No Compass',
+    'compass.compassUnavailable.message':
+        'This device does not have a compass or the compass direction is not able to be retrieved. The compass will be removed from the starting menu.',
+
     // Flashlight
     'flashlight.explainAsk':
         'In order to turn on the flashlight, the camera permission needs to be granted.',
@@ -31,6 +36,10 @@ export const enUS: LanguageData = {
     'info.barcodesNotSupported': 'Barcodes are not supported on this device.',
     'info.buildInformationHeader': 'Build Information',
     'info.camera': 'Camera:',
+    'info.compass': 'Compass:',
+    'info.compass.ABSOLUTE_ORIENTATION_SENSOR': 'A',
+    'info.compass.DEVICE_ORIENTATION': 'DO',
+    'info.compass.DEVICE_ORIENTATION_ABSOLUTE': 'DOA',
     'info.coordinates': 'Coordinates:',
     'info.coordinates.DDD': 'Decimal Degrees',
     'info.coordinates.DDM': 'Degrees Decimal Minutes',
@@ -48,7 +57,6 @@ export const enUS: LanguageData = {
     'info.permission.granted': '✔ Granted',
     'info.permission.prompt': 'Prompt',
     'info.permissionsAndFeaturesHeader': 'Permissions and Features:',
-    'info.position': 'Position:',
     'info.preferences': 'Preferences:',
     'info.preferences.reset': 'Reset Preferences',
     'info.preferences.resetComplete': 'Preferences Reset',
@@ -95,6 +103,7 @@ export const enUS: LanguageData = {
     'location.field.BEARING': 'Bearing',
     'location.field.DESTINATION': 'Name',
     'location.field.DISTANCE': 'Distance',
+    'location.field.DISTANCE_TRAVELED': 'Distance Traveled',
     'location.field.HEADING': 'Heading',
     'location.field.HEADING_SMOOTHED': 'Heading (Smoothed)',
     'location.field.SPEED': 'Speed',
@@ -108,7 +117,13 @@ export const enUS: LanguageData = {
     'location.field.UNKNOWN': 'Unknown',
     'location.field.unknownValue': 'Unknown',
     'location.help.html': html`
-        <p>Locations may be entered using a variety of common formats. Capitalization does not matter, most symbols can be ignored, and often spaces can be skipped as well. The examples listed here are not comprehensive, but should be able to illustrate many possibilities.</p>
+        <p>
+            Locations may be entered using a variety of common formats.
+            Capitalization does not matter, most symbols can be ignored, and
+            often spaces can be skipped as well. The examples listed here are
+            not comprehensive, but should be able to illustrate many
+            possibilities.
+        </p>
         <p>City names:</p>
         <ul>
             <li>Paris</li>

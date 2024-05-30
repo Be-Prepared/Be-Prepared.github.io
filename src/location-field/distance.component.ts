@@ -1,5 +1,5 @@
-import CheapRuler from 'cheap-ruler';
 import { Component, css, di, html } from 'fudgel';
+import { CoordinateService } from '../services/coordinate.service';
 import { DistanceService } from '../services/distance.service';
 import { GeolocationService } from '../services/geolocation.service';
 import { I18nService } from '../i18n/i18n.service';
@@ -15,6 +15,7 @@ import { Subscription } from 'rxjs';
     `,
 })
 export class LocationFieldDistanceComponent {
+    private _coordinateService = di(CoordinateService);
     private _distanceService = di(DistanceService);
     private _geolocationService = di(GeolocationService);
     private _i18nService = di(I18nService);
@@ -25,7 +26,7 @@ export class LocationFieldDistanceComponent {
 
     constructor() {
         const unknownValue = this._i18nService.get(
-            'location.field.unknownValue',
+            'location.field.unknownValue'
         );
         this.value = unknownValue;
     }
@@ -39,13 +40,9 @@ export class LocationFieldDistanceComponent {
             .getPosition()
             .subscribe((position) => {
                 if (position && position.success) {
-                    const cheapRuler = new CheapRuler(
-                        position.latitude,
-                        'meters',
-                    );
-                    const distance = cheapRuler.distance(
-                        [lon, lat],
-                        [position.longitude, position.latitude],
+                    const distance = this._coordinateService.distance(
+                        { lon, lat },
+                        position
                     );
                     this.value = this._distanceService.metersToString(distance);
                 } else {

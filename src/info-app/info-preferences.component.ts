@@ -13,7 +13,11 @@ import {
 import { DistanceSystem } from '../datatypes/distance-system';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { TimeService, TIME_SYSTEMS, TimeSystemDefault } from '../services/time.service';
+import {
+    TimeService,
+    TIME_SYSTEMS,
+    TimeSystemDefault,
+} from '../services/time.service';
 import { TimeSystem } from '../datatypes/time-system';
 import { ToastService } from '../services/toast.service';
 

@@ -12,8 +12,9 @@ class LocalStorageMock {
     setItem(key: string, value: string) {
         this._store.set(key, value);
     }
-};
-const storage = typeof localStorage === 'undefined' ? new LocalStorageMock : localStorage;
+}
+const storage =
+    typeof localStorage === 'undefined' ? new LocalStorageMock() : localStorage;
 
 export interface LocalStorageInterface<T> {
     getItem: () => T | null;

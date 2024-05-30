@@ -21,7 +21,7 @@ export class LocationFieldAltitudeAccuracyComponent {
 
     constructor() {
         const unknownValue = this._i18nService.get(
-            'location.field.unknownValue',
+            'location.field.unknownValue'
         );
         this.value = unknownValue;
         this._subscription = combineLatest([
@@ -33,7 +33,7 @@ export class LocationFieldAltitudeAccuracyComponent {
                     this.value = unknownValue;
                 } else {
                     this.value = this._distanceService.metersToString(
-                        position.altitudeAccuracy,
+                        position.altitudeAccuracy
                     );
                 }
             } else {

@@ -4,10 +4,7 @@ import { I18nService } from '../i18n/i18n.service';
 import { PreferenceService } from './preference.service';
 import { TimeSystem } from '../datatypes/time-system';
 
-export const TIME_SYSTEMS = [
-    TimeSystem['12_HOUR'],
-    TimeSystem['24_HOUR'],
-];
+export const TIME_SYSTEMS = [TimeSystem['12_HOUR'], TimeSystem['24_HOUR']];
 
 export const TimeSystemDefault = TimeSystem['24_HOUR'];
 
@@ -35,11 +32,14 @@ export class TimeService {
             const ampmLabel = this._i18nService.get(`info.time12Hour.${ampm}`);
             const hours12 = hours % 12 || 12;
 
-            return `${hours12}:${this._pad(t.getMinutes())}:${this._pad(t.getSeconds())} ${ampmLabel}`;
-
+            return `${hours12}:${this._pad(t.getMinutes())}:${this._pad(
+                t.getSeconds()
+            )} ${ampmLabel}`;
         }
 
-        return `${this._pad(t.getHours())}:${this._pad(t.getMinutes())}:${this._pad(t.getSeconds())}`;
+        return `${this._pad(t.getHours())}:${this._pad(
+            t.getMinutes()
+        )}:${this._pad(t.getSeconds())}`;
     }
 
     getCurrentSetting() {

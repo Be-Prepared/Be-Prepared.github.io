@@ -67,6 +67,7 @@ export class NfcAppComponent {
     }
 
     grant() {
+        this.explainAsk = false;
         this._nfcService.prompt();
     }
 

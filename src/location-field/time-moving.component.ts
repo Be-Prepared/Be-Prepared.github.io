@@ -17,17 +17,20 @@ export class LocationFieldTimeMovingComponent {
 
     constructor() {
         const unknownValue = this._i18nService.get(
-            'location.field.unknownValue',
+            'location.field.unknownValue'
         );
         this.value = unknownValue;
-        this._subscription = this._geolocationService.getPosition()
-        .subscribe((position) => {
-            if (position && position.success) {
-                this.value = this._timeService.formatTime(position.timeMoving);
-            } else {
-                this.value = unknownValue;
-            }
-        });
+        this._subscription = this._geolocationService
+            .getPosition()
+            .subscribe((position) => {
+                if (position && position.success) {
+                    this.value = this._timeService.formatTime(
+                        position.timeMoving
+                    );
+                } else {
+                    this.value = unknownValue;
+                }
+            });
     }
 
     onDestroy() {

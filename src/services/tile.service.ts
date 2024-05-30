@@ -30,13 +30,13 @@ export class TileService {
                 };
 
                 return resolved;
-            }),
+            })
         );
     }
 
     private _updateTiles() {
         return combineLatest(
-            tileDefs.map((tile) => this._lookupTilePermission(tile)),
+            tileDefs.map((tile) => this._lookupTilePermission(tile))
         ).subscribe((tilesWithResults) => {
             this._subject.next(tilesWithResults.filter((tile) => tile.show));
         });

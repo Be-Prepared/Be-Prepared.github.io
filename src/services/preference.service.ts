@@ -43,7 +43,10 @@ export class PreferenceService {
         );
         this.points = LocalStorageService.json('points');
         this.sunMoonLocation = LocalStorageService.string('sunMoonLocation');
-        this.timeSystem = LocalStorageService.enum<TimeSystem>('time', TimeSystem);
+        this.timeSystem = LocalStorageService.enum<TimeSystem>(
+            'time',
+            TimeSystem
+        );
         this.torch = LocalStorageService.boolean('torch');
     }
 

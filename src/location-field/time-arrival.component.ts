@@ -1,5 +1,5 @@
-import CheapRuler from 'cheap-ruler';
 import { Component, css, di, html } from 'fudgel';
+import { CoordinateService } from '../services/coordinate.service';
 import {
     GeolocationCoordinateResultSuccess,
     GeolocationService,
@@ -18,6 +18,7 @@ import { TimeService } from '../services/time.service';
     `,
 })
 export class LocationFieldTimeArrivalComponent {
+    private _coordinateService = di(CoordinateService);
     private _geolocationService = di(GeolocationService);
     private _i18nService = di(I18nService);
     private _subscription: Subscription | null = null;
@@ -46,23 +47,13 @@ export class LocationFieldTimeArrivalComponent {
                     this.startPosition &&
                     position !== this.startPosition
                 ) {
-                    const cheapRuler = new CheapRuler(
-                        position.latitude,
-                        'meters'
+                    const distanceAchieved = this._coordinateService.distance(
+                        this.startPosition,
+                        position
                     );
-                    const distanceAchieved = cheapRuler.distance(
-                        [
-                            this.startPosition.longitude,
-                            this.startPosition.latitude,
-                        ],
-                        [position.longitude, position.latitude]
-                    );
-                    const distanceRemaining = cheapRuler.distance(
-                        [
-                            this.startPosition.longitude,
-                            this.startPosition.latitude,
-                        ],
-                        [lon, lat]
+                    const distanceRemaining = this._coordinateService.distance(
+                        { lat, lon },
+                        position
                     );
                     const timeElapsed = position.timestamp - startTime;
                     const overallSpeed = distanceAchieved / timeElapsed;

@@ -93,11 +93,11 @@ export class GrowToFitFontSizeComponent {
 
     private _monitorSizeChanges() {
         this._resizeObserver = new ResizeObserver(() =>
-            this._findContentSize(),
+            this._findContentSize()
         );
         this._resizeObserver.observe(this.wrapper!);
         this._mutationObserver = new MutationObserver(() =>
-            this._findContentSize(),
+            this._findContentSize()
         );
         this._mutationObserver.observe(this.slot!, {
             attributes: true,

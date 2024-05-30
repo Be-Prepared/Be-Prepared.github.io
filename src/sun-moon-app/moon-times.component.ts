@@ -1,5 +1,5 @@
 import { Component, css, html } from 'fudgel';
-import { LatLon } from '../services/coordinate.service';
+import { LatLon } from '../datatypes/lat-lon';
 import { default as SunCalc } from 'suncalc';
 
 @Component('moon-times', {

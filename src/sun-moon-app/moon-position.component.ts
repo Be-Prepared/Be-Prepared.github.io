@@ -1,6 +1,6 @@
 import { Component, css, di, html } from 'fudgel';
 import { DirectionService } from '../services/direction.service';
-import { LatLon } from '../services/coordinate.service';
+import { LatLon } from '../datatypes/lat-lon';
 import { default as SunCalc } from 'suncalc';
 
 @Component('moon-position', {
@@ -25,9 +25,14 @@ export class MoonPositionComponent {
                 this.coordinates.lat,
                 this.coordinates.lon
             );
-            const bearing = this._directionService.radiansToDegreesSW(moonPosition.azimuth);
-            const bearingStr = this._directionService.toHeadingDirection(bearing);
-            const altitude = this._directionService.radiansToDegreesNW(moonPosition.altitude);
+            const bearing = this._directionService.radiansToDegreesSW(
+                moonPosition.azimuth
+            );
+            const bearingStr =
+                this._directionService.toHeadingDirection(bearing);
+            const altitude = this._directionService.radiansToDegreesNW(
+                moonPosition.altitude
+            );
             const altitudeStr = this._directionService.toHeading(altitude);
             this.moonPosition = `${bearingStr}, +${altitudeStr}`;
         }

@@ -1,9 +1,11 @@
 import { BehaviorSubject, forkJoin, Observable, of } from 'rxjs';
-import { CitiesService } from './cities.service'
+import CheapRuler from 'cheap-ruler';
+import { CitiesService } from './cities.service';
 import { Converter } from 'usng.js';
 import { CoordinateSystem } from '../datatypes/coordinate-system';
 import { di } from 'fudgel/dist/di';
 import { DirectionService } from './direction.service';
+import { LatLon } from '../datatypes/lat-lon';
 import { map } from 'rxjs/operators';
 import { PreferenceService } from './preference.service';
 
@@ -34,11 +36,6 @@ export interface NearestCity {
     bearing: number;
 }
 
-export interface LatLon {
-    lat: number;
-    lon: number;
-}
-
 export interface LL {
     lat: string;
     lon: string;
@@ -63,6 +60,7 @@ export interface UTMUPS {
 export type SystemCoordinates = LL | MGRS | UTMUPS;
 
 export class CoordinateService {
+    private _cheapRulerCache = new Map<string, CheapRuler>();
     private _citiesService = di(CitiesService);
     private _currentSetting = new BehaviorSubject<CoordinateSystem>(
         CoordinateSystemDefault
@@ -79,6 +77,36 @@ export class CoordinateService {
         }
     }
 
+    // Get the bearing between two points.
+    // Builds the CheapRuler instance from the first LatLon unless useSecond is true.
+    bearing(latLonFrom: LatLon, latLonTo: LatLon, useSecond = false): number {
+        const cheapRuler = this._cheapRuler(
+            useSecond ? latLonTo.lat : latLonFrom.lat
+        );
+
+        // Calculates the heading, not the bearing.
+        const bearingToDestination = this._directionService.standardize360(
+            cheapRuler.bearing(
+                [latLonFrom.lon, latLonFrom.lat],
+                [latLonTo.lon, latLonTo.lat]
+            )
+        );
+
+        return bearingToDestination;
+    }
+
+    // Distance between two points
+    // Builds the CheapRuler instance from the first LatLon.
+    distance(latLon1: LatLon, latLon2: LatLon): number {
+        const cheapRuler = this._cheapRuler(latLon1.lat);
+        const distance = cheapRuler.distance(
+            [latLon1.lon, latLon1.lat],
+            [latLon2.lon, latLon2.lat]
+        );
+
+        return distance;
+    }
+
     fromString(str: string): Observable<LatLon | null> {
         str = str.trim();
 
@@ -86,14 +114,53 @@ export class CoordinateService {
             this._fromStringDegrees(str),
             this._fromStringMgrs(str),
             this._fromStringUtmUps(str),
-            this._fromStringCity(str)
-        ]).pipe(map(([degrees, mgrs, utmUps, city]) => {
-            return degrees || mgrs || utmUps || city;
-        }));
+            this._fromStringCity(str),
+        ]).pipe(
+            map(([degrees, mgrs, utmUps, city]) => {
+                return degrees || mgrs || utmUps || city;
+            })
+        );
     }
 
     getCurrentSetting() {
         return this._currentSetting.asObservable();
+    }
+
+    getNearestCityByCoords(lat: number, lon: number) {
+        return this._citiesService.getCitiesObservable().pipe(
+            map((cities) => {
+                let closest = null;
+                let closestDistance = Infinity;
+
+                for (const city of cities) {
+                    const distance = this.distance({ lat, lon }, city);
+
+                    if (distance < closestDistance) {
+                        closest = city;
+                        closestDistance = distance;
+                    }
+                }
+
+                if (!closest) {
+                    return {
+                        name: '',
+                        ascii: null,
+                        lat: NaN,
+                        lon: NaN,
+                        distance: closestDistance,
+                        bearing: NaN,
+                    };
+                }
+
+                const bearing = this.bearing({ lat, lon }, closest);
+
+                return {
+                    ...closest,
+                    distance: closestDistance,
+                    bearing,
+                };
+            })
+        );
     }
 
     latLonToSystem(lat: number, lon: number): SystemCoordinates {
@@ -183,6 +250,27 @@ export class CoordinateService {
         return [firstHalf.join(' '), secondHalf.join(' ')];
     }
 
+    private _cheapRuler(lat: number): CheapRuler {
+        const rounded = lat.toFixed(2);
+        const cached = this._cheapRulerCache.get(rounded);
+
+        if (cached) {
+            return cached;
+        }
+
+        if (this._cheapRulerCache.size >= 500) {
+            // Expire the oldest 100 entries
+            for (const key of [...this._cheapRulerCache.keys()].slice(0, 100)) {
+                this._cheapRulerCache.delete(key);
+            }
+        }
+
+        const cheapRuler = new CheapRuler(parseFloat(rounded), 'meters');
+        this._cheapRulerCache.set(rounded, cheapRuler);
+
+        return cheapRuler;
+    }
+
     private _fromStringCity(str: string): Observable<LatLon | null> {
         return this._citiesService.getCityByName(str);
     }
@@ -259,7 +347,10 @@ export class CoordinateService {
             return null;
         };
         let result = null;
-        const numbers = str.replace(/[^0-9.]+/g, ' ').trim().split(' ');
+        const numbers = str
+            .replace(/[^0-9.]+/g, ' ')
+            .trim()
+            .split(' ');
         const letter = str.replace(/[^A-Z]+/g, '').charAt(0);
 
         if (numbers.length >= 2 && numbers.length <= 3 && letter.length) {
@@ -267,7 +358,12 @@ export class CoordinateService {
             let northing = parseFloat(numbers[numbers.length - 1]);
             const isNorth = letter > 'M';
 
-            if (letter === 'A' || letter === 'B' || letter === 'Y' || letter === 'Z') {
+            if (
+                letter === 'A' ||
+                letter === 'B' ||
+                letter === 'Y' ||
+                letter === 'Z'
+            ) {
                 // Polar = UPS
                 result = tryConvert(() =>
                     converter.UPStoLL({

@@ -21,7 +21,7 @@ export class LocationFieldAccuracyComponent {
 
     constructor() {
         const unknownValue = this._i18nService.get(
-            'location.field.unknownValue',
+            'location.field.unknownValue'
         );
         this.value = unknownValue;
         this._subscription = combineLatest([
@@ -30,7 +30,7 @@ export class LocationFieldAccuracyComponent {
         ]).subscribe(([position]) => {
             if (position && position.success) {
                 this.value = this._distanceService.metersToString(
-                    position.accuracy,
+                    position.accuracy
                 );
             } else {
                 this.value = unknownValue;

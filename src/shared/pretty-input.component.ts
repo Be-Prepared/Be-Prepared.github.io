@@ -66,7 +66,9 @@ import { Component, css, emit, html } from 'fudgel';
         </div>
         <show-modal *if="showingHelp" @clickoutside="hideHelp()">
             <div class="help-wrapper">
-                <div class="help"><i18n-html id="{{helpHtml}}"></i18n-html></div>
+                <div class="help">
+                    <i18n-html id="{{helpHtml}}"></i18n-html>
+                </div>
                 <pretty-labeled-button
                     id="shared.prettyInput.close"
                     @click="hideHelp()"

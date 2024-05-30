@@ -1,12 +1,10 @@
-import CheapRuler from 'cheap-ruler';
 import { first, map, shareReplay } from 'rxjs/operators';
+import { LatLon } from '../datatypes/lat-lon';
 import { Observable, ReplaySubject, Subject } from 'rxjs';
 
-export interface City {
-    lat: number;
-    lon: number;
-    name: string; // The preferred name/spelling
+export interface City extends LatLon {
     ascii: string | null; // ASCII name
+    name: string; // The preferred name/spelling
 }
 
 export class CitiesService {
@@ -18,53 +16,13 @@ export class CitiesService {
             map((cities) => {
                 const city = cities.get(name.trim().toLowerCase());
 
-                return city ? {
-                    ...city
-                } : null;
+                return city
+                    ? {
+                          ...city,
+                      }
+                    : null;
             })
         );
-    }
-
-    getNearestCityByCoords(lat: number, lon: number) {
-        return this.getCitiesObservable().pipe(map((cities) => {
-            const cheapRuler = new CheapRuler(lat, 'meters');
-            let closest = null;
-            let closestDistance = Infinity;
-
-            for (const city of cities) {
-                const distance = cheapRuler.distance(
-                    [lon, lat],
-                    [city.lon, city.lat]
-                );
-
-                if (distance < closestDistance) {
-                    closest = city;
-                    closestDistance = distance;
-                }
-            }
-
-            if (!closest) {
-                return {
-                    name: '',
-                    ascii: null,
-                    lat: NaN,
-                    lon: NaN,
-                    distance: closestDistance,
-                    bearing: NaN
-                }
-            }
-
-            const bearing = cheapRuler.bearing(
-                [lon, lat],
-                [closest.lon, closest.lat]
-            );
-
-            return {
-                ...closest,
-                distance: closestDistance,
-                bearing
-            };
-        }));
     }
 
     getCitiesObservable() {
@@ -79,19 +37,22 @@ export class CitiesService {
 
     getNameMapObservable() {
         if (!this._nameMapObservable) {
-            this._nameMapObservable = this.getCitiesObservable().pipe(map((cities) => {
-                const map = new Map<string, City>();
+            this._nameMapObservable = this.getCitiesObservable().pipe(
+                map((cities) => {
+                    const map = new Map<string, City>();
 
-                for (const city of cities) {
-                    map.set(city.name.toLowerCase(), city);
+                    for (const city of cities) {
+                        map.set(city.name.toLowerCase(), city);
 
-                    if (city.ascii) {
-                        map.set(city.ascii.toLowerCase(), city);
+                        if (city.ascii) {
+                            map.set(city.ascii.toLowerCase(), city);
+                        }
                     }
-                }
 
-                return map;
-            }), shareReplay(1));
+                    return map;
+                }),
+                shareReplay(1)
+            );
         }
 
         return this._nameMapObservable!;
@@ -134,10 +95,9 @@ export class CitiesService {
                 (text) => {
                     const cities = this._convertTextToCities(text);
                     subject.next(cities);
-                    console.log(cities);
                 },
-                (error) => {
-                    console.error(error);
+                () => {
+                    subject.next([]);
                 }
             );
     }

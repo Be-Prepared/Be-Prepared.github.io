@@ -15,9 +15,11 @@ export class LocationFieldTimeComponent {
     value?: string;
 
     constructor() {
-        this._cancelEverySecond = this._everySecondService.callEverySecond(() => {
-            this.value = this._timeService.formatTimeOfDay(Date.now());
-        });
+        this._cancelEverySecond = this._everySecondService.callEverySecond(
+            () => {
+                this.value = this._timeService.formatTimeOfDay(Date.now());
+            }
+        );
     }
 
     onDestroy() {

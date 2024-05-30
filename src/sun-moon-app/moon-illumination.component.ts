@@ -1,5 +1,5 @@
 import { Component, css, html } from 'fudgel';
-import { LatLon } from '../services/coordinate.service';
+import { LatLon } from '../datatypes/lat-lon';
 import { default as SunCalc } from 'suncalc';
 
 @Component('moon-illumination', {
@@ -27,19 +27,23 @@ export class MoonIlluminationComponent {
             if (phase < 0.0625) {
                 this.moonIllumination = 'sunMoon.moonIllumination.newMoon';
             } else if (phase < 0.1875) {
-                this.moonIllumination = 'sunMoon.moonIllumination.waxingCrescent';
+                this.moonIllumination =
+                    'sunMoon.moonIllumination.waxingCrescent';
             } else if (phase < 0.3125) {
                 this.moonIllumination = 'sunMoon.moonIllumination.firstQuarter';
             } else if (phase < 0.4375) {
-                this.moonIllumination = 'sunMoon.moonIllumination.waxingGibbous';
+                this.moonIllumination =
+                    'sunMoon.moonIllumination.waxingGibbous';
             } else if (phase < 0.5625) {
                 this.moonIllumination = 'sunMoon.moonIllumination.fullMoon';
             } else if (phase < 0.6875) {
-                this.moonIllumination = 'sunMoon.moonIllumination.waningGibbous';
+                this.moonIllumination =
+                    'sunMoon.moonIllumination.waningGibbous';
             } else if (phase < 0.8125) {
                 this.moonIllumination = 'sunMoon.moonIllumination.lastQuarter';
             } else if (phase < 0.9375) {
-                this.moonIllumination = 'sunMoon.moonIllumination.waningCrescent';
+                this.moonIllumination =
+                    'sunMoon.moonIllumination.waningCrescent';
             } else {
                 this.moonIllumination = 'sunMoon.moonIllumination.newMoon';
             }

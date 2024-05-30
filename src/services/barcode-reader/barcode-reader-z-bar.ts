@@ -1,9 +1,12 @@
-import { BarcodeReaderInterface, DetectedBarcodeData } from './barcode-reader-interface';
+import {
+    BarcodeReaderInterface,
+    DetectedBarcodeData,
+} from './barcode-reader-interface';
 import { scanImageData } from '@undecaf/zbar-wasm';
 
 export class BarcodeReaderZBar implements BarcodeReaderInterface {
     static create() {
-        return Promise.resolve(new BarcodeReaderZBar);
+        return Promise.resolve(new BarcodeReaderZBar());
     }
 
     static isSupported() {

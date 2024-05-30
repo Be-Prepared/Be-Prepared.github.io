@@ -30,8 +30,8 @@ import { Component, css, html } from 'fudgel';
             <info-share @qr="openQrCode()"></info-share>
             <info-permissions></info-permissions>
             <info-preferences></info-preferences>
-            <info-barcodes></info-barcodes>
             <info-tooling></info-tooling>
+            <info-barcodes></info-barcodes>
             <info-build></info-build>
         </default-layout>
         <show-modal *if="showQr" @clickoutside="closeQrCode()">

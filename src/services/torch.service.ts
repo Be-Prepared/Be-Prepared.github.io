@@ -76,6 +76,10 @@ export class TorchService {
         });
     }
 
+    prompt() {
+        this._permissionsService.camera(true).subscribe();
+    }
+
     turnOff() {
         return this._getAllTracksWithTorch()
             .then((tracks) => {

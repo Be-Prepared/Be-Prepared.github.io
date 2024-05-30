@@ -28,7 +28,7 @@ export class MagnifierService {
                     this._preferenceService.magnifier.setItem(false);
 
                     return AvailabilityState.UNAVAILABLE;
-                }),
+                })
             );
         };
 
@@ -48,9 +48,9 @@ export class MagnifierService {
 
                 return this._permissionsService.toAvailability(
                     state,
-                    whenGranted,
+                    whenGranted
                 );
-            }),
+            })
         );
     }
 

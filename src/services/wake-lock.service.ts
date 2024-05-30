@@ -25,7 +25,7 @@ export class WakeLockService {
                 }
 
                 return AvailabilityState.DENIED;
-            }),
+            })
         );
     }
 

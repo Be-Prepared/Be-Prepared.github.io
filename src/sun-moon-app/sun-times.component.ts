@@ -1,5 +1,5 @@
 import { Component, css, html } from 'fudgel';
-import { LatLon } from '../services/coordinate.service';
+import { LatLon } from '../datatypes/lat-lon';
 import { default as SunCalc } from 'suncalc';
 
 @Component('sun-times', {
@@ -7,20 +7,64 @@ import { default as SunCalc } from 'suncalc';
     style: css``,
     template: html`
         <div *if="coordinates">
-            <display-time id="sunMoon.sunTimes.nadir" .time="nadir"></display-time>
-            <display-time id="sunMoon.sunTimes.nightEnd" .time="nightEnd"></display-time>
-            <display-time id="sunMoon.sunTimes.nauticalDawn" .time="nauticalDawn"></display-time>
-            <display-time id="sunMoon.sunTimes.dawn" .time="dawn"></display-time>
-            <display-time id="sunMoon.sunTimes.sunrise" fail-id="sunMoon.sunTimes.neverRise" .time="sunrise"></display-time>
-            <display-time id="sunMoon.sunTimes.sunriseEnd" .time="sunriseEnd"></display-time>
-            <display-time id="sunMoon.sunTimes.goldenHourEnd" .time="goldenHourEnd"></display-time>
-            <display-time id="sunMoon.sunTimes.solarNoon" .time="solarNoon"></display-time>
-            <display-time id="sunMoon.sunTimes.goldenHour" .time="goldenHour"></display-time>
-            <display-time id="sunMoon.sunTimes.sunsetStart" .time="sunsetStart"></display-time>
-            <display-time id="sunMoon.sunTimes.sunset" fail-id="sunMoon.sunTimes.neverSet" .time="sunset"></display-time>
-            <display-time id="sunMoon.sunTimes.dusk" .time="dusk"></display-time>
-            <display-time id="sunMoon.sunTimes.nauticalDusk" .time="nauticalDusk"></display-time>
-            <display-time id="sunMoon.sunTimes.night" .time="night"></display-time>
+            <display-time
+                id="sunMoon.sunTimes.nadir"
+                .time="nadir"
+            ></display-time>
+            <display-time
+                id="sunMoon.sunTimes.nightEnd"
+                .time="nightEnd"
+            ></display-time>
+            <display-time
+                id="sunMoon.sunTimes.nauticalDawn"
+                .time="nauticalDawn"
+            ></display-time>
+            <display-time
+                id="sunMoon.sunTimes.dawn"
+                .time="dawn"
+            ></display-time>
+            <display-time
+                id="sunMoon.sunTimes.sunrise"
+                fail-id="sunMoon.sunTimes.neverRise"
+                .time="sunrise"
+            ></display-time>
+            <display-time
+                id="sunMoon.sunTimes.sunriseEnd"
+                .time="sunriseEnd"
+            ></display-time>
+            <display-time
+                id="sunMoon.sunTimes.goldenHourEnd"
+                .time="goldenHourEnd"
+            ></display-time>
+            <display-time
+                id="sunMoon.sunTimes.solarNoon"
+                .time="solarNoon"
+            ></display-time>
+            <display-time
+                id="sunMoon.sunTimes.goldenHour"
+                .time="goldenHour"
+            ></display-time>
+            <display-time
+                id="sunMoon.sunTimes.sunsetStart"
+                .time="sunsetStart"
+            ></display-time>
+            <display-time
+                id="sunMoon.sunTimes.sunset"
+                fail-id="sunMoon.sunTimes.neverSet"
+                .time="sunset"
+            ></display-time>
+            <display-time
+                id="sunMoon.sunTimes.dusk"
+                .time="dusk"
+            ></display-time>
+            <display-time
+                id="sunMoon.sunTimes.nauticalDusk"
+                .time="nauticalDusk"
+            ></display-time>
+            <display-time
+                id="sunMoon.sunTimes.night"
+                .time="night"
+            ></display-time>
         </div>
     `,
 })

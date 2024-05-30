@@ -17,7 +17,7 @@ export class LocationFieldHeadingComponent {
 
     constructor() {
         const unknownValue = this._i18nService.get(
-            'location.field.unknownValue',
+            'location.field.unknownValue'
         );
         this.value = unknownValue;
         this._subscription = this._geolocationService
@@ -28,7 +28,7 @@ export class LocationFieldHeadingComponent {
                         this.value = unknownValue;
                     } else {
                         this.value = this._directionService.toHeadingDirection(
-                            position.heading,
+                            position.heading
                         );
                     }
                 } else {

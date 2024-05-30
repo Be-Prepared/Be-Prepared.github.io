@@ -6,7 +6,7 @@ import {
     SystemCoordinates,
 } from '../services/coordinate.service';
 import { CoordinateSystem } from '../datatypes/coordinate-system';
-import { LatLon } from '../services/coordinate.service';
+import { LatLon } from '../datatypes/lat-lon';
 import { Subscription } from 'rxjs';
 
 interface EmptyData {

@@ -1,5 +1,5 @@
-import CheapRuler from 'cheap-ruler';
 import { Component, css, di, html } from 'fudgel';
+import { CoordinateService } from '../services/coordinate.service';
 import { DirectionService } from '../services/direction.service';
 import { DistanceService } from '../services/distance.service';
 import {
@@ -138,6 +138,7 @@ interface WaypointAugmented extends WaypointSaved {
     `,
 })
 export class LocationListAppComponent {
+    private _coordinateService = di(CoordinateService);
     private _directionService = di(DirectionService);
     private _distanceService = di(DistanceService);
     private _geolocationService = di(GeolocationService);
@@ -195,16 +196,17 @@ export class LocationListAppComponent {
         }
 
         const positionTyped = position as GeolocationCoordinateResultSuccess;
-        const cheapRuler = new CheapRuler(positionTyped.latitude, 'meters');
         const augmentedPoints = points.map((point) => {
-            const pointA: [number, number] = [
-                positionTyped.longitude,
-                positionTyped.latitude,
-            ];
-            const pointB: [number, number] = [point.lon, point.lat];
-            const meters = cheapRuler.distance(pointA, pointB);
+            const meters = this._coordinateService.distance(
+                point,
+                positionTyped
+            );
             const distance = this._distanceService.metersToString(meters);
-            const direction = cheapRuler.bearing(pointA, pointB);
+            const direction = this._coordinateService.bearing(
+                positionTyped,
+                point,
+                true
+            );
             const compassPoint =
                 this._directionService.toCompassPoint(direction);
 

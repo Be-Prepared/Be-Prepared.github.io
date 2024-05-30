@@ -1,6 +1,6 @@
 import { Component, css, html } from 'fudgel';
 
-@Component('camera-unavailable', {
+@Component('compass-unavailable', {
     style: css`
         .wrapper {
             height: 100%;
@@ -24,16 +24,16 @@ import { Component, css, html } from 'fudgel';
             <div class="wrapper">
                 <div class="heading">
                     <i18n-label
-                        id="shared.cameraUnavailable.heading"
+                        id="compass.compassUnavailable.heading"
                     ></i18n-label>
                 </div>
                 <div class="message">
                     <i18n-label
-                        id="shared.cameraUnavailable.message"
+                        id="compass.compassUnavailable.message"
                     ></i18n-label>
                 </div>
             </div>
         </default-layout>
     `,
 })
-export class CameraUnavailableComponent {}
+export class CompassUnavailableComponent {}

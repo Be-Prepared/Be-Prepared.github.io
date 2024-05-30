@@ -54,8 +54,8 @@ export class ToastService {
                         padding: 0.5em 1em;
                         background-color: var(--toast-bg-color);
                         border: var(--toast-border);
-                        animation: toastIt 3000ms cubic-bezier(0.785, 0.135, 0.15, 0.86)
-                            forwards;
+                        animation: toastIt 3000ms
+                            cubic-bezier(0.785, 0.135, 0.15, 0.86) forwards;
                     }
 
                     @keyframes toastIt {

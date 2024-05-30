@@ -36,14 +36,24 @@ import { Component, css, html } from 'fudgel';
             <i18n-label id="nfc.record.lang"></i18n-label>
             {{ record.lang }}
         </div>
-        <div *if="record && record.recordType === 'text'" class="data breakWord">
+        <div
+            *if="record && record.recordType === 'text'"
+            class="data breakWord"
+        >
             {{ decode() }}
         </div>
         <div *if="record && record.recordType === 'url'" class="data breakWord">
-            <styled-link href="{{ decode() }}" target="_blank">{{ decode() }}</styled-link>
+            <styled-link href="{{ decode() }}" target="_blank"
+                >{{ decode() }}</styled-link
+            >
         </div>
-        <div *if="record && record.recordType === 'absolute-url'" class="data breakWord">
-            <styled-link href="{{ decode() }}" target="_blank">{{ decode() }}</styled-link>
+        <div
+            *if="record && record.recordType === 'absolute-url'"
+            class="data breakWord"
+        >
+            <styled-link href="{{ decode() }}" target="_blank"
+                >{{ decode() }}</styled-link
+            >
         </div>
     `,
 })

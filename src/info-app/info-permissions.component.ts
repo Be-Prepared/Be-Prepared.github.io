@@ -1,7 +1,7 @@
 import { AvailabilityState } from '../datatypes/availability-state';
+import { CompassService } from '../services/compass.service';
 import { Component, css, di, html } from 'fudgel';
 import { GeolocationService } from '../services/geolocation.service';
-import { PositionService } from '../services/position.service';
 import { Subject } from 'rxjs';
 import { WakeLockService } from '../services/wake-lock.service';
 import { takeUntil } from 'rxjs/operators';
@@ -17,15 +17,20 @@ import { TorchService } from '../services/torch.service';
                 <info-app-permission permission="camera"></info-app-permission>
             </li>
             <li>
-                <i18n-label id="info.geolocation"></i18n-label>
+                <i18n-label id="info.compass"></i18n-label>
+                (<i18n-label
+                    id="info.compass.{{ compassType }}"
+                    ws=""
+                ></i18n-label
+                >)
                 <info-app-availability
-                    .availability-state="geolocation"
+                    .availability-state="compass"
                 ></info-app-availability>
             </li>
             <li>
-                <i18n-label id="info.position"></i18n-label>
+                <i18n-label id="info.geolocation"></i18n-label>
                 <info-app-availability
-                    .availability-state="position"
+                    .availability-state="geolocation"
                 ></info-app-availability>
             </li>
             <li>
@@ -44,13 +49,14 @@ import { TorchService } from '../services/torch.service';
     `,
 })
 export class InfoPermissionsComponent {
+    private _compassService = di(CompassService);
     private _geolocationService = di(GeolocationService);
-    private _positionService = di(PositionService);
     private _subject = new Subject();
     private _torchService = di(TorchService);
     private _wakeLockService = di(WakeLockService);
+    compass = AvailabilityState.ERROR;
+    compassType = 'ABSOLUTE_ORIENTATION_SENSOR';
     geolocation = AvailabilityState.ERROR;
-    position = AvailabilityState.ERROR;
     torch = AvailabilityState.ERROR;
     wakeLock = AvailabilityState.ERROR;
 
@@ -61,11 +67,17 @@ export class InfoPermissionsComponent {
             .subscribe((status) => {
                 this.geolocation = status;
             });
-        this._positionService
+        this._compassService
             .availabilityState()
             .pipe(takeUntil(this._subject))
             .subscribe((status) => {
-                this.position = status;
+                this.compass = status;
+            });
+        this._compassService
+            .typeObservable()
+            .pipe(takeUntil(this._subject))
+            .subscribe((type) => {
+                this.compassType = type;
             });
         this._torchService
             .availabilityState(false)

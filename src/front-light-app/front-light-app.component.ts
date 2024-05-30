@@ -8,9 +8,7 @@ import { WakeLockService } from '../services/wake-lock.service';
             color: black;
         }
     `,
-    template: html`
-        <default-layout class="bright"></default-layout>
-    `,
+    template: html` <default-layout class="bright"></default-layout> `,
 })
 export class FrontLightAppComponent {
     private _wakeLockService = di(WakeLockService);

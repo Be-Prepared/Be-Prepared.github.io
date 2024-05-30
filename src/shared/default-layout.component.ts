@@ -14,7 +14,7 @@ import { Component, css, html } from 'fudgel';
         }
 
         .outer {
-            padding: 1em;
+            padding: 1em 1em 0.2em 1em;
             height: 100%;
             width: 100%;
             overflow: hidden;
@@ -50,6 +50,10 @@ import { Component, css, html } from 'fudgel';
             .buttons {
                 flex-direction: column-reverse;
             }
+
+            .outer {
+                padding: 1em 0.2em 1em 1em;
+            }
         }
     `,
     template: html`
@@ -63,14 +67,14 @@ import { Component, css, html } from 'fudgel';
             <slot name="more-buttons"></slot>
         </div>
     `,
-    useShadow: true
+    useShadow: true,
 })
 export class DefaultLayoutComponent {
     frame?: string;
     innerClasses = 'inner';
 
     onChange() {
-        const innerClasses = ['inner']
+        const innerClasses = ['inner'];
 
         if (this.frame || this.frame === '') {
             innerClasses.push('frame');

@@ -62,29 +62,37 @@ export class LocationAddAppComponent {
         this._waypointService.updatePoint(point);
         // This doesn't work when called during onInit()
         setTimeout(() => {
-            history.replaceState({}, document.title, `/location-edit/${point.id}`);
+            history.replaceState(
+                {},
+                document.title,
+                `/location-edit/${point.id}`
+            );
         });
     }
 
     _useGeo() {
         const point = this._waypointService.newPoint();
         point.name = this._makeName(point);
-        this._coordinateService.fromString(this.geo || '').subscribe((parsedLocation) => {
-            if (parsedLocation) {
-                point.lat = parsedLocation.lat;
-                point.lon = parsedLocation.lon;
-                const params = new URLSearchParams(
-                    `?${window.location.search.slice(1).replace(/\?/g, '&')}`
-                );
-                const name = params.get('q');
+        this._coordinateService
+            .fromString(this.geo || '')
+            .subscribe((parsedLocation) => {
+                if (parsedLocation) {
+                    point.lat = parsedLocation.lat;
+                    point.lon = parsedLocation.lon;
+                    const params = new URLSearchParams(
+                        `?${window.location.search
+                            .slice(1)
+                            .replace(/\?/g, '&')}`
+                    );
+                    const name = params.get('q');
 
-                if (name) {
-                    point.name = name;
+                    if (name) {
+                        point.name = name;
+                    }
                 }
-            }
 
-            this._proceed(point);
-        });
+                this._proceed(point);
+            });
     }
 
     _useLocation() {
@@ -97,8 +105,8 @@ export class LocationAddAppComponent {
                 first(),
                 tap((position) => {
                     if (position && position.success) {
-                        point.lat = position.latitude;
-                        point.lon = position.longitude;
+                        point.lat = position.lat;
+                        point.lon = position.lon;
                     }
                 }),
                 catchError(() => of(null))
