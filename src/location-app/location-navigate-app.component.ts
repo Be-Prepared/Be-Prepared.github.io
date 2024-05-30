@@ -1,3 +1,4 @@
+import { AvailabilityState } from '../datatypes/availability-state';
 import { Component, css, di, emit, html } from 'fudgel';
 import { first } from 'rxjs/operators';
 import {
@@ -157,6 +158,7 @@ import { WaypointService } from './waypoint.service';
                 </div>
                 <div slot="more-buttons">
                     <scaling-icon
+                        *if="allowWakeLock"
                         class="{{wakeLockClass}}"
                         @click.stop.prevent="toggleWakeLock()"
                         href="/wake-lock.svg"
@@ -167,12 +169,13 @@ import { WaypointService } from './waypoint.service';
     `,
 })
 export class LocationNavigateAppComponent {
+    private _enabled = false;
     private _geolocationService = di(GeolocationService);
     private _preferenceService = di(PreferenceService);
     private _subscription: Subscription | null = null;
     private _wakeLockService = di(WakeLockService);
     private _waypointService = di(WaypointService);
-    enabled = false;
+    allowWakeLock = false;
     id?: string;
     startPosition: GeolocationCoordinateResultSuccess | null = null;
     startTime = Date.now();
@@ -192,9 +195,15 @@ export class LocationNavigateAppComponent {
             return;
         }
 
-        if (this._preferenceService.navigationWakeLock.getItem()) {
-            this.toggleWakeLock();
-        }
+        this._wakeLockService.availabilityState().subscribe((state) => {
+            if (state === AvailabilityState.ALLOWED) {
+                this.allowWakeLock = true;
+
+                if (this._preferenceService.navigationWakeLock.getItem() && !this._enabled) {
+                    this.toggleWakeLock();
+                }
+            }
+        });
 
         this._subscription = this._geolocationService
             .getPositionSuccess()
@@ -203,7 +212,7 @@ export class LocationNavigateAppComponent {
     }
 
     onDestroy() {
-        if (this.enabled) {
+        if (this._enabled) {
             this._wakeLockService.release();
         }
 
@@ -211,10 +220,10 @@ export class LocationNavigateAppComponent {
     }
 
     toggleWakeLock() {
-        this.enabled = !this.enabled;
-        this._preferenceService.navigationWakeLock.setItem(this.enabled);
+        this._enabled = !this._enabled;
+        this._preferenceService.navigationWakeLock.setItem(this._enabled);
 
-        if (this.enabled) {
+        if (this._enabled) {
             this.wakeLockClass = 'enabled';
             this._wakeLockService.request();
         } else {
