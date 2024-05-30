@@ -39,6 +39,7 @@ import { Component, css, html } from 'fudgel';
         .buttons {
             display: flex;
             justify-content: space-between;
+            padding: 5px;
         }
 
         @media (orientation: landscape) {

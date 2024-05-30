@@ -28,10 +28,6 @@ interface WaypointAugmented extends WaypointSaved {
             align-items: center;
         }
 
-        .add {
-            padding: 5px;
-        }
-
         .content {
             height: 100%;
             width: 100%;
@@ -130,7 +126,6 @@ interface WaypointAugmented extends WaypointSaved {
                 </div>
                 <scaling-icon
                     slot="more-buttons"
-                    class="add"
                     @click.stop.prevent="goToAdd()"
                     href="/add.svg"
                 ></scaling-icon>

@@ -11,10 +11,6 @@ import { takeUntil } from 'rxjs/operators';
 
 @Component('location-app', {
     style: css`
-        .list {
-            padding: 5px;
-        }
-
         .content {
             height: 100%;
             width: 100%;
@@ -105,7 +101,6 @@ import { takeUntil } from 'rxjs/operators';
                 </div>
                 <scaling-icon
                     slot="more-buttons"
-                    class="list"
                     @click="goToList()"
                     href="/list.svg"
                 ></scaling-icon>

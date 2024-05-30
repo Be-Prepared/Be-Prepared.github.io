@@ -2,14 +2,9 @@ import { Component, css, html } from 'fudgel';
 import { goBack } from '../util/go-back';
 
 @Component('back-button', {
-    style: css`
-        .back {
-            padding: 5px;
-        }
-    `,
+    style: css``,
     template: html`
         <scaling-icon
-            class="back"
             @click.stop.prevent="back()"
             href="/back.svg"
         ></scaling-icon>

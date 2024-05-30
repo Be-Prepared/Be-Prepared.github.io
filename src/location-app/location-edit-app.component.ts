@@ -21,10 +21,6 @@ import { WaypointService } from './waypoint.service';
             justify-content: space-between;
         }
 
-        .navigate {
-            padding: 5px;
-        }
-
         .gapAbove {
             padding-top: 0.7em;
         }
@@ -152,7 +148,6 @@ import { WaypointService } from './waypoint.service';
                 <scaling-icon
                     slot="more-buttons"
                     *if="validPoint"
-                    class="navigate"
                     @click.stop.prevent="navigate()"
                     href="/navigate.svg"
                 ></scaling-icon>
