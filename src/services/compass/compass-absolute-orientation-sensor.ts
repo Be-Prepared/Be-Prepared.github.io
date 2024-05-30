@@ -19,7 +19,7 @@ export class CompassAbsoluteOrientationSensor implements CompassInterface {
     private _permissionsService = di(PermissionsService);
 
     availabilityState() {
-        if (!(window as any).AbsoluteOrientationSenso) {
+        if (!(window as any).AbsoluteOrientationSensor) {
             return of(AvailabilityState.UNAVAILABLE);
         }
 
