@@ -86,7 +86,7 @@ export default defineConfig({
             },
             registerType: 'prompt',
             workbox: {
-                globPatterns: ['**/*.{js,css,html,svg}'],
+                globPatterns: ['**/*.{js,css,svg}', '**/index.html', '**/404.html'],
             },
         }),
     ],
