@@ -10,6 +10,7 @@ import { switchMap } from 'rxjs/operators';
 import { ToastService } from './toast.service';
 
 export class TorchService {
+    private _currentlyActiveTrack: MediaStreamTrack | null = null;
     private _permissionsService = di(PermissionsService);
     private _preferenceService = di(PreferenceService);
     private _toastService = di(ToastService);
@@ -81,6 +82,10 @@ export class TorchService {
     }
 
     turnOff() {
+        // Keep a reference to the track so garbage collection doesn't remove
+        // it, thereby turning off the torch.
+        this._currentlyActiveTrack = null;
+
         return this._getAllTracksWithTorch()
             .then((tracks) => {
                 const enabled = [];
@@ -115,6 +120,8 @@ export class TorchService {
     turnOn() {
         return this._getAllTracksWithTorch().then((tracks) => {
             if (tracks.length) {
+                this._currentlyActiveTrack = tracks[0];
+
                 return this._setTorch(tracks[0], true);
             }
 
