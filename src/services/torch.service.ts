@@ -84,7 +84,9 @@ export class TorchService {
     turnOff() {
         // Keep a reference to the track so garbage collection doesn't remove
         // it, thereby turning off the torch.
-        this._currentlyActiveTrack = null;
+        if (this._currentlyActiveTrack) {
+            this._currentlyActiveTrack = null;
+        }
 
         return this._getAllTracksWithTorch()
             .then((tracks) => {
