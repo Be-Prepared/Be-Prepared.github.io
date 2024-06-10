@@ -8,24 +8,12 @@ import { WaypointService } from './waypoint.service';
 @Component('location-edit-app', {
     attr: ['id'],
     style: css`
-        .wrapper {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            width: 100%;
-        }
-
-        .buttons {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-        }
-
         .gapAbove {
             padding-top: 0.7em;
         }
 
         .centered-text {
+            width: 100%;
             text-align: center;
         }
 
@@ -55,6 +43,13 @@ import { WaypointService } from './waypoint.service';
             justify-content: space-between;
         }
 
+        .landscape-buttons {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            padding-top: 0.4em;
+        }
+
         @media (orientation: portrait) {
             .landscape {
                 display: none;
@@ -62,14 +57,6 @@ import { WaypointService } from './waypoint.service';
         }
 
         @media (orientation: landscape) {
-            .wrapper {
-                flex-direction: row-reverse;
-            }
-
-            .buttons {
-                flex-direction: column-reverse;
-            }
-
             .portrait {
                 display: none;
             }
@@ -99,14 +86,19 @@ import { WaypointService } from './waypoint.service';
                                 content="geo:{{lat}},{{lon}}?q={{nameUrlEncode}}"
                             ></mini-qr>
                         </pretty-button>
-                        <div class="centered-text">
+                        <div class="centered-text landscape">
                             <i18n-label
-                                class="landscape"
                                 id="location.edit.helpSave"
                             ></i18n-label>
                         </div>
                         <pretty-labeled-button
+                            @click="averagePoint()"
+                            class="portrait"
+                            id="location.edit.average"
+                        ></pretty-labeled-button>
+                        <pretty-labeled-button
                             @click="deletePoint()"
+                            class="portrait"
                             id="location.edit.delete"
                         ></pretty-labeled-button>
                     </div>
@@ -137,11 +129,20 @@ import { WaypointService } from './waypoint.service';
                                 help-html="location.help.html"
                             ></pretty-input>
                         </div>
-                        <div class="gapAbove centered-text">
+                        <div class="gapAbove centered-text portrait">
                             <i18n-label
                                 id="location.edit.helpSave"
-                                class="portrait"
                             ></i18n-label>
+                        </div>
+                        <div class="landscape landscape-buttons">
+                            <pretty-labeled-button
+                                @click="deletePoint()"
+                                id="location.edit.delete"
+                            ></pretty-labeled-button>
+                            <pretty-labeled-button
+                                @click="averagePoint()"
+                                id="location.edit.average"
+                            ></pretty-labeled-button>
                         </div>
                     </div>
                 </div>
@@ -197,6 +198,14 @@ export class LocationEditComponent {
 
     onDestroy() {
         this._subscription && this._subscription.unsubscribe();
+    }
+
+    averagePoint() {
+        history.pushState(
+            {},
+            document.title,
+            `/location-average/${this.point!.id}`
+        );
     }
 
     closeQrCode() {

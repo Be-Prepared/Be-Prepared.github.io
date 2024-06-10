@@ -9,12 +9,10 @@ import {
     timeout,
 } from 'rxjs/operators';
 import { CompassInterface } from './compass-interface';
+import { DEGREES_TO_RADIANS, RADIANS_TO_DEGREES, TWO_PI } from '../../shared/radians';
 import { from, Observable, of, ReplaySubject, Subject } from 'rxjs';
 
 const USES_ABSOLUTE_LISTENER = 'ondeviceorientationabsolute' in window;
-const DEGREES_TO_RADIANS = Math.PI / 180;
-const RADIANS_TO_DEGREES = 180 / Math.PI;
-const TWO_PI = 2 * Math.PI;
 
 export class CompassDeviceOrientation implements CompassInterface {
     private _observable: Observable<number> | null = null;

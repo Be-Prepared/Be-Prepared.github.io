@@ -1,5 +1,6 @@
 export * from './location-add-app.component.ts';
 export * from './location-app.component.ts';
+export * from './location-average-app.component.ts';
 export * from './location-coordinates.component.ts';
 export * from './location-edit-app.component.ts';
 export * from './location-field.component.ts';

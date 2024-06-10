@@ -26,10 +26,12 @@
     "dependencies": {
         "@bencevans/kalman-filter": "^1.0.0",
         "@tofandel/qrcode-svg": "^1.2.0",
+        "@types/ecef-projector": "^1.0.2",
         "@types/suncalc": "^1.9.2",
         "@types/w3c-generic-sensor": "^1.0.9",
         "@undecaf/zbar-wasm": "^0.11.0",
         "cheap-ruler": "^3.0.2",
+        "ecef-projector": "^1.0.1",
         "suncalc": "^1.9.0",
         "tsx": "^4.11.0",
         "usng.js": "^0.4.5"

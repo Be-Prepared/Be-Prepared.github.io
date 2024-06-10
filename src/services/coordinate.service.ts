@@ -5,9 +5,11 @@ import { Converter } from 'usng.js';
 import { CoordinateSystem } from '../datatypes/coordinate-system';
 import { di } from 'fudgel/dist/di';
 import { DirectionService } from './direction.service';
+import { default as ecefProjector } from 'ecef-projector';
 import { LatLon } from '../datatypes/lat-lon';
 import { map } from 'rxjs/operators';
 import { PreferenceService } from './preference.service';
+import { XYZ } from '../datatypes/xyz';
 
 // By default, usng uses NAD83 but doesn't support WGS84. This is a workaround.
 const converter = new (Converter as any)();
@@ -199,6 +201,16 @@ export class CoordinateService {
         return system.utmups;
     }
 
+    latLonToXYZ(latLon: LatLon): XYZ {
+        const [x, y, z] = ecefProjector.project(latLon.lat, latLon.lon, 0);
+
+        return {
+            x,
+            y,
+            z,
+        };
+    }
+
     reset() {
         this._preferencesService.coordinateSystem.reset();
         this._currentSetting.next(CoordinateSystemDefault);
@@ -215,6 +227,15 @@ export class CoordinateService {
         return {
             lat: this._directionService.standardizeLatitude(latLon.lat),
             lon: this._directionService.standardize180(latLon.lon),
+        };
+    }
+
+    xyzToLatLon(xyz: XYZ): LatLon {
+        const [lat, lon] = ecefProjector.unproject(xyz.x, xyz.y, xyz.z);
+
+        return {
+            lat,
+            lon,
         };
     }
 

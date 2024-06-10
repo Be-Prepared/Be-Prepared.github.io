@@ -51,6 +51,7 @@ This PWA is also an example for how to use the following:
     * Automatically will use high resolution locations (GPS) and will calculate your speed and heading even when the device doesn't support these fields.
     * Ability to change field functions (especially for Geocaching and the Geocaching merit badge). See field functions section (below) for more information.
     * Keeps the screen enabled while navigating to a point.
+    * Allows you to average a series of points for a location.
 
 ![Barcode Reader](screenshots/barcode-reader.png)
 
