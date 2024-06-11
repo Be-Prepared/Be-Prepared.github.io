@@ -25,9 +25,10 @@ import { takeUntil } from 'rxjs/operators';
 
         .compass-rose {
             padding: 2em;
-            height: min(80vh, 80vw);
-            width: min(80vh, 80vw);
+            height: 95vmin;
+            width: 95vmin;
             aspect-ratio: 1/1;
+            box-sizing: border-box;
         }
 
         .info {
@@ -35,8 +36,7 @@ import { takeUntil } from 'rxjs/operators';
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            width: 100%;
-            height: 100%;
+            width: 15em;
         }
 
         .info-degrees {
