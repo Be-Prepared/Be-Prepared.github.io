@@ -1,8 +1,12 @@
 import { AvailabilityState } from '../datatypes/availability-state';
 import { di } from 'fudgel';
 import { finalize, share, switchMap } from 'rxjs/operators';
-import { Observable, of, Subject } from 'rxjs';
-import { PermissionsService } from './permissions.service';
+import { from, Observable, of, Subject } from 'rxjs';
+import {
+    PermissionsService,
+    PermissionsServiceState,
+} from './permissions.service';
+import { PreferenceService } from './preference.service';
 
 export interface NfcScanResult {
     initializeError?: true;
@@ -15,16 +19,47 @@ export interface NfcScanResult {
 
 export class NfcService {
     private _permissionsService = di(PermissionsService);
+    private _preferenceService = di(PreferenceService);
     private _observable: Observable<NfcScanResult> | null = null;
 
-    availabilityState() {
+    availabilityState(useLiveValue: boolean) {
         if (!window.NDEFReader) {
             return of(AvailabilityState.UNAVAILABLE);
         }
 
         return this._permissionsService.nfc().pipe(
             switchMap((state) => {
-                return this._permissionsService.toAvailability(state);
+                if (
+                    state === PermissionsServiceState.ERROR ||
+                    state === PermissionsServiceState.PROMPT ||
+                    state === PermissionsServiceState.DENIED
+                ) {
+                    return this._permissionsService.toAvailability(state);
+                }
+
+                if (!useLiveValue) {
+                    const cached = this._preferenceService.nfc.getItem();
+
+                    if (cached === true) {
+                        return of(AvailabilityState.ALLOWED);
+                    }
+
+                    if (cached === false) {
+                        return of(AvailabilityState.UNAVAILABLE);
+                    }
+                }
+
+                return from(
+                    this._quickScan().then((success) => {
+                        this._preferenceService.nfc.setItem(success);
+
+                        if (success) {
+                            return AvailabilityState.ALLOWED;
+                        }
+
+                        return AvailabilityState.UNAVAILABLE;
+                    })
+                );
             })
         );
     }
@@ -68,5 +103,19 @@ export class NfcService {
 
     prompt() {
         return this._permissionsService.nfc(true);
+    }
+
+    private _quickScan() {
+        return new Promise<boolean>((resolve) => {
+            const instance = new NDEFReader();
+            instance.onreading = () => resolve(true);
+
+            // This is true because it's indicating a partial read
+            instance.onreadingerror = () => resolve(true);
+            instance.scan({ signal: AbortSignal.timeout(1) }).then(
+                () => resolve(true),
+                () => resolve(false)
+            );
+        });
     }
 }

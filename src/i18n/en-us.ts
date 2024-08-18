@@ -41,9 +41,11 @@ export const enUS: LanguageData = {
     'info.compass.DEVICE_ORIENTATION': 'DO',
     'info.compass.DEVICE_ORIENTATION_ABSOLUTE': 'DOA',
     'info.contact.email': 'Email Developer',
-    'info.contact.feedback': 'To provide feedback, suggestions, and bug reports, you can go to the project site or email the developer directly.',
+    'info.contact.feedback':
+        'To provide feedback, suggestions, and bug reports, you can go to the project site or email the developer directly.',
     'info.contact.issues': 'Report Bugs, Request Features',
-    'info.contact.specificBrowsers': 'Important: This app works best in Chrome on Android and Safari on iOS. There are permissions and installation issues with other browsers.',
+    'info.contact.specificBrowsers':
+        'Important: This app works best in Chrome on Android and Safari on iOS. There are permissions and installation issues with other browsers.',
     'info.coordinates': 'Coordinates:',
     'info.coordinates.DDD': 'Decimal Degrees',
     'info.coordinates.DDM': 'Degrees Decimal Minutes',
@@ -56,6 +58,7 @@ export const enUS: LanguageData = {
     'info.framework': 'the framework driving this app',
     'info.geolocation': 'Geolocation:',
     'info.latestChangesHeader': 'Latest Changes:',
+    'info.nfc': 'NFC',
     'info.permission.denied': '✖ Denied',
     'info.permission.error': 'Error',
     'info.permission.granted': '✔ Granted',
@@ -217,6 +220,9 @@ export const enUS: LanguageData = {
     'nfc.scanResult.scanning': 'Scanning for NFC tags...',
     'nfc.scanResult.serialNumber': 'Serial number:',
     'nfc.scanResult.timestamp': 'Timestamp:',
+    'nfc.unavailable.heading': 'NFC Not Supported',
+    'nfc.unavailable.message':
+        'There is no NFC support on this device. The NFC tool will be removed from the starting menu.',
 
     // Shared components
     'shared.cameraUnavailable.heading': 'No Suitable Camera',

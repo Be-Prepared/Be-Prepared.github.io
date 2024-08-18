@@ -16,6 +16,7 @@ export class PreferenceService {
     magnifier: LocalStorageInterface<boolean>;
     navigationType: LocalStorageInterface<NavigationType>;
     navigationWakeLock: LocalStorageInterface<boolean>;
+    nfc: LocalStorageInterface<boolean>
     points: LocalStorageInterface<WaypointSaved[]>;
     sunMoonLocation: LocalStorageInterface<string>;
     timeSystem: LocalStorageInterface<TimeSystem>;
@@ -43,6 +44,7 @@ export class PreferenceService {
             NavigationType
         );
         this.navigationWakeLock = LocalStorageService.boolean('navigationWakeLock');
+        this.nfc = LocalStorageService.boolean('nfc');
         this.points = LocalStorageService.json('points');
         this.sunMoonLocation = LocalStorageService.string('sunMoonLocation');
         this.timeSystem = LocalStorageService.enum<TimeSystem>(

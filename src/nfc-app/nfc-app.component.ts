@@ -25,7 +25,7 @@ import { takeUntil } from 'rxjs/operators';
             message-id="nfc.explainAsk"
         ></permission-prompt>
         <permission-denied *if="explainDeny"></permission-denied>
-        <camera-unavailable *if="explainUnavailable"></camera-unavailable>
+        <nfc-unavailable *if="explainUnavailable"></nfc-unavailable>
         <default-layout *if="showControls" frame>
             <nfc-scan-result .scan-result="lastRead"></nfc-scan-result>
         </default-layout>
@@ -44,13 +44,14 @@ export class NfcAppComponent {
 
     onInit() {
         this._nfcService
-            .availabilityState()
+            .availabilityState(true)
             .pipe(takeUntil(this._subject))
             .subscribe((value) => {
                 this.explainAsk = value === AvailabilityState.PROMPT;
                 this.explainDeny = value === AvailabilityState.DENIED;
                 this.explainUnavailable =
-                    value === AvailabilityState.UNAVAILABLE;
+                    value === AvailabilityState.UNAVAILABLE ||
+                    value === AvailabilityState.ERROR;
                 this.showControls = value === AvailabilityState.ALLOWED;
 
                 if (this.showControls) {

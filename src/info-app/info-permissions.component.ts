@@ -2,6 +2,7 @@ import { AvailabilityState } from '../datatypes/availability-state';
 import { CompassService } from '../services/compass.service';
 import { Component, css, di, html } from 'fudgel';
 import { GeolocationService } from '../services/geolocation.service';
+import { NfcService } from '../services/nfc.service';
 import { Subject } from 'rxjs';
 import { WakeLockService } from '../services/wake-lock.service';
 import { takeUntil } from 'rxjs/operators';
@@ -34,6 +35,12 @@ import { TorchService } from '../services/torch.service';
                 ></info-app-availability>
             </li>
             <li>
+                <i18n-label id="info.nfc"></i18n-label>
+                <info-app-availability
+                    .availability-state="nfc"
+                ></info-app-availability>
+            </li>
+            <li>
                 <i18n-label id="info.torch"></i18n-label>
                 <info-app-availability
                     .availability-state="torch"
@@ -51,12 +58,14 @@ import { TorchService } from '../services/torch.service';
 export class InfoPermissionsComponent {
     private _compassService = di(CompassService);
     private _geolocationService = di(GeolocationService);
+    private _nfcService = di(NfcService);
     private _subject = new Subject();
     private _torchService = di(TorchService);
     private _wakeLockService = di(WakeLockService);
     compass = AvailabilityState.ERROR;
     compassType = 'ABSOLUTE_ORIENTATION_SENSOR';
     geolocation = AvailabilityState.ERROR;
+    nfc = AvailabilityState.ERROR;
     torch = AvailabilityState.ERROR;
     wakeLock = AvailabilityState.ERROR;
 
@@ -78,6 +87,12 @@ export class InfoPermissionsComponent {
             .pipe(takeUntil(this._subject))
             .subscribe((type) => {
                 this.compassType = type;
+            });
+        this._nfcService
+            .availabilityState(false)
+            .pipe(takeUntil(this._subject))
+            .subscribe((status) => {
+                this.nfc = status;
             });
         this._torchService
             .availabilityState(false)

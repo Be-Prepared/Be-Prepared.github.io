@@ -60,7 +60,8 @@ export class FlashlightAppComponent {
                 this.explainAsk = value === AvailabilityState.PROMPT;
                 this.explainDeny = value === AvailabilityState.DENIED;
                 this.explainUnavailable =
-                    value === AvailabilityState.UNAVAILABLE;
+                    value === AvailabilityState.UNAVAILABLE ||
+                    value === AvailabilityState.ERROR;
                 this.showControls = value === AvailabilityState.ALLOWED;
 
                 if (this.showControls) {

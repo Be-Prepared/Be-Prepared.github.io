@@ -101,7 +101,7 @@ export const tileDefs: TileDef[] = [
         icon: '/nfc.svg',
         label: 'tile.nfc',
         component: 'nfc-app',
-        show: nfcService.availabilityState().pipe(availabilityToBoolean),
+        show: nfcService.availabilityState(false).pipe(availabilityToBoolean),
     },
     {
         id: 'timer',

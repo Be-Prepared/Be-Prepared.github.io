@@ -22,16 +22,12 @@ export class TorchService {
 
         return this._permissionsService.camera().pipe(
             switchMap((state) => {
-                if (state === PermissionsServiceState.ERROR) {
-                    return of(AvailabilityState.ERROR);
-                }
-
-                if (state === PermissionsServiceState.PROMPT) {
-                    return of(AvailabilityState.PROMPT);
-                }
-
-                if (state === PermissionsServiceState.DENIED) {
-                    return of(AvailabilityState.DENIED);
+                if (
+                    state === PermissionsServiceState.ERROR ||
+                    state === PermissionsServiceState.PROMPT ||
+                    state === PermissionsServiceState.DENIED
+                ) {
+                    return this._permissionsService.toAvailability(state);
                 }
 
                 if (!useLiveValue) {
