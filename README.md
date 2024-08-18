@@ -51,7 +51,7 @@ This PWA is also an example for how to use the following:
     * Automatically will use high resolution locations (GPS) and will calculate your speed and heading even when the device doesn't support these fields.
     * Ability to change field functions (especially for Geocaching and the Geocaching merit badge). See field functions section (below) for more information.
     * Keeps the screen enabled while navigating to a point.
-    * Allows you to average a series of points for a location.
+    * Allows you to average a series of points for a location. This uses a [Kalman filter] and it is best to get readings for several minutes or even up to an hour. The averages start over with each set of readings and does not build upon previous readings.
 
 ![Barcode Reader](screenshots/barcode-reader.png)
 
@@ -89,7 +89,7 @@ The Location app can show a number of different fields. The majority can be used
 * Distance (Navigation only): How much distance is between you and your destination.
 * Distance Traveled: How far you've traveled while having the GPS enabled.
 * Heading: When available, this is the heading reported by your GPS. If not available, this will be calculated.
-* Heading (Smoothed): Your current direction of travel, averaged over the last five successful readings. It uses a [Kalman filter](https://en.wikipedia.org/wiki/Kalman_filter), which takes into account the GPS accuracy figures and helps eliminate jumps and spikes.
+* Heading (Smoothed): Your current direction of travel, averaged over the last five successful readings. It uses a [Kalman filter], which takes into account the GPS accuracy figures and helps eliminate jumps and spikes.
 * Speed: The speed reported by your GPS. If not available, this value is calculated.
 * Speed (Smoothed): An exponential moving average based on the last five successful speed readings or the last five calculated speeds. The average helps eliminate spikes and dips in the speed.
 * Time Elapsed (Navigation only): How long you've been navigating towards a destination.
@@ -130,3 +130,5 @@ Pull requests for additional functionality are welcome. Please make sure you mai
 * No access to local files; using `localStorage` is acceptable.
 * No sending data off the application.
 * Most animations and extra frills are limited to conserve battery and space.
+
+[Kalman filter]: https://en.wikipedia.org/wiki/Kalman_filter
