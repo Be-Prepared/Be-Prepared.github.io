@@ -7,7 +7,7 @@ import { Component, css, html } from 'fudgel';
         <ul>
             <li>
                 <styled-link
-                    href="https://github.com/be-Prepared/Be-Prepared.github.io/"
+                    href="https://github.com/Be-Prepared/Be-Prepared.github.io/"
                     target="_blank"
                     >GitHub</styled-link
                 >

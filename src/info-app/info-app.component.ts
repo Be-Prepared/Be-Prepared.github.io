@@ -28,6 +28,7 @@ import { Component, css, html } from 'fudgel';
     template: html`
         <default-layout frame>
             <info-share @qr="openQrCode()"></info-share>
+            <info-contact></info-contact>
             <info-permissions></info-permissions>
             <info-preferences></info-preferences>
             <info-tooling></info-tooling>
