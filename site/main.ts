@@ -1,11 +1,12 @@
-import { bootstrap } from '../src/index';
+import { bootstrap, storage } from '../src/index';
 
 // Handle 404 redirections for hosting a single page app on GitHub.
 // https://www.smashingmagazine.com/2016/08/sghpa-single-page-app-hack-github-pages/
-var redirect = sessionStorage.redirect;
-delete sessionStorage.redirect;
+const redirectKey = 'redirect';
+const redirect = sessionStorage.getItem(redirectKey);
+sessionStorage.removeItem(redirectKey);
 
-if (redirect && redirect != location.href) {
+if (redirect && redirect !== location.href) {
     history.pushState(null, null, redirect);
 }
 
@@ -14,16 +15,19 @@ const startApp = () => {
     document.body.append(document.createElement('app-root'));
 };
 
-// Enable Eruda (a developer console) when "eruda" is in the URL.
+// Enable Eruda (a developer console) when "eruda" is in the URL or flagged via
+// localStorage.
 const src = '//cdn.jsdelivr.net/npm/eruda';
+const eruda = 'eruda';
 
-if (window.location.toString().indexOf('eruda') >= 0) {
+if (window.location.toString().indexOf(eruda) >= 0 || storage.getItem(eruda)) {
+    sessionStorage.setItem(eruda, '1');
     const script = document.createElement('script');
     script.src = '//cdn.jsdelivr.net/npm/eruda';
     script.onload = () => {
         (window as any).eruda.init();
         startApp();
-    }
+    };
     document.body.append(script);
 } else {
     startApp();

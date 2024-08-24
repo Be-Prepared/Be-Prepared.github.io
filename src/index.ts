@@ -17,5 +17,6 @@ export * from './update-pwa/update-pwa.module';
 
 export { bootstrap } from './bootstrap';
 import { defineRouterComponent } from 'fudgel';
+export { storage } from './services/local-storage.service';
 
 defineRouterComponent('app-router');

@@ -40,7 +40,7 @@ export class NfcService {
                 if (!useLiveValue) {
                     const cached = this._preferenceService.nfc.getItem();
 
-                    if (cached === true) {
+                    if (cached) {
                         return of(AvailabilityState.ALLOWED);
                     }
 
@@ -114,7 +114,11 @@ export class NfcService {
             instance.onreadingerror = () => resolve(true);
             instance.scan({ signal: AbortSignal.timeout(1) }).then(
                 () => resolve(true),
-                (e) => resolve(e?.name === 'AbortError')
+                // MDN indicates AbortError, actual event is TimeoutError
+                (e) =>
+                    resolve(
+                        e?.name === 'AbortError' || e?.name === 'TimeoutError'
+                    )
             );
         });
     }

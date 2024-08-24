@@ -3,7 +3,10 @@ import { Component, css, html } from 'fudgel';
 @Component('info-build', {
     style: css``,
     template: html`
-        <info-header id="info.buildInformationHeader"></info-header>
+        <info-header
+            id="info.buildInformationHeader"
+            @click="tap()"
+        ></info-header>
         <ul>
             <li>
                 {{buildDate}}, commit
@@ -23,6 +26,24 @@ export class InfoBuildComponent {
     hostArch = __HOST_ARCH__;
     nodeVersion = __NODE_VERSION__;
     shortVersion = __BE_PREPARED_VERSION__.substr(0, 7);
+    tapCount = 0;
     version = __BE_PREPARED_VERSION__;
     website = __WEBSITE__;
+
+    tap() {
+        this.tapCount++;
+        const eruda = 'eruda';
+
+        if (this.tapCount > 9) {
+            const enabled = sessionStorage.getItem(eruda);
+
+            if (enabled) {
+                sessionStorage.removeItem(eruda);
+            } else {
+                sessionStorage.setItem(eruda, '1');
+            }
+
+            window.location.reload();
+        }
+    }
 }

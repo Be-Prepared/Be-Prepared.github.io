@@ -13,7 +13,7 @@ class LocalStorageMock {
         this._store.set(key, value);
     }
 }
-const storage =
+export const storage =
     typeof localStorage === 'undefined' ? new LocalStorageMock() : localStorage;
 
 export interface LocalStorageInterface<T> {
@@ -63,6 +63,14 @@ export class LocalStorageService {
                 allowedValues.includes(value)
                     ? this._set(key, value, version)
                     : storage.removeItem(key),
+        };
+    }
+
+    static number(key: string, version = 1): LocalStorageInterface<number> {
+        return {
+            getItem: () => this._get(key, version),
+            reset: () => storage.removeItem(key),
+            setItem: (value: number) => this._set(key, value, version),
         };
     }
 
