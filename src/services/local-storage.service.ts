@@ -23,70 +23,76 @@ export interface LocalStorageInterface<T> {
 }
 
 export class LocalStorageService {
-    static boolean(key: string): LocalStorageInterface<boolean> {
+    static boolean(key: string, version = 1): LocalStorageInterface<boolean> {
         return {
-            getItem: () => {
-                const value = storage.getItem(key);
-
-                return value === 'true'
-                    ? true
-                    : value === 'false'
-                      ? false
-                      : null;
-            },
+            getItem: () => this._get(key, version),
             reset: () => storage.removeItem(key),
-            setItem: (value: boolean) => storage.setItem(key, `${value}`),
+            setItem: (value: boolean) => this._set(key, value, version),
         };
     }
 
     static enum<T>(
         key: string,
-        enumObject: { [key: string]: T }
+        enumObject: { [key: string]: T },
+        version = 1
     ): LocalStorageInterface<T> {
-        return this.list(key, [...Object.values(enumObject)]);
+        return this.list(key, [...Object.values(enumObject)], version);
     }
 
-    static json<T>(key: string): LocalStorageInterface<T> {
+    static json<T>(key: string, version = 1): LocalStorageInterface<T> {
         return {
-            getItem: () => {
-                const value = storage.getItem(key);
-
-                try {
-                    if (value) {
-                        return JSON.parse(value);
-                    }
-                } catch (ignore) {}
-
-                return null;
-            },
+            getItem: () => this._get(key, version),
             reset: () => storage.removeItem(key),
-            setItem: (value: T) => storage.setItem(key, JSON.stringify(value)),
+            setItem: (value: T) => this._set(key, value, version),
         };
     }
 
-    static list<T>(key: string, allowedValues: T[]): LocalStorageInterface<T> {
+    static list<T>(
+        key: string,
+        allowedValues: T[],
+        version = 1
+    ): LocalStorageInterface<T> {
         return {
             getItem: () => {
-                const value = storage.getItem(key);
+                const value = this._get(key, version);
 
-                return typeof value === 'string' &&
-                    allowedValues.includes(value as T)
-                    ? (value as T)
-                    : null;
+                return allowedValues.includes(value as T) ? (value as T) : null;
             },
             reset: () => storage.removeItem(key),
             setItem: (value: T) =>
                 allowedValues.includes(value)
-                    ? storage.setItem(key, value as string)
+                    ? this._set(key, value, version)
                     : storage.removeItem(key),
         };
     }
 
-    static string(key: string): LocalStorageInterface<string> {
+    static string(key: string, version = 1): LocalStorageInterface<string> {
         return {
-            getItem: () => storage.getItem(key) || null,
+            getItem: () => this._get(key, version),
             reset: () => storage.removeItem(key),
-            setItem: (value: string) => storage.setItem(key, value),
+            setItem: (value: string) => this._set(key, value, version),
         };
+    }
+
+    static _get(key: string, version: number) {
+        const encoded = storage.getItem(key);
+
+        if (!encoded) {
+            return null;
+        }
+
+        try {
+            const parsed = JSON.parse(encoded);
+
+            if (parsed[0] === version) {
+                return parsed.value;
+            }
+        } catch (_ignore) {}
+
+        return null;
+    }
+
+    static _set(key: string, value: any, version: number) {
+        storage.setItem(key, JSON.stringify([version, value]));
     }
 }

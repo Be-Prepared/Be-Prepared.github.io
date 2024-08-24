@@ -114,7 +114,7 @@ export class NfcService {
             instance.onreadingerror = () => resolve(true);
             instance.scan({ signal: AbortSignal.timeout(1) }).then(
                 () => resolve(true),
-                () => resolve(false)
+                (e) => resolve(e?.name === 'AbortError')
             );
         });
     }
