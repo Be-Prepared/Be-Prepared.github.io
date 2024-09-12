@@ -89,7 +89,7 @@ export class PreferenceService {
         const old = storage.getItem(key);
         storage.removeItem(key);
 
-        if (old) {
+        if (old && typeof old[0] !== 'number') {
             storage.setItem(newKey || key, `[1,${old}]`);
         }
     }

@@ -4,7 +4,7 @@
     "scripts": {
         "build": "tsc && vite build",
         "generate-pwa-assets": "pwa-assets-generator",
-        "reinstall": "rm -rf node_modules && npm install",
+        "reinstall": "rm -rf node_modules package-lock.json && npm install",
         "start": "vite",
         "test": "tsx node_modules/.bin/ava",
         "tunnel": "echo \"Your tunnel password: $(curl https://loca.lt/mytunnelpassword)\" && npx localtunnel -p 8080"
