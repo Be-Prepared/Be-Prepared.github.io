@@ -3,7 +3,7 @@ import { combineLatest, Observable, ReplaySubject } from 'rxjs';
 import { CompassAbsoluteOrientationSensor } from './compass/compass-absolute-orientation-sensor';
 import { CompassDeviceOrientation } from './compass/compass-device-orientation';
 import { CompassInterface } from './compass/compass-interface';
-import { di } from 'fudgel';
+import { di } from '../di';
 import { map, shareReplay, switchMap } from 'rxjs/operators';
 
 export class CompassService {

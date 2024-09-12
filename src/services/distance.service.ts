@@ -1,5 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
-import { di } from 'fudgel';
+import { di } from '../di';
 import { DistanceSystem } from '../datatypes/distance-system';
 import { PreferenceService } from './preference.service';
 

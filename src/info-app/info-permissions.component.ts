@@ -1,6 +1,7 @@
 import { AvailabilityState } from '../datatypes/availability-state';
 import { CompassService } from '../services/compass.service';
-import { Component, css, di, html } from 'fudgel';
+import { Component, css, html } from 'fudgel';
+import { di } from '../di';
 import { GeolocationService } from '../services/geolocation.service';
 import { NfcService } from '../services/nfc.service';
 import { Subject } from 'rxjs';

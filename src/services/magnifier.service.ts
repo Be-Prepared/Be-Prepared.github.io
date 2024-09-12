@@ -1,5 +1,5 @@
 import { AvailabilityState } from '../datatypes/availability-state';
-import { di } from 'fudgel';
+import { di } from '../di';
 import { from, of } from 'rxjs';
 import { PermissionsService } from './permissions.service';
 import { PreferenceService } from './preference.service';

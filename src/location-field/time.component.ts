@@ -1,4 +1,5 @@
-import { Component, css, di, html } from 'fudgel';
+import { Component, css, html } from 'fudgel';
+import { di } from '../di';
 import { EverySecondService } from '../services/every-second.service';
 import { TimeService } from '../services/time.service';
 

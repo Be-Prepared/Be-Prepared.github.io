@@ -1,7 +1,8 @@
 import { AvailabilityState } from '../datatypes/availability-state';
 import { BarcodeReaderService } from '../services/barcode-reader.service';
-import { Component, css, di, html } from 'fudgel';
+import { Component, css, html } from 'fudgel';
 import { DetectedBarcodeData } from '../services/barcode-reader/barcode-reader-interface';
+import { di } from '../di';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { TorchService } from '../services/torch.service';

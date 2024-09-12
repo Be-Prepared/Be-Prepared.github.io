@@ -1,5 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
-import { di } from 'fudgel';
+import { di } from '../di';
 import { NavigationType } from '../datatypes/navigation-type';
 import { PreferenceService } from '../services/preference.service';
 

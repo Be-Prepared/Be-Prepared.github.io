@@ -1,6 +1,7 @@
 import { AvailabilityState } from '../datatypes/availability-state';
 import { CompassService } from '../services/compass.service';
-import { Component, css, di, html } from 'fudgel';
+import { Component, css, html } from 'fudgel';
+import { di } from '../di';
 import { DirectionService } from '../services/direction.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';

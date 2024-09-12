@@ -1,4 +1,5 @@
-import { di, html } from 'fudgel';
+import { di } from '../di';
+import { html } from 'fudgel';
 import { I18nService } from '../i18n/i18n.service';
 
 // Toast service based off of this example:

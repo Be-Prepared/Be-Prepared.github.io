@@ -1,5 +1,6 @@
 import { BarcodeReaderService } from '../services/barcode-reader.service';
-import { Component, css, di, html } from 'fudgel';
+import { Component, css, html } from 'fudgel';
+import { di } from '../di';
 import { I18nService } from '../i18n/i18n.service';
 
 @Component('info-barcodes', {

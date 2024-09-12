@@ -1,4 +1,5 @@
-import { Component, di, rootElement } from 'fudgel';
+import { Component, rootElement } from 'fudgel';
+import { di } from '../di';
 import { I18nService } from './i18n.service';
 
 @Component('i18n-html', {

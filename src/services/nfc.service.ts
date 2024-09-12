@@ -1,5 +1,5 @@
 import { AvailabilityState } from '../datatypes/availability-state';
-import { di } from 'fudgel';
+import { di } from '../di';
 import { finalize, share, switchMap } from 'rxjs/operators';
 import { from, Observable, of, Subject } from 'rxjs';
 import {

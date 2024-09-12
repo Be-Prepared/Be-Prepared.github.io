@@ -1,4 +1,4 @@
-import { di } from 'fudgel';
+import { di } from '../di';
 import { PreferenceService } from '../services/preference.service';
 import { WaypointSaved } from '../datatypes/waypoint-saved';
 

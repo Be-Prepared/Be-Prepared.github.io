@@ -1,5 +1,6 @@
 import { AvailabilityState } from '../datatypes/availability-state';
-import { Component, css, di, html } from 'fudgel';
+import { Component, css, html } from 'fudgel';
+import { di } from '../di';
 import { MagnifierService } from '../services/magnifier.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';

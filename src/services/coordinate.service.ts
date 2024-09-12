@@ -3,7 +3,7 @@ import CheapRuler from 'cheap-ruler';
 import { CitiesService } from './cities.service';
 import { Converter } from 'usng.js';
 import { CoordinateSystem } from '../datatypes/coordinate-system';
-import { di } from 'fudgel/dist/di';
+import { di } from '../di';
 import { DirectionService } from './direction.service';
 import { default as ecefProjector } from 'ecef-projector';
 import { LatLon } from '../datatypes/lat-lon';
@@ -68,11 +68,11 @@ export class CoordinateService {
         CoordinateSystemDefault
     );
     private _directionService = di(DirectionService);
-    private _preferencesService = di(PreferenceService);
+    private _preferenceService = di(PreferenceService);
 
     constructor() {
         const storedSetting =
-            this._preferencesService.coordinateSystem.getItem();
+            this._preferenceService.coordinateSystem.getItem();
 
         if (storedSetting) {
             this._currentSetting.next(storedSetting as CoordinateSystem);
@@ -212,14 +212,14 @@ export class CoordinateService {
     }
 
     reset() {
-        this._preferencesService.coordinateSystem.reset();
+        this._preferenceService.coordinateSystem.reset();
         this._currentSetting.next(CoordinateSystemDefault);
     }
 
     setCoordinateSystem(system: CoordinateSystem) {
         if (COORDINATE_SYSTEMS.includes(system as CoordinateSystem)) {
             this._currentSetting.next(system as CoordinateSystem);
-            this._preferencesService.coordinateSystem.setItem(system);
+            this._preferenceService.coordinateSystem.setItem(system);
         }
     }
 

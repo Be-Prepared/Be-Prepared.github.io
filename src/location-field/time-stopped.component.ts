@@ -1,7 +1,8 @@
-import { Subscription } from 'rxjs';
-import { Component, css, di, html } from 'fudgel';
+import { Component, css, html } from 'fudgel';
+import { di } from '../di';
 import { GeolocationService } from '../services/geolocation.service';
 import { I18nService } from '../i18n/i18n.service';
+import { Subscription } from 'rxjs';
 import { TimeService } from '../services/time.service';
 
 @Component('location-field-time-stopped', {

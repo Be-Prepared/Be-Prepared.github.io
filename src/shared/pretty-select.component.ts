@@ -1,4 +1,5 @@
-import { Component, css, di, emit, html } from 'fudgel';
+import { Component, css, emit, html } from 'fudgel';
+import { di } from '../di';
 import { I18nService } from '../i18n/i18n.service';
 
 @Component('pretty-select', {

@@ -1,10 +1,11 @@
-import { Component, css, di, html } from 'fudgel';
+import { Component, css, html } from 'fudgel';
 import {
     CoordinateService,
     COORDINATE_SYSTEMS,
     CoordinateSystemDefault,
 } from '../services/coordinate.service';
 import { CoordinateSystem } from '../datatypes/coordinate-system';
+import { di } from '../di';
 import {
     DistanceService,
     DISTANCE_SYSTEMS,

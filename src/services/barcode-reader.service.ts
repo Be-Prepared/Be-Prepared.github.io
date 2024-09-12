@@ -2,7 +2,7 @@ import { AvailabilityState } from '../datatypes/availability-state';
 import { BarcodeReaderInterface } from './barcode-reader/barcode-reader-interface';
 import { BarcodeReaderNative } from './barcode-reader/barcode-reader-native';
 import { BarcodeReaderZBar } from './barcode-reader/barcode-reader-z-bar';
-import { di } from 'fudgel';
+import { di } from '../di';
 import { from, of } from 'rxjs';
 import { PermissionsService } from './permissions.service';
 import { PreferenceService } from './preference.service';

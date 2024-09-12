@@ -9,7 +9,7 @@ import {
     throwError,
 } from 'rxjs';
 import { CompassInterface } from './compass-interface';
-import { di } from 'fudgel';
+import { di } from '../../di';
 import { PermissionsService } from '../permissions.service';
 
 const RADIANS_TO_DEGREES = 180 / Math.PI;

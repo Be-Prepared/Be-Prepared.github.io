@@ -1,6 +1,6 @@
 import { AvailabilityState } from '../datatypes/availability-state';
 import { CoordinateService } from './coordinate.service';
-import { di } from 'fudgel';
+import { di } from '../di';
 import { filter, finalize, share, switchMap } from 'rxjs/operators';
 import { KalmanFilterArray } from '@bencevans/kalman-filter';
 import { LatLon } from '../datatypes/lat-lon';

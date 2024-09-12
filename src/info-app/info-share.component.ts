@@ -1,4 +1,5 @@
-import { Component, css, di, emit, html } from 'fudgel';
+import { Component, css, emit, html } from 'fudgel';
+import { di } from '../di';
 import { QrService } from '../services/qr.service';
 import { ToastService } from '../services/toast.service';
 

@@ -1,5 +1,6 @@
-import { Component, css, di, html } from 'fudgel';
+import { Component, css, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
+import { di } from '../di';
 import { Subscription } from 'rxjs';
 import { ToastService } from '../services/toast.service';
 import { WaypointSaved } from '../datatypes/waypoint-saved';

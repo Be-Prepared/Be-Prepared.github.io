@@ -1,5 +1,6 @@
 import { AvailabilityState } from '../datatypes/availability-state';
-import { Component, css, di, html } from 'fudgel';
+import { Component, css, html } from 'fudgel';
+import { di } from '../di';
 import { GeolocationService } from '../services/geolocation.service';
 import { of, Subject } from 'rxjs';
 import { PermissionsService } from '../services/permissions.service';

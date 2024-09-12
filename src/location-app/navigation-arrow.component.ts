@@ -1,7 +1,8 @@
 import { AvailabilityState } from '../datatypes/availability-state';
 import { CompassService } from '../services/compass.service';
-import { Component, css, di, html } from 'fudgel';
+import { Component, css, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
+import { di } from '../di';
 import { EMPTY, Subject } from 'rxjs';
 import {
     GeolocationCoordinateResultSuccess,

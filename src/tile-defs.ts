@@ -1,7 +1,7 @@
 import { AvailabilityState } from './datatypes/availability-state';
 import { BarcodeReaderService } from './services/barcode-reader.service';
 import { CompassService } from './services/compass.service';
-import { di } from 'fudgel';
+import { di } from './di';
 import { MagnifierService } from './services/magnifier.service';
 import { map } from 'rxjs/operators';
 import { NfcService } from './services/nfc.service';

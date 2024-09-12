@@ -1,5 +1,6 @@
 import { AvailabilityState } from '../datatypes/availability-state';
-import { Component, css, di, emit, html } from 'fudgel';
+import { Component, css, emit, html } from 'fudgel';
+import { di } from '../di';
 import { first } from 'rxjs/operators';
 import {
     GeolocationCoordinateResultSuccess,

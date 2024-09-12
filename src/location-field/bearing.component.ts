@@ -1,5 +1,6 @@
 import { CoordinateService } from '../services/coordinate.service';
-import { Component, css, di, html } from 'fudgel';
+import { Component, css, html } from 'fudgel';
+import { di } from '../di';
 import { DirectionService } from '../services/direction.service';
 import { GeolocationService } from '../services/geolocation.service';
 import { I18nService } from '../i18n/i18n.service';

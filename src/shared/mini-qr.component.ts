@@ -1,4 +1,5 @@
-import { Component, css, di, html } from 'fudgel';
+import { Component, css, html } from 'fudgel';
+import { di } from '../di';
 import { QrService } from '../services/qr.service';
 
 @Component('mini-qr', {

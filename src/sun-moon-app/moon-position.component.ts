@@ -1,4 +1,5 @@
-import { Component, css, di, html } from 'fudgel';
+import { Component, css, html } from 'fudgel';
+import { di } from '../di';
 import { DirectionService } from '../services/direction.service';
 import { LatLon } from '../datatypes/lat-lon';
 import { default as SunCalc } from 'suncalc';

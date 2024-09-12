@@ -1,5 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
-import { di } from 'fudgel';
+import { di } from '../di';
 import { I18nService } from '../i18n/i18n.service';
 import { PreferenceService } from './preference.service';
 import { TimeSystem } from '../datatypes/time-system';
