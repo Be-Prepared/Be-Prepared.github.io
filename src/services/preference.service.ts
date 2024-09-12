@@ -86,19 +86,27 @@ export class PreferenceService {
     }
 
     _migrateJson(key: string, newKey?: string) {
-        const old = storage.getItem(key);
-        storage.removeItem(key);
+        let old = storage.getItem(key);
 
-        if (old && typeof old[0] !== 'number') {
-            storage.setItem(newKey || key, `[1,${old}]`);
+        if (old) {
+            this._setItem(newKey || key, `[1,${old}]`);
         }
     }
 
     _migrateString(key: string) {
-        const old = storage.getItem(key);
+        let old = storage.getItem(key);
 
         if (old) {
-            storage.setItem(key, JSON.stringify([1, old]));
+            this._setItem(key, JSON.stringify([1, old]));
+        }
+    }
+
+    _setItem(key: string, value: string) {
+        try {
+            storage.setItem(key, value);
+        } catch (e) {
+            // Catch and fix error by clearing preferences
+            storage.clear();
         }
     }
 }

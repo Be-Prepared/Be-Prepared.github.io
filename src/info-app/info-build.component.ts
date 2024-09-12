@@ -40,7 +40,11 @@ export class InfoBuildComponent {
             if (enabled) {
                 sessionStorage.removeItem(eruda);
             } else {
-                sessionStorage.setItem(eruda, '1');
+                try {
+                    sessionStorage.setItem(eruda, '1');
+                } catch (_ignore) {
+                    sessionStorage.clear();
+                }
             }
 
             window.location.reload();

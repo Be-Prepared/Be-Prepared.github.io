@@ -21,7 +21,12 @@ const src = '//cdn.jsdelivr.net/npm/eruda';
 const eruda = 'eruda';
 
 if (window.location.toString().indexOf(eruda) >= 0 || storage.getItem(eruda)) {
-    sessionStorage.setItem(eruda, '1');
+    try {
+        sessionStorage.setItem(eruda, '1');
+    } catch (_ignore) {
+        sessionStorage.clear();
+    }
+
     const script = document.createElement('script');
     script.src = '//cdn.jsdelivr.net/npm/eruda';
     script.onload = () => {

@@ -1,6 +1,10 @@
 class LocalStorageMock {
     private _store = new Map<string, string>();
 
+    clear() {
+        this._store.clear();
+    }
+
     getItem(key: string) {
         return this._store.get(key) || null;
     }
@@ -101,6 +105,11 @@ export class LocalStorageService {
     }
 
     static _set(key: string, value: any, version: number) {
-        storage.setItem(key, JSON.stringify([version, value]));
+        try {
+            storage.setItem(key, JSON.stringify([version, value]));
+        } catch (_ignore) {
+            // On error, clear the storage. There was a value that ran away.
+            storage.clear();
+        }
     }
 }
