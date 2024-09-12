@@ -1,4 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
+import { di } from 'fudgel';
 import { NavigationType } from '../datatypes/navigation-type';
 import { PreferenceService } from '../services/preference.service';
 
@@ -9,7 +10,7 @@ const allowedOptions = [
 ];
 
 export class NavigationTypeService {
-    private _preferenceService = new PreferenceService();
+    private _preferenceService = di(PreferenceService);
     private _subject = new BehaviorSubject<NavigationType>(allowedOptions[0]);
 
     constructor() {

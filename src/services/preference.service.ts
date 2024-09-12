@@ -58,7 +58,11 @@ export class PreferenceService {
         this.navigationWakeLock =
             LocalStorageService.boolean('navigationWakeLock');
         this.nfc = LocalStorageService.boolean('nfc');
-        this.points = LocalStorageService.json('points');
+        this.points = LocalStorageService.json('points', 1, (value) => {
+            return Array.isArray(value) && value.every((item) => {
+                return typeof item === 'object' && item && 'lat' in item && 'lon' in item;
+            });
+        });
         this.sunMoonLocation = LocalStorageService.string('sunMoonLocation');
         this.timeSystem = LocalStorageService.enum<TimeSystem>(
             'time',
