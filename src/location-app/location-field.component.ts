@@ -72,11 +72,11 @@ import { PreferenceService } from '../services/preference.service';
                 <location-field-altitude-minimum
                     *if="selectedValue === 'ALTITUDE_MINIMUM'"
                 ></location-field-altitude-minimum>
-                <location-field-distance
+                <location-field-bearing
                     *if="selectedValue === 'BEARING'"
                     lat="{{lat}}"
                     lon="{{lon}}"
-                ></location-field-distance>
+                ></location-field-bearing>
                 <location-field-destination
                     *if="selectedValue === 'DESTINATION'"
                     name="{{name}}"
