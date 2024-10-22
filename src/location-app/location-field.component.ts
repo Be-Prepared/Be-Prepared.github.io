@@ -96,6 +96,12 @@ import { PreferenceService } from '../services/preference.service';
                     *if="selectedValue === 'HEADING_SMOOTHED'"
                 ></location-field-heading-smoothed>
                 <location-field-speed
+                    *if="selectedValue === 'MAX_SPEED'"
+                ></location-field-speed>
+                <location-field-speed-smoothed
+                    *if="selectedValue === 'MAX_SPEED_SMOOTHED'"
+                ></location-field-speed-smoothed>
+                <location-field-speed
                     *if="selectedValue === 'SPEED'"
                 ></location-field-speed>
                 <location-field-speed-smoothed

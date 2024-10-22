@@ -127,6 +127,8 @@ export const enUS: LanguageData = {
     'location.field.DISTANCE_TRAVELED': 'Distance Traveled',
     'location.field.HEADING': 'Heading',
     'location.field.HEADING_SMOOTHED': 'Heading (Smoothed)',
+    'location.field.MAX_SPEED': 'Max Speed',
+    'location.field.MAX_SPEED_SMOOTHED': 'Max Speed (Smoothed)',
     'location.field.SPEED': 'Speed',
     'location.field.SPEED_SMOOTHED': 'Speed (Smoothed)',
     'location.field.TIME': 'Current Time',

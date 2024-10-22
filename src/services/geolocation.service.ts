@@ -20,6 +20,7 @@ export interface GeolocationCoordinateResultSuccess extends LatLon {
     accuracy: number;
     altitude: number | null;
     altitudeAccuracy: number | null;
+    maxSpeed: number;
     speed: number; // If null, we calculate one in m/s
     heading: number; // If null, we calculate one or use NaN
     isMoving: boolean;
@@ -28,6 +29,7 @@ export interface GeolocationCoordinateResultSuccess extends LatLon {
     timeTotal: number;
     firstPosition: GeolocationCoordinateResultSuccess | null;
     headingSmoothed: number;
+    maxSpeedSmoothed: number;
     speedSmoothed: number;
     isMovingSmoothed: boolean;
     altitudeSum: number;
@@ -82,6 +84,7 @@ export class GeolocationService {
                 altitudeAccuracy: position.coords.altitudeAccuracy,
                 // NULL values are calculated later
                 speed: position.coords.speed as any,
+                maxSpeed: 0,
                 heading: position.coords.heading as any,
                 // Computed
                 firstPosition: null,
@@ -90,6 +93,7 @@ export class GeolocationService {
                 timeStopped: 0,
                 timeTotal: 0,
                 speedSmoothed: 0,
+                maxSpeedSmoothed: 0,
                 isMovingSmoothed: false,
                 headingSmoothed: NaN,
                 altitudeSum: 0,
@@ -160,6 +164,8 @@ export class GeolocationService {
             previous.speedSmoothed,
             speed
         );
+        current.maxSpeed = Math.max(current.speed, previous.maxSpeed);
+        current.maxSpeedSmoothed = Math.max(current.speedSmoothed, previous.maxSpeedSmoothed);
         current.isMovingSmoothed = current.speedSmoothed >= SPEED_THRESHOLD;
         current.headingSmoothed = heading;
 
