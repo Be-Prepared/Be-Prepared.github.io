@@ -99,16 +99,16 @@ import { PreferenceService } from '../services/preference.service';
                     *if="selectedValue === 'SPEED'"
                 ></location-field-speed>
                 <location-field-speed-avg
-                    *if="selectedValue === 'SPEED_AVG'"
+                    *if="selectedValue === 'SPEED_AVERAGE'"
                 ></location-field-speed-avg>
                 <location-field-speed-max
-                    *if="selectedValue === 'SPEED_MAX'"
+                    *if="selectedValue === 'SPEED_MAXIMUM'"
                 ></location-field-speed-max>
                 <location-field-speed-smoothed
                     *if="selectedValue === 'SPEED_SMOOTHED'"
                 ></location-field-speed-smoothed>
                 <location-field-speed-smoothed-max
-                    *if="selectedValue === 'SPEED_SMOOTHED_MAX'"
+                    *if="selectedValue === 'SPEED_SMOOTHED_MAXIMUM'"
                 ></location-field-speed-smoothed-max>
                 <location-field-time
                     *if="selectedValue === 'TIME'"
@@ -166,10 +166,10 @@ export class LocationFieldComponent {
             'HEADING',
             'HEADING_SMOOTHED',
             'SPEED',
-            'SPEED_AVG',
-            'SPEED_MAX',
+            'SPEED_AVERAGE',
+            'SPEED_MAXIMUM',
             'SPEED_SMOOTHED',
-            'SPEED_SMOOTHED_MAX',
+            'SPEED_SMOOTHED_MAXIMUM',
             'TIME',
             'TIME_MOVING',
             'TIME_STOPPED',
