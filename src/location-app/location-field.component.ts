@@ -95,18 +95,21 @@ import { PreferenceService } from '../services/preference.service';
                 <location-field-heading-smoothed
                     *if="selectedValue === 'HEADING_SMOOTHED'"
                 ></location-field-heading-smoothed>
-                <location-field-max-speed
-                    *if="selectedValue === 'MAX_SPEED'"
-                ></location-field-max-speed>
-                <location-field-max-speed-smoothed
-                    *if="selectedValue === 'MAX_SPEED_SMOOTHED'"
-                ></location-field-max-speed-smoothed>
                 <location-field-speed
                     *if="selectedValue === 'SPEED'"
                 ></location-field-speed>
+                <location-field-speed-avg
+                    *if="selectedValue === 'SPEED_AVG'"
+                ></location-field-speed-avg>
+                <location-field-speed-max
+                    *if="selectedValue === 'SPEED_MAX'"
+                ></location-field-speed-max>
                 <location-field-speed-smoothed
                     *if="selectedValue === 'SPEED_SMOOTHED'"
                 ></location-field-speed-smoothed>
+                <location-field-speed-smoothed-max
+                    *if="selectedValue === 'SPEED_SMOOTHED_MAX'"
+                ></location-field-speed-smoothed-max>
                 <location-field-time
                     *if="selectedValue === 'TIME'"
                 ></location-field-time>

@@ -5,7 +5,7 @@ import { GeolocationService } from '../services/geolocation.service';
 import { I18nService } from '../i18n/i18n.service';
 import { Subscription } from 'rxjs';
 
-@Component('location-field-max-speed-smoothed', {
+@Component('location-field-speed-smoothed-max', {
     style: css``,
     template: html`
         <changeable-setting @click="toggleDistanceSystem()"
@@ -13,7 +13,7 @@ import { Subscription } from 'rxjs';
         >
     `,
 })
-export class LocationFieldMaxSpeedSmoothedComponent {
+export class LocationFieldSpeedSmoothedMaxComponent {
     private _distanceService = di(DistanceService);
     private _geolocationService = di(GeolocationService);
     private _i18nService = di(I18nService);
@@ -28,7 +28,7 @@ export class LocationFieldMaxSpeedSmoothedComponent {
         this._geolocationService.getPosition().subscribe((position) => {
             if (position && position.success) {
                 this.value = this._distanceService.metersToString(
-                    position.maxSpeedSmoothed,
+                    position.speedSmoothedMax,
                     {
                         isSpeed: true,
                     }

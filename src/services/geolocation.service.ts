@@ -20,7 +20,6 @@ export interface GeolocationCoordinateResultSuccess extends LatLon {
     accuracy: number;
     altitude: number | null;
     altitudeAccuracy: number | null;
-    maxSpeed: number;
     speed: number; // If null, we calculate one in m/s
     heading: number; // If null, we calculate one or use NaN
     isMoving: boolean;
@@ -29,8 +28,10 @@ export interface GeolocationCoordinateResultSuccess extends LatLon {
     timeTotal: number;
     firstPosition: GeolocationCoordinateResultSuccess | null;
     headingSmoothed: number;
-    maxSpeedSmoothed: number;
+    speedAvg: number;
+    speedMax: number;
     speedSmoothed: number;
+    speedSmoothedMax: number;
     isMovingSmoothed: boolean;
     altitudeSum: number;
     altitudeCount: number;
@@ -84,7 +85,6 @@ export class GeolocationService {
                 altitudeAccuracy: position.coords.altitudeAccuracy,
                 // NULL values are calculated later
                 speed: position.coords.speed as any,
-                maxSpeed: 0,
                 heading: position.coords.heading as any,
                 // Computed
                 firstPosition: null,
@@ -92,8 +92,10 @@ export class GeolocationService {
                 timeMoving: 0,
                 timeStopped: 0,
                 timeTotal: 0,
+                speedAvg: 0,
+                speedMax: 0,
                 speedSmoothed: 0,
-                maxSpeedSmoothed: 0,
+                speedSmoothedMax: 0,
                 isMovingSmoothed: false,
                 headingSmoothed: NaN,
                 altitudeSum: 0,
@@ -164,8 +166,8 @@ export class GeolocationService {
             previous.speedSmoothed,
             speed
         );
-        current.maxSpeed = Math.max(current.speed, previous.maxSpeed);
-        current.maxSpeedSmoothed = Math.max(current.speedSmoothed, previous.maxSpeedSmoothed);
+        current.speedMax = Math.max(current.speed, previous.speedMax);
+        current.speedSmoothedMax = Math.max(current.speedSmoothed, previous.speedSmoothedMax);
         current.isMovingSmoothed = current.speedSmoothed >= SPEED_THRESHOLD;
         current.headingSmoothed = heading;
 
@@ -179,10 +181,11 @@ export class GeolocationService {
 
         current.isMoving = current.speed >= SPEED_THRESHOLD;
         current.timeTotal = current.timestamp - previous.timestamp;
-        current.firstPosition = previous;
+        current.firstPosition = previous.firstPosition || previous;
         current.timeMoving = previous.timeMoving;
         current.timeStopped = previous.timeStopped;
         current.distanceTraveled = previous.distanceTraveled + distance;
+        current.speedAvg = current.distanceTraveled / current.timeTotal;
 
         if (typeof current.altitude === 'number') {
             current.altitudeSum =
