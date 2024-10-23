@@ -10,6 +10,8 @@ export * from './distance.component.ts';
 export * from './distance-traveled.component.ts';
 export * from './heading.component.ts';
 export * from './heading-smoothed.component.ts';
+export * from './max-speed.component.ts';
+export * from './max-speed-smoothed.component.ts';
 export * from './speed.component.ts';
 export * from './speed-smoothed.component.ts';
 export * from './time.component.ts';
