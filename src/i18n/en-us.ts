@@ -128,7 +128,7 @@ export const enUS: LanguageData = {
     'location.field.HEADING': 'Heading',
     'location.field.HEADING_SMOOTHED': 'Heading (Smoothed)',
     'location.field.SPEED': 'Speed',
-    'location.field.SPEED_AVGERAGE': 'Speed (Average)',
+    'location.field.SPEED_AVERAGE': 'Speed (Average)',
     'location.field.SPEED_MAXIMUM': 'Speed (Max)',
     'location.field.SPEED_SMOOTHED': 'Speed (Smoothed)',
     'location.field.SPEED_SMOOTHED_MAXIMUM': 'Speed (Smoothed, Max)',
