@@ -162,6 +162,8 @@ export class LocationFieldComponent {
             'DISTANCE_TRAVELED',
             'HEADING',
             'HEADING_SMOOTHED',
+            'MAX_SPEED',
+            'MAX_SPEED_SMOOTHED',
             'SPEED',
             'SPEED_SMOOTHED',
             'TIME',
