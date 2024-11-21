@@ -3,7 +3,7 @@ import { LatLon } from '../datatypes/lat-lon';
 import { default as SunCalc } from 'suncalc';
 
 @Component('sun-times', {
-    prop: ['coordinates'],
+    prop: ['coordinates', 'date'],
     style: css``,
     template: html`
         <div *if="coordinates">
@@ -70,6 +70,7 @@ import { default as SunCalc } from 'suncalc';
 })
 export class SunTimesComponent {
     coordinates: LatLon | null = null;
+    date: Date | null = null;
     dawn?: Date;
     dusk?: Date;
     goldenHour?: Date;
@@ -86,9 +87,13 @@ export class SunTimesComponent {
     sunsetStart?: Date;
 
     onChange(prop: string) {
-        if (prop === 'coordinates' && this.coordinates) {
+        if (!this.coordinates || !this.date) {
+            return;
+        }
+
+        if (prop === 'coordinates' || prop === 'date') {
             const times = SunCalc.getTimes(
-                new Date(),
+                this.date,
                 this.coordinates.lat,
                 this.coordinates.lon
             );

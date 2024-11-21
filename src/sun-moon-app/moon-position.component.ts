@@ -5,7 +5,7 @@ import { LatLon } from '../datatypes/lat-lon';
 import { default as SunCalc } from 'suncalc';
 
 @Component('moon-position', {
-    prop: ['coordinates'],
+    prop: ['coordinates', 'date'],
     style: css``,
     template: html`
         <div *if="coordinates">
@@ -17,12 +17,17 @@ import { default as SunCalc } from 'suncalc';
 export class MoonPositionComponent {
     private _directionService = di(DirectionService);
     coordinates: LatLon | null = null;
+    date: Date | null = null;
     moonPosition: string | null = null;
 
     onChange(prop: string) {
-        if (prop === 'coordinates' && this.coordinates) {
+        if (!this.coordinates || !this.date) {
+            return;
+        }
+
+        if (prop === 'coordinates' || prop === 'date') {
             const moonPosition = SunCalc.getMoonPosition(
-                new Date(),
+                this.date,
                 this.coordinates.lat,
                 this.coordinates.lon
             );

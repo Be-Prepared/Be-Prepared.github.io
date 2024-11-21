@@ -249,6 +249,7 @@ export const enUS: LanguageData = {
 
     // Sun & Moon
     'sunMoon.enterCoordinates': 'Enter location:',
+    'sunMoon.enterDate': 'Enter date and time:',
     'sunMoon.geolocation': 'Getting current location...',
     'sunMoon.geolocationError': 'Error getting current position',
     'sunMoon.locationUnknown': 'Location needed',

@@ -3,7 +3,7 @@ import { LatLon } from '../datatypes/lat-lon';
 import { default as SunCalc } from 'suncalc';
 
 @Component('moon-times', {
-    prop: ['coordinates'],
+    prop: ['coordinates', 'date'],
     style: css``,
     template: html`
         <div *if="coordinates">
@@ -31,18 +31,23 @@ import { default as SunCalc } from 'suncalc';
     `,
 })
 export class MoonTimesComponent {
-    coordinates: LatLon | null = null;
     alwaysDown: boolean = false;
     alwaysUp: boolean = false;
+    coordinates: LatLon | null = null;
+    date: Date | null = null;
     moonRise?: Date;
     moonRiseTime?: string;
     moonSet?: Date;
     moonSetTime?: string;
 
     onChange(prop: string) {
-        if (prop === 'coordinates' && this.coordinates) {
+        if (!this.coordinates || !this.date) {
+            return;
+        }
+
+        if (prop === 'coordinates' || prop === 'date') {
             const times = SunCalc.getMoonTimes(
-                new Date(),
+                this.date,
                 this.coordinates.lat,
                 this.coordinates.lon
             );

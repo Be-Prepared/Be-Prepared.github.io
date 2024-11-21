@@ -3,7 +3,7 @@ import { LatLon } from '../datatypes/lat-lon';
 import { default as SunCalc } from 'suncalc';
 
 @Component('moon-illumination', {
-    prop: ['coordinates'],
+    prop: ['coordinates', 'date'],
     style: css``,
     template: html`
         <div *if="coordinates">
@@ -15,12 +15,17 @@ import { default as SunCalc } from 'suncalc';
 })
 export class MoonIlluminationComponent {
     coordinates: LatLon | null = null;
+    date: Date | null = null;
     fraction: number | null = null;
     moonIllumination: string | null = null;
 
     onChange(prop: string) {
-        if (prop === 'coordinates' && this.coordinates) {
-            const moonIllumination = SunCalc.getMoonIllumination(new Date());
+        if (!this.coordinates || !this.date) {
+            return;
+        }
+
+        if (prop === 'coordinates' || prop === 'date') {
+            const moonIllumination = SunCalc.getMoonIllumination(this.date);
             this.fraction = Math.round(moonIllumination.fraction * 100);
             const phase = moonIllumination.phase;
 

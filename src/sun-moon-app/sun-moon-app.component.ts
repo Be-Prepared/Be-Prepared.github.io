@@ -25,6 +25,12 @@ import { ToastService } from '../services/toast.service';
             gap: 1em;
         }
 
+        .date {
+            padding-top: 0.25em;
+            display: flex;
+            flex-direction: column;
+        }
+
         .coordinates {
             display: flex;
             flex-direction: column;
@@ -101,6 +107,18 @@ import { ToastService } from '../services/toast.service';
                         ></load-svg>
                     </div>
                 </div>
+                <div class="date">
+                    <div class="space-between-bottom">
+                        <i18n-label id="sunMoon.enterDate"></i18n-label>
+                        <location-coordinate-info></location-coordinate-info>
+                    </div>
+                    <pretty-input
+                        type="datetime-local"
+                        @change.stop.prevent="dateUpdate($event.detail)"
+                        #ref="date"
+                        class="grow"
+                    ></pretty-input>
+                </div>
                 <div class="wrapper">
                     <div class="wrapper-inner">
                         <div>{{location}}</div>
@@ -108,15 +126,26 @@ import { ToastService } from '../services/toast.service';
                             .coordinates="coordinates"
                         ></nearest-major-city>
                         <div class="gap"></div>
-                        <sun-position .coordinates="coordinates"></sun-position>
-                        <sun-times .coordinates="coordinates"></sun-times>
+                        <sun-position
+                            .coordinates="coordinates"
+                            .date="dateValue"
+                        ></sun-position>
+                        <sun-times
+                            .coordinates="coordinates"
+                            .date="dateValue"
+                        ></sun-times>
                         <div class="gap"></div>
                         <moon-position
                             .coordinates="coordinates"
+                            .date="dateValue"
                         ></moon-position>
-                        <moon-times .coordinates="coordinates"></moon-times>
+                        <moon-times
+                            .coordinates="coordinates"
+                            .date="dateValue"
+                        ></moon-times>
                         <moon-illumination
                             .coordinates="coordinates"
+                            .date="dateValue"
                         ></moon-illumination>
                     </div>
                 </div>
@@ -137,8 +166,10 @@ export class SunMoonAppComponent {
     private _toastService = di(ToastService);
     allowGetLocation = false;
     coordinates: LatLon | null = null;
+    date?: HTMLInputElement;
+    dateValue = new Date();
     gettingLocation = false;
-    input: any;
+    input?: HTMLInputElement;
     location: string = '';
     subject = new Subject();
 
@@ -161,6 +192,10 @@ export class SunMoonAppComponent {
     onViewInit() {
         const locationStr = this._preferenceService.sunMoonLocation.getItem();
 
+        if (this.date) {
+            this.date.value = this.dateValue.toISOString().slice(0, 16);
+        }
+
         if (locationStr) {
             this._setValue(locationStr);
         } else {
@@ -171,6 +206,10 @@ export class SunMoonAppComponent {
     onDestroy() {
         this.subject.next(null);
         this.subject.complete();
+    }
+
+    dateUpdate(value: string) {
+        this.dateValue = new Date(value);
     }
 
     locationUpdate(value: string) {

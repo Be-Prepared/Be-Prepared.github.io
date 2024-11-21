@@ -26,6 +26,7 @@
             }
 
             :root {
+                --active-background-color: #4ff;
                 --changeable-setting-underline-color: #4ff;
                 --bg-color: white;
                 --fg-color: black;
@@ -42,6 +43,7 @@
 
             @media (prefers-color-scheme: dark) {
                 :root {
+                    --active-background-color: #133;
                     --changeable-setting-underline-color: #4ff;
                     --bg-color: black;
                     --fg-color: white;
@@ -49,6 +51,10 @@
                     --link-color: teal;
                     --toast-border: 1px solid white;
                     --toast-bg-color: #203020;
+                }
+
+                input {
+                    color-scheme: dark;
                 }
             }
         </style>

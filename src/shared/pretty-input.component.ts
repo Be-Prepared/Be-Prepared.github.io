@@ -1,7 +1,7 @@
 import { Component, css, emit, html } from 'fudgel';
 
 @Component('pretty-input', {
-    attr: ['helpHtml', 'value'],
+    attr: ['helpHtml', 'type', 'value'],
     prop: ['value'],
     style: css`
         :host {
@@ -22,6 +22,11 @@ import { Component, css, emit, html } from 'fudgel';
             color: var(--fg-color);
             background-color: var(--bg-color);
             border: 0;
+        }
+
+        input:focus {
+            outline: none;
+            background-color: var(--active-background-color);
         }
 
         .help-icon {
@@ -53,7 +58,7 @@ import { Component, css, emit, html } from 'fudgel';
     template: html`
         <div class="wrapper">
             <input
-                type="text"
+                type="{{type}}"
                 value="{{value}}"
                 @change.stop.prevent="change($event.target.value)"
             />
@@ -80,6 +85,7 @@ import { Component, css, emit, html } from 'fudgel';
 export class PrettyInputComponent {
     helpHtml?: string;
     showingHelp = false;
+    type = 'text';
 
     change(value: string) {
         emit(this, 'change', value);

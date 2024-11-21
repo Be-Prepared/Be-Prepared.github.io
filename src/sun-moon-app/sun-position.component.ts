@@ -5,7 +5,7 @@ import { LatLon } from '../datatypes/lat-lon';
 import { default as SunCalc } from 'suncalc';
 
 @Component('sun-position', {
-    prop: ['coordinates'],
+    prop: ['coordinates', 'date'],
     style: css``,
     template: html`
         <div *if="coordinates">
@@ -17,12 +17,17 @@ import { default as SunCalc } from 'suncalc';
 export class SunPositionComponent {
     private _directionService = di(DirectionService);
     coordinates: LatLon | null = null;
+    date: Date | null = null;
     sunPosition: string | null = null;
 
     onChange(prop: string) {
-        if (prop === 'coordinates' && this.coordinates) {
+        if (!this.date || !this.coordinates) {
+            return;
+        }
+
+        if (prop === 'date' || prop === 'coordinates') {
             const sunPosition = SunCalc.getPosition(
-                new Date(),
+                this.date,
                 this.coordinates.lat,
                 this.coordinates.lon
             );
