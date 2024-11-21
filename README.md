@@ -40,7 +40,7 @@ This PWA is also an example for how to use the following:
 
 * Compass
     * A simple compass that shows your bearing.
-    * Requires a magnetometer (compass) in the device. Can work from being laid flat and up to vertical by using a 3D sensor.
+    * Requires a magnetometer (compass) in the device. When available, this uses a 3D sensor to correctly point your way.
     * Your compass is likely not calibrated and calibration detection is disabled in PWAs. To increase accuracy, slowly turn your device around in all axis several times.
 
 ![Location](screenshots/location.gif) ![Location List](screenshots/location-list.png) ![Location Edit](screenshots/location-edit.png) ![Location Navigate](screenshots/location-navigate.png)
@@ -63,6 +63,7 @@ This PWA is also an example for how to use the following:
 
 * Sun & Moon
     * Look up information for any location (by coordinates or use a major city's name).
+    * Select a date, so you can see historical information or plan for the future.
     * Show location in current coordinate system, plus direction and distance to nearest major city.
     * Shows sunrise, sunset, and current sun location.
     * Moon's rise, moon's set, and the current moon location and phase.
