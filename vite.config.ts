@@ -74,12 +74,12 @@ export default defineConfig({
                     {
                         // This one should work because it is safelisted, but ...
                         protocol: 'geo',
-                        url: '/location-add?location=%s',
+                        url: '/location-add/%s',
                     },
                     {
                         // ... this one is what actually works. No harm in both existing.
                         protocol: 'web+geo',
-                        url: '/location-add?location=%s',
+                        url: '/location-add/%s',
                     },
                 ],
                 theme_color: '#000000',
