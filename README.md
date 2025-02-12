@@ -51,7 +51,7 @@ This PWA is also an example for how to use the following:
     * Automatically will use high resolution locations (GPS) and will calculate your speed and heading even when the device doesn't support these fields.
     * Ability to change field functions (especially for Geocaching and the Geocaching merit badge). See field functions section (below) for more information.
     * Keeps the screen enabled while navigating to a point.
-    * Allows you to average a series of points for a location. This uses a [Kalman filter] and it is best to get readings for several minutes or even up to an hour. The averages start over with each set of readings and does not build upon previous readings.
+    * Allows you to average a series of points for a location. This uses a weighted average of ECEL coordinates, then calculates the standard deviation for the 95% distance. Due to atomospheric variances, it is best to get readings for at least an hour. The averages start over with each set of readings and does not build upon previous readings.
 
 ![Barcode Reader](screenshots/barcode-reader.png)
 

@@ -89,15 +89,15 @@ export const enUS: LanguageData = {
     'location.add.gettingCurrentLocation': 'Getting current location...',
     'location.add.waypointName': 'Unnamed Waypoint {{id}}',
     'location.average.currentEstimate': 'Current estimate:',
-    'location.average.acc': 'Accuracy:',
     'location.average.calculating': 'Calculating...',
     'location.average.heading': 'Averaging:',
     'location.average.help':
-        'It is best to collect several hundred or thousand points to help ensure accurate results. The screen must stay on for the app to be able to access the GPS, so it is recommended to use dark mode, dim your screen, and use an external battery if needed.',
+        'It is best to collect points for over an hour to improve accuracy. Points will collect at 1 point per second, so 3,600 per hour. The screen must stay on for the app to be able to access the GPS, so it is recommended to use dark mode, dim your screen, and use an external battery if needed.',
     'location.average.help2':
-        'When saving the point, the app will compute a recursive least squares regression fit of the collected points. This is an intensive process that can take several seconds to complete. The ending point might not match the location shown on this screen.',
+        'The distance to 95% of the collected points is shown. The value is essentially meaningless with fewer than a few hundred points. After collecting a thousand points, the value here shows how well clustered the points are.',
     'location.average.lat': 'Latitude:',
     'location.average.lon': 'Longitude:',
+    'location.average.ninetyFive': '95% Distance:',
     'location.average.pointsCollected': 'Points collected:',
     'location.average.xDelta': 'X Delta:',
     'location.average.yDelta': 'Y Delta:',

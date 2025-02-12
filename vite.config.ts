@@ -92,6 +92,7 @@ export default defineConfig({
     ],
     root: 'site',
     server: {
+        allowedHosts: true,
         host: true,
         port: 8080,
         strictPort: true,
