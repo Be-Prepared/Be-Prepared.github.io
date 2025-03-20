@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-import minifyLiterals from 'rollup-plugin-minify-html-literals-v3';
+import { literalsHtmlCssMinifier } from '@literals/rollup-plugin-html-css-minifier';
 import { resolve } from 'path';
 import simpleHtmlPlugin from 'vite-plugin-simple-html';
 import { vitePluginVersionMark } from 'vite-plugin-version-mark';
@@ -40,7 +40,7 @@ export default defineConfig({
             ifGlobal: true,
             ifMeta: false,
         }),
-        minifyLiterals(),
+        literalsHtmlCssMinifier(),
         simpleHtmlPlugin({
             minify: true,
         }),
