@@ -160,6 +160,15 @@ export const tileDefs: TileDef[] = [
         show: of(true),
     },
     {
+        id: 'file-transfer',
+        icon: '/file-transfer.svg',
+        label: 'tile.fileTransfer',
+        component: 'file-transfer-app',
+        show: barcodeReaderService
+            .availabilityState(false)
+            .pipe(availabilityToBoolean),
+    },
+    {
         id: 'info',
         icon: '/info.svg',
         label: 'tile.info',

@@ -17,6 +17,18 @@ export const enUS: LanguageData = {
     'compass.compassUnavailable.message':
         'This device does not have a compass or the compass direction is not able to be retrieved. The compass will be removed from the starting menu.',
 
+    // File Transfer
+    'fileTransfer.send': 'Send',
+    'fileTransfer.send.fps': 'FPS:',
+    'fileTransfer.send.fps.loading': 'Loading',
+    'fileTransfer.send.selectFile': 'Select File',
+    'fileTransfer.send.size': 'Size:',
+    'fileTransfer.receive': 'Receive',
+    'fileTransfer.receive.download': 'Download:',
+    'fileTransfer.receive.explainAsk':
+        'To use the barcode reader to receive a file, the camera permission is required.',
+    'fileTransfer.receive.fps': 'FPS',
+
     // Flashlight
     'flashlight.explainAsk':
         'In order to turn on the flashlight, the camera permission needs to be granted.',
@@ -289,6 +301,7 @@ export const enUS: LanguageData = {
     // Tile labels on index
     'tile.barcodeReader': 'Read Barcodes',
     'tile.compass': 'Compass',
+    'tile.fileTransfer': 'File Transfer',
     'tile.flashlight': 'Flashlight',
     'tile.frontLight': 'Front Light',
     'tile.info': 'Info',

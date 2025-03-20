@@ -134,4 +134,6 @@ Pull requests for additional functionality are welcome. Please make sure you mai
 * No sending data off the application.
 * Most animations and extra frills are limited to conserve battery and space.
 
+**Images:** Images shown within the application are all SVG, manually edited to use only viewBox for the size and enabling CSS colors, then optimized by [svgo](https://github.com/svg/svgo).
+
 [Kalman filter]: https://en.wikipedia.org/wiki/Kalman_filter
