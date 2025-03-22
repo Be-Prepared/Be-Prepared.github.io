@@ -112,7 +112,11 @@ export class NfcService {
 
             // This is true because it's indicating a partial read
             instance.onreadingerror = () => resolve(true);
-            instance.scan({ signal: AbortSignal.timeout(1) }).then(
+            // Can't use AbortSignal.timeout(1) as that static method may not
+            // exist.
+            const controller = new AbortController();
+            setTimeout(() => controller.abort(), 1);
+            instance.scan({ signal: controller.signal }).then(
                 () => resolve(true),
                 // MDN indicates AbortError, actual event is TimeoutError
                 (e) =>
