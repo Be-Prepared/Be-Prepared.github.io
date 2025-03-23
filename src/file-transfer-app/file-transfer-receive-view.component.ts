@@ -27,6 +27,7 @@ const state = {
             display: flex;
         }
 
+        img,
         video,
         audio {
             max-width: 100%;
