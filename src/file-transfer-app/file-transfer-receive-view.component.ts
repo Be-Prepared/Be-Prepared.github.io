@@ -27,7 +27,8 @@ const state = {
             display: flex;
         }
 
-        video, audio {
+        video,
+        audio {
             max-width: 100%;
             max-height: 100%;
             flex-shrink: 1;
@@ -47,7 +48,7 @@ const state = {
                 <audio controls src="{{downloadUrl}}"></audio>
             </div>
             <div *if="contentTypeFirst === 'text'" class="preview">
-                <pre>{{data}}</pre>
+                <pre>{{text}}</pre>
             </div>
             <a *if="downloadUrl" .href="downloadUrl" download="{{filename}}">
                 <i18n-label id="fileTransfer.receive.download"></i18n-label>
@@ -63,12 +64,22 @@ export class FileTransferReceiveViewComponent {
     downloadUrl: string | null = null;
     filename = 'download.dat';
     meta?: any;
+    text?: string;
 
     onChange(propName: string) {
         if (propName === 'meta') {
             this.contentType =
                 `${this.meta?.contentType}` || 'application/octet-stream';
             this.contentTypeFirst = this.contentType.split('/')[0];
+
+            if (this.contentTypeFirst === 'text') {
+                this.text = new TextDecoder().decode(
+                    this.data || new Uint8Array()
+                );
+            } else {
+                this.text = '';
+            }
+
             this.filename = `${this.meta?.filename}` || 'download.dat';
             this._update();
         }
