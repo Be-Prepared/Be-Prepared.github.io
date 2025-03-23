@@ -59,8 +59,14 @@ import { fromUint8Array } from 'js-base64';
             <div *if="!fileSelected && !fileLoaded" class="wrapper">
                 <div class="qr">
                     <label class="full center">
-                        <input type="file" class="file-input" @change="selectFile($event.target.files)" />
-                        <i18n-label id="fileTransfer.send.selectFile"></i18n-label>
+                        <input
+                            type="file"
+                            class="file-input"
+                            @change="selectFile($event.target.files)"
+                        />
+                        <i18n-label
+                            id="fileTransfer.send.selectFile"
+                        ></i18n-label>
                     </label>
                 </div>
                 <div class="controls">
@@ -87,7 +93,9 @@ import { fromUint8Array } from 'js-base64';
                 <i18n-label id="fileTransfer.send.loading"></i18n-label>
             </div>
             <div *if="fileLoaded" class="wrapper">
-                <div class="qr"><qr-code content="{{qrContent}}"></qr-code></div>
+                <div class="qr">
+                    <qr-code content="{{qrContent}}"></qr-code>
+                </div>
                 <div class="controls">
                     <div class="center">
                         <span
@@ -159,10 +167,11 @@ export class FileTransferSendAppComponent {
     }
 
     private _encode() {
+        const startTime = Date.now();
         const degree = this._getDegree(this._encoder!.k);
 
         // Get up to 8 indices.
-        const indices = this._getIndices(this._encoder!.k, degree)
+        const indices = this._getIndices(this._encoder!.k, degree);
 
         // Build a block from the indices.
         const block = this._encoder!.createBlock(indices);
@@ -186,7 +195,12 @@ export class FileTransferSendAppComponent {
         // Max size for QR code content is 2953 bytes
         // URL prefix is 32 bytes. 2921 bytes remain for content.
         this.qrContent = `https://be-prepared.github.io/r#${base64}`;
-        this._timeout = setTimeout(() => this._encode(), 1000 / this.fps);
+        const endTime = Date.now();
+        const desiredDuration = 1000 / this.fps;
+        this._timeout = setTimeout(
+            () => this._encode(),
+            Math.max(10, desiredDuration - (endTime - startTime))
+        );
     }
 
     private _getDegree(k: number) {
@@ -230,26 +244,26 @@ export class FileTransferSendAppComponent {
         // Increase probability of 1 block when transferring large files so
         // memory doesn't explode on the receiver while waiting for a single
         // block.
-        const one = Math.max(1/k, 1/128);
+        const one = Math.max(1 / k, 1 / 128);
         const remainder = 1 - one;
 
         // Limit to 16 blocks
         const probabilities = [
             one, // 1 index
-            one + remainder * 16384 / 32767, // 2, 16384
-            one + remainder * 24576 / 32767, // 3, 8192
-            one + remainder * 28672 / 32767, // 4, 4096
-            one + remainder * 30720 / 32767, // 5, 2048
-            one + remainder * 31744 / 32767, // 6, 1024
-            one + remainder * 32256 / 32767, // 7, 512
-            one + remainder * 32512 / 32767, // 8, 256
-            one + remainder * 32640 / 32767, // 9, 128
-            one + remainder * 32704 / 32767, // 10, 64
-            one + remainder * 32736 / 32767, // 11, 32
-            one + remainder * 32752 / 32767, // 12, 16
-            one + remainder * 32760 / 32767, // 13, 8
-            one + remainder * 32764 / 32767, // 14, 4
-            one + remainder * 32766 / 32767, // 15, 2
+            one + (remainder * 16384) / 32767, // 2, 16384
+            one + (remainder * 24576) / 32767, // 3, 8192
+            one + (remainder * 28672) / 32767, // 4, 4096
+            one + (remainder * 30720) / 32767, // 5, 2048
+            one + (remainder * 31744) / 32767, // 6, 1024
+            one + (remainder * 32256) / 32767, // 7, 512
+            one + (remainder * 32512) / 32767, // 8, 256
+            one + (remainder * 32640) / 32767, // 9, 128
+            one + (remainder * 32704) / 32767, // 10, 64
+            one + (remainder * 32736) / 32767, // 11, 32
+            one + (remainder * 32752) / 32767, // 12, 16
+            one + (remainder * 32760) / 32767, // 13, 8
+            one + (remainder * 32764) / 32767, // 14, 4
+            one + (remainder * 32766) / 32767, // 15, 2
             1, // 16, 1
         ];
 
