@@ -240,32 +240,52 @@ export class FileTransferSendAppComponent {
         return Array.from(indices);
     }
 
+    // Uses a robust soliton distribution, modified to have at most 16 blocks
+    // transferred so the data will fit into a QR code.
     private _getProbabilities(k: number) {
-        // Increase probability of 1 block when transferring large files so
-        // memory doesn't explode on the receiver while waiting for a single
-        // block.
-        const one = Math.max(1 / k, 1 / 128);
-        const remainder = 1 - one;
+        // These affect the shape of the distribution.
+        const c = 0.04;
+        const d = 0.01; // Failure probability
+        const r = c * Math.sqrt(k) * Math.log(k / d);
 
-        // Limit to 16 blocks
-        const probabilities = [
-            one, // 1 index
-            one + (remainder * 16384) / 32767, // 2, 16384
-            one + (remainder * 24576) / 32767, // 3, 8192
-            one + (remainder * 28672) / 32767, // 4, 4096
-            one + (remainder * 30720) / 32767, // 5, 2048
-            one + (remainder * 31744) / 32767, // 6, 1024
-            one + (remainder * 32256) / 32767, // 7, 512
-            one + (remainder * 32512) / 32767, // 8, 256
-            one + (remainder * 32640) / 32767, // 9, 128
-            one + (remainder * 32704) / 32767, // 10, 64
-            one + (remainder * 32736) / 32767, // 11, 32
-            one + (remainder * 32752) / 32767, // 12, 16
-            one + (remainder * 32760) / 32767, // 13, 8
-            one + (remainder * 32764) / 32767, // 14, 4
-            one + (remainder * 32766) / 32767, // 15, 2
-            1, // 16, 1
-        ];
+        // Constrain R so K/R is at most 16.
+        const r16 = Math.min(k / 16, Math.floor(r));
+        const threshold = Math.floor(k / r16);
+        let total = 0;
+        const probabilities = [];
+
+        for (let i = 1; i <= 16; i += 1) {
+            let tao = r / (k * i);
+
+            if (i === threshold) {
+                tao = r16 * Math.log(r16 / d) / (k);
+            }
+
+            let rho = 1 / (i * (i - 1));
+
+            if (i === 1) {
+                rho = 1 / (k);
+            }
+
+            const sum = tao + rho;
+            probabilities.push(sum);
+            total += sum;
+        }
+
+        // Fix scaling
+        let accumulated = 0;
+        for (let i = 0; i < probabilities.length; i += 1) {
+            accumulated += (probabilities[i] / total);
+            probabilities[i] = accumulated;
+        }
+
+        // Guarantee no more than 16 and that there's no slim chance due to
+        // imprecise math that we'd miss a probability.
+        probabilities[15] = 1
+
+        if (k < 16) {
+            probabilities[k - 1] = 1;
+        }
 
         return probabilities;
     }
