@@ -11,14 +11,14 @@
     },
     "type": "module",
     "devDependencies": {
-        "@vite-pwa/assets-generator": "^0.2.6",
-        "ava": "^6.2.0",
-        "fudgel": "^1.5.4",
+        "@vite-pwa/assets-generator": "^1.0.0",
+        "ava": "^6.3.0",
+        "fudgel": "^1.6.1",
         "node-stream-zip": "^1.15.0",
         "rxjs": "^7.8.2",
-        "typescript": "^5.8.2",
-        "vite": "^6.2.2",
-        "vite-plugin-pwa": "^0.21.1",
+        "typescript": "^5.8.3",
+        "vite": "^6.3.5",
+        "vite-plugin-pwa": "^1.0.0",
         "vite-plugin-simple-html": "^0.2.0",
         "vite-plugin-version-mark": "^0.1.4"
     },
@@ -35,7 +35,7 @@
         "js-base64": "^3.7.7",
         "luby-transform": "^0.2.0",
         "suncalc": "^1.9.0",
-        "tsx": "^4.19.3",
+        "tsx": "^4.19.4",
         "usng.js": "^0.4.5"
     },
     "ava": {

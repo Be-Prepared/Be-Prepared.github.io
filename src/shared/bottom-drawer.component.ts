@@ -1,4 +1,4 @@
-import { Component, css, html, metadataControllerElement } from 'fudgel';
+import { Component, controllerToElement, css, html } from 'fudgel';
 
 let lock = Promise.resolve();
 
@@ -84,7 +84,7 @@ export class BottomDrawerComponent {
     }
 
     private _element() {
-        return metadataControllerElement.get(this)!;
+        return controllerToElement(this)!;
     }
 
     private _height() {
