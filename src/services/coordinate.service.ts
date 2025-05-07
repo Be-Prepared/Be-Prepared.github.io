@@ -97,6 +97,11 @@ export class CoordinateService {
         return bearingToDestination;
     }
 
+    // Clears the cache. Used for tests.
+    clearCache() {
+        this._cheapRulerCache.clear();
+    }
+
     // Distance between two points
     // Builds the CheapRuler instance from the first LatLon.
     distance(latLon1: LatLon, latLon2: LatLon): number {

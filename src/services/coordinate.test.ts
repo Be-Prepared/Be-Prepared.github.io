@@ -87,6 +87,7 @@ for (const scenario of Object.entries(fromStringScenarios)) {
 }
 
 test(`bearing`, (t) => {
+    coordinateService.clearCache();
     const bearing = coordinateService.bearing(
         {
             lat: 43.17699373293893,
@@ -97,7 +98,7 @@ test(`bearing`, (t) => {
             lon: -110.3390909060057,
         }
     );
-    t.is(bearing.toFixed(7), `129.3233098`);
+    t.is(bearing.toFixed(7), `129.3247025`);
 
     const bearing2 = coordinateService.bearing(
         {
@@ -106,7 +107,7 @@ test(`bearing`, (t) => {
         },
         { lat: 78.55234791058881, lon: -111.80324056660511 }
     );
-    t.is(bearing2.toFixed(7), '2.5925751');
+    t.is(bearing2.toFixed(7), '2.5917353');
 
     const bearing3 = coordinateService.bearing(
         {
@@ -118,5 +119,5 @@ test(`bearing`, (t) => {
             lon: 146.22486843038413,
         }
     );
-    t.is(bearing3.toFixed(7), '258.3230285');
+    t.is(bearing3.toFixed(7), '258.3226296');
 });
