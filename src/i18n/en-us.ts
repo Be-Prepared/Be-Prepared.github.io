@@ -20,7 +20,7 @@ export const enUS: LanguageData = {
     // File Transfer
     'fileTransfer.send': 'Send',
     'fileTransfer.send.fps': 'FPS:',
-    'fileTransfer.send.fps.loading': 'Loading',
+    'fileTransfer.send.loading': 'Loading',
     'fileTransfer.send.selectFile': 'Select File',
     'fileTransfer.send.size': 'Size:',
     'fileTransfer.receive': 'Receive',
