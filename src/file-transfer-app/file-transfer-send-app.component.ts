@@ -121,7 +121,6 @@ import { fromUint8Array } from 'js-base64';
 })
 export class FileTransferSendAppComponent {
     _encoder: LtEncoder | null = null;
-    _indices: number[] = [];
     _probabilities: number[] = [1];
     _timeout: ReturnType<typeof setTimeout> | null = null;
     contentType = '';
@@ -168,8 +167,6 @@ export class FileTransferSendAppComponent {
     private _encode() {
         const startTime = Date.now();
         const degree = this._getDegree(this._encoder!.k);
-
-        // Get up to 8 indices.
         const indices = this._getIndices(this._encoder!.k, degree);
 
         // Build a block from the indices.
@@ -226,23 +223,11 @@ export class FileTransferSendAppComponent {
         return Math.max(16, k);
     }
 
+    // In practice, forcing a specific index to get picked for each block
+    // doesn't seem to have a positive or negative effect when some blocks are
+    // lost during transmission.
     private _getIndices(k: number, degree: number) {
-        // I dislike random indices because there's no guarantee that a block
-        // will be picked. One index will always cycle through all blocks.
         const indices = new Set<number>();
-
-        if (!this._indices.length) {
-            this._indices = Array.from({ length: k }, (_, i) => i);
-
-            for (let i = 0; i < k; i += 1) {
-                const j = Math.floor(Math.random() * k);
-                const t = this._indices[i];
-                this._indices[i] = this._indices[j];
-                this._indices[j] = t;
-            }
-        }
-
-        indices.add(this._indices.pop()!);
 
         while (indices.size < degree) {
             indices.add(Math.floor(Math.random() * k));
