@@ -213,14 +213,14 @@ export class FileTransferSendAppComponent {
         }
 
         if (r < 0.673469) {
-            return Math.max(2, k);
+            return Math.min(2, k);
         }
 
         if (r < 0.836734) {
-            return Math.max(8, k);
+            return Math.min(8, k);
         }
 
-        return Math.max(16, k);
+        return Math.min(16, k);
     }
 
     // In practice, forcing a specific index to get picked for each block
