@@ -76,7 +76,7 @@ This PWA is also an example for how to use the following:
     * The receiver needs to capture several frames and once enough are decoded, it will have a ripple effect and give you the file blocks.
     * Shows a status while receiving. "2/1700 (+ 104) @ 7.98 FPS" means 2 blocks were decoded out of 1700. There were 104 frames captured so far, and those will feed into the decoded block once enough pieces are received.
     * The FPS numbers on both the sender and receiver are approximate.
-    * Compatible with [QRS](https://github.com/qifi-dev/qrs#readme), though this implementation will complete a file with fewer blocks and more QR codes will be decodable, on average. This is because Be Prepared limits to 16 indices per frame and employs a robust soliton distribution.
+    * Compatible with [QRS](https://github.com/qifi-dev/qrs#readme), though this implementation will complete a file with fewer blocks and more QR codes will be decodable, on average. This is because Be Prepared limits to 16 indices per frame and employs a different distribution so the file is transferred about 30% faster.
 
 ![Info](screenshots/info.png)
 
