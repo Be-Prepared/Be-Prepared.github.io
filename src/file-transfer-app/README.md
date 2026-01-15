@@ -97,3 +97,5 @@ After that, a generative algorithm was used while some wild guessing and experim
 
     Average loops: 416.40
     Standard deviation: 54.11
+
+All of these tests were done with 10,000 iterations and 321 blocks. When the number of blocks was increased to 4321, the results were similar but took almost an hour to test each distribution.
