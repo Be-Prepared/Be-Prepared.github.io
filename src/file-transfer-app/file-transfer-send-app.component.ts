@@ -158,7 +158,6 @@ export class FileTransferSendAppComponent {
         });
         this.fileLoaded = true;
         this._encoder = createEncoder(data, this.size);
-        this._probabilities = this._getProbabilities(this._encoder.k);
         this._encode();
     }
 
@@ -185,7 +184,7 @@ export class FileTransferSendAppComponent {
         // So, the maximum is 16 indices in this implementation, which
         // means 4 + 4*16 + 4 + 4 + 4 bytes (80 bytes) max for block header,
         // leaving 2110 (max) bytes for the block data and the UI allows blocks
-        // up to 2100 bytes in case the URL needs to change.
+        // up to 2100 bytes in case the URL need a minor change.
         const binary = blockToBinary(block);
 
         // Base64 encoding changes 3 bytes to 4 characters
@@ -203,16 +202,28 @@ export class FileTransferSendAppComponent {
         );
     }
 
+    /**
+     * This returns the number of source blocks to combine into
+     * an encoded block.
+     *
+     * See README.md for details about the distribution.
+     */
     private _getDegree(k: number) {
         const r = Math.random();
 
-        for (let i = 0; i < this._probabilities.length && i < k; i += 1) {
-            if (r <= this._probabilities[i]) {
-                return i + 1;
-            }
+        if (r < 0.020408) {
+            return 1;
         }
 
-        return k;
+        if (r < 0.673469) {
+            return Math.max(2, k);
+        }
+
+        if (r < 0.836734) {
+            return Math.max(8, k);
+        }
+
+        return Math.max(16, k);
     }
 
     private _getIndices(k: number, degree: number) {
@@ -238,55 +249,5 @@ export class FileTransferSendAppComponent {
         }
 
         return Array.from(indices);
-    }
-
-    // Uses a robust soliton distribution, modified to have at most 16 blocks
-    // transferred so the data will fit into a QR code.
-    private _getProbabilities(k: number) {
-        // These affect the shape of the distribution.
-        const c = 0.04;
-        const d = 0.01; // Failure probability
-        const r = c * Math.sqrt(k) * Math.log(k / d);
-
-        // Constrain R so K/R is at most 16.
-        const r16 = Math.min(k / 16, Math.floor(r));
-        const threshold = Math.floor(k / r16);
-        let total = 0;
-        const probabilities = [];
-
-        for (let i = 1; i <= 16; i += 1) {
-            let tao = r / (k * i);
-
-            if (i === threshold) {
-                tao = r16 * Math.log(r16 / d) / (k);
-            }
-
-            let rho = 1 / (i * (i - 1));
-
-            if (i === 1) {
-                rho = 1 / (k);
-            }
-
-            const sum = tao + rho;
-            probabilities.push(sum);
-            total += sum;
-        }
-
-        // Fix scaling
-        let accumulated = 0;
-        for (let i = 0; i < probabilities.length; i += 1) {
-            accumulated += (probabilities[i] / total);
-            probabilities[i] = accumulated;
-        }
-
-        // Guarantee no more than 16 and that there's no slim chance due to
-        // imprecise math that we'd miss a probability.
-        probabilities[15] = 1
-
-        if (k < 16) {
-            probabilities[k - 1] = 1;
-        }
-
-        return probabilities;
     }
 }

@@ -9,6 +9,7 @@ import { Soliton16PlusSingles } from './encoder/soliton-16-plus-singles.mjs';
 import { NoDupes } from './decoder/no-dupes.mjs';
 import { Standard } from './decoder/standard.mjs';
 import { StandardKeyed } from './decoder/standard-keyed.mjs';
+import { Keyfinding } from './decoder/keyfinding.mjs';
 
 const encoders = {
     "robust-soliton-16": RobustSoliton16,
@@ -21,6 +22,7 @@ const decoders = {
     standard: Standard,
     "standard-keyed": StandardKeyed,
     "no-dupes": NoDupes,
+    "keyfinding": Keyfinding,
 };
 
 function showHelpList(items) {
@@ -51,6 +53,7 @@ Global Options:
     --k=...\tNumber of blocks to transfer
     --debug\tShows some additional debug information
     --loss=...\tNumber from 0 (default) to 1 indicating chance of transfer failure.
+    --seed=...\tSeed for random number generator (patches Math.random)
 
 Encoders:${showHelpList(encoders)}
 
@@ -124,9 +127,21 @@ if (options.debug) {
     console.log(options);
 }
 
-if (options['help']) {
+if (options.help) {
     showHelp();
     process.exit(0);
+}
+
+if (options.seed) {
+    let seed = +options.seed;
+    console.log(`Using seed: ${seed}`);
+    // Mulberry32 PRNG
+    Math.random = () => {
+        let t = seed += 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
 }
 
 if (args.length < 3) {

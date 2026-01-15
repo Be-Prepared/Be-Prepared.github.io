@@ -11,8 +11,8 @@ export class NoDupes {
 
     constructor(k) {
         this.k = +k;
-        this.blocks = new Set();
-        this.queue = new Set();
+        this.blocks = new Set(); // Isolated indices
+        this.queue = new Map(); // The queued indices that can be added after isolation
     }
 
     isDecoded() {
@@ -24,60 +24,45 @@ export class NoDupes {
     }
 
     addIndices(indices) {
-        this.reduce(indices);
+        const reduced = new Set([...indices].filter(index => !this.blocks.has(index)));
 
-        if (indices.size === 1) {
-            this.blocks.add([...indices][0]);
-            this.reprocess();
-        } else if (indices.size > 1) {
-            if (this.isUnique(indices)) {
-                this.queue.add(indices);
-            }
+        if (reduced.size === 1) {
+            const index = [...reduced][0];
+            this.reprocess(index);
+        } else if (reduced.size > 1) {
+            this.queue.set(this.indexKey(reduced), reduced);
         }
     }
 
-    isUnique(indices) {
-        for (const block in this.queue) {
-            if (block.size === indices.size && block.isSubsetOf(indices)) {
-                return false;
-            }
-        }
+    reprocess(index) {
+        const solved = [index];
+        const values = [...this.queue.values()];
 
-        return true;
-    }
+        while (solved.length > 0) {
+            const current = solved.pop();
+            this.blocks.add(current);
 
-    reprocess() {
-        let changed = false;
+            for (const indices of values) {
+                if (indices.has(current)) {
+                    indices.delete(current);
 
-        do {
-            changed = false;
-
-            for (const item of this.queue) {
-                if (this.reduce(item)) {
-                    changed += 1;
-
-                    if (item.size === 1) {
-                        this.blocks.add([...item][0]);
-                    }
-
-                    if (item.size < 2) {
-                        this.queue.delete(item);
+                    if (indices.size === 1) {
+                        solved.push([...indices][0]);
                     }
                 }
             }
-        } while (changed);
-    }
-
-    reduce(indices) {
-        let result = false;
-
-        for (const index of [...indices]) {
-            if (this.blocks.has(index)) {
-                result = true;
-                indices.delete(index);
-            }
         }
 
-        return result;
+        this.queue = new Map();
+
+        for (const item of values) {
+            if (item.size > 1) {
+                this.queue.set(this.indexKey(item), item);
+            }
+        }
+    }
+
+    indexKey(indices) {
+        return [...indices].sort((a, b) => a - b).join(',');
     }
 }
