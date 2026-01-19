@@ -3,7 +3,7 @@
 import { showProbabilities, runTests } from './test-lib.mjs';
 
 function helpAndExit() {
-    console.error('Usage: test-arbitrary.mjs <blocks> <chance1> ... <chance16>');
+    console.error('Usage: test-arbitrary.mjs <blocks> <iterations> <chance1> ... <chance16>');
     console.error(
         "  <chance1> through <chance16> are normalized into probabilities"
     );
@@ -11,14 +11,15 @@ function helpAndExit() {
 }
 
 function main() {
-    if (process.argv.length < 19) {
+    if (process.argv.length < 20) {
         helpAndExit();
     }
 
     const blocks = parseInt(process.argv[2], 10);
+    const iterations = parseInt(process.argv[3], 10);
     const probabilities = [];
 
-    for (let i = 3; i < 19; i++) {
+    for (let i = 4; i < 20; i++) {
         probabilities.push(parseFloat(process.argv[i]));
     }
 
@@ -33,11 +34,11 @@ function main() {
         probabilities[i] += probabilities[i - 1];
     }
 
-    console.log('Block size:', blocks);
+    console.log('Block count:', blocks);
     console.log('');
     console.log('Arbitrary Probabilities:');
     showProbabilities(probabilities);
-    runTests(probabilities, blocks);
+    runTests(probabilities, blocks, iterations);
 }
 
 main();

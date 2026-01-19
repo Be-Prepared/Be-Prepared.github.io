@@ -74,28 +74,30 @@ That provided a small bit of a boost, but not significantly. Further testing sho
     Average loops: 590.11
     Standard deviation: 225.32
 
-After that, a generative algorithm was used while some wild guessing and experimentation took place and this produced the best results yet. It's also remarkably simple.
+After that, a generative algorithm was used while some wild guessing and experimentation took place and this produced the best results yet.
 
 | Size |   Prob   | Visualization                                      |
 |-----:|:--------:|----------------------------------------------------|
-|    1 | 0.020408 | ##                                                 |
-|    2 | 0.653061 | ################################################## |
-|    3 | 0.000000 |                                                    |
-|    4 | 0.000000 |                                                    |
+|    1 | 0.094253 | ################                                   |
+|    2 | 0.291954 | ################################################## |
+|    3 | 0.204598 | ###################################                |
+|    4 | 0.142529 | ########################                           |
 |    5 | 0.000000 |                                                    |
-|    6 | 0.000000 |                                                    |
+|    6 | 0.006897 | #                                                  |
 |    7 | 0.000000 |                                                    |
-|    8 | 0.163265 | ############                                       |
+|    8 | 0.000000 |                                                    |
 |    9 | 0.000000 |                                                    |
-|   10 | 0.000000 |                                                    |
+|   10 | 0.006897 | #                                                  |
 |   11 | 0.000000 |                                                    |
 |   12 | 0.000000 |                                                    |
 |   13 | 0.000000 |                                                    |
-|   14 | 0.000000 |                                                    |
-|   15 | 0.000000 |                                                    |
-|   16 | 0.163266 | ############                                       |
+|   14 | 0.016092 | ###                                                |
+|   15 | 0.204598 | ###################################                |
+|   16 | 0.032184 | ######                                             |
 
-    Average loops: 416.40
-    Standard deviation: 54.11
+    Average loops: 409.88
+    Standard deviation: 37.89
 
 All of these tests were done with 10,000 iterations and 321 blocks. When the number of blocks was increased to 4321, the results were similar but took almost an hour to test each distribution.
+
+For further information check out the experiments/soliton folder.

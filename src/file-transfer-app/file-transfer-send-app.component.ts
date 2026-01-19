@@ -130,6 +130,17 @@ export class FileTransferSendAppComponent {
     fps = 10;
     qrContent = '';
     size = 300;
+    degreeDistribution = [
+        [0.094470, 1],
+        [0.387097, 2],
+        [0.592166, 3],
+        [0.735023, 4],
+        [0.741935, 6],
+        [0.746543, 10],
+        [0.762672, 14],
+        [0.967741, 15],
+        [1.0, 16],
+    ];
 
     onDestroy() {
         if (this._timeout) {
@@ -208,19 +219,14 @@ export class FileTransferSendAppComponent {
     private _getDegree(k: number) {
         const r = Math.random();
 
-        if (r < 0.020408) {
-            return 1;
+        for (const [cumulativeProbability, degree] of this.degreeDistribution) {
+            if (r < cumulativeProbability) {
+                return Math.min(degree, k);
+            }
         }
 
-        if (r < 0.673469) {
-            return Math.min(2, k);
-        }
-
-        if (r < 0.836734) {
-            return Math.min(8, k);
-        }
-
-        return Math.min(16, k);
+        // Fallback, should not happen.
+        return 1;
     }
 
     // In practice, forcing a specific index to get picked for each block

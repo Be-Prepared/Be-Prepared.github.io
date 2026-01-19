@@ -80,32 +80,35 @@ function addIndices(found, queue, indices) {
     }
 
     if (indices.size === 1) {
-        found.add([...indices][0]);
-        rework(found, queue);
+        rework(new Set([...indices]), found, queue);
     } else if (indices.size > 1) {
         queue.add(indices);
     }
 }
 
-function rework(found, queue) {
-    let changedFound = true;
+function rework(addedIndices, found, queue) {
+    while (addedIndices.size > 0) {
+        for (const index of addedIndices) {
+            found.add(index);
+        }
 
-    while (changedFound) {
-        changedFound = false;
+        const remove = new Set([...addedIndices]);
+        addedIndices.clear();
 
         for (const item of queue) {
-            for (const index of [...item]) {
-                if (found.has(index)) {
+            for (const index of remove) {
+                if (item.has(index)) {
                     item.delete(index);
-                }
-
-                if (item.size === 1) {
-                    found.add([...item][0]);
-                    changedFound = true;
-                    queue.delete(item);
                 }
             }
 
+            if (item.size === 1) {
+                addedIndices.add([...item][0]);
+            }
+
+            if (item.size < 2) {
+                queue.delete(item);
+            }
         }
     }
 }
