@@ -122,7 +122,9 @@ export const tileDefs: TileDef[] = [
         icon: '/speed.svg',
         label: 'tile.speed',
         component: 'speed-app',
-        show: of(false),
+        show: geolocationService
+            .availabilityState()
+            .pipe(availabilityToBoolean),
     },
     {
         id: 'level',

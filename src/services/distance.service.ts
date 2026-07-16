@@ -4,8 +4,10 @@ import { DistanceSystem } from '../datatypes/distance-system';
 import { PreferenceService } from './preference.service';
 
 export interface DistanceOptions {
-    useSmallUnits?: boolean;
     isSpeed?: boolean;
+    omitLabel?: boolean;
+    useSmallUnits?: boolean;
+    wholeNumber?: boolean;
 }
 
 export const DISTANCE_SYSTEMS = [
@@ -14,6 +16,8 @@ export const DISTANCE_SYSTEMS = [
 ];
 
 export const DistanceSystemDefault = DistanceSystem.IMPERIAL;
+
+const METERS_TO_FEET = 3.2808398950131;
 
 export class DistanceService {
     private _currentSetting = new BehaviorSubject<DistanceSystem>(
@@ -62,7 +66,7 @@ export class DistanceService {
         this.setDistanceSystem(newValue);
     }
 
-    private _fixed(n: number): string {
+    private _fixed(n: number, options: DistanceOptions): string {
         const a = Math.abs(n);
         let digits = 0;
 
@@ -72,6 +76,10 @@ export class DistanceService {
             digits = 2;
         } else if (a < 100) {
             digits = 1;
+        }
+
+        if (options.wholeNumber) {
+            digits = 0;
         }
 
         const factor = Math.pow(10, digits);
@@ -86,29 +94,37 @@ export class DistanceService {
         if (options.isSpeed) {
             const mph = (feet * 3600) / 5280;
 
-            return `${this._fixed(mph)} mph`;
+            return this._withLabel(this._fixed(mph, options), 'mph', options);
         }
 
         if (feet < 528 || options.useSmallUnits) {
-            return `${Math.round(feet)} ft`;
+            return this._withLabel(Math.round(feet), 'ft', options);
         }
 
         const miles = feet / 5280;
 
-        return `${this._fixed(miles)} mi`;
+        return this._withLabel(this._fixed(miles, options), 'mi', options);
     }
 
     private _toMetric(meters: number, options: DistanceOptions): string {
         if (options.isSpeed) {
-            return `${this._fixed(3.6 * meters)} km/h`;
+            return this._withLabel(this._fixed(3.6 * meters, options), 'km/h', options);
         }
 
         if (meters < 1000 || options.useSmallUnits) {
-            return `${this._fixed(meters)} m`;
+            return this._withLabel(Math.round(meters), 'm', options);
         }
 
         const kilometers = meters / 1000;
 
-        return `${this._fixed(kilometers)} km`;
+        return this._withLabel(this._fixed(kilometers, options), 'km', options);
+    }
+
+    private _withLabel(value: string | number, label: string, options: DistanceOptions): string {
+        if (options.omitLabel) {
+            return `${value}`;
+        }
+
+        return `${value} ${label}`;
     }
 }

@@ -14,6 +14,7 @@ export * from './magnifier-app/magnifier-app.module';
 export * from './nfc-app/nfc-app.module';
 export * from './file-transfer-app/file-transfer-app.module';
 export * from './shared/shared.module';
+export * from './speed-app/speed-app.module';
 export * from './sun-moon-app/sun-moon-app.module';
 export * from './update-pwa/update-pwa.module';
 

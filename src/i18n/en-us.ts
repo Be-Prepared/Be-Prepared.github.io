@@ -257,6 +257,10 @@ export const enUS: LanguageData = {
     'shared.permissionPrompt.heading': 'Permission Required',
     'shared.prettyInput.close': 'Close Help',
 
+    // Speed
+    'speed.average': 'Average:',
+    'speed.maximum': 'Maximum:',
+
     // Services
     'service.torch.deviceIssue': 'Flashlight issue - reload required',
     'service.wakeLock.released': 'Letting Screen Turn Off',
