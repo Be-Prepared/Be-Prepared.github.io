@@ -1,4 +1,3 @@
-import { AvailabilityState } from '../datatypes/availability-state';
 import { Component, css, html } from 'fudgel';
 import { di } from '../di';
 import {
@@ -11,16 +10,11 @@ import {
     GeolocationCoordinateResultSuccess,
     GeolocationService,
 } from '../services/geolocation.service';
-import { of, Subject } from 'rxjs';
-import { PermissionsService } from '../services/permissions.service';
-import { switchMap, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component('speed-app', {
     style: css`
-        :host {
-            font-size: 1.2em;
-        }
-
         .wrapper {
             display: flex;
             flex-direction: column;
@@ -75,55 +69,53 @@ import { switchMap, takeUntil } from 'rxjs/operators';
         }
     `,
     template: html`
-        <permission-prompt
-            *if="explainAsk"
-            @grant.stop.prevent="grant()"
-            message-id="location.explainAsk"
-        ></permission-prompt>
-        <permission-denied *if="explainDeny"></permission-denied>
-        <location-unavailable *if="explainUnavailable"></location-unavailable>
-        <permission-error *if="explainError"></permission-error>
-        <default-layout *if="showControls">
-            <div class="wrapper">
-                <div class="speed-display">
-                    <grow-to-fit-font-size>{{currentSpeed}}</grow-to-fit-font-size>
-                </div>
-                <div class="speed-info">
-                    <div class="info-item">
-                        <span><i18n-label id="speed.average"></i18n-label></span>
-                        <span>{{averageSpeed}}</span>
+        <location-wrapper>
+            <default-layout>
+                <div class="wrapper">
+                    <div class="speed-display">
+                        <grow-to-fit-font-size
+                            >{{currentSpeed}}</grow-to-fit-font-size
+                        >
                     </div>
-                    <div class="info-item">
-                        <span><i18n-label id="speed.maximum"></i18n-label></span>
-                        <span>{{maximumSpeed}}</span>
+                    <div class="speed-info">
+                        <div class="info-item">
+                            <span
+                                ><i18n-label
+                                    id="speed.average"
+                                ></i18n-label></span
+                            >
+                            <span>{{averageSpeed}}</span>
+                        </div>
+                        <div class="info-item">
+                            <span
+                                ><i18n-label
+                                    id="speed.maximum"
+                                ></i18n-label></span
+                            >
+                            <span>{{maximumSpeed}}</span>
+                        </div>
+                        <pretty-select
+                            i18n-base="info.distances"
+                            value="{{distanceSystem}}"
+                            .options="distanceSystems"
+                            @change="changeDistanceSystem($event.detail)"
+                        ></pretty-select>
                     </div>
-                    <pretty-select
-                        i18n-base="info.distances"
-                        value="{{distanceSystem}}"
-                        .options="distanceSystems"
-                        @change="changeDistanceSystem($event.detail)"
-                    ></pretty-select>
                 </div>
-            </div>
-        </default-layout>
+            </default-layout>
+        </location-wrapper>
     `,
 })
 export class SpeedAppComponent {
     private _distanceService = di(DistanceService);
     private _geolocationService = di(GeolocationService);
     private _lastPosition: GeolocationCoordinateResultSuccess | null = null;
-    private _permissionsService = di(PermissionsService);
     private _subject = new Subject();
     averageSpeed = '';
     currentSpeed = '';
     distanceSystem: DistanceSystem = DistanceSystemDefault;
     distanceSystems = DISTANCE_SYSTEMS;
-    explainAsk = false;
-    explainDeny = false;
-    explainError = false;
-    explainUnavailable = false;
     maximumSpeed = '';
-    showControls = false;
 
     onInit() {
         this._distanceService
@@ -135,29 +127,11 @@ export class SpeedAppComponent {
             });
 
         this._geolocationService
-            .availabilityState()
-            .pipe(
-                takeUntil(this._subject),
-                switchMap((value) => {
-                    this.explainAsk = value === AvailabilityState.PROMPT;
-                    this.explainDeny = value === AvailabilityState.DENIED;
-                    this.explainUnavailable =
-                        value === AvailabilityState.UNAVAILABLE;
-                    this.explainError = value === AvailabilityState.ERROR;
-                    this.showControls = value === AvailabilityState.ALLOWED;
-
-                    if (this.showControls) {
-                        return this._geolocationService.getPositionSuccess();
-                    }
-
-                    return of(null);
-                })
-            )
+            .getPositionSuccess()
+            .pipe(takeUntil(this._subject))
             .subscribe((position) => {
-                if (position) {
-                    this._lastPosition = position;
-                    this._updateDisplay();
-                }
+                this._lastPosition = position;
+                this._updateDisplay();
             });
     }
 
@@ -168,11 +142,6 @@ export class SpeedAppComponent {
 
     changeDistanceSystem(value: DistanceSystem) {
         this._distanceService.setDistanceSystem(value);
-    }
-
-    grant() {
-        this.explainAsk = false;
-        this._permissionsService.geolocation(true);
     }
 
     private _speedNumber(metersPerSecond: number): string {
@@ -201,3 +170,4 @@ export class SpeedAppComponent {
         );
     }
 }
+
