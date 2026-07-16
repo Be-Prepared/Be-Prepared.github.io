@@ -17,6 +17,10 @@ import { switchMap, takeUntil } from 'rxjs/operators';
 
 @Component('speed-app', {
     style: css`
+        :host {
+            font-size: 1.2em;
+        }
+
         .wrapper {
             display: flex;
             flex-direction: column;
