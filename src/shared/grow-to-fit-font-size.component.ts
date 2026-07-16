@@ -5,6 +5,7 @@ import { Component, css, html } from 'fudgel';
         :host {
             box-sizing: border-box;
             height: 100%;
+            overflow: hidden;
             width: 100%;
         }
 

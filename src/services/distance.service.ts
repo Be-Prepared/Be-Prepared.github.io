@@ -4,6 +4,7 @@ import { DistanceSystem } from '../datatypes/distance-system';
 import { PreferenceService } from './preference.service';
 
 export interface DistanceOptions {
+    floor?: boolean;
     isSpeed?: boolean;
     omitLabel?: boolean;
     useSmallUnits?: boolean;
@@ -81,7 +82,9 @@ export class DistanceService {
         }
 
         const factor = Math.pow(10, digits);
-        const result = Math.round(n * factor) / factor;
+        const scaled = n * factor;
+        const visible = options.floor ? Math.floor(scaled) : Math.round(scaled);
+        const result = visible / factor;
 
         return result.toLocaleString();
     }

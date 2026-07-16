@@ -80,18 +80,14 @@ import { takeUntil } from 'rxjs/operators';
                     <div class="speed-info">
                         <div class="info-item">
                             <span
-                                ><i18n-label
-                                    id="speed.average"
-                                ></i18n-label></span
-                            >
+                                ><i18n-label id="speed.average"></i18n-label
+                            ></span>
                             <span>{{averageSpeed}}</span>
                         </div>
                         <div class="info-item">
                             <span
-                                ><i18n-label
-                                    id="speed.maximum"
-                                ></i18n-label></span
-                            >
+                                ><i18n-label id="speed.maximum"></i18n-label
+                            ></span>
                             <span>{{maximumSpeed}}</span>
                         </div>
                         <pretty-select
@@ -151,7 +147,7 @@ export class SpeedAppComponent {
 
         this.currentSpeed = this._distanceService.metersToString(
             this._lastPosition.speed,
-            { isSpeed: true, omitLabel: true, wholeNumber: true }
+            { floor: true, isSpeed: true, omitLabel: true, wholeNumber: true }
         );
         this.averageSpeed = this._distanceService.metersToString(
             this._lastPosition.speedSmoothed,
@@ -163,4 +159,3 @@ export class SpeedAppComponent {
         );
     }
 }
-

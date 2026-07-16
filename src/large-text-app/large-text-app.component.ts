@@ -25,7 +25,7 @@ import { I18nService } from '../i18n/i18n.service';
             outline: none;
             text-align: center;
             white-space: pre-wrap;
-            overflow-wrap: anywhere;
+            overflow-wrap: break-word;
             max-width: 100%;
             min-width: 0;
             min-height: 1em;
