@@ -97,6 +97,9 @@ export const enUS: LanguageData = {
     'install.action': 'Install',
     'install.message': 'Install to Home Screen',
 
+    // Large Text
+    'largeText.placeholder': 'Type Here',
+
     // Location
     'location.add.gettingCurrentLocation': 'Getting current location...',
     'location.add.waypointName': 'Unnamed Waypoint {{id}}',
@@ -305,6 +308,7 @@ export const enUS: LanguageData = {
     'tile.flashlight': 'Flashlight',
     'tile.frontLight': 'Front Light',
     'tile.info': 'Info',
+    'tile.largeText': 'Large Text',
     'tile.level': 'Level',
     'tile.location': 'Location',
     'tile.magnifier': 'Magnifier',

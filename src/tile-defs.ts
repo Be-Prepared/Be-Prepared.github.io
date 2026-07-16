@@ -169,6 +169,13 @@ export const tileDefs: TileDef[] = [
             .pipe(availabilityToBoolean),
     },
     {
+        id: 'large-text',
+        icon: '/large-text.svg',
+        label: 'tile.largeText',
+        component: 'large-text-app',
+        show: of(true),
+    },
+    {
         id: 'info',
         icon: '/info.svg',
         label: 'tile.info',

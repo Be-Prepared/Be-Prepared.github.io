@@ -18,13 +18,16 @@ import { Component, css, html } from 'fudgel';
     `,
     template: html`
         <div class="wrapper" #ref="wrapper">
-            <div #ref="content"><slot #ref="slot"></slot></div>
+            <div #ref="content">
+                <slot #ref="slot" @slotchange="monitorAssignedContent()"></slot>
+            </div>
         </div>
     `,
     useShadow: true,
 })
 export class GrowToFitFontSizeComponent {
     private _mutationObserver?: MutationObserver;
+    private _observedNodes: Node[] = [];
     private _resizeObserver?: ResizeObserver;
     content?: HTMLDivElement;
     slot?: HTMLSlotElement;
@@ -43,6 +46,11 @@ export class GrowToFitFontSizeComponent {
         if (this._mutationObserver) {
             this._mutationObserver.disconnect();
         }
+    }
+
+    monitorAssignedContent() {
+        this._findContentSize();
+        this._watchAssignedNodes();
     }
 
     private _findContentSize() {
@@ -99,11 +107,27 @@ export class GrowToFitFontSizeComponent {
         this._mutationObserver = new MutationObserver(() =>
             this._findContentSize()
         );
-        this._mutationObserver.observe(this.slot!, {
-            attributes: true,
-            childList: true,
-            characterData: true,
-            subtree: true,
-        });
+        this._watchAssignedNodes();
+    }
+
+    private _watchAssignedNodes() {
+        const slot = this.slot;
+        const mutationObserver = this._mutationObserver;
+
+        if (!slot || !mutationObserver) {
+            return;
+        }
+
+        mutationObserver.disconnect();
+        this._observedNodes = slot.assignedNodes({ flatten: true });
+
+        for (const node of this._observedNodes) {
+            mutationObserver.observe(node, {
+                attributes: true,
+                childList: true,
+                characterData: true,
+                subtree: true,
+            });
+        }
     }
 }
