@@ -23,11 +23,15 @@ This PWA is also an example for how to use the following:
     * Sets the `torch` capability on a video track. If the capability is not there or the device doesn't report any video devices, the status moves to "unavailable". This information is cached so it isn't queried the next time you start the app.
     * Keeps the screen on, otherwise the flashlight will turn off.
 
+---
+
 ![Front Light](screenshots/front-light.png)
 
 * Front light
     * Makes the screen white. Useful for devices without a flashlight on the camera.
     * Keeps the screen on, otherwise this would be pretty pointless.
+
+---
 
 ![Magnifier](screenshots/magnifier.gif)
 
@@ -36,12 +40,16 @@ This PWA is also an example for how to use the following:
     * Requires the `camera` permission. This permission and the results of probing for a camera are cached so it isn't queried the next time you start the app.
     * Can turn on and off the camera's light, if one exists.
 
+---
+
 ![Compass](screenshots/compass.gif)
 
 * Compass
     * A simple compass that shows your bearing.
     * Requires a magnetometer (compass) in the device. When available, this uses a 3D sensor to correctly point your way.
     * Your compass is likely not calibrated and calibration detection is disabled in PWAs. To increase accuracy, slowly turn your device around in all axis several times.
+
+---
 
 ![Location](screenshots/location.gif) ![Location List](screenshots/location-list.png) ![Location Edit](screenshots/location-edit.png) ![Location Navigate](screenshots/location-navigate.png)
 
@@ -53,11 +61,32 @@ This PWA is also an example for how to use the following:
     * Keeps the screen enabled while navigating to a point.
     * Allows you to average a series of points for a location. This uses a weighted average of ECEL coordinates, then calculates the standard deviation for the 95% distance. Due to atomospheric variances, it is best to get readings for at least an hour. The averages start over with each set of readings and does not build upon previous readings.
 
+---
+
 ![Barcode Reader](screenshots/barcode-reader.png)
 
 * Barcode reader
     * Reads all 1d and 2d barcodes that your device allows.
     * Falls back to WASM module if the device doesn't have a barcode scanning library built-in.
+
+---
+
+![NFC](screenshots/nfc.png)
+
+* NFC reader
+    * Reads NFC tags and displays the information.
+    * Requires the `nfc` permission. This permission and the results of probing for an NFC reader are cached so it isn't queried the next time you start the app.
+    * If your device doesn't have an NFC reader, this icon will be removed.
+
+---
+
+![Speed](screenshots/speed.png)
+
+* Speedometer
+    * Shows your speed in either imperial (mph) or metric (kph) by tapping on the speed field.
+    * Uses the GPS to calculate your speed.
+
+---
 
 ![Sun and Moon](screenshots/sun-moon.png)
 
@@ -68,6 +97,8 @@ This PWA is also an example for how to use the following:
     * Shows sunrise, sunset, and current sun location.
     * Moon's rise, moon's set, and the current moon location and phase.
 
+---
+
 ![File Transfer](screenshots/file-transfer.png) ![File Transfer Send](screenshots/file-transfer-send.png) ![File Transfer Sending](screenshots/file-transfer-sending.png) ![File Transfer Receiving](screenshots/file-transfer-receiving.png)
 
 * File Transfer
@@ -77,6 +108,16 @@ This PWA is also an example for how to use the following:
     * Shows a status while receiving. "2/1700 (+ 104) @ 7.98 FPS" means 2 blocks were decoded out of 1700. There were 104 frames captured so far, and those will feed into the decoded block once enough pieces are received.
     * The FPS numbers on both the sender and receiver are approximate.
     * Compatible with [QRS](https://github.com/qifi-dev/qrs#readme), though this implementation will complete a file with fewer blocks and more QR codes will be decodable, on average. This is because Be Prepared limits to 16 indices per frame and employs a different distribution so the file is transferred about 30% faster.
+
+---
+
+![Large Text](screenshots/large-text.png) ![Large Text Landscape](screenshots/large-text-landscape.png)
+
+* Large Text
+    * Lets you display a message on your phone so it's easily readable from a distance.
+    * Automatically sizes the text to fit on the screen.
+
+---
 
 ![Info](screenshots/info.png)
 
