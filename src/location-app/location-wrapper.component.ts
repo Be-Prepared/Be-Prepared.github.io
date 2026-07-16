@@ -1,12 +1,66 @@
 import { AvailabilityState } from '../datatypes/availability-state';
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import { GeolocationService } from '../services/geolocation.service';
 import { of, Subject } from 'rxjs';
 import { PermissionsService } from '../services/permissions.service';
 import { switchMap, takeUntil } from 'rxjs/operators';
 
-@Component('location-wrapper', {
+export class LocationWrapperComponent {
+    private _geolocationService = di(GeolocationService);
+    private _permissionsService = di(PermissionsService);
+    private _subject = new Subject();
+    control = 'current';
+    explainAsk = false;
+    explainDeny = false;
+    explainError = false;
+    explainUnavailable = false;
+    showControls = false;
+    waypointId?: number;
+
+    onInit() {
+        this._geolocationService
+            .availabilityState()
+            .pipe(
+                takeUntil(this._subject),
+                switchMap((value) => {
+                    this.explainAsk = value === AvailabilityState.PROMPT;
+                    this.explainDeny = value === AvailabilityState.DENIED;
+                    this.explainUnavailable =
+                        value === AvailabilityState.UNAVAILABLE;
+                    this.explainError = value === AvailabilityState.ERROR;
+                    this.showControls = value === AvailabilityState.ALLOWED;
+
+                    if (this.showControls) {
+                        return this._geolocationService.getPosition();
+                    }
+
+                    return of(null);
+                })
+            )
+            .subscribe();
+    }
+
+    onDestroy() {
+        this._subject.next(null);
+        this._subject.complete();
+    }
+
+    grant() {
+        this.explainAsk = false;
+        this._permissionsService.geolocation(true);
+    }
+
+    setControl(control: string, waypointId?: number) {
+        // Set the waypoint first so the control can access it
+        this.waypointId = waypointId;
+
+        // Next, update the control
+        this.control = control;
+    }
+}
+
+component('location-wrapper', {
     style: css`
         .full {
             height: 100%;
@@ -92,57 +146,4 @@ import { switchMap, takeUntil } from 'rxjs/operators';
         </div>
     `,
     useShadow: true,
-})
-export class LocationWrapperComponent {
-    private _geolocationService = di(GeolocationService);
-    private _permissionsService = di(PermissionsService);
-    private _subject = new Subject();
-    control = 'current';
-    explainAsk = false;
-    explainDeny = false;
-    explainError = false;
-    explainUnavailable = false;
-    showControls = false;
-    waypointId?: number;
-
-    onInit() {
-        this._geolocationService
-            .availabilityState()
-            .pipe(
-                takeUntil(this._subject),
-                switchMap((value) => {
-                    this.explainAsk = value === AvailabilityState.PROMPT;
-                    this.explainDeny = value === AvailabilityState.DENIED;
-                    this.explainUnavailable =
-                        value === AvailabilityState.UNAVAILABLE;
-                    this.explainError = value === AvailabilityState.ERROR;
-                    this.showControls = value === AvailabilityState.ALLOWED;
-
-                    if (this.showControls) {
-                        return this._geolocationService.getPosition();
-                    }
-
-                    return of(null);
-                })
-            )
-            .subscribe();
-    }
-
-    onDestroy() {
-        this._subject.next(null);
-        this._subject.complete();
-    }
-
-    grant() {
-        this.explainAsk = false;
-        this._permissionsService.geolocation(true);
-    }
-
-    setControl(control: string, waypointId?: number) {
-        // Set the waypoint first so the control can access it
-        this.waypointId = waypointId;
-
-        // Next, update the control
-        this.control = control;
-    }
-}
+}, LocationWrapperComponent);

@@ -1,8 +1,24 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import { I18nService } from '../i18n/i18n.service';
 
-@Component('large-text-app', {
+export class LargeTextAppComponent {
+    private _i18nService = di(I18nService);
+    editor?: HTMLDivElement;
+    placeholder = '';
+
+    onInit() {
+        this.placeholder = this._i18nService.get('largeText.placeholder');
+    }
+
+    onInput() {
+        if (this.editor && !this.editor.textContent?.trim()) {
+            this.editor.textContent = '';
+        }
+    }
+}
+
+component('large-text-app', {
     style: css`
         :host {
             display: block;
@@ -53,19 +69,4 @@ import { I18nService } from '../i18n/i18n.service';
         </default-layout>
     `,
     useShadow: true,
-})
-export class LargeTextAppComponent {
-    private _i18nService = di(I18nService);
-    editor?: HTMLDivElement;
-    placeholder = '';
-
-    onInit() {
-        this.placeholder = this._i18nService.get('largeText.placeholder');
-    }
-
-    onInput() {
-        if (this.editor && !this.editor.textContent?.trim()) {
-            this.editor.textContent = '';
-        }
-    }
-}
+}, LargeTextAppComponent);

@@ -1,18 +1,10 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import { DistanceService } from '../services/distance.service';
 import { GeolocationService } from '../services/geolocation.service';
 import { I18nService } from '../i18n/i18n.service';
 import { Subscription } from 'rxjs';
 
-@Component('location-field-speed-max', {
-    style: css``,
-    template: html`
-        <changeable-setting @click="toggleDistanceSystem()"
-            >{{value}}</changeable-setting
-        >
-    `,
-})
 export class LocationFieldSpeedMaxComponent {
     private _distanceService = di(DistanceService);
     private _geolocationService = di(GeolocationService);
@@ -47,3 +39,12 @@ export class LocationFieldSpeedMaxComponent {
         this._distanceService.toggleSystem();
     }
 }
+
+component('location-field-speed-max', {
+    style: css``,
+    template: html`
+        <changeable-setting @click="toggleDistanceSystem()"
+            >{{value}}</changeable-setting
+        >
+    `,
+}, LocationFieldSpeedMaxComponent);

@@ -1,6 +1,8 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 
-@Component('flashlight-unavailable', {
+export class FlashlightUnavailableComponent {}
+
+component('flashlight-unavailable', {
     style: css`
         :host {
             height: 100%;
@@ -30,5 +32,4 @@ import { Component, css, html } from 'fudgel';
         <back-button></back-button>
         <div></div>
     `,
-})
-export class FlashlightUnavailableComponent {}
+}, FlashlightUnavailableComponent);

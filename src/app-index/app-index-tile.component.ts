@@ -1,6 +1,20 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 
-@Component('app-index-tile', {
+export class AppIndexTileComponent {
+    icon?: string;
+    id?: string;
+    label?: string;
+
+    onInit() {
+        history.replaceState({}, document.title, '/');
+    }
+
+    setActiveTool() {
+        history.pushState({}, document.title, `/${this.id}`);
+    }
+}
+
+component('app-index-tile', {
     attr: ['icon', 'id', 'label'],
     style: css`
         :host {
@@ -51,17 +65,4 @@ import { Component, css, html } from 'fudgel';
             </div>
         </pretty-button>
     `,
-})
-export class AppIndexTileComponent {
-    icon?: string;
-    id?: string;
-    label?: string;
-
-    onInit() {
-        history.replaceState({}, document.title, '/');
-    }
-
-    setActiveTool() {
-        history.pushState({}, document.title, `/${this.id}`);
-    }
-}
+}, AppIndexTileComponent);

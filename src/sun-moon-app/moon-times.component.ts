@@ -1,35 +1,7 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { LatLon } from '../datatypes/lat-lon';
-import { default as SunCalc } from 'suncalc';
+import * as SunCalc from 'suncalc';
 
-@Component('moon-times', {
-    prop: ['coordinates', 'date'],
-    style: css``,
-    template: html`
-        <div *if="coordinates">
-            <i18n-label
-                *if="alwaysUp"
-                id="sunMoon.moonTimes.alwaysUp"
-            ></i18n-label>
-            <i18n-label
-                *if="alwaysDown"
-                id="sunMoon.moonTimes.alwaysDown"
-            ></i18n-label>
-            <div *if="!alwaysUp && !alwaysDown">
-                <display-time
-                    id="sunMoon.moonTimes.rise"
-                    fail-id="sunMoon.moonTimes.neverRise"
-                    .time="moonRise"
-                ></display-time>
-                <display-time
-                    id="sunMoon.moonTimes.set"
-                    fail-id="sunMoon.moonTimes.neverSet"
-                    .time="moonSet"
-                ></display-time>
-            </div>
-        </div>
-    `,
-})
 export class MoonTimesComponent {
     alwaysDown: boolean = false;
     alwaysUp: boolean = false;
@@ -70,3 +42,32 @@ export class MoonTimesComponent {
         return date.toLocaleString();
     }
 }
+
+component('moon-times', {
+    prop: ['coordinates', 'date'],
+    style: css``,
+    template: html`
+        <div *if="coordinates">
+            <i18n-label
+                *if="alwaysUp"
+                id="sunMoon.moonTimes.alwaysUp"
+            ></i18n-label>
+            <i18n-label
+                *if="alwaysDown"
+                id="sunMoon.moonTimes.alwaysDown"
+            ></i18n-label>
+            <div *if="!alwaysUp && !alwaysDown">
+                <display-time
+                    id="sunMoon.moonTimes.rise"
+                    fail-id="sunMoon.moonTimes.neverRise"
+                    .time="moonRise"
+                ></display-time>
+                <display-time
+                    id="sunMoon.moonTimes.set"
+                    fail-id="sunMoon.moonTimes.neverSet"
+                    .time="moonSet"
+                ></display-time>
+            </div>
+        </div>
+    `,
+}, MoonTimesComponent);

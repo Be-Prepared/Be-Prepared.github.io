@@ -1,5 +1,5 @@
 import { AvailabilityState } from '../datatypes/availability-state';
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
 import { di } from '../di';
 import { DistanceService } from '../services/distance.service';
@@ -19,89 +19,6 @@ interface DataPoint extends XYZ, LatLon {
     accuracy: number;
 }
 
-@Component('location-average-app', {
-    attr: ['id'],
-    style: css`
-        .content {
-            height: 100%;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            box-sizing: border-box;
-        }
-
-        .wrapper {
-            padding-top: 1em;
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-            display: flex;
-            box-sizing: border-box;
-        }
-
-        .wrapper-inner {
-            flex-grow: 1;
-            padding: 0.3em;
-            border-style: solid;
-            box-sizing: border-box;
-            border-width: 1px;
-            overflow-x: auto;
-            height: 100%;
-            width: 100%;
-        }
-    `,
-    template: html`
-        <location-wrapper>
-            <default-layout *if="point">
-                <div class="content">
-                    <div>
-                        <i18n-label
-                            id="location.average.heading"
-                        ></i18n-label>
-                        <div>{{point.name}}</div>
-                    </div>
-                    <div class="wrapper">
-                        <div class="wrapper-inner">
-                            <div>
-                                <i18n-label
-                                    id="location.average.pointsCollected"
-                                ></i18n-label>
-                                {{pointCount}}
-                            </div>
-                            <div>
-                                <i18n-label
-                                    id="location.average.ninetyFive"
-                                ></i18n-label>
-                                <changeable-setting
-                                    @click="toggleDistanceSystem()"
-                                    >{{ninetyFive}}</changeable-setting
-                                >
-                            </div>
-                            <location-coordinates
-                                .coords="averagedDataPoint"
-                            ></location-coordinates>
-                            <p>
-                                <i18n-label
-                                    id="location.average.help"
-                                ></i18n-label>
-                            </p>
-                            <p>
-                                <i18n-label
-                                    id="location.average.help2"
-                                ></i18n-label>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <scaling-icon
-                    slot="more-buttons"
-                    @click.stop.prevent="save()"
-                    href="/save.svg"
-                ></scaling-icon>
-            </default-layout>
-        </location-wrapper>
-    `,
-})
 export class LocationAverageComponent {
     private _coordinateService = di(CoordinateService);
     private _distanceService = di(DistanceService);
@@ -231,3 +148,87 @@ export class LocationAverageComponent {
         }
     }
 }
+
+component('location-average-app', {
+    attr: ['id'],
+    style: css`
+        .content {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .wrapper {
+            padding-top: 1em;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            display: flex;
+            box-sizing: border-box;
+        }
+
+        .wrapper-inner {
+            flex-grow: 1;
+            padding: 0.3em;
+            border-style: solid;
+            box-sizing: border-box;
+            border-width: 1px;
+            overflow-x: auto;
+            height: 100%;
+            width: 100%;
+        }
+    `,
+    template: html`
+        <location-wrapper>
+            <default-layout *if="point">
+                <div class="content">
+                    <div>
+                        <i18n-label
+                            id="location.average.heading"
+                        ></i18n-label>
+                        <div>{{point.name}}</div>
+                    </div>
+                    <div class="wrapper">
+                        <div class="wrapper-inner">
+                            <div>
+                                <i18n-label
+                                    id="location.average.pointsCollected"
+                                ></i18n-label>
+                                {{pointCount}}
+                            </div>
+                            <div>
+                                <i18n-label
+                                    id="location.average.ninetyFive"
+                                ></i18n-label>
+                                <changeable-setting
+                                    @click="toggleDistanceSystem()"
+                                    >{{ninetyFive}}</changeable-setting
+                                >
+                            </div>
+                            <location-coordinates
+                                .coords="averagedDataPoint"
+                            ></location-coordinates>
+                            <p>
+                                <i18n-label
+                                    id="location.average.help"
+                                ></i18n-label>
+                            </p>
+                            <p>
+                                <i18n-label
+                                    id="location.average.help2"
+                                ></i18n-label>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <scaling-icon
+                    slot="more-buttons"
+                    @click.stop.prevent="save()"
+                    href="/save.svg"
+                ></scaling-icon>
+            </default-layout>
+        </location-wrapper>
+    `,
+}, LocationAverageComponent);

@@ -1,6 +1,14 @@
-import { Component, css, emit, html } from 'fudgel';
+import { component, css, emit, html } from 'fudgel';
 
-@Component('show-modal', {
+export class ShowModalComponent {
+    clickOutside() {
+        emit(this, 'clickoutside');
+    }
+
+    ignore() {}
+}
+
+component('show-modal', {
     style: css`
         .outer {
             display: flex;
@@ -29,11 +37,4 @@ import { Component, css, emit, html } from 'fudgel';
         </div>
     `,
     useShadow: true,
-})
-export class ShowModalComponent {
-    clickOutside() {
-        emit(this, 'clickoutside');
-    }
-
-    ignore() {}
-}
+}, ShowModalComponent);

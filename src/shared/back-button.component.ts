@@ -1,7 +1,13 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { goBack } from '../util/go-back';
 
-@Component('back-button', {
+export class BackButtonComponent {
+    back() {
+        goBack();
+    }
+}
+
+component('back-button', {
     style: css``,
     template: html`
         <scaling-icon
@@ -9,9 +15,4 @@ import { goBack } from '../util/go-back';
             href="/back.svg"
         ></scaling-icon>
     `,
-})
-export class BackButtonComponent {
-    back() {
-        goBack();
-    }
-}
+}, BackButtonComponent);

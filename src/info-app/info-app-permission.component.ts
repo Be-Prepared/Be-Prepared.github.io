@@ -1,4 +1,4 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import {
     PermissionsService,
@@ -7,31 +7,6 @@ import {
 } from '../services/permissions.service';
 import { Subscription } from 'rxjs';
 
-@Component('info-app-permission', {
-    attr: ['permission'],
-    style: css`
-        .state_granted {
-            color: green;
-        }
-
-        .state_error {
-            color: purple;
-        }
-
-        .state_prompt {
-            color: gray;
-        }
-
-        .state_denied {
-            color: orange;
-        }
-    `,
-    template: html`
-        <span class="state_{{stateStr}}"
-            ><i18n-label id="info.permission.{{stateStr}}"></i18n-label
-        ></span>
-    `,
-})
 export class InfoAppPermissionComponent {
     private _permissionsService = di(PermissionsService);
     private _subscription?: Subscription;
@@ -75,3 +50,29 @@ export class InfoAppPermissionComponent {
         }
     }
 }
+
+component('info-app-permission', {
+    attr: ['permission'],
+    style: css`
+        .state_granted {
+            color: green;
+        }
+
+        .state_error {
+            color: purple;
+        }
+
+        .state_prompt {
+            color: gray;
+        }
+
+        .state_denied {
+            color: orange;
+        }
+    `,
+    template: html`
+        <span class="state_{{stateStr}}"
+            ><i18n-label id="info.permission.{{stateStr}}"></i18n-label
+        ></span>
+    `,
+}, InfoAppPermissionComponent);

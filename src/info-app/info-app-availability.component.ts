@@ -1,7 +1,26 @@
 import { AvailabilityState } from '../datatypes/availability-state';
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 
-@Component('info-app-availability', {
+export class InfoAppAvailabilityComponent {
+    availabilityState = AvailabilityState.ERROR;
+    stateStr = 'error';
+
+    onChange() {
+        if (this.availabilityState === AvailabilityState.UNAVAILABLE) {
+            this.stateStr = 'unavailable';
+        } else if (this.availabilityState === AvailabilityState.DENIED) {
+            this.stateStr = 'denied';
+        } else if (this.availabilityState === AvailabilityState.PROMPT) {
+            this.stateStr = 'prompt';
+        } else if (this.availabilityState === AvailabilityState.ALLOWED) {
+            this.stateStr = 'allowed';
+        } else {
+            this.stateStr = 'error';
+        }
+    }
+}
+
+component('info-app-availability', {
     prop: ['availabilityState'],
     style: css`
         .state_allowed {
@@ -29,22 +48,4 @@ import { Component, css, html } from 'fudgel';
             ><i18n-label id="info.availability.{{stateStr}}"></i18n-label
         ></span>
     `,
-})
-export class InfoAppAvailabilityComponent {
-    availabilityState = AvailabilityState.ERROR;
-    stateStr = 'error';
-
-    onChange() {
-        if (this.availabilityState === AvailabilityState.UNAVAILABLE) {
-            this.stateStr = 'unavailable';
-        } else if (this.availabilityState === AvailabilityState.DENIED) {
-            this.stateStr = 'denied';
-        } else if (this.availabilityState === AvailabilityState.PROMPT) {
-            this.stateStr = 'prompt';
-        } else if (this.availabilityState === AvailabilityState.ALLOWED) {
-            this.stateStr = 'allowed';
-        } else {
-            this.stateStr = 'error';
-        }
-    }
-}
+}, InfoAppAvailabilityComponent);

@@ -1,6 +1,17 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 
-@Component('pretty-button', {
+export class PrettyButtonComponent {
+    button?: HTMLButtonElement;
+    padding = '0.5em';
+
+    onViewInit() {
+        if (this.button) {
+            this.button.style.padding = this.padding || '0.5em';
+        }
+    }
+}
+
+component('pretty-button', {
     attr: ['padding'],
     prop: ['enabled'],
     style: css`
@@ -30,14 +41,4 @@ import { Component, css, html } from 'fudgel';
         </button>
     `,
     useShadow: true,
-})
-export class PrettyButtonComponent {
-    button?: HTMLButtonElement;
-    padding = '0.5em';
-
-    onViewInit() {
-        if (this.button) {
-            this.button.style.padding = this.padding || '0.5em';
-        }
-    }
-}
+}, PrettyButtonComponent);

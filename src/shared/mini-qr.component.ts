@@ -1,6 +1,10 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 
-@Component('mini-qr', {
+export class MiniQrComponent {
+    content = '';
+}
+
+component('mini-qr', {
     attr: ['content'],
     style: css`
         :host {
@@ -13,7 +17,4 @@ import { Component, css, html } from 'fudgel';
     template: html`
         <qr-code content="{{content}}"></qr-code>
     `,
-})
-export class MiniQrComponent {
-    content = '';
-}
+}, MiniQrComponent);

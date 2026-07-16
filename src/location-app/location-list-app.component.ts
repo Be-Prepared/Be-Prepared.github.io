@@ -1,4 +1,4 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
 import { di } from '../di';
 import { DirectionService } from '../services/direction.service';
@@ -19,7 +19,105 @@ interface WaypointAugmented extends WaypointSaved {
     location: string;
 }
 
-@Component('location-list-app', {
+export class LocationListAppComponent {
+    private _coordinateService = di(CoordinateService);
+    private _directionService = di(DirectionService);
+    private _distanceService = di(DistanceService);
+    private _geolocationService = di(GeolocationService);
+    private _i18nService = di(I18nService);
+    private _subscription?: Subscription;
+    private _waypointService = di(WaypointService);
+    points: WaypointAugmented[] = [];
+    position: GeolocationCoordinateResult | null = null;
+
+    onInit() {
+        this._subscription = this._geolocationService
+            .getPosition()
+            .pipe(first())
+            .subscribe((position) => {
+                this.position = position;
+                this._updatePoints(this.points);
+            });
+        this._updatePoints(this._waypointService.getPoints());
+    }
+
+    onDestroy() {
+        this._subscription && this._subscription.unsubscribe();
+    }
+
+    goToAdd() {
+        history.pushState({}, document.title, '/location-add');
+    }
+
+    goToEdit(waypoint: WaypointSaved) {
+        history.pushState({}, document.title, `/location-edit/${waypoint.id}`);
+    }
+
+    sortByDistance() {
+        this.points = this._sortByDistance(this.points);
+    }
+
+    sortByName() {
+        this.points = this._sortByName(this.points);
+    }
+
+    private _sortByDistance(points: WaypointAugmented[]): WaypointAugmented[] {
+        return points.sort((a, b) => a.meters - b.meters);
+    }
+
+    private _sortByName(points: WaypointAugmented[]): WaypointAugmented[] {
+        return points.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    private _updatePoints(points: WaypointSaved[]) {
+        const position = this.position;
+
+        if (!position || !position.success) {
+            this._updatePointsNoPosition(points);
+            return;
+        }
+
+        const positionTyped = position as GeolocationCoordinateResultSuccess;
+        const augmentedPoints = points.map((point) => {
+            const meters = this._coordinateService.distance(
+                point,
+                positionTyped
+            );
+            const distance = this._distanceService.metersToString(meters);
+            const direction = this._coordinateService.bearing(
+                positionTyped,
+                point,
+                true
+            );
+            const compassPoint =
+                this._directionService.toCompassPoint(direction);
+
+            return {
+                ...point,
+                meters,
+                location: `${distance} ${compassPoint}`,
+            };
+        });
+
+        this.points = this._sortByDistance(augmentedPoints);
+    }
+
+    private _updatePointsNoPosition(points: WaypointSaved[]) {
+        const emptyPoints = points.map((point) => {
+            return {
+                ...point,
+                meters: 0,
+                location: this._i18nService.get(
+                    'location.waypoints.unknownLocation'
+                ),
+            };
+        });
+
+        this.points = this._sortByName(emptyPoints);
+    }
+}
+
+component('location-list-app', {
     style: css`
         .full-flex {
             display: flex;
@@ -133,101 +231,4 @@ interface WaypointAugmented extends WaypointSaved {
             </default-layout>
         </location-wrapper>
     `,
-})
-export class LocationListAppComponent {
-    private _coordinateService = di(CoordinateService);
-    private _directionService = di(DirectionService);
-    private _distanceService = di(DistanceService);
-    private _geolocationService = di(GeolocationService);
-    private _i18nService = di(I18nService);
-    private _subscription?: Subscription;
-    private _waypointService = di(WaypointService);
-    points: WaypointAugmented[] = [];
-    position: GeolocationCoordinateResult | null = null;
-
-    onInit() {
-        this._subscription = this._geolocationService
-            .getPosition()
-            .pipe(first())
-            .subscribe((position) => {
-                this.position = position;
-                this._updatePoints(this.points);
-            });
-        this._updatePoints(this._waypointService.getPoints());
-    }
-
-    onDestroy() {
-        this._subscription && this._subscription.unsubscribe();
-    }
-
-    goToAdd() {
-        history.pushState({}, document.title, '/location-add');
-    }
-
-    goToEdit(waypoint: WaypointSaved) {
-        history.pushState({}, document.title, `/location-edit/${waypoint.id}`);
-    }
-
-    sortByDistance() {
-        this.points = this._sortByDistance(this.points);
-    }
-
-    sortByName() {
-        this.points = this._sortByName(this.points);
-    }
-
-    private _sortByDistance(points: WaypointAugmented[]): WaypointAugmented[] {
-        return points.sort((a, b) => a.meters - b.meters);
-    }
-
-    private _sortByName(points: WaypointAugmented[]): WaypointAugmented[] {
-        return points.sort((a, b) => a.name.localeCompare(b.name));
-    }
-
-    private _updatePoints(points: WaypointSaved[]) {
-        const position = this.position;
-
-        if (!position || !position.success) {
-            this._updatePointsNoPosition(points);
-            return;
-        }
-
-        const positionTyped = position as GeolocationCoordinateResultSuccess;
-        const augmentedPoints = points.map((point) => {
-            const meters = this._coordinateService.distance(
-                point,
-                positionTyped
-            );
-            const distance = this._distanceService.metersToString(meters);
-            const direction = this._coordinateService.bearing(
-                positionTyped,
-                point,
-                true
-            );
-            const compassPoint =
-                this._directionService.toCompassPoint(direction);
-
-            return {
-                ...point,
-                meters,
-                location: `${distance} ${compassPoint}`,
-            };
-        });
-
-        this.points = this._sortByDistance(augmentedPoints);
-    }
-
-    private _updatePointsNoPosition(points: WaypointSaved[]) {
-        const emptyPoints = points.map((point) => {
-            return {
-                ...point,
-                meters: 0,
-                location: this._i18nService.get(
-                    'location.waypoints.unknownLocation'
-                ),
-            };
-        });
-
-        this.points = this._sortByName(emptyPoints);
-    }
-}
+}, LocationListAppComponent);

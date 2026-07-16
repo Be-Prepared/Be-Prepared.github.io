@@ -1,6 +1,19 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 
-@Component('info-app', {
+export class InfoAppComponent {
+    showQr = false;
+    website = __WEBSITE__;
+
+    closeQrCode() {
+        this.showQr = false;
+    }
+
+    openQrCode() {
+        this.showQr = true;
+    }
+}
+
+component('info-app', {
     style: css`
         :host {
             display: flex;
@@ -39,16 +52,4 @@ import { Component, css, html } from 'fudgel';
             <big-qr @click="closeQrCode()" content="{{website}}"></big-qr>
         </show-modal>
     `,
-})
-export class InfoAppComponent {
-    showQr = false;
-    website = __WEBSITE__;
-
-    closeQrCode() {
-        this.showQr = false;
-    }
-
-    openQrCode() {
-        this.showQr = true;
-    }
-}
+}, InfoAppComponent);

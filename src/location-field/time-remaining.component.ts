@@ -1,4 +1,4 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
 import { di } from '../di';
 import {
@@ -9,12 +9,6 @@ import { I18nService } from '../i18n/i18n.service';
 import { Subscription } from 'rxjs';
 import { TimeService } from '../services/time.service';
 
-@Component('location-field-time-remaining', {
-    attr: ['lat', 'lon', 'startTime'],
-    prop: ['startPosition'],
-    style: css``,
-    template: html`{{value}}`,
-})
 export class LocationFieldTimeRemainingComponent {
     private _coordinateService = di(CoordinateService);
     private _geolocationService = di(GeolocationService);
@@ -74,3 +68,10 @@ export class LocationFieldTimeRemainingComponent {
         this._subscription && this._subscription.unsubscribe();
     }
 }
+
+component('location-field-time-remaining', {
+    attr: ['lat', 'lon', 'startTime'],
+    prop: ['startPosition'],
+    style: css``,
+    template: html`{{value}}`,
+}, LocationFieldTimeRemainingComponent);

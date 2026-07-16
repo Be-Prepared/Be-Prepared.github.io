@@ -1,16 +1,8 @@
 import { BarcodeReaderService } from '../services/barcode-reader.service';
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import { I18nService } from '../i18n/i18n.service';
 
-@Component('info-barcodes', {
-    style: css``,
-    template: html`
-        <info-header id="info.barcodes"></info-header>
-        <span *if="barcodes">{{type}}: {{barcodes}}</span>
-        <i18n-label *if="!barcodes" id="info.barcodesNotSupported"></i18n-label>
-    `,
-})
 export class InfoBarcodesComponent {
     private _barcodeReaderService = di(BarcodeReaderService);
     private _i18nService = di(I18nService);
@@ -30,3 +22,12 @@ export class InfoBarcodesComponent {
         });
     }
 }
+
+component('info-barcodes', {
+    style: css``,
+    template: html`
+        <info-header id="info.barcodes"></info-header>
+        <span *if="barcodes">{{type}}: {{barcodes}}</span>
+        <i18n-label *if="!barcodes" id="info.barcodesNotSupported"></i18n-label>
+    `,
+}, InfoBarcodesComponent);

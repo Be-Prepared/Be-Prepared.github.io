@@ -1,6 +1,8 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 
-@Component('info-contact', {
+export class InfoContactComponent {}
+
+component('info-contact', {
     style: css``,
     template: html`
         <p><i18n-label id="info.contact.specificBrowsers"></i18n-label></p>
@@ -20,5 +22,4 @@ import { Component, css, html } from 'fudgel';
             </li>
         </ul>
     `,
-})
-export class InfoContactComponent {}
+}, InfoContactComponent);

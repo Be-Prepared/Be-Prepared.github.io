@@ -1,5 +1,5 @@
 import { AvailabilityState } from '../datatypes/availability-state';
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
 import { di } from '../di';
 import { GeolocationService } from '../services/geolocation.service';
@@ -10,7 +10,120 @@ import { PreferenceService } from '../services/preference.service';
 import { Subject } from 'rxjs';
 import { ToastService } from '../services/toast.service';
 
-@Component('sun-moon-app', {
+export class SunMoonAppComponent {
+    private _coordinateService = di(CoordinateService);
+    private _geolocationService = di(GeolocationService);
+    private _i18nService = di(I18nService);
+    private _preferenceService = di(PreferenceService);
+    private _toastService = di(ToastService);
+    allowGetLocation = false;
+    coordinates: LatLon | null = null;
+    date?: HTMLInputElement;
+    dateValue = new Date();
+    gettingLocation = false;
+    input?: HTMLInputElement;
+    location: string = '';
+    subject = new Subject();
+
+    constructor() {
+        this._geolocationService
+            .availabilityState()
+            .pipe(takeUntil(this.subject))
+            .subscribe((state) => {
+                if (
+                    state === AvailabilityState.PROMPT ||
+                    state === AvailabilityState.ALLOWED
+                ) {
+                    this.allowGetLocation = true;
+                } else {
+                    this.allowGetLocation = false;
+                }
+            });
+    }
+
+    onViewInit() {
+        const locationStr = this._preferenceService.sunMoonLocation.getItem();
+
+        if (this.date) {
+            this.date.value = this.dateValue.toISOString().slice(0, 16);
+        }
+
+        if (locationStr) {
+            this._setValue(locationStr);
+        } else {
+            this._coordinatesUpdated();
+        }
+    }
+
+    onDestroy() {
+        this.subject.next(null);
+        this.subject.complete();
+    }
+
+    dateUpdate(value: string) {
+        this.dateValue = new Date(value);
+    }
+
+    locationUpdate(value: string) {
+        this._coordinateService.fromString(value).subscribe((coordinates) => {
+            if (coordinates) {
+                this._preferenceService.sunMoonLocation.setItem(value);
+                this.coordinates = coordinates;
+                this._coordinatesUpdated();
+            }
+        });
+    }
+
+    getCurrentLocation() {
+        this.gettingLocation = true;
+        this._geolocationService
+            .getPosition()
+            .pipe(
+                takeUntil(this.subject),
+                first(),
+                finalize(() => {
+                    this.gettingLocation = false;
+                })
+            )
+            .subscribe(
+                (geolocation) => {
+                    if (geolocation.success) {
+                        this._setValue(`${geolocation.lat} ${geolocation.lon}`);
+                    } else {
+                        this._geolocationError();
+                    }
+                },
+                () => {
+                    this._geolocationError();
+                }
+            );
+    }
+
+    _coordinatesUpdated() {
+        if (this.coordinates) {
+            this.location = this._coordinateService.latLonToSystemString(
+                this.coordinates.lat,
+                this.coordinates.lon
+            );
+        } else {
+            this.location = this._i18nService.get('sunMoon.locationUnknown');
+        }
+    }
+
+    _geolocationError() {
+        this._toastService.popI18n('sunMoon.geolocationError');
+    }
+
+    _setValue(value: string) {
+        if (this.input) {
+            this.input.value = value;
+        }
+
+        this.locationUpdate(value);
+    }
+}
+
+component('sun-moon-app', {
     style: css`
         .flex-full {
             display: flex;
@@ -157,116 +270,4 @@ import { ToastService } from '../services/toast.service';
             </div>
         </show-modal>
     `,
-})
-export class SunMoonAppComponent {
-    private _coordinateService = di(CoordinateService);
-    private _geolocationService = di(GeolocationService);
-    private _i18nService = di(I18nService);
-    private _preferenceService = di(PreferenceService);
-    private _toastService = di(ToastService);
-    allowGetLocation = false;
-    coordinates: LatLon | null = null;
-    date?: HTMLInputElement;
-    dateValue = new Date();
-    gettingLocation = false;
-    input?: HTMLInputElement;
-    location: string = '';
-    subject = new Subject();
-
-    constructor() {
-        this._geolocationService
-            .availabilityState()
-            .pipe(takeUntil(this.subject))
-            .subscribe((state) => {
-                if (
-                    state === AvailabilityState.PROMPT ||
-                    state === AvailabilityState.ALLOWED
-                ) {
-                    this.allowGetLocation = true;
-                } else {
-                    this.allowGetLocation = false;
-                }
-            });
-    }
-
-    onViewInit() {
-        const locationStr = this._preferenceService.sunMoonLocation.getItem();
-
-        if (this.date) {
-            this.date.value = this.dateValue.toISOString().slice(0, 16);
-        }
-
-        if (locationStr) {
-            this._setValue(locationStr);
-        } else {
-            this._coordinatesUpdated();
-        }
-    }
-
-    onDestroy() {
-        this.subject.next(null);
-        this.subject.complete();
-    }
-
-    dateUpdate(value: string) {
-        this.dateValue = new Date(value);
-    }
-
-    locationUpdate(value: string) {
-        this._coordinateService.fromString(value).subscribe((coordinates) => {
-            if (coordinates) {
-                this._preferenceService.sunMoonLocation.setItem(value);
-                this.coordinates = coordinates;
-                this._coordinatesUpdated();
-            }
-        });
-    }
-
-    getCurrentLocation() {
-        this.gettingLocation = true;
-        this._geolocationService
-            .getPosition()
-            .pipe(
-                takeUntil(this.subject),
-                first(),
-                finalize(() => {
-                    this.gettingLocation = false;
-                })
-            )
-            .subscribe(
-                (geolocation) => {
-                    if (geolocation.success) {
-                        this._setValue(`${geolocation.lat} ${geolocation.lon}`);
-                    } else {
-                        this._geolocationError();
-                    }
-                },
-                () => {
-                    this._geolocationError();
-                }
-            );
-    }
-
-    _coordinatesUpdated() {
-        if (this.coordinates) {
-            this.location = this._coordinateService.latLonToSystemString(
-                this.coordinates.lat,
-                this.coordinates.lon
-            );
-        } else {
-            this.location = this._i18nService.get('sunMoon.locationUnknown');
-        }
-    }
-
-    _geolocationError() {
-        this._toastService.popI18n('sunMoon.geolocationError');
-    }
-
-    _setValue(value: string) {
-        if (this.input) {
-            this.input.value = value;
-        }
-
-        this.locationUpdate(value);
-    }
-}
+}, SunMoonAppComponent);

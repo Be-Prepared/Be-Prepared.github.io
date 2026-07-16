@@ -1,26 +1,8 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import { Subscription } from 'rxjs';
 import { TileDefResolved, TileService } from '../services/tile.service';
 
-@Component('app-index', {
-    style: css`
-        :host {
-            display: flex;
-            justify-content: space-evenly;
-            flex-wrap: wrap;
-        }
-    `,
-    template: html`
-        <div *for="tile of tiles">
-            <app-index-tile
-                id="{{tile.id}}"
-                icon="{{tile.icon}}"
-                label="{{tile.label}}"
-            ></app-index-tile>
-        </div>
-    `,
-})
 export class AppIndex {
     private _subscription?: Subscription;
     private _tileService = di(TileService);
@@ -38,3 +20,22 @@ export class AppIndex {
         }
     }
 }
+
+component('app-index', {
+    style: css`
+        :host {
+            display: flex;
+            justify-content: space-evenly;
+            flex-wrap: wrap;
+        }
+    `,
+    template: html`
+        <div *for="tile of tiles">
+            <app-index-tile
+                id="{{tile.id}}"
+                icon="{{tile.icon}}"
+                label="{{tile.label}}"
+            ></app-index-tile>
+        </div>
+    `,
+}, AppIndex);

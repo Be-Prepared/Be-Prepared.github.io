@@ -1,25 +1,5 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 
-@Component('info-build', {
-    style: css``,
-    template: html`
-        <info-header
-            id="info.buildInformationHeader"
-            @click="tap()"
-        ></info-header>
-        <ul>
-            <li>
-                {{buildDate}}, commit
-                <styled-link
-                    href="https://github.com/Be-Prepared/Be-Prepared/commit/{{version}}"
-                    target="_blank"
-                    >{{shortVersion}}</styled-link
-                >
-            </li>
-            <li>Node.js {{nodeVersion}} ({{hostPlatform}} {{hostArch}})</li>
-        </ul>
-    `,
-})
 export class InfoBuildComponent {
     buildDate = __BUILD_DATE__;
     hostPlatform = __HOST_PLATFORM__;
@@ -51,3 +31,24 @@ export class InfoBuildComponent {
         }
     }
 }
+
+component('info-build', {
+    style: css``,
+    template: html`
+        <info-header
+            id="info.buildInformationHeader"
+            @click="tap()"
+        ></info-header>
+        <ul>
+            <li>
+                {{buildDate}}, commit
+                <styled-link
+                    href="https://github.com/Be-Prepared/Be-Prepared/commit/{{version}}"
+                    target="_blank"
+                    >{{shortVersion}}</styled-link
+                >
+            </li>
+            <li>Node.js {{nodeVersion}} ({{hostPlatform}} {{hostArch}})</li>
+        </ul>
+    `,
+}, InfoBuildComponent);

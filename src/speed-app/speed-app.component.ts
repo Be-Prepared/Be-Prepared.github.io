@@ -1,4 +1,4 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import {
     DistanceService,
@@ -13,7 +13,65 @@ import {
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-@Component('speed-app', {
+export class SpeedAppComponent {
+    private _distanceService = di(DistanceService);
+    private _geolocationService = di(GeolocationService);
+    private _lastPosition: GeolocationCoordinateResultSuccess | null = null;
+    private _subject = new Subject();
+    averageSpeed = '';
+    currentSpeed = '';
+    distanceSystem: DistanceSystem = DistanceSystemDefault;
+    distanceSystems = DISTANCE_SYSTEMS;
+    maximumSpeed = '';
+
+    onInit() {
+        this._distanceService
+            .getCurrentSetting()
+            .pipe(takeUntil(this._subject))
+            .subscribe((system) => {
+                this.distanceSystem = system;
+                this._updateDisplay();
+            });
+
+        this._geolocationService
+            .getPositionSuccess()
+            .pipe(takeUntil(this._subject))
+            .subscribe((position) => {
+                this._lastPosition = position;
+                this._updateDisplay();
+            });
+    }
+
+    onDestroy() {
+        this._subject.next(null);
+        this._subject.complete();
+    }
+
+    changeDistanceSystem(value: DistanceSystem) {
+        this._distanceService.setDistanceSystem(value);
+    }
+
+    private _updateDisplay() {
+        if (!this._lastPosition) {
+            return;
+        }
+
+        this.currentSpeed = this._distanceService.metersToString(
+            this._lastPosition.speed,
+            { floor: true, isSpeed: true, omitLabel: true, wholeNumber: true }
+        );
+        this.averageSpeed = this._distanceService.metersToString(
+            this._lastPosition.speedSmoothed,
+            { isSpeed: true }
+        );
+        this.maximumSpeed = this._distanceService.metersToString(
+            this._lastPosition.speedMax,
+            { isSpeed: true }
+        );
+    }
+}
+
+component('speed-app', {
     style: css`
         .wrapper {
             display: flex;
@@ -101,61 +159,4 @@ import { takeUntil } from 'rxjs/operators';
             </default-layout>
         </location-wrapper>
     `,
-})
-export class SpeedAppComponent {
-    private _distanceService = di(DistanceService);
-    private _geolocationService = di(GeolocationService);
-    private _lastPosition: GeolocationCoordinateResultSuccess | null = null;
-    private _subject = new Subject();
-    averageSpeed = '';
-    currentSpeed = '';
-    distanceSystem: DistanceSystem = DistanceSystemDefault;
-    distanceSystems = DISTANCE_SYSTEMS;
-    maximumSpeed = '';
-
-    onInit() {
-        this._distanceService
-            .getCurrentSetting()
-            .pipe(takeUntil(this._subject))
-            .subscribe((system) => {
-                this.distanceSystem = system;
-                this._updateDisplay();
-            });
-
-        this._geolocationService
-            .getPositionSuccess()
-            .pipe(takeUntil(this._subject))
-            .subscribe((position) => {
-                this._lastPosition = position;
-                this._updateDisplay();
-            });
-    }
-
-    onDestroy() {
-        this._subject.next(null);
-        this._subject.complete();
-    }
-
-    changeDistanceSystem(value: DistanceSystem) {
-        this._distanceService.setDistanceSystem(value);
-    }
-
-    private _updateDisplay() {
-        if (!this._lastPosition) {
-            return;
-        }
-
-        this.currentSpeed = this._distanceService.metersToString(
-            this._lastPosition.speed,
-            { floor: true, isSpeed: true, omitLabel: true, wholeNumber: true }
-        );
-        this.averageSpeed = this._distanceService.metersToString(
-            this._lastPosition.speedSmoothed,
-            { isSpeed: true }
-        );
-        this.maximumSpeed = this._distanceService.metersToString(
-            this._lastPosition.speedMax,
-            { isSpeed: true }
-        );
-    }
-}
+}, SpeedAppComponent);

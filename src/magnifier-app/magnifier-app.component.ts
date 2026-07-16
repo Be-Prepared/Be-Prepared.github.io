@@ -1,62 +1,11 @@
 import { AvailabilityState } from '../datatypes/availability-state';
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import { MagnifierService } from '../services/magnifier.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { TorchService } from '../services/torch.service';
 
-@Component('magnifier-app', {
-    style: css`
-        video {
-            height: 100%;
-            width: 100%;
-            object-fit: cover;
-        }
-
-        /* Do not convert pointer events to touch events after 0.3 seconds */
-        default-layout {
-            touch-action: none;
-        }
-
-        .enabled {
-            color: var(--button-fg-color-enabled);
-        }
-    `,
-    template: html`
-        <permission-prompt
-            *if="explainAsk"
-            @grant.stop.prevent="grant()"
-            message-id="magnifier.explainAsk"
-        ></permission-prompt>
-        <permission-denied *if="explainDeny"></permission-denied>
-        <camera-unavailable *if="explainUnavailable"></camera-unavailable>
-        <video
-            *if="showControls"
-            #ref="video"
-            autoplay
-            muted
-            playsinline
-        ></video>
-        <default-layout
-            *if="showControls"
-            @pointerdown.stop.prevent="pointerDown($event)"
-            @pointermove.stop.prevent="pointerMove($event)"
-            @pointerup.stop.prevent="pointerUp($event)"
-            @pointercancel.stop.prevent="pointerUp($event)"
-            @pointerout.stop.prevent="pointerUp($event)"
-            @pointerleave.stop.prevent="pointerUp($event)"
-        >
-            <scaling-icon
-                slot="more-buttons"
-                *if="torchAvailable"
-                @click.stop.prevent="toggleTorch()"
-                class="{{torchClass}}"
-                href="/flashlight.svg"
-            ></scaling-icon>
-        </default-layout>
-    `,
-})
 export class MagnifierAppComponent {
     private _magnifierService = di(MagnifierService);
     private _pointerInitialDiff: number | null = null;
@@ -248,3 +197,55 @@ export class MagnifierAppComponent {
         });
     }
 }
+
+component('magnifier-app', {
+    style: css`
+        video {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        /* Do not convert pointer events to touch events after 0.3 seconds */
+        default-layout {
+            touch-action: none;
+        }
+
+        .enabled {
+            color: var(--button-fg-color-enabled);
+        }
+    `,
+    template: html`
+        <permission-prompt
+            *if="explainAsk"
+            @grant.stop.prevent="grant()"
+            message-id="magnifier.explainAsk"
+        ></permission-prompt>
+        <permission-denied *if="explainDeny"></permission-denied>
+        <camera-unavailable *if="explainUnavailable"></camera-unavailable>
+        <video
+            *if="showControls"
+            #ref="video"
+            autoplay
+            muted
+            playsinline
+        ></video>
+        <default-layout
+            *if="showControls"
+            @pointerdown.stop.prevent="pointerDown($event)"
+            @pointermove.stop.prevent="pointerMove($event)"
+            @pointerup.stop.prevent="pointerUp($event)"
+            @pointercancel.stop.prevent="pointerUp($event)"
+            @pointerout.stop.prevent="pointerUp($event)"
+            @pointerleave.stop.prevent="pointerUp($event)"
+        >
+            <scaling-icon
+                slot="more-buttons"
+                *if="torchAvailable"
+                @click.stop.prevent="toggleTorch()"
+                class="{{torchClass}}"
+                href="/flashlight.svg"
+            ></scaling-icon>
+        </default-layout>
+    `,
+}, MagnifierAppComponent);

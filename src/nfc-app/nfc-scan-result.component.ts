@@ -1,7 +1,11 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { NfcScanResult } from '../services/nfc.service';
 
-@Component('nfc-scan-result', {
+export class NfcScanResultComponent {
+    scanResult?: NfcScanResult;
+}
+
+component('nfc-scan-result', {
     prop: ['scanResult'],
     style: css`
         .breakWord {
@@ -42,7 +46,4 @@ import { NfcScanResult } from '../services/nfc.service';
             ></nfc-record>
         </div>
     `,
-})
-export class NfcScanResultComponent {
-    scanResult?: NfcScanResult;
-}
+}, NfcScanResultComponent);

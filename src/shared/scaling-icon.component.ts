@@ -1,6 +1,10 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 
-@Component('scaling-icon', {
+export class ScalingIconComponent {
+    href?: string;
+}
+
+component('scaling-icon', {
     attr: ['href'],
     style: css`
         :host {
@@ -17,7 +21,4 @@ import { Component, css, html } from 'fudgel';
         }
     `,
     template: html` <load-svg class="icon" href="{{href}}"></load-svg> `,
-})
-export class ScalingIconComponent {
-    href?: string;
-}
+}, ScalingIconComponent);

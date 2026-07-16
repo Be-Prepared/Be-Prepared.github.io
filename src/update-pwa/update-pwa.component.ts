@@ -1,8 +1,30 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import { UpdatePwaService } from './update-pwa.service';
 
-@Component('update-pwa', {
+export class UpdatePwaComponent {
+    private _updatePwaService = di(UpdatePwaService);
+    drawer?: HTMLElement;
+
+    onViewInit() {
+        if (this.drawer) {
+            (this.drawer as any).show();
+        }
+    }
+
+    reload() {
+        this._updatePwaService.performUpdate();
+        this._callDrawer('hide');
+    }
+
+    private _callDrawer(action: 'show' | 'hide') {
+        if (this.drawer) {
+            (this.drawer as any)[action]();
+        }
+    }
+}
+
+component('update-pwa', {
     style: css`
         .load-svg-wrapper {
             padding: 0 3%;
@@ -59,25 +81,4 @@ import { UpdatePwaService } from './update-pwa.service';
             </div>
         </bottom-drawer>
     `,
-})
-export class UpdatePwaComponent {
-    private _updatePwaService = di(UpdatePwaService);
-    drawer?: HTMLElement;
-
-    onViewInit() {
-        if (this.drawer) {
-            (this.drawer as any).show();
-        }
-    }
-
-    reload() {
-        this._updatePwaService.performUpdate();
-        this._callDrawer('hide');
-    }
-
-    private _callDrawer(action: 'show' | 'hide') {
-        if (this.drawer) {
-            (this.drawer as any)[action]();
-        }
-    }
-}
+}, UpdatePwaComponent);

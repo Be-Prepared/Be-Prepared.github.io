@@ -1,4 +1,4 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
 import { di } from '../di';
 import {
@@ -9,15 +9,6 @@ import { I18nService } from '../i18n/i18n.service';
 import { Subscription } from 'rxjs';
 import { TimeService } from '../services/time.service';
 
-@Component('location-field-time-arrival', {
-    attr: ['lat', 'lon', 'startPosition', 'startTime'],
-    style: css``,
-    template: html`
-        <changeable-setting @click="toggleTimeSystem()"
-            >{{value}}</changeable-setting
-        >
-    `,
-})
 export class LocationFieldTimeArrivalComponent {
     private _coordinateService = di(CoordinateService);
     private _geolocationService = di(GeolocationService);
@@ -79,3 +70,13 @@ export class LocationFieldTimeArrivalComponent {
         this._timeService.toggleSystem();
     }
 }
+
+component('location-field-time-arrival', {
+    attr: ['lat', 'lon', 'startPosition', 'startTime'],
+    style: css``,
+    template: html`
+        <changeable-setting @click="toggleTimeSystem()"
+            >{{value}}</changeable-setting
+        >
+    `,
+}, LocationFieldTimeArrivalComponent);

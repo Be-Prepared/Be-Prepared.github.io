@@ -1,6 +1,24 @@
-import { Component, css, emit, html } from 'fudgel';
+import { component, css, emit, html } from 'fudgel';
 
-@Component('pretty-input', {
+export class PrettyInputComponent {
+    helpHtml?: string;
+    showingHelp = false;
+    type = 'text';
+
+    change(value: string) {
+        emit(this, 'change', value);
+    }
+
+    hideHelp() {
+        this.showingHelp = false;
+    }
+
+    showHelp() {
+        this.showingHelp = true;
+    }
+}
+
+component('pretty-input', {
     attr: ['helpHtml', 'type', 'value'],
     prop: ['value'],
     style: css`
@@ -81,21 +99,4 @@ import { Component, css, emit, html } from 'fudgel';
             </div>
         </show-modal>
     `,
-})
-export class PrettyInputComponent {
-    helpHtml?: string;
-    showingHelp = false;
-    type = 'text';
-
-    change(value: string) {
-        emit(this, 'change', value);
-    }
-
-    hideHelp() {
-        this.showingHelp = false;
-    }
-
-    showHelp() {
-        this.showingHelp = true;
-    }
-}
+}, PrettyInputComponent);

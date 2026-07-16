@@ -1,37 +1,10 @@
 import { AvailabilityState } from '../datatypes/availability-state';
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import { NfcScanResult, NfcService } from '../services/nfc.service';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-@Component('nfc-app', {
-    style: css`
-        .enabled {
-            color: var(--button-fg-color-enabled);
-        }
-
-        .scanning {
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2em;
-        }
-    `,
-    template: html`
-        <permission-prompt
-            *if="explainAsk"
-            @grant.stop.prevent="grant()"
-            message-id="nfc.explainAsk"
-        ></permission-prompt>
-        <permission-denied *if="explainDeny"></permission-denied>
-        <nfc-unavailable *if="explainUnavailable"></nfc-unavailable>
-        <default-layout *if="showControls" frame>
-            <nfc-scan-result .scan-result="lastRead"></nfc-scan-result>
-        </default-layout>
-    `,
-})
 export class NfcAppComponent {
     private _nfcService = di(NfcService);
     private _scanSubscription?: Subscription;
@@ -96,3 +69,31 @@ export class NfcAppComponent {
         this._scanSubscription!.unsubscribe();
     }
 }
+
+component('nfc-app', {
+    style: css`
+        .enabled {
+            color: var(--button-fg-color-enabled);
+        }
+
+        .scanning {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+        }
+    `,
+    template: html`
+        <permission-prompt
+            *if="explainAsk"
+            @grant.stop.prevent="grant()"
+            message-id="nfc.explainAsk"
+        ></permission-prompt>
+        <permission-denied *if="explainDeny"></permission-denied>
+        <nfc-unavailable *if="explainUnavailable"></nfc-unavailable>
+        <default-layout *if="showControls" frame>
+            <nfc-scan-result .scan-result="lastRead"></nfc-scan-result>
+        </default-layout>
+    `,
+}, NfcAppComponent);

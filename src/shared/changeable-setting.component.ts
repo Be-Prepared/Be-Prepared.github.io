@@ -1,6 +1,8 @@
-import { Component, css } from 'fudgel';
+import { component, css } from 'fudgel';
 
-@Component('changeable-setting', {
+export class ChangeableSettingComponent {}
+
+component('changeable-setting', {
     style: css`
         :host {
             text-decoration: underline;
@@ -11,5 +13,4 @@ import { Component, css } from 'fudgel';
     `,
     template: '<slot></slot>',
     useShadow: true,
-})
-export class ChangeableSettingComponent {}
+}, ChangeableSettingComponent);

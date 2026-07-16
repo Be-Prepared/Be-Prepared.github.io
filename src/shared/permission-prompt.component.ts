@@ -1,7 +1,19 @@
-import { Component, css, emit, html } from 'fudgel';
+import { component, css, emit, html } from 'fudgel';
 import { goBack } from '../util/go-back';
 
-@Component('permission-prompt', {
+export class PermissionPromptComponent {
+    messageId: string = '';
+
+    goBack() {
+        goBack();
+    }
+
+    grant() {
+        emit(this, 'grant');
+    }
+}
+
+component('permission-prompt', {
     attr: ['messageId'],
     style: css`
         :host {
@@ -45,15 +57,4 @@ import { goBack } from '../util/go-back';
         </div>
         <div></div>
     `,
-})
-export class PermissionPromptComponent {
-    messageId: string = '';
-
-    goBack() {
-        goBack();
-    }
-
-    grant() {
-        emit(this, 'grant');
-    }
-}
+}, PermissionPromptComponent);

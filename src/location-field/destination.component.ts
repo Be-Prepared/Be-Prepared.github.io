@@ -1,6 +1,8 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 
-@Component('location-field-destination', {
+export class LocationFieldDestinationComponent {}
+
+component('location-field-destination', {
     attr: ['name'],
     style: css`
         .no-overflow {
@@ -10,5 +12,4 @@ import { Component, css, html } from 'fudgel';
         }
     `,
     template: html`<div class="no-overflow">{{name}}</div>`,
-})
-export class LocationFieldDestinationComponent {}
+}, LocationFieldDestinationComponent);

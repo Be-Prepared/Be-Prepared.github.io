@@ -1,28 +1,5 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 
-@Component('styled-link', {
-    attr: ['href', 'target'],
-    style: css`
-        :host {
-            display: inline;
-        }
-
-        a {
-            color: var(--link-color);
-            text-decoration: none;
-        }
-    `,
-    // The spaces at the ends are important because this is an inline element,
-    // but vite/esbuild doesn't treat it as such and will remove surrounding
-    // spaces.
-    template: html`
-        {{ws}}
-        <a *if="hijackGeo" href="/location-add/{{hrefGeo}}"><slot></slot></a>
-        <a *if="!hijackGeo" href="{{href}}" target="{{target}}"><slot></slot></a
-        >{{ws}}
-    `,
-    useShadow: true,
-})
 export class StyledLinkComponent {
     hrefGeo?: string;
     hijackGeo = false;
@@ -45,3 +22,27 @@ export class StyledLinkComponent {
         }
     }
 }
+
+component('styled-link', {
+    attr: ['href', 'target'],
+    style: css`
+        :host {
+            display: inline;
+        }
+
+        a {
+            color: var(--link-color);
+            text-decoration: none;
+        }
+    `,
+    // The spaces at the ends are important because this is an inline element,
+    // but vite/esbuild doesn't treat it as such and will remove surrounding
+    // spaces.
+    template: html`
+        {{ws}}
+        <a *if="hijackGeo" href="/location-add/{{hrefGeo}}"><slot></slot></a>
+        <a *if="!hijackGeo" href="{{href}}" target="{{target}}"><slot></slot></a
+        >{{ws}}
+    `,
+    useShadow: true,
+}, StyledLinkComponent);

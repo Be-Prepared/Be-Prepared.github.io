@@ -1,6 +1,17 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 
-@Component('file-transfer-app', {
+export class FileTransferAppComponent {
+    receive() {
+        // Short URL for shorter QR codes
+        history.pushState({}, document.title, '/r');
+    }
+
+    send() {
+        history.pushState({}, document.title, '/file-transfer-send');
+    }
+}
+
+component('file-transfer-app', {
     style: css`
         .wrapper {
             height: 100%;
@@ -28,14 +39,4 @@ import { Component, css, html } from 'fudgel';
             </div>
         </default-layout>
     `,
-})
-export class FileTransferAppComponent {
-    receive() {
-        // Short URL for shorter QR codes
-        history.pushState({}, document.title, '/r');
-    }
-
-    send() {
-        history.pushState({}, document.title, '/file-transfer-send');
-    }
-}
+}, FileTransferAppComponent);

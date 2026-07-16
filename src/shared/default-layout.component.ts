@@ -1,6 +1,21 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 
-@Component('default-layout', {
+export class DefaultLayoutComponent {
+    frame?: string;
+    innerClasses = 'inner';
+
+    onChange() {
+        const innerClasses = ['inner'];
+
+        if (this.frame || this.frame === '') {
+            innerClasses.push('frame');
+        }
+
+        this.innerClasses = innerClasses.join(' ');
+    }
+}
+
+component('default-layout', {
     attr: ['frame'],
     style: css`
         :host {
@@ -69,18 +84,4 @@ import { Component, css, html } from 'fudgel';
         </div>
     `,
     useShadow: true,
-})
-export class DefaultLayoutComponent {
-    frame?: string;
-    innerClasses = 'inner';
-
-    onChange() {
-        const innerClasses = ['inner'];
-
-        if (this.frame || this.frame === '') {
-            innerClasses.push('frame');
-        }
-
-        this.innerClasses = innerClasses.join(' ');
-    }
-}
+}, DefaultLayoutComponent);

@@ -1,6 +1,8 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 
-@Component('camera-unavailable', {
+export class CameraUnavailableComponent {}
+
+component('camera-unavailable', {
     style: css`
         .wrapper {
             height: 100%;
@@ -35,5 +37,4 @@ import { Component, css, html } from 'fudgel';
             </div>
         </default-layout>
     `,
-})
-export class CameraUnavailableComponent {}
+}, CameraUnavailableComponent);

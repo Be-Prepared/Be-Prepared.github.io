@@ -1,18 +1,7 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { LatLon } from '../datatypes/lat-lon';
-import { default as SunCalc } from 'suncalc';
+import * as SunCalc from 'suncalc';
 
-@Component('moon-illumination', {
-    prop: ['coordinates', 'date'],
-    style: css``,
-    template: html`
-        <div *if="coordinates">
-            <i18n-label id="sunMoon.moonIllumination.label"></i18n-label>
-            <i18n-label id="{{moonIllumination}}"></i18n-label>
-            <span>({{fraction}}%)</span>
-        </div>
-    `,
-})
 export class MoonIlluminationComponent {
     coordinates: LatLon | null = null;
     date: Date | null = null;
@@ -55,3 +44,15 @@ export class MoonIlluminationComponent {
         }
     }
 }
+
+component('moon-illumination', {
+    prop: ['coordinates', 'date'],
+    style: css``,
+    template: html`
+        <div *if="coordinates">
+            <i18n-label id="sunMoon.moonIllumination.label"></i18n-label>
+            <i18n-label id="{{moonIllumination}}"></i18n-label>
+            <span>({{fraction}}%)</span>
+        </div>
+    `,
+}, MoonIlluminationComponent);

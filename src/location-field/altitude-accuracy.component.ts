@@ -1,18 +1,10 @@
 import { combineLatest, Subscription } from 'rxjs';
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import { DistanceService } from '../services/distance.service';
 import { GeolocationService } from '../services/geolocation.service';
 import { I18nService } from '../i18n/i18n.service';
 
-@Component('location-field-altitude-accuracy', {
-    style: css``,
-    template: html`
-        <changeable-setting @click="toggleDistanceSystem()"
-            >{{value}}</changeable-setting
-        >
-    `,
-})
 export class LocationFieldAltitudeAccuracyComponent {
     private _distanceService = di(DistanceService);
     private _geolocationService = di(GeolocationService);
@@ -51,3 +43,12 @@ export class LocationFieldAltitudeAccuracyComponent {
         this._distanceService.toggleSystem();
     }
 }
+
+component('location-field-altitude-accuracy', {
+    style: css``,
+    template: html`
+        <changeable-setting @click="toggleDistanceSystem()"
+            >{{value}}</changeable-setting
+        >
+    `,
+}, LocationFieldAltitudeAccuracyComponent);

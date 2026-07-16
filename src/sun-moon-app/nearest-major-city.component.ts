@@ -1,20 +1,10 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
 import { di } from '../di';
 import { LatLon } from '../datatypes/lat-lon';
 import { DirectionService } from '../services/direction.service';
 import { DistanceService } from '../services/distance.service';
 
-@Component('nearest-major-city', {
-    prop: ['coordinates'],
-    style: css``,
-    template: html`
-        <div *if="coordinates">
-            <i18n-label id="sunMoon.nearestMajorCity.label"></i18n-label>
-            {{nearestMajorCity}}
-        </div>
-    `,
-})
 export class NearestMajorCityComponent {
     private _coordinateService = di(CoordinateService);
     private _directionService = di(DirectionService);
@@ -42,3 +32,14 @@ export class NearestMajorCityComponent {
         }
     }
 }
+
+component('nearest-major-city', {
+    prop: ['coordinates'],
+    style: css``,
+    template: html`
+        <div *if="coordinates">
+            <i18n-label id="sunMoon.nearestMajorCity.label"></i18n-label>
+            {{nearestMajorCity}}
+        </div>
+    `,
+}, NearestMajorCityComponent);

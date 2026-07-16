@@ -1,8 +1,28 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import { InstallPwaService } from './install-pwa.service';
 
-@Component('install-pwa', {
+export class InstallPwaComponent {
+    private _installPwaService = di(InstallPwaService);
+    drawer?: HTMLElement;
+
+    logoLoaded() {
+        setTimeout(() => this._callDrawer('show'), 400);
+    }
+
+    install() {
+        this._installPwaService.triggerSavedEvent();
+        this._callDrawer('hide');
+    }
+
+    private _callDrawer(action: 'show' | 'hide') {
+        if (this.drawer) {
+            (this.drawer as any)[action]();
+        }
+    }
+}
+
+component('install-pwa', {
     style: css`
         .load-svg-wrapper {
             padding: 0 3%;
@@ -61,23 +81,4 @@ import { InstallPwaService } from './install-pwa.service';
             </div>
         </bottom-drawer>
     `,
-})
-export class InstallPwaComponent {
-    private _installPwaService = di(InstallPwaService);
-    drawer?: HTMLElement;
-
-    logoLoaded() {
-        setTimeout(() => this._callDrawer('show'), 400);
-    }
-
-    install() {
-        this._installPwaService.triggerSavedEvent();
-        this._callDrawer('hide');
-    }
-
-    private _callDrawer(action: 'show' | 'hide') {
-        if (this.drawer) {
-            (this.drawer as any)[action]();
-        }
-    }
-}
+}, InstallPwaComponent);

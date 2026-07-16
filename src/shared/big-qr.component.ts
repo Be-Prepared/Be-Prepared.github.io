@@ -1,6 +1,10 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 
-@Component('big-qr', {
+export class BigQrComponent {
+    content = '';
+}
+
+component('big-qr', {
     attr: ['content'],
     style: css`
         :host {
@@ -17,7 +21,4 @@ import { Component, css, html } from 'fudgel';
     template: html`
         <div class="svg"><qr-code content="{{content}}"></qr-code></div>
     `,
-})
-export class BigQrComponent {
-    content = '';
-}
+}, BigQrComponent);

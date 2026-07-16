@@ -1,5 +1,5 @@
 import { AvailabilityState } from '../datatypes/availability-state';
-import { Component, css, emit, html } from 'fudgel';
+import { component, css, emit, html } from 'fudgel';
 import { di } from '../di';
 import { first } from 'rxjs/operators';
 import {
@@ -12,7 +12,72 @@ import { WakeLockService } from '../services/wake-lock.service';
 import { WaypointSaved } from '../datatypes/waypoint-saved';
 import { WaypointService } from './waypoint.service';
 
-@Component('location-navigate-app', {
+export class LocationNavigateAppComponent {
+    private _enabled = false;
+    private _geolocationService = di(GeolocationService);
+    private _preferenceService = di(PreferenceService);
+    private _subscription: Subscription | null = null;
+    private _wakeLockService = di(WakeLockService);
+    private _waypointService = di(WaypointService);
+    allowWakeLock = false;
+    id?: string;
+    startPosition: GeolocationCoordinateResultSuccess | null = null;
+    startTime = Date.now();
+    point: WaypointSaved | null = null;
+    wakeLockClass = '';
+
+    onInit() {
+        const id = this.id;
+
+        if (id) {
+            this.point = this._waypointService.getPoint(+id);
+        }
+
+        if (!this.point) {
+            emit(this, 'edit', this.id);
+
+            return;
+        }
+
+        this._wakeLockService.availabilityState().subscribe((state) => {
+            if (state === AvailabilityState.ALLOWED) {
+                this.allowWakeLock = true;
+
+                if (this._preferenceService.navigationWakeLock.getItem() && !this._enabled) {
+                    this.toggleWakeLock();
+                }
+            }
+        });
+
+        this._subscription = this._geolocationService
+            .getPositionSuccess()
+            .pipe(first())
+            .subscribe((position) => (this.startPosition = position));
+    }
+
+    onDestroy() {
+        if (this._enabled) {
+            this._wakeLockService.release();
+        }
+
+        this._subscription && this._subscription.unsubscribe();
+    }
+
+    toggleWakeLock() {
+        this._enabled = !this._enabled;
+        this._preferenceService.navigationWakeLock.setItem(this._enabled);
+
+        if (this._enabled) {
+            this.wakeLockClass = 'enabled';
+            this._wakeLockService.request();
+        } else {
+            this.wakeLockClass = '';
+            this._wakeLockService.release();
+        }
+    }
+}
+
+component('location-navigate-app', {
     attr: ['id'],
     style: css`
         .navigate {
@@ -168,68 +233,4 @@ import { WaypointService } from './waypoint.service';
             </default-layout>
         </location-wrapper>
     `,
-})
-export class LocationNavigateAppComponent {
-    private _enabled = false;
-    private _geolocationService = di(GeolocationService);
-    private _preferenceService = di(PreferenceService);
-    private _subscription: Subscription | null = null;
-    private _wakeLockService = di(WakeLockService);
-    private _waypointService = di(WaypointService);
-    allowWakeLock = false;
-    id?: string;
-    startPosition: GeolocationCoordinateResultSuccess | null = null;
-    startTime = Date.now();
-    point: WaypointSaved | null = null;
-    wakeLockClass = '';
-
-    onInit() {
-        const id = this.id;
-
-        if (id) {
-            this.point = this._waypointService.getPoint(+id);
-        }
-
-        if (!this.point) {
-            emit(this, 'edit', this.id);
-
-            return;
-        }
-
-        this._wakeLockService.availabilityState().subscribe((state) => {
-            if (state === AvailabilityState.ALLOWED) {
-                this.allowWakeLock = true;
-
-                if (this._preferenceService.navigationWakeLock.getItem() && !this._enabled) {
-                    this.toggleWakeLock();
-                }
-            }
-        });
-
-        this._subscription = this._geolocationService
-            .getPositionSuccess()
-            .pipe(first())
-            .subscribe((position) => (this.startPosition = position));
-    }
-
-    onDestroy() {
-        if (this._enabled) {
-            this._wakeLockService.release();
-        }
-
-        this._subscription && this._subscription.unsubscribe();
-    }
-
-    toggleWakeLock() {
-        this._enabled = !this._enabled;
-        this._preferenceService.navigationWakeLock.setItem(this._enabled);
-
-        if (this._enabled) {
-            this.wakeLockClass = 'enabled';
-            this._wakeLockService.request();
-        } else {
-            this.wakeLockClass = '';
-            this._wakeLockService.release();
-        }
-    }
-}
+}, LocationNavigateAppComponent);

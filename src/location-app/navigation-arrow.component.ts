@@ -1,6 +1,6 @@
 import { AvailabilityState } from '../datatypes/availability-state';
 import { CompassService } from '../services/compass.service';
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
 import { di } from '../di';
 import { EMPTY, Subject } from 'rxjs';
@@ -12,50 +12,6 @@ import { NavigationType } from '../datatypes/navigation-type';
 import { NavigationTypeService } from './navigation-type.service';
 import { switchMap, takeUntil } from 'rxjs/operators';
 
-@Component('navigation-arrow', {
-    attr: ['lat', 'lon'],
-    style: css`
-        :host {
-            display: flex;
-            overflow: hidden;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-
-        .container {
-            position: absolute;
-            aspect-ratio: 1/1;
-            margin: auto;
-            inset: 0;
-            max-width: 100%;
-            max-height: 100%;
-        }
-
-        .compassRose {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-        }
-
-        .directionArrow {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            padding: 30%;
-            box-sizing: border-box;
-            color: var(--navigate-color);
-        }
-    `,
-    template: html`
-        <div class="container">
-            <load-svg #ref="compassRose" class="compassRose" href="/compass-rose.svg" #ref="compassRose"></load-svg>
-            <div class="directionArrow">
-            <load-svg #ref="directionArrow" href="/navigation.svg" #ref="directionArrow"></load-svg>
-            </div>
-        </container>
-    `,
-})
 export class NavigationArrowComponent {
     private _compassService = di(CompassService);
     private _coordinateService = di(CoordinateService);
@@ -166,3 +122,48 @@ export class NavigationArrowComponent {
         }
     }
 }
+
+component('navigation-arrow', {
+    attr: ['lat', 'lon'],
+    style: css`
+        :host {
+            display: flex;
+            overflow: hidden;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .container {
+            position: absolute;
+            aspect-ratio: 1/1;
+            margin: auto;
+            inset: 0;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .compassRose {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .directionArrow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            padding: 30%;
+            box-sizing: border-box;
+            color: var(--navigate-color);
+        }
+    `,
+    template: html`
+        <div class="container">
+            <load-svg #ref="compassRose" class="compassRose" href="/compass-rose.svg" #ref="compassRose"></load-svg>
+            <div class="directionArrow">
+            <load-svg #ref="directionArrow" href="/navigation.svg" #ref="directionArrow"></load-svg>
+            </div>
+        </container>
+    `,
+}, NavigationArrowComponent);

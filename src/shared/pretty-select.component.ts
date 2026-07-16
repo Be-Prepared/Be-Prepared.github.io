@@ -1,37 +1,7 @@
-import { Component, css, emit, html } from 'fudgel';
+import { component, css, emit, html } from 'fudgel';
 import { di } from '../di';
 import { I18nService } from '../i18n/i18n.service';
 
-@Component('pretty-select', {
-    attr: ['i18nBase', 'default', 'value'],
-    prop: ['options'],
-    style: css`
-        :host {
-            display: inline-block;
-            position: relative;
-        }
-
-        select {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            font-size: inherit;
-            cursor: pointer;
-        }
-    `,
-    template: html`
-        <changeable-setting>{{label}} ▿</changeable-setting>
-        <select
-            #ref="select"
-            @change.stop.prevent="selectValue($event.target.value)"
-            value="{{value}}"
-        >
-            <option *for="option of sorted" value="{{option.value}}">
-                {{option.label}}
-            </option>
-        </select>
-    `,
-})
 export class PrettySelectComponent {
     private _i18nService = di(I18nService);
     default: string = '';
@@ -100,3 +70,34 @@ export class PrettySelectComponent {
         return this._i18nService.get(`${this.i18nBase}.${value}`);
     }
 }
+
+component('pretty-select', {
+    attr: ['i18nBase', 'default', 'value'],
+    prop: ['options'],
+    style: css`
+        :host {
+            display: inline-block;
+            position: relative;
+        }
+
+        select {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            font-size: inherit;
+            cursor: pointer;
+        }
+    `,
+    template: html`
+        <changeable-setting>{{label}} ▿</changeable-setting>
+        <select
+            #ref="select"
+            @change.stop.prevent="selectValue($event.target.value)"
+            value="{{value}}"
+        >
+            <option *for="option of sorted" value="{{option.value}}">
+                {{option.label}}
+            </option>
+        </select>
+    `,
+}, PrettySelectComponent);

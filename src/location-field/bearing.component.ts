@@ -1,16 +1,11 @@
 import { CoordinateService } from '../services/coordinate.service';
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import { DirectionService } from '../services/direction.service';
 import { GeolocationService } from '../services/geolocation.service';
 import { I18nService } from '../i18n/i18n.service';
 import { Subscription } from 'rxjs';
 
-@Component('location-field-bearing', {
-    attr: ['lat', 'lon'],
-    style: css``,
-    template: html`{{value}}`,
-})
 export class LocationFieldBearingComponent {
     private _coordinateService = di(CoordinateService);
     private _directionService = di(DirectionService);
@@ -53,3 +48,9 @@ export class LocationFieldBearingComponent {
         this._subscription && this._subscription.unsubscribe();
     }
 }
+
+component('location-field-bearing', {
+    attr: ['lat', 'lon'],
+    style: css``,
+    template: html`{{value}}`,
+}, LocationFieldBearingComponent);

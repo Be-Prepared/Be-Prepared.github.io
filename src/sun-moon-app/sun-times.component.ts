@@ -1,8 +1,59 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { LatLon } from '../datatypes/lat-lon';
-import { default as SunCalc } from 'suncalc';
+import * as SunCalc from 'suncalc';
 
-@Component('sun-times', {
+export class SunTimesComponent {
+    coordinates: LatLon | null = null;
+    date: Date | null = null;
+    dawn?: Date | null;
+    dusk?: Date | null;
+    goldenHour?: Date | null;
+    goldenHourEnd?: Date | null;
+    nadir?: Date | null;
+    nauticalDawn?: Date | null;
+    nauticalDusk?: Date | null;
+    night?: Date | null;
+    nightEnd?: Date | null;
+    solarNoon?: Date | null;
+    sunrise?: Date | null;
+    sunriseEnd?: Date | null;
+    sunset?: Date | null;
+    sunsetStart?: Date | null;
+
+    onChange(prop: string) {
+        if (!this.coordinates || !this.date) {
+            return;
+        }
+
+        if (prop === 'coordinates' || prop === 'date') {
+            const times = SunCalc.getTimes(
+                this.date,
+                this.coordinates.lat,
+                this.coordinates.lon
+            );
+            this.sunrise = times.sunrise;
+            this.sunriseEnd = times.sunriseEnd;
+            this.goldenHourEnd = times.goldenHourEnd;
+            this.solarNoon = times.solarNoon;
+            this.goldenHour = times.goldenHour;
+            this.sunsetStart = times.sunsetStart;
+            this.sunset = times.sunset;
+            this.dusk = times.dusk;
+            this.nauticalDusk = times.nauticalDusk;
+            this.night = times.night;
+            this.nadir = times.nadir;
+            this.nightEnd = times.nightEnd;
+            this.nauticalDawn = times.nauticalDawn;
+            this.dawn = times.dawn;
+        }
+    }
+
+    _parseTime(date: Date): string {
+        return date.toLocaleString();
+    }
+}
+
+component('sun-times', {
     prop: ['coordinates', 'date'],
     style: css``,
     template: html`
@@ -67,54 +118,4 @@ import { default as SunCalc } from 'suncalc';
             ></display-time>
         </div>
     `,
-})
-export class SunTimesComponent {
-    coordinates: LatLon | null = null;
-    date: Date | null = null;
-    dawn?: Date;
-    dusk?: Date;
-    goldenHour?: Date;
-    goldenHourEnd?: Date;
-    nadir?: Date;
-    nauticalDawn?: Date;
-    nauticalDusk?: Date;
-    night?: Date;
-    nightEnd?: Date;
-    solarNoon?: Date;
-    sunrise?: Date;
-    sunriseEnd?: Date;
-    sunset?: Date;
-    sunsetStart?: Date;
-
-    onChange(prop: string) {
-        if (!this.coordinates || !this.date) {
-            return;
-        }
-
-        if (prop === 'coordinates' || prop === 'date') {
-            const times = SunCalc.getTimes(
-                this.date,
-                this.coordinates.lat,
-                this.coordinates.lon
-            );
-            this.sunrise = times.sunrise;
-            this.sunriseEnd = times.sunriseEnd;
-            this.goldenHourEnd = times.goldenHourEnd;
-            this.solarNoon = times.solarNoon;
-            this.goldenHour = times.goldenHour;
-            this.sunsetStart = times.sunsetStart;
-            this.sunset = times.sunset;
-            this.dusk = times.dusk;
-            this.nauticalDusk = times.nauticalDusk;
-            this.night = times.night;
-            this.nadir = times.nadir;
-            this.nightEnd = times.nightEnd;
-            this.nauticalDawn = times.nauticalDawn;
-            this.dawn = times.dawn;
-        }
-    }
-
-    _parseTime(date: Date): string {
-        return date.toLocaleString();
-    }
-}
+}, SunTimesComponent);

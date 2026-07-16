@@ -1,4 +1,4 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import {
     CoordinateService,
     COORDINATE_SYSTEMS,
@@ -22,46 +22,6 @@ import {
 import { TimeSystem } from '../datatypes/time-system';
 import { ToastService } from '../services/toast.service';
 
-@Component('info-preferences', {
-    style: css``,
-    template: html`
-        <info-header id="info.preferences"></info-header>
-        <ul>
-            <li>
-                <i18n-label id="info.coordinates"></i18n-label>
-                <pretty-select
-                    i18n-base="location.coordinates"
-                    value="{{coordinateSystem}}"
-                    .options="coordinateSystems"
-                    @change="changeCoordinateSystem($event.detail)"
-                ></pretty-select>
-            </li>
-            <li>
-                <i18n-label id="info.distances"></i18n-label>
-                <pretty-select
-                    i18n-base="info.distances"
-                    value="{{distanceSystem}}"
-                    .options="distanceSystems"
-                    @change="changeDistanceSystem($event.detail)"
-                ></pretty-select>
-            </li>
-            <li>
-                <i18n-label id="info.timeSystem"></i18n-label>
-                <pretty-select
-                    i18n-base="info.timeSystem"
-                    value="{{timeSystem}}"
-                    .options="timeSystems"
-                    @change="changeTimeSystem($event.detail)"
-                ></pretty-select>
-            </li>
-            <li>
-                <changeable-setting @click="reset()"
-                    ><i18n-label id="info.preferences.reset"></i18n-label
-                ></changeable-setting>
-            </li>
-        </ul>
-    `,
-})
 export class InfoPreferencesComponent {
     private _coordinateService = di(CoordinateService);
     private _distanceService = di(DistanceService);
@@ -119,3 +79,44 @@ export class InfoPreferencesComponent {
         this._toastService.popI18n('info.preferences.resetComplete');
     }
 }
+
+component('info-preferences', {
+    style: css``,
+    template: html`
+        <info-header id="info.preferences"></info-header>
+        <ul>
+            <li>
+                <i18n-label id="info.coordinates"></i18n-label>
+                <pretty-select
+                    i18n-base="location.coordinates"
+                    value="{{coordinateSystem}}"
+                    .options="coordinateSystems"
+                    @change="changeCoordinateSystem($event.detail)"
+                ></pretty-select>
+            </li>
+            <li>
+                <i18n-label id="info.distances"></i18n-label>
+                <pretty-select
+                    i18n-base="info.distances"
+                    value="{{distanceSystem}}"
+                    .options="distanceSystems"
+                    @change="changeDistanceSystem($event.detail)"
+                ></pretty-select>
+            </li>
+            <li>
+                <i18n-label id="info.timeSystem"></i18n-label>
+                <pretty-select
+                    i18n-base="info.timeSystem"
+                    value="{{timeSystem}}"
+                    .options="timeSystems"
+                    @change="changeTimeSystem($event.detail)"
+                ></pretty-select>
+            </li>
+            <li>
+                <changeable-setting @click="reset()"
+                    ><i18n-label id="info.preferences.reset"></i18n-label
+                ></changeable-setting>
+            </li>
+        </ul>
+    `,
+}, InfoPreferencesComponent);

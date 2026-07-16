@@ -1,6 +1,16 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 
-@Component('nfc-record', {
+export class NfcRecordComponent {
+    record?: NDEFRecord;
+
+    decode() {
+        const decoder = new TextDecoder(this.record?.encoding || 'utf-8');
+
+        return decoder.decode(this.record?.data);
+    }
+}
+
+component('nfc-record', {
     prop: ['record'],
     style: css`
         :host {
@@ -56,13 +66,4 @@ import { Component, css, html } from 'fudgel';
             >
         </div>
     `,
-})
-export class NfcRecordComponent {
-    record?: NDEFRecord;
-
-    decode() {
-        const decoder = new TextDecoder(this.record?.encoding || 'utf-8');
-
-        return decoder.decode(this.record?.data);
-    }
-}
+}, NfcRecordComponent);

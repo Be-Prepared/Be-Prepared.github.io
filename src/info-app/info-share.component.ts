@@ -1,9 +1,29 @@
-import { Component, css, emit, html } from 'fudgel';
+import { component, css, emit, html } from 'fudgel';
 import { di } from '../di';
 import { QrService } from '../services/qr.service';
 import { ToastService } from '../services/toast.service';
 
-@Component('info-share', {
+export class InfoShareComponent {
+    _qrService = di(QrService);
+    _toastService = di(ToastService);
+    allowCopy = false;
+    website = __WEBSITE__;
+
+    onInit() {
+        this.allowCopy = !!navigator.clipboard;
+    }
+
+    copyToClipboard() {
+        navigator.clipboard.writeText(__WEBSITE__);
+        this._toastService.popI18n('info.share.copied');
+    }
+
+    openQrCode() {
+        emit(this, 'qr');
+    }
+}
+
+component('info-share', {
     style: css`
         :host {
             position: relative;
@@ -49,23 +69,4 @@ import { ToastService } from '../services/toast.service';
             ></pretty-labeled-button>
         </div>
     `,
-})
-export class InfoShareComponent {
-    _qrService = di(QrService);
-    _toastService = di(ToastService);
-    allowCopy = false;
-    website = __WEBSITE__;
-
-    onInit() {
-        this.allowCopy = !!navigator.clipboard;
-    }
-
-    copyToClipboard() {
-        navigator.clipboard.writeText(__WEBSITE__);
-        this._toastService.popI18n('info.share.copied');
-    }
-
-    openQrCode() {
-        emit(this, 'qr');
-    }
-}
+}, InfoShareComponent);

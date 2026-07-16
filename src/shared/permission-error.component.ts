@@ -1,7 +1,15 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { goBack } from '../util/go-back';
 
-@Component('permission-error', {
+export class PermissionErrorComponent {
+    messageId: string = '';
+
+    goBack() {
+        goBack();
+    }
+}
+
+component('permission-error', {
     attr: ['messageId'],
     style: css`
         :host {
@@ -32,11 +40,4 @@ import { goBack } from '../util/go-back';
         <back-button></back-button>
         <div></div>
     `,
-})
-export class PermissionErrorComponent {
-    messageId: string = '';
-
-    goBack() {
-        goBack();
-    }
-}
+}, PermissionErrorComponent);

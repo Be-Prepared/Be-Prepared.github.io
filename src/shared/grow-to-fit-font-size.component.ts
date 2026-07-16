@@ -1,31 +1,5 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 
-@Component('grow-to-fit-font-size', {
-    style: css`
-        :host {
-            box-sizing: border-box;
-            height: 100%;
-            overflow: hidden;
-            width: 100%;
-        }
-
-        .wrapper {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-    `,
-    template: html`
-        <div class="wrapper" #ref="wrapper">
-            <div #ref="content">
-                <slot #ref="slot" @slotchange="monitorAssignedContent()"></slot>
-            </div>
-        </div>
-    `,
-    useShadow: true,
-})
 export class GrowToFitFontSizeComponent {
     private _mutationObserver?: MutationObserver;
     private _observedNodes: Node[] = [];
@@ -132,3 +106,30 @@ export class GrowToFitFontSizeComponent {
         }
     }
 }
+
+component('grow-to-fit-font-size', {
+    style: css`
+        :host {
+            box-sizing: border-box;
+            height: 100%;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    `,
+    template: html`
+        <div class="wrapper" #ref="wrapper">
+            <div #ref="content">
+                <slot #ref="slot" @slotchange="monitorAssignedContent()"></slot>
+            </div>
+        </div>
+    `,
+    useShadow: true,
+}, GrowToFitFontSizeComponent);

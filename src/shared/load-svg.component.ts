@@ -1,14 +1,5 @@
-import { Component, css, emit, rootElement } from 'fudgel';
+import { Controller, component, css, emit, metadata } from 'fudgel';
 
-@Component('load-svg', {
-    attr: ['href'],
-    style: css`
-        :host {
-            display: block;
-        }
-    `,
-    template: '',
-})
 export class LoadSvgComponent {
     href?: string;
     private _svg: HTMLElement | null = null;
@@ -26,7 +17,7 @@ export class LoadSvgComponent {
 
     private _apply(svgContent: HTMLElement) {
         const svg = document.importNode(svgContent, true);
-        const root = rootElement(this);
+        const root = (this as Controller)[metadata]?.root;
 
         if (!root) {
             return;
@@ -59,3 +50,13 @@ export class LoadSvgComponent {
         xhr.send();
     }
 }
+
+component('load-svg', {
+    attr: ['href'],
+    style: css`
+        :host {
+            display: block;
+        }
+    `,
+    template: '',
+}, LoadSvgComponent);

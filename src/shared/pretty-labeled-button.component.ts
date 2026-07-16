@@ -1,6 +1,8 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 
-@Component('pretty-labeled-button', {
+export class PrettyLabeledButtonComponent {}
+
+component('pretty-labeled-button', {
     attr: ['id'],
     style: css``,
     template: html`
@@ -8,5 +10,4 @@ import { Component, css, html } from 'fudgel';
             <i18n-label id="{{id}}"></i18n-label>
         </pretty-button>
     `,
-})
-export class PrettyLabeledButtonComponent {}
+}, PrettyLabeledButtonComponent);

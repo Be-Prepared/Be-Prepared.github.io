@@ -1,4 +1,4 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
 import { di } from '../di';
 import { Subscription } from 'rxjs';
@@ -6,7 +6,124 @@ import { ToastService } from '../services/toast.service';
 import { WaypointSaved } from '../datatypes/waypoint-saved';
 import { WaypointService } from './waypoint.service';
 
-@Component('location-edit-app', {
+export class LocationEditComponent {
+    private _coordinateService = di(CoordinateService);
+    private _subscription?: Subscription;
+    private _toastService = di(ToastService);
+    private _waypointService = di(WaypointService);
+    id?: string;
+    lat?: number;
+    location: string = '';
+    locationInput: any;
+    lon?: number;
+    nameUrlEncode: string = '';
+    point: WaypointSaved | null = null;
+    showQr = false;
+    validPoint = false;
+
+    onInit() {
+        const id = this.id;
+        let point;
+
+        if (id) {
+            point = this._waypointService.getPoint(+id);
+        }
+
+        if (!point) {
+            history.go(-1);
+            return;
+        }
+
+        this.point = point;
+        this._updatePointProperties();
+        this._updateLocation();
+        this.validPoint = true;
+    }
+
+    onDestroy() {
+        this._subscription && this._subscription.unsubscribe();
+    }
+
+    averagePoint() {
+        history.pushState(
+            {},
+            document.title,
+            `/location-average/${this.point!.id}`
+        );
+    }
+
+    closeQrCode() {
+        this.showQr = false;
+    }
+
+    deletePoint() {
+        this._waypointService.deletePoint(this.point!.id);
+        history.go(-1);
+    }
+
+    locationChange(location: string) {
+        this._coordinateService
+            .fromString(location)
+            .subscribe((convertedLocation) => {
+                if (convertedLocation) {
+                    this.point!.lat = convertedLocation.lat;
+                    this.point!.lon = convertedLocation.lon;
+                    this._updatePointProperties();
+                    this._waypointService.updatePoint(this.point!);
+                    this._updateLocation();
+                    this.validPoint = true;
+                } else {
+                    this._toastService.popI18n('location.edit.badLocation');
+                    this.validPoint = false;
+                }
+            });
+    }
+
+    nameChange(name: string) {
+        this.point!.name = name;
+        this._updatePointProperties();
+        this._waypointService.updatePoint(this.point!);
+    }
+
+    navigate() {
+        history.pushState(
+            {},
+            document.title,
+            `/location-navigate/${this.point!.id}`
+        );
+    }
+
+    openQrCode() {
+        this.showQr = true;
+    }
+
+    private _updatePointProperties() {
+        this.lat = this.point!.lat;
+        this.lon = this.point!.lon;
+        this.nameUrlEncode = encodeURIComponent(this.point!.name);
+    }
+
+    private _updateLocation() {
+        const location = this._coordinateService.latLonToSystem(
+            this.point!.lat,
+            this.point!.lon
+        );
+
+        if ('mgrs' in location) {
+            this.location = location.mgrs;
+        } else if ('utmups' in location) {
+            this.location = location.utmups;
+        } else {
+            this.location = location.latLon;
+        }
+
+        if (this.locationInput) {
+            this.locationInput.value = this.location;
+        }
+    }
+}
+
+component('location-edit-app', {
     attr: ['id'],
     style: css`
         .gapAbove {
@@ -162,120 +279,4 @@ import { WaypointService } from './waypoint.service';
             </show-modal>
         </location-wrapper>
     `,
-})
-export class LocationEditComponent {
-    private _coordinateService = di(CoordinateService);
-    private _subscription?: Subscription;
-    private _toastService = di(ToastService);
-    private _waypointService = di(WaypointService);
-    id?: string;
-    lat?: number;
-    location: string = '';
-    locationInput: any;
-    lon?: number;
-    nameUrlEncode: string = '';
-    point: WaypointSaved | null = null;
-    showQr = false;
-    validPoint = false;
-
-    onInit() {
-        const id = this.id;
-        let point;
-
-        if (id) {
-            point = this._waypointService.getPoint(+id);
-        }
-
-        if (!point) {
-            history.go(-1);
-            return;
-        }
-
-        this.point = point;
-        this._updatePointProperties();
-        this._updateLocation();
-        this.validPoint = true;
-    }
-
-    onDestroy() {
-        this._subscription && this._subscription.unsubscribe();
-    }
-
-    averagePoint() {
-        history.pushState(
-            {},
-            document.title,
-            `/location-average/${this.point!.id}`
-        );
-    }
-
-    closeQrCode() {
-        this.showQr = false;
-    }
-
-    deletePoint() {
-        this._waypointService.deletePoint(this.point!.id);
-        history.go(-1);
-    }
-
-    locationChange(location: string) {
-        this._coordinateService
-            .fromString(location)
-            .subscribe((convertedLocation) => {
-                if (convertedLocation) {
-                    this.point!.lat = convertedLocation.lat;
-                    this.point!.lon = convertedLocation.lon;
-                    this._updatePointProperties();
-                    this._waypointService.updatePoint(this.point!);
-                    this._updateLocation();
-                    this.validPoint = true;
-                } else {
-                    this._toastService.popI18n('location.edit.badLocation');
-                    this.validPoint = false;
-                }
-            });
-    }
-
-    nameChange(name: string) {
-        this.point!.name = name;
-        this._updatePointProperties();
-        this._waypointService.updatePoint(this.point!);
-    }
-
-    navigate() {
-        history.pushState(
-            {},
-            document.title,
-            `/location-navigate/${this.point!.id}`
-        );
-    }
-
-    openQrCode() {
-        this.showQr = true;
-    }
-
-    private _updatePointProperties() {
-        this.lat = this.point!.lat;
-        this.lon = this.point!.lon;
-        this.nameUrlEncode = encodeURIComponent(this.point!.name);
-    }
-
-    private _updateLocation() {
-        const location = this._coordinateService.latLonToSystem(
-            this.point!.lat,
-            this.point!.lon
-        );
-
-        if ('mgrs' in location) {
-            this.location = location.mgrs;
-        } else if ('utmups' in location) {
-            this.location = location.utmups;
-        } else {
-            this.location = location.latLon;
-        }
-
-        if (this.locationInput) {
-            this.locationInput.value = this.location;
-        }
-    }
-}
+}, LocationEditComponent);

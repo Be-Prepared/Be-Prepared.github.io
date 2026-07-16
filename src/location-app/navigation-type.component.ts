@@ -1,16 +1,8 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import { NavigationTypeService } from './navigation-type.service';
 import { Subscription } from 'rxjs';
 
-@Component('navigation-type', {
-    style: css``,
-    template: html`
-        <changeable-setting @click="toggleSetting()"
-            ><i18n-label id="location.navigation.{{value}}"></i18n-label
-        ></changeable-setting>
-    `,
-})
 export class NavigationTypeComponent {
     private _navigationTypeService = di(NavigationTypeService);
     private _subscription?: Subscription;
@@ -32,3 +24,12 @@ export class NavigationTypeComponent {
         this._navigationTypeService.toggleSetting();
     }
 }
+
+component('navigation-type', {
+    style: css``,
+    template: html`
+        <changeable-setting @click="toggleSetting()"
+            ><i18n-label id="location.navigation.{{value}}"></i18n-label
+        ></changeable-setting>
+    `,
+}, NavigationTypeComponent);

@@ -1,6 +1,8 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 
-@Component('info-tooling', {
+export class InfoToolingComponent {}
+
+component('info-tooling', {
     style: css``,
     template: html`
         <info-header id="info.toolingHeader"></info-header>
@@ -21,5 +23,4 @@ import { Component, css, html } from 'fudgel';
             </li>
         </ul>
     `,
-})
-export class InfoToolingComponent {}
+}, InfoToolingComponent);

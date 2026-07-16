@@ -1,13 +1,8 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import { EverySecondService } from '../services/every-second.service';
 import { TimeService } from '../services/time.service';
 
-@Component('location-field-time-elapsed', {
-    attr: ['startTime'],
-    style: css``,
-    template: html`{{value}}`,
-})
 export class LocationFieldTimeElapsedComponent {
     private _cancelEverySecond?: () => void;
     private _everySecondService = di(EverySecondService);
@@ -34,3 +29,9 @@ export class LocationFieldTimeElapsedComponent {
         this._timeService.toggleSystem();
     }
 }
+
+component('location-field-time-elapsed', {
+    attr: ['startTime'],
+    style: css``,
+    template: html`{{value}}`,
+}, LocationFieldTimeElapsedComponent);

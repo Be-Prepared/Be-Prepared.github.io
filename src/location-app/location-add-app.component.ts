@@ -1,5 +1,5 @@
 import { catchError, first, tap, timeout } from 'rxjs/operators';
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
 import { di } from '../di';
 import { GeolocationService } from '../services/geolocation.service';
@@ -9,26 +9,6 @@ import { of, Subscription } from 'rxjs';
 import { WaypointSaved } from '../datatypes/waypoint-saved';
 import { WaypointService } from './waypoint.service';
 
-@Component('location-add-app', {
-    attr: ['geo'],
-    style: css`
-        .full {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-        }
-    `,
-    template: html`
-        <location-wrapper>
-            <div class="full">
-                <i18n-label
-                    id="location.add.gettingCurrentLocation"
-                ></i18n-label>
-            </div>
-        </location-wrapper>
-    `,
-})
 export class LocationAddAppComponent {
     private _coordinateService = di(CoordinateService);
     private _geolocationService = di(GeolocationService);
@@ -117,3 +97,24 @@ export class LocationAddAppComponent {
             });
     }
 }
+
+component('location-add-app', {
+    attr: ['geo'],
+    style: css`
+        .full {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+    `,
+    template: html`
+        <location-wrapper>
+            <div class="full">
+                <i18n-label
+                    id="location.add.gettingCurrentLocation"
+                ></i18n-label>
+            </div>
+        </location-wrapper>
+    `,
+}, LocationAddAppComponent);

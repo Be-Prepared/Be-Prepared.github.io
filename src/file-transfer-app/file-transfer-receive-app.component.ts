@@ -1,6 +1,6 @@
 import { AvailabilityState } from '../datatypes/availability-state';
 import { BarcodeReaderService } from '../services/barcode-reader.service';
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import KalmanFilter from '@bencevans/kalman-filter';
 import {
     LtDecoder,
@@ -14,80 +14,6 @@ import { di } from '../di';
 import { takeUntil } from 'rxjs/operators';
 import { toUint8Array } from 'js-base64';
 
-@Component('file-transfer-receive-app', {
-    style: css`
-        .wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-evenly;
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-        }
-
-        @media (orientation: landscape) {
-            .wrapper {
-                flex-direction: row;
-            }
-        }
-
-        .qr {
-            max-height: 95vmin;
-            max-width: 95vmin;
-            flex-grow: 1;
-            aspect-ratio: 1/1;
-            box-sizing: border-box;
-            margin: 2em;
-            border: 1px solid;
-        }
-
-        .center {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        video {
-            height: 100%;
-            width: 100%;
-            object-fit: cover;
-            touch-action: none;
-        }
-    `,
-    template: html`
-        <permission-prompt
-            *if="explainAsk"
-            @grant.stop.prevent="grant()"
-            message-id="fileTransfer.receive.explainAsk"
-        ></permission-prompt>
-        <permission-denied *if="explainDeny"></permission-denied>
-        <camera-unavailable *if="explainUnavailable"></camera-unavailable>
-        <default-layout *if="showControls">
-            <div *if="!data" class="wrapper">
-                <div class="qr">
-                    <video #ref="video" autoplay muted playsinline></video>
-                </div>
-                <div class="center">
-                    {{ decodedCount }} / {{ k }} (+ {{ encodedCount }}) @ {{ fps
-                    }}&nbsp;<i18n-label id="fileTransfer.receive.fps"></i18n-label>
-                </div>
-            </div>
-            <file-transfer-receive-view
-                *if="data"
-                .data="data"
-                .meta="meta"
-            ></file-transfer-receive-view>
-            <scaling-icon
-                slot="more-buttons"
-                *if="torchAvailable"
-                @click.stop.prevent="toggleTorch()"
-                class="{{torchClass}}"
-                href="/flashlight.svg"
-            ></scaling-icon>
-        </default-layout>
-    `,
-})
 export class FileTransferReceiveAppComponent {
     private _animationFrame: ReturnType<typeof requestAnimationFrame> | null =
         null;
@@ -278,3 +204,78 @@ export class FileTransferReceiveAppComponent {
         });
     }
 }
+
+component('file-transfer-receive-app', {
+    style: css`
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-evenly;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        @media (orientation: landscape) {
+            .wrapper {
+                flex-direction: row;
+            }
+        }
+
+        .qr {
+            max-height: 95vmin;
+            max-width: 95vmin;
+            flex-grow: 1;
+            aspect-ratio: 1/1;
+            box-sizing: border-box;
+            margin: 2em;
+            border: 1px solid;
+        }
+
+        .center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        video {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+            touch-action: none;
+        }
+    `,
+    template: html`
+        <permission-prompt
+            *if="explainAsk"
+            @grant.stop.prevent="grant()"
+            message-id="fileTransfer.receive.explainAsk"
+        ></permission-prompt>
+        <permission-denied *if="explainDeny"></permission-denied>
+        <camera-unavailable *if="explainUnavailable"></camera-unavailable>
+        <default-layout *if="showControls">
+            <div *if="!data" class="wrapper">
+                <div class="qr">
+                    <video #ref="video" autoplay muted playsinline></video>
+                </div>
+                <div class="center">
+                    {{ decodedCount }} / {{ k }} (+ {{ encodedCount }}) @ {{ fps
+                    }}&nbsp;<i18n-label id="fileTransfer.receive.fps"></i18n-label>
+                </div>
+            </div>
+            <file-transfer-receive-view
+                *if="data"
+                .data="data"
+                .meta="meta"
+            ></file-transfer-receive-view>
+            <scaling-icon
+                slot="more-buttons"
+                *if="torchAvailable"
+                @click.stop.prevent="toggleTorch()"
+                class="{{torchClass}}"
+                href="/flashlight.svg"
+            ></scaling-icon>
+        </default-layout>
+    `,
+}, FileTransferReceiveAppComponent);

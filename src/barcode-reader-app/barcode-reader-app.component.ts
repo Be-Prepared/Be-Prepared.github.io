@@ -1,6 +1,6 @@
 import { AvailabilityState } from '../datatypes/availability-state';
 import { BarcodeReaderService } from '../services/barcode-reader.service';
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { DetectedBarcodeData } from '../services/barcode-reader/barcode-reader-interface';
 import { di } from '../di';
 import { Subject } from 'rxjs';
@@ -8,68 +8,6 @@ import { takeUntil } from 'rxjs/operators';
 import { TorchService } from '../services/torch.service';
 import { UrlService } from '../services/url.service';
 
-@Component('barcode-reader-app', {
-    style: css`
-        :host,
-        .wrapper {
-            height: 100%;
-            width: 100%;
-        }
-
-        video {
-            height: 100%;
-            width: 100%;
-            object-fit: cover;
-            touch-action: none;
-        }
-
-        .enabled {
-            color: var(--button-fg-color-enabled);
-        }
-
-        .raw-value {
-            background-color: var(--bg-color);
-            padding: 1em;
-            border-radius: 0.5em;
-            font-size: 1.4em;
-            word-wrap: break-word;
-            box-sizing: border-box;
-            max-width: 100%;
-        }
-    `,
-    template: html`
-        <permission-prompt
-            *if="explainAsk"
-            @grant.stop.prevent="grant()"
-            message-id="barcodeReader.explainAsk"
-        ></permission-prompt>
-        <permission-denied *if="explainDeny"></permission-denied>
-        <camera-unavailable *if="explainUnavailable"></camera-unavailable>
-        <div *if="showControls" class="wrapper">
-            <video #ref="video" autoplay muted playsinline></video>
-            <default-layout>
-                <scaling-icon
-                    slot="more-buttons"
-                    *if="torchAvailable"
-                    @click.stop.prevent="toggleTorch()"
-                    class="{{torchClass}}"
-                    href="/flashlight.svg"
-                ></scaling-icon>
-            </default-layout>
-            <show-modal *if="barcodeFound" @clickoutside="resetFound()">
-                <div class="raw-value" @click="resetFound()">
-                    <styled-link
-                        *if="isUrl"
-                        href="{{barcodeFound.rawValue}}"
-                        target="_blank"
-                        >{{barcodeFound.rawValue}}</styled-link
-                    >
-                    <span *if="!isUrl"> {{barcodeFound.rawValue}} </span>
-                </div>
-            </show-modal>
-        </div>
-    `,
-})
 export class BarcodeReaderAppComponent {
     private _animationFrame: ReturnType<typeof requestAnimationFrame> | null =
         null;
@@ -204,3 +142,66 @@ export class BarcodeReaderAppComponent {
         });
     }
 }
+
+component('barcode-reader-app', {
+    style: css`
+        :host,
+        .wrapper {
+            height: 100%;
+            width: 100%;
+        }
+
+        video {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+            touch-action: none;
+        }
+
+        .enabled {
+            color: var(--button-fg-color-enabled);
+        }
+
+        .raw-value {
+            background-color: var(--bg-color);
+            padding: 1em;
+            border-radius: 0.5em;
+            font-size: 1.4em;
+            word-wrap: break-word;
+            box-sizing: border-box;
+            max-width: 100%;
+        }
+    `,
+    template: html`
+        <permission-prompt
+            *if="explainAsk"
+            @grant.stop.prevent="grant()"
+            message-id="barcodeReader.explainAsk"
+        ></permission-prompt>
+        <permission-denied *if="explainDeny"></permission-denied>
+        <camera-unavailable *if="explainUnavailable"></camera-unavailable>
+        <div *if="showControls" class="wrapper">
+            <video #ref="video" autoplay muted playsinline></video>
+            <default-layout>
+                <scaling-icon
+                    slot="more-buttons"
+                    *if="torchAvailable"
+                    @click.stop.prevent="toggleTorch()"
+                    class="{{torchClass}}"
+                    href="/flashlight.svg"
+                ></scaling-icon>
+            </default-layout>
+            <show-modal *if="barcodeFound" @clickoutside="resetFound()">
+                <div class="raw-value" @click="resetFound()">
+                    <styled-link
+                        *if="isUrl"
+                        href="{{barcodeFound.rawValue}}"
+                        target="_blank"
+                        >{{barcodeFound.rawValue}}</styled-link
+                    >
+                    <span *if="!isUrl"> {{barcodeFound.rawValue}} </span>
+                </div>
+            </show-modal>
+        </div>
+    `,
+}, BarcodeReaderAppComponent);

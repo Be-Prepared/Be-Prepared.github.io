@@ -1,14 +1,10 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import { GeolocationService } from '../services/geolocation.service';
 import { I18nService } from '../i18n/i18n.service';
 import { Subscription } from 'rxjs';
 import { TimeService } from '../services/time.service';
 
-@Component('location-field-time-moving', {
-    style: css``,
-    template: html`{{value}}`,
-})
 export class LocationFieldTimeMovingComponent {
     private _geolocationService = di(GeolocationService);
     private _i18nService = di(I18nService);
@@ -38,3 +34,8 @@ export class LocationFieldTimeMovingComponent {
         this._subscription && this._subscription.unsubscribe();
     }
 }
+
+component('location-field-time-moving', {
+    style: css``,
+    template: html`{{value}}`,
+}, LocationFieldTimeMovingComponent);

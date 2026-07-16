@@ -1,10 +1,71 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import { GeolocationCoordinateResultSuccess } from '../services/geolocation.service';
 import { LocalStorageInterface } from '../services/local-storage.service';
 import { PreferenceService } from '../services/preference.service';
 
-@Component('location-field', {
+export class LocationFieldComponent {
+    private _preferenceService = di(PreferenceService);
+    private _storage?: LocalStorageInterface<string>;
+    allowedFields: string[] = [];
+    default?: string;
+    startPosition?: GeolocationCoordinateResultSuccess | null = null;
+    id?: string;
+    lat?: string;
+    lon?: string;
+    name?: string;
+    select?: HTMLSelectElement;
+    selectedValue = '';
+    startTime?: string;
+
+    onInit() {
+        const allowedFields = [
+            'ACCURACY',
+            'ALTITUDE',
+            'ALTITUDE_ACCURACY',
+            'ALTITUDE_AVERAGE',
+            'ALTITUDE_MAXIMUM',
+            'ALTITUDE_MINIMUM',
+            'DISTANCE_TRAVELED',
+            'HEADING',
+            'HEADING_SMOOTHED',
+            'SPEED',
+            'SPEED_AVERAGE',
+            'SPEED_MAXIMUM',
+            'SPEED_SMOOTHED',
+            'SPEED_SMOOTHED_MAXIMUM',
+            'TIME',
+            'TIME_MOVING',
+            'TIME_STOPPED',
+        ];
+
+        if (typeof this.lat === 'string' && typeof this.lon === 'string') {
+            allowedFields.push(
+                'BEARING',
+                'DESTINATION',
+                'DISTANCE',
+                'TIME_ARRIVAL',
+                'TIME_ELAPSED',
+                'TIME_REMAINING'
+            );
+        }
+
+        this._storage = this._preferenceService.field(
+            this.id || '',
+            allowedFields
+        );
+        this.allowedFields = allowedFields;
+        this.selectedValue =
+            this._storage.getItem() || this.default || 'UNKNOWN';
+    }
+
+    selectValue(value: string) {
+        this.selectedValue = value;
+        this._storage!.setItem(value);
+    }
+}
+
+component('location-field', {
     attr: ['default', 'id', 'lat', 'lon', 'name', 'startTime'],
     prop: ['startPosition'],
     style: css`
@@ -139,64 +200,4 @@ import { PreferenceService } from '../services/preference.service';
             </div>
         </div>
     `,
-})
-export class LocationFieldComponent {
-    private _preferenceService = di(PreferenceService);
-    private _storage?: LocalStorageInterface<string>;
-    allowedFields: string[] = [];
-    default?: string;
-    startPosition?: GeolocationCoordinateResultSuccess | null = null;
-    id?: string;
-    lat?: string;
-    lon?: string;
-    name?: string;
-    select?: HTMLSelectElement;
-    selectedValue = '';
-    startTime?: string;
-
-    onInit() {
-        const allowedFields = [
-            'ACCURACY',
-            'ALTITUDE',
-            'ALTITUDE_ACCURACY',
-            'ALTITUDE_AVERAGE',
-            'ALTITUDE_MAXIMUM',
-            'ALTITUDE_MINIMUM',
-            'DISTANCE_TRAVELED',
-            'HEADING',
-            'HEADING_SMOOTHED',
-            'SPEED',
-            'SPEED_AVERAGE',
-            'SPEED_MAXIMUM',
-            'SPEED_SMOOTHED',
-            'SPEED_SMOOTHED_MAXIMUM',
-            'TIME',
-            'TIME_MOVING',
-            'TIME_STOPPED',
-        ];
-
-        if (typeof this.lat === 'string' && typeof this.lon === 'string') {
-            allowedFields.push(
-                'BEARING',
-                'DESTINATION',
-                'DISTANCE',
-                'TIME_ARRIVAL',
-                'TIME_ELAPSED',
-                'TIME_REMAINING'
-            );
-        }
-
-        this._storage = this._preferenceService.field(
-            this.id || '',
-            allowedFields
-        );
-        this.allowedFields = allowedFields;
-        this.selectedValue =
-            this._storage.getItem() || this.default || 'UNKNOWN';
-    }
-
-    selectValue(value: string) {
-        this.selectedValue = value;
-        this._storage!.setItem(value);
-    }
-}
+}, LocationFieldComponent);

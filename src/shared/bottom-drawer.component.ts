@@ -1,37 +1,7 @@
-import { Component, controllerToElement, css, html } from 'fudgel';
+import { Controller, component, css, html, metadata } from 'fudgel';
 
 let lock = Promise.resolve();
 
-@Component('bottom-drawer', {
-    style: css`
-        :host {
-            top: 200vh;
-            position: fixed;
-            display: flex;
-            transition: bottom 1s ease-in-out 0s;
-            left: 50%;
-            transform: translate(-50%);
-        }
-
-        .tab {
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
-            border-top: 2px solid;
-            border-left: 2px solid;
-            border-right: 2px solid;
-            padding: 0.3em 0.6em;
-            background-color: var(--button-bg-color);
-            display: flex;
-            align-items: center;
-        }
-    `,
-    template: html`
-        <div class="tab">
-            <slot></slot>
-        </div>
-    `,
-    useShadow: true,
-})
 export class BottomDrawerComponent {
     private _lockRelease = () => {};
     private _timeout?: ReturnType<typeof setTimeout>;
@@ -84,7 +54,7 @@ export class BottomDrawerComponent {
     }
 
     private _element() {
-        return controllerToElement(this)!;
+        return (this as Controller)[metadata]!.host;
     }
 
     private _height() {
@@ -95,3 +65,34 @@ export class BottomDrawerComponent {
         return Math.ceil(rect.height + 1);
     }
 }
+
+component('bottom-drawer', {
+    style: css`
+        :host {
+            top: 200vh;
+            position: fixed;
+            display: flex;
+            transition: bottom 1s ease-in-out 0s;
+            left: 50%;
+            transform: translate(-50%);
+        }
+
+        .tab {
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            border-top: 2px solid;
+            border-left: 2px solid;
+            border-right: 2px solid;
+            padding: 0.3em 0.6em;
+            background-color: var(--button-bg-color);
+            display: flex;
+            align-items: center;
+        }
+    `,
+    template: html`
+        <div class="tab">
+            <slot></slot>
+        </div>
+    `,
+    useShadow: true,
+}, BottomDrawerComponent);

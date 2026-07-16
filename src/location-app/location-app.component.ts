@@ -1,5 +1,5 @@
 import { AvailabilityState } from '../datatypes/availability-state';
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import { filter, switchMap } from 'rxjs/operators';
 import {
@@ -10,7 +10,52 @@ import { LatLon } from '../datatypes/lat-lon';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-@Component('location-app', {
+export class LocationAppComponent {
+    private _geolocationService = di(GeolocationService);
+    private _subject = new Subject();
+    latLon: LatLon | null = null;
+    position: GeolocationCoordinateResult | null = null;
+
+    onInit() {
+        this._geolocationService
+            .availabilityState()
+            .pipe(
+                takeUntil(this._subject),
+                filter((state) => {
+                    return state === AvailabilityState.ALLOWED;
+                }),
+                switchMap(() => {
+                    return this._geolocationService.getPosition();
+                })
+            )
+            .subscribe((position) => {
+                this.position = position;
+                this._redraw();
+            });
+    }
+
+    onDestroy() {
+        this._subject.next(null);
+        this._subject.complete();
+    }
+
+    goToList() {
+        history.pushState({}, document.title, '/location-list');
+    }
+
+    private _redraw() {
+        if (this.position && this.position.success) {
+            this.latLon = {
+                lat: this.position.lat,
+                lon: this.position.lon,
+            };
+        } else {
+            this.latLon = null;
+        }
+    }
+}
+
+component('location-app', {
     style: css`
         .content {
             height: 100%;
@@ -108,48 +153,4 @@ import { takeUntil } from 'rxjs/operators';
             </default-layout>
         </location-wrapper>
     `,
-})
-export class LocationAppComponent {
-    private _geolocationService = di(GeolocationService);
-    private _subject = new Subject();
-    latLon: LatLon | null = null;
-    position: GeolocationCoordinateResult | null = null;
-
-    onInit() {
-        this._geolocationService
-            .availabilityState()
-            .pipe(
-                takeUntil(this._subject),
-                filter((state) => {
-                    return state === AvailabilityState.ALLOWED;
-                }),
-                switchMap(() => {
-                    return this._geolocationService.getPosition();
-                })
-            )
-            .subscribe((position) => {
-                this.position = position;
-                this._redraw();
-            });
-    }
-
-    onDestroy() {
-        this._subject.next(null);
-        this._subject.complete();
-    }
-
-    goToList() {
-        history.pushState({}, document.title, '/location-list');
-    }
-
-    private _redraw() {
-        if (this.position && this.position.success) {
-            this.latLon = {
-                lat: this.position.lat,
-                lon: this.position.lon,
-            };
-        } else {
-            this.latLon = null;
-        }
-    }
-}
+}, LocationAppComponent);

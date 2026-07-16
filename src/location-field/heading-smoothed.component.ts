@@ -1,14 +1,10 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import { DirectionService } from '../services/direction.service';
 import { GeolocationService } from '../services/geolocation.service';
 import { I18nService } from '../i18n/i18n.service';
 import { Subscription } from 'rxjs';
 
-@Component('location-field-heading-smoothed', {
-    style: css``,
-    template: html`{{value}}`,
-})
 export class LocationFieldHeadingSmoothedComponent {
     private _directionService = di(DirectionService);
     private _geolocationService = di(GeolocationService);
@@ -42,3 +38,8 @@ export class LocationFieldHeadingSmoothedComponent {
         this._subscription && this._subscription.unsubscribe();
     }
 }
+
+component('location-field-heading-smoothed', {
+    style: css``,
+    template: html`{{value}}`,
+}, LocationFieldHeadingSmoothedComponent);

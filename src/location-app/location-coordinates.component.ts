@@ -1,4 +1,4 @@
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import {
     CoordinateService,
     CoordinateSystemDefault,
@@ -14,44 +14,6 @@ interface EmptyData {
     empty: boolean;
 }
 
-@Component('location-coordinates', {
-    prop: ['coords'],
-    style: css`
-        :host {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .multi-line {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-    `,
-    template: html`
-        <pretty-select
-            i18n-base="location.coordinates"
-            value="{{coordinateSystem}}"
-            .options="coordinateSystems"
-            @change="changeCoordinateSystem($event.detail)"
-        ></pretty-select>
-        <div *if="dataToDisplay.lat" class="multi-line">
-            <div>{{ dataToDisplay.lat }}</div>
-            <div>{{ dataToDisplay.lon }}</div>
-        </div>
-        <div *if="dataToDisplay.mgrs" class="multi-line">
-            <div>{{ dataToDisplay.mgrs }}</div>
-        </div>
-        <div *if="dataToDisplay.utmups" class="multi-line">
-            <div>{{ dataToDisplay.utmups }}</div>
-        </div>
-        <div *if="dataToDisplay.empty">
-            <i18n-label id="location.coordinates.empty"></i18n-label>
-        </div>
-    `,
-})
 export class LocationCoordinatesComponent {
     private _coordinateService = di(CoordinateService);
     private _subscription: Subscription | null = null;
@@ -96,3 +58,42 @@ export class LocationCoordinatesComponent {
         );
     }
 }
+
+component('location-coordinates', {
+    prop: ['coords'],
+    style: css`
+        :host {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .multi-line {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+    `,
+    template: html`
+        <pretty-select
+            i18n-base="location.coordinates"
+            value="{{coordinateSystem}}"
+            .options="coordinateSystems"
+            @change="changeCoordinateSystem($event.detail)"
+        ></pretty-select>
+        <div *if="dataToDisplay.lat" class="multi-line">
+            <div>{{ dataToDisplay.lat }}</div>
+            <div>{{ dataToDisplay.lon }}</div>
+        </div>
+        <div *if="dataToDisplay.mgrs" class="multi-line">
+            <div>{{ dataToDisplay.mgrs }}</div>
+        </div>
+        <div *if="dataToDisplay.utmups" class="multi-line">
+            <div>{{ dataToDisplay.utmups }}</div>
+        </div>
+        <div *if="dataToDisplay.empty">
+            <i18n-label id="location.coordinates.empty"></i18n-label>
+        </div>
+    `,
+}, LocationCoordinatesComponent);

@@ -1,12 +1,62 @@
 import { AvailabilityState } from '../datatypes/availability-state';
 import { CompassService } from '../services/compass.service';
-import { Component, css, html } from 'fudgel';
+import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import { DirectionService } from '../services/direction.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-@Component('compass-app', {
+export class CompassAppComponent {
+    private _compassService = di(CompassService);
+    private _directionService = di(DirectionService);
+    private _subject = new Subject();
+    compassRose?: HTMLElement;
+    degrees = 0;
+    explainAsk = false;
+    explainDeny = false;
+    explainUnavailable = false;
+    headingDirection = '';
+    showControls = false;
+
+    onInit() {
+        this._compassService
+            .availabilityState()
+            .pipe(takeUntil(this._subject))
+            .subscribe((value) => {
+                this.explainAsk = value === AvailabilityState.PROMPT;
+                this.explainDeny = value === AvailabilityState.DENIED;
+                this.explainUnavailable =
+                    value === AvailabilityState.UNAVAILABLE;
+                this.showControls = value === AvailabilityState.ALLOWED;
+            });
+        this._compassService
+            .getCompassBearing()
+            .pipe(takeUntil(this._subject))
+            .subscribe((bearing: number) => {
+                const rounded = this._directionService.standardize360(
+                    Math.round(bearing)
+                );
+                this.headingDirection =
+                    this._directionService.toHeadingDirection(bearing);
+
+                if (this.compassRose) {
+                    this.compassRose.style.transform = `rotate(-${rounded}deg)`;
+                }
+            });
+    }
+
+    onDestroy() {
+        this._subject.next(null);
+        this._subject.complete();
+    }
+
+    grant() {
+        this.explainAsk = false;
+        this._compassService.prompt();
+    }
+}
+
+component('compass-app', {
     style: css`
         .wrapper {
             display: flex;
@@ -68,53 +118,4 @@ import { takeUntil } from 'rxjs/operators';
             </div>
         </default-layout>
     `,
-})
-export class CompassAppComponent {
-    private _compassService = di(CompassService);
-    private _directionService = di(DirectionService);
-    private _subject = new Subject();
-    compassRose?: HTMLElement;
-    degrees = 0;
-    explainAsk = false;
-    explainDeny = false;
-    explainUnavailable = false;
-    headingDirection = '';
-    showControls = false;
-
-    onInit() {
-        this._compassService
-            .availabilityState()
-            .pipe(takeUntil(this._subject))
-            .subscribe((value) => {
-                this.explainAsk = value === AvailabilityState.PROMPT;
-                this.explainDeny = value === AvailabilityState.DENIED;
-                this.explainUnavailable =
-                    value === AvailabilityState.UNAVAILABLE;
-                this.showControls = value === AvailabilityState.ALLOWED;
-            });
-        this._compassService
-            .getCompassBearing()
-            .pipe(takeUntil(this._subject))
-            .subscribe((bearing: number) => {
-                const rounded = this._directionService.standardize360(
-                    Math.round(bearing)
-                );
-                this.headingDirection =
-                    this._directionService.toHeadingDirection(bearing);
-
-                if (this.compassRose) {
-                    this.compassRose.style.transform = `rotate(-${rounded}deg)`;
-                }
-            });
-    }
-
-    onDestroy() {
-        this._subject.next(null);
-        this._subject.complete();
-    }
-
-    grant() {
-        this.explainAsk = false;
-        this._compassService.prompt();
-    }
-}
+}, CompassAppComponent);

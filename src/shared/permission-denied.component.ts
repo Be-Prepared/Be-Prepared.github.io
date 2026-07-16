@@ -1,7 +1,19 @@
-import { Component, css, emit, html } from 'fudgel';
+import { component, css, emit, html } from 'fudgel';
 import { goBack } from '../util/go-back';
 
-@Component('permission-denied', {
+export class PermissionDeniedComponent {
+    messageId: string = '';
+
+    goBack() {
+        goBack();
+    }
+
+    grant() {
+        emit(this, 'grant');
+    }
+}
+
+component('permission-denied', {
     attr: ['messageId'],
     style: css`
         :host {
@@ -32,15 +44,4 @@ import { goBack } from '../util/go-back';
         <back-button></back-button>
         <div></div>
     `,
-})
-export class PermissionDeniedComponent {
-    messageId: string = '';
-
-    goBack() {
-        goBack();
-    }
-
-    grant() {
-        emit(this, 'grant');
-    }
-}
+}, PermissionDeniedComponent);
