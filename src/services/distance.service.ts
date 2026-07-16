@@ -4,6 +4,7 @@ import { DistanceSystem } from '../datatypes/distance-system';
 import { PreferenceService } from './preference.service';
 
 export interface DistanceOptions {
+    omitLabel?: boolean;
     useSmallUnits?: boolean;
     isSpeed?: boolean;
 }
@@ -86,29 +87,41 @@ export class DistanceService {
         if (options.isSpeed) {
             const mph = (feet * 3600) / 5280;
 
-            return `${this._fixed(mph)} mph`;
+            return options.omitLabel
+                ? this._fixed(mph)
+                : `${this._fixed(mph)} mph`;
         }
 
         if (feet < 528 || options.useSmallUnits) {
-            return `${Math.round(feet)} ft`;
+            return options.omitLabel
+                ? String(Math.round(feet))
+                : `${Math.round(feet)} ft`;
         }
 
         const miles = feet / 5280;
 
-        return `${this._fixed(miles)} mi`;
+        return options.omitLabel
+            ? this._fixed(miles)
+            : `${this._fixed(miles)} mi`;
     }
 
     private _toMetric(meters: number, options: DistanceOptions): string {
         if (options.isSpeed) {
-            return `${this._fixed(3.6 * meters)} km/h`;
+            return options.omitLabel
+                ? this._fixed(3.6 * meters)
+                : `${this._fixed(3.6 * meters)} km/h`;
         }
 
         if (meters < 1000 || options.useSmallUnits) {
-            return `${this._fixed(meters)} m`;
+            return options.omitLabel
+                ? this._fixed(meters)
+                : `${this._fixed(meters)} m`;
         }
 
         const kilometers = meters / 1000;
 
-        return `${this._fixed(kilometers)} km`;
+        return options.omitLabel
+            ? this._fixed(kilometers)
+            : `${this._fixed(kilometers)} km`;
     }
 }

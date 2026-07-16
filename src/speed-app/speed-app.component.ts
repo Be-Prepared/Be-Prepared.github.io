@@ -144,22 +144,15 @@ export class SpeedAppComponent {
         this._distanceService.setDistanceSystem(value);
     }
 
-    private _speedNumber(metersPerSecond: number): string {
-        if (this.distanceSystem === DistanceSystem.IMPERIAL) {
-            const mph = (metersPerSecond * 3.2808398950131 * 3600) / 5280;
-
-            return Math.round(mph).toString();
-        }
-
-        return Math.round(metersPerSecond * 3.6).toString();
-    }
-
     private _updateDisplay() {
         if (!this._lastPosition) {
             return;
         }
 
-        this.currentSpeed = this._speedNumber(this._lastPosition.speed);
+        this.currentSpeed = this._distanceService.metersToString(
+            this._lastPosition.speed,
+            { isSpeed: true, omitLabel: true }
+        );
         this.averageSpeed = this._distanceService.metersToString(
             this._lastPosition.speedSmoothed,
             { isSpeed: true }
