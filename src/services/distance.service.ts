@@ -17,8 +17,6 @@ export const DISTANCE_SYSTEMS = [
 
 export const DistanceSystemDefault = DistanceSystem.IMPERIAL;
 
-const METERS_TO_FEET = 3.2808398950131;
-
 export class DistanceService {
     private _currentSetting = new BehaviorSubject<DistanceSystem>(
         DistanceSystemDefault
