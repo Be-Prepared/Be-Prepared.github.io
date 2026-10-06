@@ -8,26 +8,20 @@ on:
 permissions:
     contents: write
 
-# A workflow run is made up of one or more jobs that can run sequentially or in
-# parallel
+# Unit tests and browser tests run side by side. The site is only deployed
+# when both pass.
 jobs:
-    build-and-deploy:
+    test:
+        name: Unit tests and build
         runs-on: ubuntu-latest
 
         steps:
-            # Checks out your repository under $GITHUB_WORKSPACE, so your job
-            # can access it If you're using actions/checkout@v2 you must set
-            # persist-credentials to false in most cases for the deployment to
-            # work correctly.
             - name: Checkout 🛎️
               uses: actions/checkout@v4
               with:
+                  # The build stamps the git commit into the app.
                   fetch-depth: 0
 
-            # This example project is built using npm and outputs the result to
-            # the 'build' folder. Replace with the commands required to build
-            # your project, or remove this step entirely if your site is
-            # pre-built.
             # The test runner needs Node 22 or newer for glob patterns.
             - name: Set up Node ⚙️
               uses: actions/setup-node@v4
@@ -35,14 +29,69 @@ jobs:
                   node-version: 'lts/*'
                   cache: npm
 
-            - name: Install and Build 🔧
+            - name: Install, test, and build 🔧
               run: |
                   npm ci
                   npm test
                   npm run build
 
+            - name: Keep the build for deploying 📦
+              uses: actions/upload-artifact@v4
+              with:
+                  name: dist
+                  path: dist
+
+    e2e:
+        name: Browser tests
+        runs-on: ubuntu-latest
+        # Screenshot baselines were made in this image, so fonts and rendering
+        # match. Keep the version in step with @playwright/test.
+        container:
+            image: mcr.microsoft.com/playwright:v1.63.0-noble
+            options: --ipc=host
+
+        steps:
+            - name: Checkout 🛎️
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Install 🔧
+              run: npm ci
+
+            - name: Test in Chromium, Firefox, and WebKit 🧪
+              # Firefox refuses to run when HOME belongs to another user.
+              env:
+                  HOME: /root
+              run: npx playwright test
+
+            - name: Keep the report when something fails 📋
+              if: failure()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: playwright-report
+                  path: |
+                      playwright-report
+                      test-results
+                  retention-days: 14
+
+    deploy:
+        name: Deploy
+        needs: [test, e2e]
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout 🛎️
+              uses: actions/checkout@v4
+
+            - name: Get the build 📦
+              uses: actions/download-artifact@v4
+              with:
+                  name: dist
+                  path: dist
+
             - name: Deploy 🚀
               uses: JamesIves/github-pages-deploy-action@v4
               with:
-                  folder: dist # The folder the action should deploy.
+                  folder: dist
                   single-commit: true

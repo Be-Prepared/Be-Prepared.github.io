@@ -8,6 +8,6 @@
             "@types/w3c-generic-sensor"
         ]
     },
-    "include": ["src"],
+    "include": ["src", "e2e", "playwright.config.ts"],
     "exclude": []
 }

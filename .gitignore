@@ -2,3 +2,6 @@ dist/
 node_modules/
 *.swp
 cities15000.zip
+test-results/
+playwright-report/
+dist-size/

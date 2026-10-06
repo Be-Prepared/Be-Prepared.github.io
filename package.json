@@ -9,11 +9,15 @@
         "generate-pwa-assets": "pwa-assets-generator",
         "reinstall": "rm -rf node_modules package-lock.json && npm install",
         "start": "vite",
-        "test": "tsc -p tsconfig.test.json && node --import tsx --test \"src/**/*.test.ts\"",
-        "tunnel": "echo \"Your tunnel password: $(curl https://loca.lt/mytunnelpassword)\" && npx localtunnel -p 8080"
+        "test": "tsc -p tsconfig.test.json && node --import tsx --test \"src/**/*.test.ts\" \"experiments/**/*.test.mjs\"",
+        "tunnel": "echo \"Your tunnel password: $(curl https://loca.lt/mytunnelpassword)\" && npx localtunnel -p 8080",
+        "test:e2e": "playwright test",
+        "test:e2e:docker": "docker run --rm --ipc=host --user \"$(id -u):$(id -g)\" -e HOME=/tmp -v \"$PWD\":/work --tmpfs /work/node_modules:exec,mode=1777 -w /work mcr.microsoft.com/playwright:v1.63.0-noble bash -c 'npm ci --no-audit --no-fund && npx playwright test \"$@\"' --",
+        "size": "node scripts/size-report.mjs"
     },
     "type": "module",
     "devDependencies": {
+        "@playwright/test": "^1.63.0",
         "@types/node": "^26.6.4",
         "@vite-pwa/assets-generator": "^1.0.2",
         "fudgel": "^3.3.0",
