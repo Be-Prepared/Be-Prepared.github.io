@@ -4,8 +4,12 @@ export class PrettyInputComponent {
     helpHtml?: string;
     showingHelp = false;
     type = 'text';
+    value = '';
 
     change(value: string) {
+        // Track what is shown, so a parent setting a different value (such
+        // as expanded shorthand) is seen as a change and updates the input.
+        this.value = value;
         emit(this, 'change', value);
     }
 
@@ -87,7 +91,7 @@ component('pretty-input', {
         <div class="wrapper">
             <input
                 type="{{type}}"
-                value="{{value}}"
+                .value="value || ''"
                 @change.stop.prevent="change($event.target.value)"
             />
             <load-svg

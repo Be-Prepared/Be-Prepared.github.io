@@ -174,7 +174,17 @@ export class AccessController<T> {
             }
         };
 
-        return this._config.acquire().then(
+        // A synchronous throw (for example a missing browser API) counts as
+        // a failed acquire, not a crash that leaves the screen spinning.
+        let acquiring: Promise<T>;
+
+        try {
+            acquiring = Promise.resolve(this._config.acquire());
+        } catch (error) {
+            acquiring = Promise.reject(error);
+        }
+
+        return acquiring.then(
             (resource) => {
                 done();
 

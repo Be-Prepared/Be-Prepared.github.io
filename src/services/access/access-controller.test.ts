@@ -357,3 +357,12 @@ test('duplicate requests do not acquire twice', async () => {
     controller.request();
     assert.equal(acquireCalls.count, 1);
 });
+
+test('an acquire that throws right away shows the error state', async () => {
+    const { controller } = setup(PermissionStatus.UNKNOWN, () => {
+        throw error('NotSupportedError');
+    });
+    controller.init();
+    await tick();
+    assert.equal(controller.currentState, AccessState.UNAVAILABLE);
+});

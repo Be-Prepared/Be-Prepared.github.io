@@ -1,3 +1,4 @@
+import { chooseLanguage } from './choose-language';
 import { enUS } from './en-us';
 import { LanguageData } from './language-data';
 import { languages } from './languages';
@@ -9,26 +10,24 @@ export class I18nService {
         return this._data[str] || str;
     }
 
-    set(language: string) {
-        for (const lang of [language, language.split('-')[0], '']) {
-            const data = languages[lang];
+    // Uses the first language in the browser's preference list that has a
+    // translation, so someone who reads Portuguese and then English gets
+    // Portuguese when it exists.
+    set(preferences: string | readonly string[]) {
+        const list = typeof preferences === 'string' ? [preferences] : preferences;
+        const language = chooseLanguage(list, Object.keys(languages));
+        this._data = languages[language] || enUS;
+        const html = document.getElementsByTagName('html')[0];
 
-            if (data) {
-                this._data = data;
-                const html = document.getElementsByTagName('html')[0];
+        if (html) {
+            // The language actually shown, for screen readers and spelling.
+            html.setAttribute('lang', language || 'en-US');
+        }
 
-                if (html) {
-                    html.setAttribute('lang', language);
-                }
+        const title = document.getElementsByTagName('title')[0];
 
-                const title = document.getElementsByTagName('title')[0];
-
-                if (title) {
-                    title.textContent = this.get('app.title');
-                }
-
-                return;
-            }
+        if (title) {
+            title.textContent = this.get('app.title');
         }
     }
 

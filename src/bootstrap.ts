@@ -5,7 +5,11 @@ import { ReminderService } from './services/reminder.service';
 import { UpdatePwaService } from './update-pwa/update-pwa.service';
 
 export const bootstrap = () => {
-    di(I18nService).set(navigator.language || '');
+    di(I18nService).set(
+        navigator.languages?.length
+            ? navigator.languages
+            : [navigator.language || '']
+    );
     di(InstallPwaService).listenForEvents();
     di(UpdatePwaService).listenForEvents();
 

@@ -28,11 +28,15 @@ const SAFELISTED_SCHEMES = [
 const OTHER_ALLOWED_SCHEMS = ['http', 'https'];
 export class UrlService {
     isUrl(url: string) {
+        // Schemes are case-insensitive, and alphanumeric QR codes can only
+        // hold capital letters.
+        const lower = url.toLowerCase();
+
         for (const protocol of [
             ...SAFELISTED_SCHEMES,
             ...OTHER_ALLOWED_SCHEMS,
         ]) {
-            if (url.startsWith(`${protocol}:`)) {
+            if (lower.startsWith(`${protocol}:`)) {
                 return true;
             }
         }

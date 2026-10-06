@@ -34,6 +34,13 @@ export class NfcService {
         return new AccessController<AbortController>({
             permission: watchPermission('nfc'),
             acquire: () => {
+                if (!this.isSupported()) {
+                    const error = new Error('Web NFC is not supported');
+                    error.name = 'NotSupportedError';
+
+                    return Promise.reject(error);
+                }
+
                 const abortController = new AbortController();
                 const reader = new NDEFReader();
                 reader.onreading = (event) =>
