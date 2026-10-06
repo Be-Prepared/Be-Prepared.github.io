@@ -42,7 +42,7 @@ Decoders:
 The findings below led to a new frame format, now in `src/file-transfer-app/`:
 
 * **Seeded frames.** Each frame carries a random 32-bit seed instead of a list of block numbers. Sender and receiver derive the same blocks from it, so there's no 16-block cap and the header is a fixed 13 bytes.
-* **Robust soliton degrees plus 2% dense frames.** 98% of frames combine a few blocks (robust soliton, c = 0.03, δ = 0.5). 2% combine a random half of all blocks. Every frame is still random and independent of the others.
+* **Robust soliton degrees plus 2% dense frames.** 98% of frames combine a few blocks (robust soliton, c = 0.03, δ = 0.5). 2% combine a random quarter of all blocks. Every frame is still random and independent of the others.
 * **Inactivation decoding.** The receiver peels as frames arrive. Once it has k frames, it finishes with elimination over a few dozen to a few hundred "inactivated" blocks. That rebuilds the file whenever the frames determine it at all, the same as full Gaussian elimination, at a fraction of the cost.
 * **Alphanumeric QR payload** and native `CompressionStream` instead of pako (section 4).
 
@@ -91,21 +91,21 @@ Today's format at k = 5000 needs 1.58 × k on average and up to 2.83 × k (`resu
 
 ### 1b. How dense should the dense frames be?
 
-Dense frames hold a random half of all blocks. Fewer would be cheaper to build, so `robust.mjs --densities=...` tried 20% to 60% in steps of 5%, with 10,000 blocks, 95% of frames lost, and 200 runs each (`results-density-k10000.txt`):
+Dense frames could hold any share of the blocks. Fewer is cheaper to build and to work back out, so `robust.mjs --densities=...` tried 20% to 60% in steps of 5%, with 10,000 blocks, 95% of frames lost, and 200 runs each (`results-density-k10000.txt`):
 
 | Dense frame holds | Extra frames beyond k: mean / p99 / worst |
 |---:|---:|
 | 20% | 4.2 / 19 / 21 |
-| 25% | 4.1 / 14 / 17 |
+| **25% (app)** | **4.1 / 14 / 17** |
 | 30% | 4.2 / 13 / 17 |
 | 35% | 4.2 / 15 / 19 |
 | 40% | 4.1 / 16 / 18 |
 | 45% | 4.3 / 19 / 20 |
-| 50% (app) | 4.3 / 14 / 19 |
+| 50% | 4.3 / 14 / 19 |
 | 55% | 4.3 / 13 / 18 |
 | 60% | 3.9 / 14 / 17 |
 
-They're all the same within noise: about 4 extra frames for 10,000 blocks (1.0004 × k), and at most about 21 (1.002). With thousands of blocks, even a 20% frame is random enough that each one fixes a missing piece about as surely as a 50% frame. A fully dense code averages about 1.6 extra frames, so this design is already within about 3 frames of the best possible; the small remainder comes from the sparse frames that keep decoding cheap. The app keeps 50%.
+They're all the same within noise: about 4 extra frames for 10,000 blocks (1.0004 × k), and at most about 21 (1.002). With thousands of blocks, even a 20% frame is random enough that each one fixes a missing piece about as surely as a 50% frame. A fully dense code averages about 1.6 extra frames, so this design is already within about 3 frames of the best possible; the small remainder comes from the sparse frames that keep decoding cheap. The app uses 25%: it needs just as few frames, and each dense frame holds half as many blocks to XOR in and out. The tables in section 1 were run at 50%.
 
 ### 2. The app's decoder on real data
 
@@ -119,6 +119,8 @@ They're all the same within noise: about 4 extra frames for 10,000 blocks (1.000
 | 1,000 | 0.4 MB | 90% | 1.0044 / 1.0080 | 23 | 18 | 18 |
 | 5,000 | 2.1 MB | 90% | 1.0020 / 1.0020 | 201 | 147 | 316 |
 | 2,000 (1400-byte frames) | 2.7 MB | 25% | 1.0024 / 1.0040 | 58 | 47 | 114 |
+
+That table was measured with dense frames holding 50% of blocks. At 25%, with the decoder storing only the blocks a frame still needs, the same benchmark at 95% loss (`results-app-decoder-25.txt`) finishes in 92 ms at k = 5,000 and 412 ms at k = 10,000, with the slowest frame while receiving at 26 ms and 95 ms. Frame counts are unchanged.
 
 While frames arrive, the decoder only peels and, every 0.2% of k frames, checks with bit masks whether the frames are enough. The block work happens once, after the camera stops ("Finishing…" on screen). The transfer itself takes minutes, so a second or two at the end is fine.
 

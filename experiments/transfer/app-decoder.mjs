@@ -21,7 +21,7 @@ const blockSize = +(options.block || 450);
 const loss = +(options.loss || 0.5);
 const density = options.density ? +options.density : undefined;
 
-console.log(`dense frames hold ${Math.round((density ?? 0.5) * 100)}% of blocks, block ${blockSize} bytes, ${Math.round(loss * 100)}% of frames lost, ${runs} runs\n`);
+console.log(`dense frames hold ${Math.round((density ?? 0.25) * 100)}% of blocks, block ${blockSize} bytes, ${Math.round(loss * 100)}% of frames lost, ${runs} runs\n`);
 console.log('| k | file size | received ÷ k mean / worst | CPU ms while receiving, mean / worst | slowest frame ms | finishing ms mean / worst |');
 console.log('|---:|---:|---:|---:|---:|---:|');
 

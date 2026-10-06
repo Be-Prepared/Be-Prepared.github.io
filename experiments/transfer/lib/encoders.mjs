@@ -116,8 +116,9 @@ export function carouselDense(k, _table, rng, every = 4) {
 // and late starts don't matter. The dense frames close the rare gap where
 // some block never landed in any LT frame, which is what causes the LT
 // worst case. They join the small elimination system at the end.
-// `density` is the share of all blocks in each dense frame.
-export function mixed(k, table, rng, denseShare = 0.02, density = 0.5) {
+// `density` is the share of all blocks in each dense frame. The app uses a
+// quarter; the share makes no measurable difference from 20% to 60%.
+export function mixed(k, table, rng, denseShare = 0.02, density = 0.25) {
     return () =>
         rng() < denseShare
             ? denseIndices(k, rng, density)

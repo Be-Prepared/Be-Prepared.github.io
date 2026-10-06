@@ -1,0 +1,7 @@
+dense frames hold 25% of blocks, block 450 bytes, 95% of frames lost, 10 runs
+
+| k | file size | received ÷ k mean / worst | CPU ms while receiving, mean / worst | slowest frame ms | finishing ms mean / worst |
+|---:|---:|---:|---:|---:|---:|
+| 1000 | 0.4 MB | 1.0058 / 1.0120 | 11 / 18 | 7 | 6 / 7 |
+| 5000 | 2.1 MB | 1.0020 / 1.0040 | 70 / 90 | 26 | 92 / 123 |
+| 10000 | 4.3 MB | 1.0020 / 1.0020 | 297 / 348 | 95 | 412 / 465 |

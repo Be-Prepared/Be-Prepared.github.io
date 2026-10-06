@@ -8,7 +8,7 @@
 // started watching. See experiments/transfer/README.md for the numbers.
 //
 // * Most frames use a robust soliton degree distribution (Luby, 2002).
-// * DENSE_SHARE of frames XOR a random half of all blocks. They close the
+// * DENSE_SHARE of frames XOR a random quarter of all blocks. They close the
 //   rare gap where some block never landed in any other frame, which is
 //   what made plain LT codes need 30-60% extra frames in bad runs.
 // * The decoder peels as frames arrive (cheap, and shows progress). Once
@@ -21,7 +21,7 @@ const SOLITON_C = 0.03;
 const SOLITON_DELTA = 0.5;
 export const DENSE_SHARE = 0.02;
 // Share of all blocks in each dense frame.
-export const DENSE_DENSITY = 0.5;
+export const DENSE_DENSITY = 0.25;
 
 // Small, fast, and identical everywhere. Not for cryptography.
 export function mulberry32(seed: number) {
@@ -154,12 +154,18 @@ export class FountainEncoder {
 }
 
 interface Equation {
+    // Blocks that weren't known when the frame arrived. Known ones are
+    // XORed out right away and never stored.
     blocks: number[];
+    // The frame's data with every known block XORed out.
     data: Uint8Array;
     // Blocks in this equation that aren't solved yet.
     remaining: number;
+    // Used to solve a block, or found to hold nothing new.
     done: boolean;
 }
+
+const NOTHING = new Uint8Array(0);
 
 export class FountainDecoder {
     readonly k: number;
@@ -196,27 +202,29 @@ export class FountainDecoder {
         this.receivedCount += 1;
         const id = this._equations.length;
         const equation: Equation = {
-            blocks: this._indexer(seed),
+            blocks: [],
             data: data.slice(),
             remaining: 0,
             done: false,
         };
         this._equations.push(equation);
 
-        for (const block of equation.blocks) {
+        for (const block of this._indexer(seed)) {
             const value = this._values[block];
 
             if (value) {
                 xorInto(equation.data, value);
             } else {
-                equation.remaining += 1;
+                equation.blocks.push(block);
                 this._waiting[block].push(id);
             }
         }
 
+        equation.remaining = equation.blocks.length;
+
         if (equation.remaining === 0) {
             // Nothing new in this frame.
-            equation.done = true;
+            this._retire(equation);
         } else if (equation.remaining === 1) {
             this._peel([id]);
         }
@@ -264,13 +272,22 @@ export class FountainDecoder {
             if (equation.remaining === 1) {
                 queue.push(other);
             } else if (equation.remaining === 0) {
-                equation.done = true;
+                // Every block it held was solved some other way.
+                this._retire(equation);
             }
         }
 
         this._waiting[block] = [];
 
         return queue;
+    }
+
+    // A finished equation is never read again, so let go of its memory.
+    // (When it solved a block, its data lives on as that block's value.)
+    private _retire(equation: Equation) {
+        equation.done = true;
+        equation.blocks = [];
+        equation.data = NOTHING;
     }
 
     private _peel(queue: number[]) {
@@ -282,8 +299,9 @@ export class FountainDecoder {
             }
 
             const block = equation.blocks.find((b) => !this._values[b])!;
-            equation.done = true;
-            queue.push(...this._solve(block, equation.data));
+            const value = equation.data;
+            this._retire(equation);
+            queue.push(...this._solve(block, value));
         }
     }
 

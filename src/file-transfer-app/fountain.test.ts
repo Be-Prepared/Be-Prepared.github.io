@@ -102,3 +102,52 @@ test('extra and duplicate frames are harmless', () => {
     assert.deepEqual(decoder.blocks(), blocks);
     assert.equal(decoder.add(12345, encoder.frame(12345)), true);
 });
+
+test('solved blocks are removed from every waiting frame right away', () => {
+    const k = 300;
+    const blocks = randomBlocks(k, 8, 77);
+    const encoder = new FountainEncoder(blocks);
+    const decoder = new FountainDecoder(k);
+    // Looks inside: the test is about the bookkeeping, not the result.
+    const inside = decoder as unknown as {
+        _equations: { blocks: number[]; data: Uint8Array; done: boolean; remaining: number }[];
+        _values: (Uint8Array | null)[];
+        _waiting: number[][];
+    };
+
+    for (let seed = 1000; !decoder.done; seed += 1) {
+        decoder.add(seed, encoder.frame(seed));
+
+        if (decoder.done) {
+            break;
+        }
+
+        inside._equations.forEach((equation, id) => {
+            if (equation.done) {
+                // Finished frames hold no memory.
+                assert.equal(equation.blocks.length + equation.data.length, 0);
+
+                return;
+            }
+
+            const unknown = equation.blocks.filter((b) => !inside._values[b]);
+            assert.equal(equation.remaining, unknown.length);
+            // One unknown block would have been solved; none means done.
+            assert.ok(unknown.length >= 2, `frame ${id} left with ${unknown.length}`);
+            // The data is exactly the XOR of the blocks still unknown.
+            const expected = new Uint8Array(8);
+            unknown.forEach((b) => blocks[b].forEach((byte, i) => (expected[i] ^= byte)));
+            assert.deepEqual(equation.data, expected);
+            // And each of those blocks knows this frame is waiting on it.
+            unknown.forEach((b) => assert.ok(inside._waiting[b].includes(id)));
+        });
+        inside._values.forEach((value, b) => {
+            if (value) {
+                assert.deepEqual(value, blocks[b]);
+                assert.equal(inside._waiting[b].length, 0);
+            }
+        });
+    }
+
+    assert.deepEqual(decoder.blocks(), blocks);
+});
