@@ -1,3 +1,4 @@
+import { BarcodeEngine } from './barcode-reader/engine-selection';
 import { CoordinateSystem } from '../datatypes/coordinate-system';
 import { DistanceSystem } from '../datatypes/distance-system';
 import {
@@ -10,6 +11,7 @@ import { WaypointSaved } from '../datatypes/waypoint-saved';
 import { TimeSystem } from '../datatypes/time-system';
 
 export class PreferenceService {
+    barcodeEngine: LocalStorageInterface<BarcodeEngine>;
     coordinateSystem: LocalStorageInterface<CoordinateSystem>;
     distanceSystem: LocalStorageInterface<DistanceSystem>;
     // fields are not stored here
@@ -45,6 +47,12 @@ export class PreferenceService {
             storage.removeItem(name);
         }
 
+        // Not "barcodeReader"; that key held an old cached probe result
+        // and is removed above.
+        this.barcodeEngine = LocalStorageService.enum<BarcodeEngine>(
+            'barcodeEngine',
+            BarcodeEngine
+        );
         this.coordinateSystem = LocalStorageService.enum<CoordinateSystem>(
             'coordinateSystem',
             CoordinateSystem

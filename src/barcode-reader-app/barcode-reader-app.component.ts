@@ -1,4 +1,9 @@
 import { AccessState } from '../services/access/access-controller';
+import {
+    BARCODE_ENGINES,
+    BarcodeEngine,
+    nativeUsable,
+} from '../services/barcode-reader/engine-selection';
 import { BarcodeReaderService } from '../services/barcode-reader.service';
 import {
     CameraService,
@@ -35,6 +40,15 @@ export class BarcodeReaderAppComponent {
     private _track: MediaStreamTrack | null = null;
     private _urlService = di(UrlService);
     barcodeFound: DetectedBarcodeData | null = null;
+    engineChoices: {
+        value: BarcodeEngine;
+        labelId: string;
+        enabled: boolean;
+    }[] = [];
+    engineFellBack = false;
+    engineLabelId = '';
+    engineMenuOpen = false;
+    nativeUnusable = false;
     isUrl = false;
     screenState = AccessState.CHECKING;
     torchAvailable = false;
@@ -49,6 +63,22 @@ export class BarcodeReaderAppComponent {
             .pipe(takeUntil(this._subject))
             .subscribe((stream) => this._attach(stream));
         this._camera.init();
+        this._barcodeReaderService
+            .getPreference()
+            .pipe(takeUntil(this._subject))
+            .subscribe(() => this._updateEngine());
+    }
+
+    chooseEngine(value: BarcodeEngine) {
+        this._barcodeReaderService.setPreference(value);
+    }
+
+    closeEngineMenu() {
+        this.engineMenuOpen = false;
+    }
+
+    openEngineMenu() {
+        this.engineMenuOpen = true;
     }
 
     onDestroy() {
@@ -120,6 +150,21 @@ export class BarcodeReaderAppComponent {
                     this._scanLoop.start();
                 }
             }
+        });
+    }
+
+    private _updateEngine() {
+        this._barcodeReaderService.report().then((report) => {
+            const usable = nativeUsable(report.native);
+
+            this.engineLabelId = `barcodeReader.${report.choice.engine}`;
+            this.engineFellBack = report.choice.fellBack;
+            this.engineChoices = BARCODE_ENGINES.map((value) => ({
+                value,
+                labelId: `barcodeReader.engine.${value}`,
+                enabled: value === report.preference,
+            }));
+            this.nativeUnusable = !usable;
         });
     }
 
@@ -211,6 +256,59 @@ component(
             .actions {
                 margin-top: var(--space-3);
             }
+
+            .engine-chip {
+                position: absolute;
+                top: calc(env(safe-area-inset-top) + var(--space-3));
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 2;
+                padding: var(--space-1) var(--space-3);
+                border-radius: 999px;
+                border: 1px solid var(--border);
+                background: var(--surface);
+                color: var(--fg);
+                font: inherit;
+                font-size: 0.85rem;
+                white-space: nowrap;
+                max-width: calc(100% - 2 * var(--space-4));
+                overflow: hidden;
+                text-overflow: ellipsis;
+                cursor: pointer;
+                box-shadow: var(--shadow);
+            }
+
+            .engine-menu {
+                background-color: var(--bg);
+                border: 1px solid var(--border);
+                color: var(--fg);
+                padding: var(--space-4);
+                border-radius: var(--radius-l);
+                box-sizing: border-box;
+                width: min(100%, 26rem);
+                max-height: 90vh;
+                overflow: auto;
+            }
+
+            .engine-menu h2 {
+                margin: 0 0 var(--space-3);
+                font-size: 1.2rem;
+            }
+
+            .engine-menu pretty-button {
+                margin-bottom: var(--space-2);
+            }
+
+            .engine-help {
+                color: var(--fg-muted);
+                font-size: 0.9rem;
+                line-height: 1.4;
+                margin: var(--space-3) 0;
+            }
+
+            .warning {
+                color: var(--warning);
+            }
         `,
         template: html`
             <access-screen
@@ -224,6 +322,15 @@ component(
                 <video #ref="video" autoplay muted playsinline></video>
                 <div class="target"></div>
             </div>
+            <button
+                *if="screenState === 'READY' && engineLabelId"
+                class="engine-chip"
+                @click.stop.prevent="openEngineMenu()"
+            >
+                <i18n-label id="barcodeReader.engine.using" ws=""></i18n-label>
+                <i18n-label id="{{engineLabelId}}"></i18n-label>
+                <span *if="engineFellBack" class="warning">⚠</span>
+            </button>
             <default-layout *if="screenState === 'READY'" overlay>
                 <icon-button
                     slot="more-buttons"
@@ -233,7 +340,46 @@ component(
                     .active="torchEnabled"
                     @click.stop.prevent="toggleTorch()"
                 ></icon-button>
+                <icon-button
+                    slot="more-buttons"
+                    href="/barcode-reader.svg"
+                    label-id="barcodeReader.engine"
+                    @click.stop.prevent="openEngineMenu()"
+                ></icon-button>
             </default-layout>
+            <show-modal *if="engineMenuOpen" @clickoutside="closeEngineMenu()">
+                <div class="engine-menu">
+                    <h2>
+                        <i18n-label id="barcodeReader.engine" ws=""></i18n-label>
+                    </h2>
+                    <pretty-button
+                        *for="choice of engineChoices"
+                        .enabled="choice.enabled"
+                        @click.stop.prevent="chooseEngine(choice.value)"
+                        ><i18n-label id="{{choice.labelId}}" ws=""></i18n-label
+                    ></pretty-button>
+                    <div *if="nativeUnusable" class="engine-help warning">
+                        <i18n-label
+                            id="barcodeReader.engine.nativeUnavailable"
+                            ws=""
+                        ></i18n-label>
+                    </div>
+                    <div class="engine-help">
+                        <i18n-label
+                            id="barcodeReader.engine.help"
+                            ws=""
+                        ></i18n-label>
+                    </div>
+                    <pretty-button
+                        variant="primary"
+                        @click.stop.prevent="closeEngineMenu()"
+                        ><i18n-label
+                            id="barcodeReader.engine.done"
+                            ws=""
+                        ></i18n-label
+                    ></pretty-button>
+                </div>
+            </show-modal>
             <show-modal *if="barcodeFound" @clickoutside="resetFound()">
                 <div class="result">
                     <div class="format">{{barcodeFound.format}}</div>

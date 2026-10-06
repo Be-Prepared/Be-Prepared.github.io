@@ -1,8 +1,15 @@
 import { component, css, html } from 'fudgel';
+import { decodeRecord, NfcDecodedRecord } from './nfc-decode';
 import { NfcScanResult } from '../services/nfc.service';
 
 export class NfcScanResultComponent {
+    decoded: NfcDecodedRecord[] = [];
     scanResult?: NfcScanResult;
+
+    onChange() {
+        const records = (this.scanResult && this.scanResult.records) || [];
+        this.decoded = records.map((record) => decodeRecord(record));
+    }
 }
 
 component('nfc-scan-result', {
@@ -37,7 +44,7 @@ component('nfc-scan-result', {
         </div>
         <div *if="scanResult && scanResult.records">
             <nfc-record
-                *for="record of scanResult.records"
+                *for="record of decoded"
                 .record="record"
                 class="gapAbove"
             ></nfc-record>

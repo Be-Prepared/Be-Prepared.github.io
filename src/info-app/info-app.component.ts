@@ -42,6 +42,7 @@ component('info-app', {
         <default-layout frame>
             <info-share @qr="openQrCode()"></info-share>
             <info-contact></info-contact>
+            <info-browser></info-browser>
             <info-permissions></info-permissions>
             <info-preferences></info-preferences>
             <info-tooling></info-tooling>

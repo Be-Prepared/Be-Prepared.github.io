@@ -1,5 +1,6 @@
 export * from './info-app.component';
 export * from './info-barcodes.component';
+export * from './info-browser.component';
 export * from './info-build.component';
 export * from './info-contact.component';
 export * from './info-header.component';
