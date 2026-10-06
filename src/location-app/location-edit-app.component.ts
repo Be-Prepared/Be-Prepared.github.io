@@ -2,21 +2,24 @@ import { component, css, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
 import { di } from '../di';
 import { Subscription } from 'rxjs';
+import { ReferenceLocationService } from '../services/reference-location.service';
 import { ToastService } from '../services/toast.service';
 import { WaypointSaved } from '../datatypes/waypoint-saved';
 import { WaypointService } from './waypoint.service';
 
 export class LocationEditComponent {
     private _coordinateService = di(CoordinateService);
+    private _parseSubscription?: Subscription;
+    private _referenceLocationService = di(ReferenceLocationService);
     private _subscription?: Subscription;
     private _toastService = di(ToastService);
     private _waypointService = di(WaypointService);
+    gettingLocation = false;
     id?: string;
     lat?: number;
     location: string = '';
     locationInput: any;
     lon?: number;
-    nameUrlEncode: string = '';
     point: WaypointSaved | null = null;
     showQr = false;
     validPoint = false;
@@ -42,6 +45,7 @@ export class LocationEditComponent {
 
     onDestroy() {
         this._subscription && this._subscription.unsubscribe();
+        this._parseSubscription && this._parseSubscription.unsubscribe();
     }
 
     averagePoint() {
@@ -62,18 +66,26 @@ export class LocationEditComponent {
     }
 
     locationChange(location: string) {
-        this._coordinateService
-            .fromString(location)
-            .subscribe((convertedLocation) => {
-                if (convertedLocation) {
-                    this.point!.lat = convertedLocation.lat;
-                    this.point!.lon = convertedLocation.lon;
+        this._parseSubscription && this._parseSubscription.unsubscribe();
+        // Shorthand like "UJ 2337 0651" is completed using where you are.
+        this._parseSubscription = this._referenceLocationService
+            .parseLocation(location, (isWaiting) => {
+                this.gettingLocation = isWaiting;
+            })
+            .subscribe(({ latLon, missingReference }) => {
+                if (latLon) {
+                    this.point!.lat = latLon.lat;
+                    this.point!.lon = latLon.lon;
                     this._updatePointProperties();
                     this._waypointService.updatePoint(this.point!);
                     this._updateLocation();
                     this.validPoint = true;
                 } else {
-                    this._toastService.popI18n('location.edit.badLocation');
+                    this._toastService.popI18n(
+                        missingReference
+                            ? 'location.needReference'
+                            : 'location.edit.badLocation'
+                    );
                     this.validPoint = false;
                 }
             });
@@ -100,7 +112,6 @@ export class LocationEditComponent {
     private _updatePointProperties() {
         this.lat = this.point!.lat;
         this.lon = this.point!.lon;
-        this.nameUrlEncode = encodeURIComponent(this.point!.name);
     }
 
     private _updateLocation() {
@@ -113,6 +124,8 @@ export class LocationEditComponent {
             this.location = location.mgrs;
         } else if ('utmups' in location) {
             this.location = location.utmups;
+        } else if ('pluscode' in location) {
+            this.location = location.pluscode;
         } else {
             this.location = location.latLon;
         }
@@ -126,6 +139,17 @@ export class LocationEditComponent {
 component('location-edit-app', {
     attr: ['id'],
     style: css`
+        .share-content {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .share-icon {
+            width: 1.5em;
+            height: 1.5em;
+        }
+
         .gapAbove {
             padding-top: 0.7em;
         }
@@ -193,16 +217,33 @@ component('location-edit-app', {
         .full-width {
             width: 100%;
         }
+
+        .getting-location {
+            padding: var(--space-3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-m);
+            background-color: var(--surface);
+        }
     `,
     template: html`
         <location-wrapper>
             <default-layout *if="point">
                 <div class="content">
                     <div class="actions">
-                        <pretty-button @click="openQrCode()" padding="0px">
-                            <mini-qr
-                                content="geo:{{lat}},{{lon}}?q={{nameUrlEncode}}"
-                            ></mini-qr>
+                        <pretty-button
+                            class="share-button"
+                            @click="openQrCode()"
+                        >
+                            <span class="share-content">
+                                <load-svg
+                                    class="share-icon"
+                                    href="/share-1.svg"
+                                ></load-svg>
+                                <i18n-label
+                                    id="location.share.button"
+                                    ws=""
+                                ></i18n-label>
+                            </span>
                         </pretty-button>
                         <div class="centered-text landscape">
                             <i18n-label
@@ -272,11 +313,20 @@ component('location-edit-app', {
                     label-id="location.navigate"
                 ></icon-button>
             </default-layout>
+            <show-modal *if="gettingLocation">
+                <div class="getting-location">
+                    <i18n-label
+                        id="location.add.gettingCurrentLocation"
+                    ></i18n-label>
+                </div>
+            </show-modal>
             <show-modal *if="showQr" @clickoutside="closeQrCode()">
-                <big-qr
-                    @click="closeQrCode()"
-                    content="geo:{{lat}},{{lon}}?q={{nameUrlEncode}}"
-                ></big-qr>
+                <location-share
+                    lat="{{lat}}"
+                    lon="{{lon}}"
+                    name="{{point.name}}"
+                    @close="closeQrCode()"
+                ></location-share>
             </show-modal>
         </location-wrapper>
     `,

@@ -9,3 +9,4 @@ export * from './location-navigate-app.component.ts';
 export * from './location-wrapper.component.ts';
 export * from './navigation-arrow.component.ts';
 export * from './navigation-type.component.ts';
+export * from './location-share.component';
