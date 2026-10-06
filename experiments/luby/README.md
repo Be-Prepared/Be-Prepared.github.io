@@ -10,6 +10,8 @@ this with the following command.
 node run.mjs --k=5000 robust-soliton-16 --c=0.04 --d=0.01 standard 1000 --seed=1337
 ```
 
+**Note (2026-10):** `run.mjs` used to compute StdDev from only the last run, so the StdDev values in the results below are wrong. With the fix, the first command's block count StdDev is about 1730 (13.6%), not 94. Averages are unaffected. See `../transfer/` for a newer harness that also compares decoders, channels, and frame formats.
+
 Using a fixed seed allows for consistent results between runs as long as the only thing that changes is the decoder and the `--loss` argument is not used.
 
 The most recent run of the above command produced these results:

@@ -1,0 +1,22 @@
+k=5000 runs=12 seed=1337
+Mean degree: app 5.772, robust16 5.136, robust 13.234
+
+Frames shown ÷ k (lower is better; the ideal is 1 ÷ (1 − loss)).
+
+| Strategy | perfect mean / p95 | iid:0.1 mean / p95 | iid:0.3 mean / p95 | burst:0.2:8 mean / p95 | GE size (iid:0.1) |
+|---|---:|---:|---:|---:|---:|
+| app: random, cap 16, peel | 1.512 / 1.918 | 1.771 / 2.410 | 2.258 / 2.816 | 1.956 / 2.453 | — |
+| app: random, cap 16, peel+GE | 1.512 / 1.918 | 1.771 / 2.410 | 2.258 / 2.816 | 1.956 / 2.453 | 0 |
+| robust cap 16, peel | 1.795 / 2.126 | 2.072 / 3.003 | 2.708 / 3.678 | 2.229 / 3.083 | — |
+| robust cap 16, peel+GE | 1.795 / 2.126 | 2.072 / 3.003 | 2.708 / 3.678 | 2.229 / 3.083 | 0 |
+| systematic + app, peel | 1.000 / 1.000 | 2.255 / 2.637 | 3.042 / 3.525 | 2.727 / 3.017 | — |
+| systematic + app, peel+GE | 1.000 / 1.000 | 2.255 / 2.637 | 3.042 / 3.525 | 2.727 / 3.017 | 0 |
+| seeded robust (no cap), peel | 1.060 / 1.092 | 1.175 / 1.197 | 1.504 / 1.564 | 1.330 / 1.391 | — |
+| seeded robust (no cap), peel+GE | 1.001 / 1.004 | 1.111 / 1.120 | 1.424 / 1.441 | 1.266 / 1.337 | 4393 |
+| systematic + robust (no cap), peel+GE | 1.000 / 1.000 | 1.570 / 1.646 | 1.931 / 2.011 | 1.740 / 1.811 | 3 |
+| systematic + dense repair, peel+GE | 1.000 / 1.000 | 1.111 / 1.120 | 1.422 / 1.440 | 1.265 / 1.335 | 495 |
+| carousel + dense every 4th, peel+GE | 1.000 / 1.000 | 1.339 / 1.371 | 1.895 / 1.930 | 1.656 / 1.760 | 382 |
+
+real	1m38.910s
+user	1m40.293s
+sys	0m0.686s

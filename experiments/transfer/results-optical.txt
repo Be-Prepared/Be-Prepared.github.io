@@ -1,0 +1,16 @@
+Camera 960x720, QR fills 60% of height, noise σ=6, levels 30..220, ECC L, 12 runs per cell, 10 frames/s
+
+| QR version | Bytes | Pixels per module | blur σ=0.6: decoded / ms / bytes per s | blur σ=1: decoded / ms / bytes per s | blur σ=1.4: decoded / ms / bytes per s | blur σ=1.8: decoded / ms / bytes per s |
+|---:|---:|---:|---:|---:|---:|---:|
+| 10 | 267 | 6.65 | 100% / 78 / 2003 | 100% / 83 / 2003 | 100% / 81 / 2003 | 100% / 103 / 2003 |
+| 15 | 513 | 5.08 | 100% / 175 / 3848 | 100% / 128 / 3848 | 100% / 95 / 3848 | 92% / 98 / 3527 |
+| 20 | 851 | 4.11 | 100% / 99 / 6383 | 100% / 95 / 6383 | 100% / 103 / 6383 | 0% / 97 / 0 |
+| 25 | 1262 | 3.46 | 100% / 97 / 9465 | 100% / 99 / 9465 | 0% / 103 / 0 | 0% / 97 / 0 |
+| 30 | 1721 | 2.98 | 100% / 99 / 12908 | 8% / 94 / 1076 | 0% / 106 / 0 | 0% / 95 / 0 |
+| 35 | 2291 | 2.62 | 100% / 102 / 17183 | 0% / 115 / 0 | 0% / 104 / 0 | 0% / 115 / 0 |
+| 40 | 2938 | 2.34 | 83% / 139 / 18363 | 0% / 152 / 0 | 0% / 97 / 0 | 0% / 101 / 0 |
+
+Blur σ=0.6: best is version 40 at about 18363 bytes/s
+Blur σ=1: best is version 25 at about 9465 bytes/s
+Blur σ=1.4: best is version 20 at about 6383 bytes/s
+Blur σ=1.8: best is version 15 at about 3527 bytes/s

@@ -91,7 +91,7 @@ function showStats(name, numbers, vsLabel, vsSize) {
 
     for (const n of numbers) {
         const diff = Math.abs(avg - n);
-        diffSquared = diff * diff;
+        diffSquared += diff * diff;
     }
 
     const stdDev = Math.sqrt(diffSquared / numbers.length);
