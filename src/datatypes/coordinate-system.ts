@@ -4,4 +4,5 @@ export enum CoordinateSystem {
     DDD = 'DDD',
     UTMUPS = 'UTMUPS',
     MGRS = 'MGRS',
+    PLUSCODE = 'PLUSCODE',
 }

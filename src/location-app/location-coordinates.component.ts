@@ -92,6 +92,9 @@ component('location-coordinates', {
         <div *if="dataToDisplay.utmups" class="multi-line">
             <div>{{ dataToDisplay.utmups }}</div>
         </div>
+        <div *if="dataToDisplay.pluscode" class="multi-line">
+            <div>{{ dataToDisplay.pluscode }}</div>
+        </div>
         <div *if="dataToDisplay.empty">
             <i18n-label id="location.coordinates.empty"></i18n-label>
         </div>

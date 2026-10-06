@@ -8,6 +8,15 @@ import { DirectionService } from './direction.service';
 import { default as ecefProjector } from 'ecef-projector';
 import { LatLon } from '../datatypes/lat-lon';
 import { map } from 'rxjs/operators';
+import {
+    decodePlusCode,
+    isFullPlusCode,
+    isShortPlusCode,
+    isValidPlusCode,
+    PLUS_CODE_LENGTH_EXTRA,
+    encodePlusCode,
+    recoverNearestPlusCode,
+} from './plus-codes';
 import { PreferenceService } from './preference.service';
 import { XYZ } from '../datatypes/xyz';
 
@@ -28,7 +37,24 @@ export const COORDINATE_SYSTEMS = [
     CoordinateSystem.DDD,
     CoordinateSystem.UTMUPS,
     CoordinateSystem.MGRS,
+    CoordinateSystem.PLUSCODE,
 ];
+
+// Latitude bands for UTM and MGRS, south to north.
+const UTM_BANDS = 'CDEFGHJKLMNPQRSTUVWX';
+
+// "UJ 2337 0651", "UJ23370651", or "2337 0651" (zone and square omitted).
+const MGRS_SHORTHAND_SQUARE =
+    /^([A-HJ-NP-Z])([A-HJ-NP-V]) ?(?:(\d{1,5}) (\d{1,5})|(\d{2,10}))$/;
+const MGRS_SHORTHAND_DIGITS = /^(\d{1,5}) (\d{1,5})$/;
+
+// "J 123456 1234567" or "123456mE 1234567mN" (zone omitted).
+const UTM_SHORTHAND =
+    /^(?:([C-HJ-NP-X]) ?)?(\d{6}(?:\.\d+)?) ?(?:ME?)? (\d{1,7}(?:\.\d+)?) ?(?:MN?)?$/;
+
+// A plus code, optionally followed by a city name ("CWC8+R9 Mountain View").
+const PLUS_CODE =
+    /^([23456789CFGHJMPQRVWX0]{0,8}\+[23456789CFGHJMPQRVWX]*)(?:[ ,]+(.+))?$/i;
 
 export interface NearestCity {
     name: string;
@@ -59,7 +85,11 @@ export interface UTMUPS {
     utmups: string;
 }
 
-export type SystemCoordinates = LL | MGRS | UTMUPS;
+export interface PlusCode {
+    pluscode: string;
+}
+
+export type SystemCoordinates = LL | MGRS | UTMUPS | PlusCode;
 
 export class CoordinateService {
     private _cheapRulerCache = new Map<string, CheapRuler>();
@@ -114,8 +144,21 @@ export class CoordinateService {
         return distance;
     }
 
-    fromString(str: string): Observable<LatLon | null> {
+    // Parses a location. Shorthand (MGRS without the grid zone, UTM without
+    // the zone number, short plus codes) is filled in with the candidate
+    // closest to the reference location and fails when there is no reference.
+    fromString(
+        str: string,
+        reference?: LatLon | null
+    ): Observable<LatLon | null> {
         str = str.trim();
+        const plusCode = this._matchPlusCode(str);
+
+        if (plusCode) {
+            // Plus codes are checked on their own because the degree parser
+            // would happily turn "CWC8+R9" into 8° N 9° W.
+            return this._fromStringPlusCode(plusCode[0], plusCode[1], reference);
+        }
 
         return forkJoin([
             this._fromStringDegrees(str),
@@ -124,8 +167,39 @@ export class CoordinateService {
             this._fromStringCity(str),
         ]).pipe(
             map(([degrees, mgrs, utmUps, city]) => {
-                return degrees || mgrs || utmUps || city;
+                const parsed = degrees || mgrs || utmUps || city;
+
+                if (parsed) {
+                    return parsed;
+                }
+
+                if (reference) {
+                    return (
+                        this._fromStringMgrsShorthand(str, reference) ||
+                        this._fromStringUtmShorthand(str, reference)
+                    );
+                }
+
+                return null;
             })
+        );
+    }
+
+    // True when the text is shorthand that can only be understood relative to
+    // a reference location, such as the current GPS position.
+    needsReference(str: string): boolean {
+        const plusCode = this._matchPlusCode(str);
+
+        if (plusCode) {
+            return !plusCode[1] && isShortPlusCode(plusCode[0]);
+        }
+
+        const cleansed = this._cleanseShorthand(str);
+
+        return (
+            MGRS_SHORTHAND_SQUARE.test(cleansed) ||
+            MGRS_SHORTHAND_DIGITS.test(cleansed) ||
+            UTM_SHORTHAND.test(cleansed)
         );
     }
 
@@ -189,6 +263,10 @@ export class CoordinateService {
             return this._toUTMUPS(lat, lon);
         }
 
+        if (currentSetting === CoordinateSystem.PLUSCODE) {
+            return this._toPlusCode(lat, lon);
+        }
+
         return this._toMGRS(lat, lon);
     }
 
@@ -201,6 +279,10 @@ export class CoordinateService {
 
         if ('mgrs' in system) {
             return system.mgrs;
+        }
+
+        if ('pluscode' in system) {
+            return system.pluscode;
         }
 
         return system.utmups;
@@ -297,6 +379,10 @@ export class CoordinateService {
         return cheapRuler;
     }
 
+    private _cleanseShorthand(str: string) {
+        return str.toUpperCase().replace(/,/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+
     private _fromStringCity(str: string): Observable<LatLon | null> {
         return this._citiesService.getCityByName(str);
     }
@@ -357,6 +443,180 @@ export class CoordinateService {
         return of(null);
     }
 
+    // Fills in the grid zone (and the 100 km square when it is missing too)
+    // using the candidate closest to the reference. That may be in a
+    // neighboring square or zone instead of the reference's own.
+    private _fromStringMgrsShorthand(
+        str: string,
+        reference: LatLon
+    ): LatLon | null {
+        const cleansed = this._cleanseShorthand(str);
+        let prefixes: string[];
+        let easting: string;
+        let northing: string;
+        const withSquare = cleansed.match(MGRS_SHORTHAND_SQUARE);
+
+        if (withSquare) {
+            const square = withSquare[1] + withSquare[2];
+
+            if (withSquare[5]) {
+                if (withSquare[5].length % 2) {
+                    return null;
+                }
+
+                const half = withSquare[5].length / 2;
+                easting = withSquare[5].slice(0, half);
+                northing = withSquare[5].slice(half);
+            } else {
+                easting = withSquare[3];
+                northing = withSquare[4];
+            }
+
+            // A square's letters repeat every 2,000 km north to south and
+            // every three zones east to west. Each band letter selects a
+            // different 2,000 km cycle.
+            prefixes = [];
+
+            for (const zone of this._nearbyZones(reference, 2)) {
+                for (const band of UTM_BANDS) {
+                    prefixes.push(`${zone}${band}${square}`);
+                }
+            }
+        } else {
+            const digitsOnly = cleansed.match(MGRS_SHORTHAND_DIGITS);
+
+            if (!digitsOnly) {
+                return null;
+            }
+
+            easting = digitsOnly[1];
+            northing = digitsOnly[2];
+            prefixes = this._nearbyMgrsSquares(reference);
+        }
+
+        if (easting.length !== northing.length) {
+            return null;
+        }
+
+        let best: LatLon | null = null;
+        let bestDistance = Infinity;
+
+        for (const prefix of prefixes) {
+            const candidate = this._mgrsCandidate(
+                `${prefix}${easting}${northing}`
+            );
+
+            if (candidate) {
+                const distance = this._greatCircleDistance(
+                    reference,
+                    candidate
+                );
+
+                if (distance < bestDistance) {
+                    best = candidate;
+                    bestDistance = distance;
+                }
+            }
+        }
+
+        return best;
+    }
+
+    private _fromStringPlusCode(
+        code: string,
+        locality: string,
+        reference?: LatLon | null
+    ): Observable<LatLon | null> {
+        const decodeCenter = (fullCode: string | null) => {
+            const area = fullCode ? decodePlusCode(fullCode) : null;
+
+            return area
+                ? { lat: area.latitudeCenter, lon: area.longitudeCenter }
+                : null;
+        };
+
+        if (isFullPlusCode(code)) {
+            // A full code doesn't need the locality, so it is ignored.
+            return of(decodeCenter(code));
+        }
+
+        if (locality) {
+            return this._citiesService
+                .getCityByName(locality)
+                .pipe(
+                    map((city) =>
+                        city
+                            ? decodeCenter(
+                                  recoverNearestPlusCode(code, city.lat, city.lon)
+                              )
+                            : null
+                    )
+                );
+        }
+
+        if (reference) {
+            return of(
+                decodeCenter(
+                    recoverNearestPlusCode(code, reference.lat, reference.lon)
+                )
+            );
+        }
+
+        return of(null);
+    }
+
+    // Fills in the zone number (and the hemisphere when the band letter is
+    // missing) using the candidate closest to the reference.
+    private _fromStringUtmShorthand(
+        str: string,
+        reference: LatLon
+    ): LatLon | null {
+        const match = this._cleanseShorthand(str).match(UTM_SHORTHAND);
+
+        if (!match) {
+            return null;
+        }
+
+        const band = match[1];
+        const easting = parseFloat(match[2]);
+        const northing = parseFloat(match[3]);
+        const hemispheres = band ? [band >= 'N'] : [true, false];
+        let best: LatLon | null = null;
+        let bestDistance = Infinity;
+
+        for (const zone of this._nearbyZones(reference, 1)) {
+            for (const isNorth of hemispheres) {
+                let candidate: LatLon | null = null;
+
+                try {
+                    const result = converter.UTMtoLL(
+                        isNorth ? northing : northing - 10000000,
+                        easting,
+                        zone
+                    );
+
+                    if (isFinite(result.lat) && isFinite(result.lon)) {
+                        candidate = { lat: result.lat, lon: result.lon };
+                    }
+                } catch (ignore) {}
+
+                if (candidate) {
+                    const distance = this._greatCircleDistance(
+                        reference,
+                        candidate
+                    );
+
+                    if (distance < bestDistance) {
+                        best = candidate;
+                        bestDistance = distance;
+                    }
+                }
+            }
+        }
+
+        return best;
+    }
+
     private _fromStringUtmUps(str: string): Observable<LatLon | null> {
         str = str.toUpperCase().trim();
         const tryConvert = (cb: () => any) => {
@@ -366,7 +626,11 @@ export class CoordinateService {
                 convertResult = cb();
             } catch (ignore) {}
 
-            if (convertResult) {
+            if (
+                convertResult &&
+                Math.abs(convertResult.lat) <= 90 &&
+                Math.abs(convertResult.lon) <= 180
+            ) {
                 return { lat: convertResult.lat, lon: convertResult.lon };
             }
 
@@ -398,7 +662,11 @@ export class CoordinateService {
                         northPole: isNorth,
                     })
                 );
-            } else if (numbers.length === 3) {
+            } else if (
+                numbers.length === 3 &&
+                parseInt(numbers[0], 10) >= 1 &&
+                parseInt(numbers[0], 10) <= 60
+            ) {
                 // UTM
                 // "northing" needs to be adjusted for southern hemisphere
                 if (!isNorth) {
@@ -416,6 +684,129 @@ export class CoordinateService {
         }
 
         return of(result);
+    }
+
+    // Haversine distance. Unlike CheapRuler it stays accurate over the
+    // hundreds of kilometers between shorthand candidates and across the
+    // antimeridian.
+    private _greatCircleDistance(a: LatLon, b: LatLon): number {
+        const toRad = Math.PI / 180;
+        const dLat = (b.lat - a.lat) * toRad;
+        const dLon = (b.lon - a.lon) * toRad;
+        const h =
+            Math.sin(dLat / 2) ** 2 +
+            Math.cos(a.lat * toRad) *
+                Math.cos(b.lat * toRad) *
+                Math.sin(dLon / 2) ** 2;
+
+        return 2 * 6371008.8 * Math.asin(Math.min(1, Math.sqrt(h)));
+    }
+
+    // Decodes a full MGRS string and checks that it really is in the zone and
+    // 100 km square it claims. Square letters that don't exist in a zone
+    // decode to a misleading location.
+    // Returns the upper case code and the locality ('' when there is none)
+    // when the text is a valid plus code. A locality must contain a letter
+    // so "+45 +70" is still read as degrees.
+    private _matchPlusCode(str: string): [string, string] | null {
+        const match = str.trim().match(PLUS_CODE);
+
+        if (!match || !isValidPlusCode(match[1])) {
+            return null;
+        }
+
+        const locality = (match[2] || '').trim();
+
+        if (locality && !/\p{L}/u.test(locality)) {
+            return null;
+        }
+
+        return [match[1].toUpperCase(), locality];
+    }
+
+    private _mgrsCandidate(mgrs: string): LatLon | null {
+        try {
+            if (!converter.isUSNG(mgrs)) {
+                return null;
+            }
+
+            const area = converter.USNGtoLL(mgrs);
+
+            if (!isFinite(area.south) || !isFinite(area.west)) {
+                return null;
+            }
+
+            const check = converter.LLtoUSNG(
+                (area.north + area.south) / 2,
+                (area.east + area.west) / 2,
+                1
+            );
+            const [zoneBand, square] = check.split(' ');
+            const wanted = mgrs.match(/^(\d+)[A-Z]([A-Z]{2})/)!;
+
+            if (
+                parseInt(zoneBand, 10) !== parseInt(wanted[1], 10) ||
+                square !== wanted[2]
+            ) {
+                return null;
+            }
+
+            // Same corner as full MGRS references.
+            return { lat: area.south, lon: area.west };
+        } catch (ignore) {
+            return null;
+        }
+    }
+
+    // Grid zone and 100 km square prefixes ("18SUJ") around the reference.
+    // Digits repeat every 100 km, so the closest match is within about one
+    // square of the reference; sampling 150 km around it covers that.
+    private _nearbyMgrsSquares(reference: LatLon): string[] {
+        const prefixes = new Set<string>();
+        const step = 50000;
+        const metersPerDegree = 111320;
+
+        for (let dy = -3; dy <= 3; dy += 1) {
+            const lat = reference.lat + (dy * step) / metersPerDegree;
+
+            if (lat < -80 || lat > 84) {
+                continue;
+            }
+
+            const cosLat = Math.max(Math.cos((lat * Math.PI) / 180), 0.01);
+
+            for (let dx = -3; dx <= 3; dx += 1) {
+                const lon = this._directionService.standardize180(
+                    reference.lon + (dx * step) / (metersPerDegree * cosLat)
+                );
+
+                try {
+                    prefixes.add(
+                        converter.LLtoUSNG(lat, lon, 1).replace(/ /g, '')
+                    );
+                } catch (ignore) {}
+            }
+        }
+
+        return [...prefixes];
+    }
+
+    // UTM zone numbers within `spread` zones of the reference, wrapping
+    // around the antimeridian.
+    private _nearbyZones(reference: LatLon, spread: number): number[] {
+        if (reference.lat < -80 || reference.lat > 84) {
+            return [];
+        }
+
+        const lon = this._directionService.standardize180(reference.lon);
+        const zone = Math.min(Math.floor((lon + 180) / 6) + 1, 60);
+        const zones: number[] = [];
+
+        for (let offset = -spread; offset <= spread; offset += 1) {
+            zones.push(((zone + offset + 59) % 60) + 1);
+        }
+
+        return zones;
     }
 
     private _padLeading(str: string): string {
@@ -469,19 +860,37 @@ export class CoordinateService {
         };
     }
 
+    // Rounds once, in the smallest unit shown, and then splits into parts.
+    // Rounding each part separately can show 59.96 seconds as "60.0"
+    // instead of carrying into the next minute.
+    private _splitDDM(value: number) {
+        const thousandthsOfMinutes = Math.round(Math.abs(value) * 60000);
+
+        return {
+            degrees: Math.floor(thousandthsOfMinutes / 60000),
+            minutes: (thousandthsOfMinutes % 60000) / 1000,
+        };
+    }
+
+    private _splitDMS(value: number) {
+        const tenthsOfSeconds = Math.round(Math.abs(value) * 36000);
+
+        return {
+            degrees: Math.floor(tenthsOfSeconds / 36000),
+            minutes: Math.floor((tenthsOfSeconds % 36000) / 600),
+            seconds: (tenthsOfSeconds % 600) / 10,
+        };
+    }
+
     private _toDDM(lat: number, lon: number): LL {
         const latDir = lat >= 0 ? 'N' : 'S';
         const lonDir = lon >= 0 ? 'E' : 'W';
-
-        lat = Math.abs(lat);
-        const latDeg = Math.floor(lat);
-        const latMin = (lat - latDeg) * 60;
-        const latMinFixed = this._padLeading(latMin.toFixed(3));
-
-        lon = Math.abs(lon);
-        const lonDeg = Math.floor(lon);
-        const lonMin = (lon - lonDeg) * 60;
-        const lonMinFixed = this._padLeading(lonMin.toFixed(3));
+        const latParts = this._splitDDM(lat);
+        const lonParts = this._splitDDM(lon);
+        const latDeg = latParts.degrees;
+        const latMinFixed = this._padLeading(latParts.minutes.toFixed(3));
+        const lonDeg = lonParts.degrees;
+        const lonMinFixed = this._padLeading(lonParts.minutes.toFixed(3));
 
         return {
             lat: `${latDir} ${latDeg}° ${latMinFixed}'`,
@@ -493,22 +902,14 @@ export class CoordinateService {
     private _toDMS(lat: number, lon: number): LL {
         const latDir = lat >= 0 ? 'N' : 'S';
         const lonDir = lon >= 0 ? 'E' : 'W';
-
-        lat = Math.abs(lat);
-        const latDeg = Math.floor(lat);
-        lat = (lat - latDeg) * 60;
-        const latMin = Math.floor(lat);
-        const latMinFixed = this._padLeading(latMin.toFixed(0));
-        const latSec = (lat - latMin) * 60;
-        const latSecFixed = this._padLeading(latSec.toFixed(1));
-
-        lon = Math.abs(lon);
-        const lonDeg = Math.floor(lon);
-        lon = (lon - lonDeg) * 60;
-        const lonMin = Math.floor(lon);
-        const lonMinFixed = this._padLeading(lonMin.toFixed(0));
-        const lonSec = (lon - lonMin) * 60;
-        const lonSecFixed = this._padLeading(lonSec.toFixed(1));
+        const latParts = this._splitDMS(lat);
+        const lonParts = this._splitDMS(lon);
+        const latDeg = latParts.degrees;
+        const latMinFixed = this._padLeading(latParts.minutes.toFixed(0));
+        const latSecFixed = this._padLeading(latParts.seconds.toFixed(1));
+        const lonDeg = lonParts.degrees;
+        const lonMinFixed = this._padLeading(lonParts.minutes.toFixed(0));
+        const lonSecFixed = this._padLeading(lonParts.seconds.toFixed(1));
 
         return {
             lat: `${latDir} ${latDeg}° ${latMinFixed}' ${latSecFixed}"`,
@@ -517,8 +918,17 @@ export class CoordinateService {
         };
     }
 
-    private _toMGRS(lat: number, lon: number): MGRS {
-        const mgrs = converter.LLtoUSNG(lat, lon, 6);
+    private _toMGRS(lat: number, lon: number): MGRS | UTMUPS {
+        let mgrs: string;
+
+        try {
+            mgrs = converter.LLtoUSNG(lat, lon, 6);
+        } catch (ignore) {
+            // usng.js has no polar MGRS (north of 84° N, south of 80° S) and
+            // rounds points next to the poles out of range. UPS covers both.
+            return this._toUTMUPS(lat, lon);
+        }
+
         const [zone, square, easting, northing] = mgrs.split(' ');
 
         return {
@@ -527,6 +937,13 @@ export class CoordinateService {
             easting,
             northing,
             mgrs,
+        };
+    }
+
+    private _toPlusCode(lat: number, lon: number): PlusCode {
+        // 11 digits is a cell of about 3 by 3 meters.
+        return {
+            pluscode: encodePlusCode(lat, lon, PLUS_CODE_LENGTH_EXTRA) || '',
         };
     }
 
