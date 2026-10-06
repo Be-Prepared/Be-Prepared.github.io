@@ -1,4 +1,5 @@
 import {
+    screenToProtractor,
     angleBetween,
     angleFromBase,
     arcPath,
@@ -115,4 +116,18 @@ test('rayLength reaches the edge of the box', () => {
     assert.equal(rayLength(V, 90, 200, margins), 180);
     assert.ok(Math.abs(rayLength(V, 45, 200, margins) - 90 * Math.SQRT2) < 1e-9);
     assert.equal(rayLength(V, 90, 200, { side: 10, top: 300 }, 30), 30);
+});
+
+test('screenToProtractor leaves landscape alone', () => {
+    assert.deepEqual(screenToProtractor({ x: 10, y: 20 }, false, 300), { x: 10, y: 20 });
+});
+
+test('screenToProtractor undoes the portrait turn', () => {
+    // Drawing height 390 (the screen's width). The vertex at the middle of
+    // the base, drawing (365, 362), is drawn at screen (390 - 362, 365).
+    assert.deepEqual(screenToProtractor({ x: 28, y: 365 }, true, 390), { x: 365, y: 362 });
+    // A point straight to the right of the vertex on screen is "up" in the
+    // drawing, which is 90 degrees.
+    const p = screenToProtractor({ x: 228, y: 365 }, true, 390);
+    assert.deepEqual(p, { x: 365, y: 162 });
 });

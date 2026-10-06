@@ -1,5 +1,11 @@
 import { AccessState } from '../services/access/access-controller';
-import { CameraService } from '../services/camera.service';
+import {
+    CameraService,
+    getVideoTrack,
+    hasTorch,
+    isTorchOn,
+    setTorch,
+} from '../services/camera.service';
 import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import {
@@ -16,6 +22,7 @@ import {
     pointAt,
     pointerAngle,
     rayLength,
+    screenToProtractor,
     ticks,
     wedgePath,
 } from './protractor-geometry';
@@ -30,17 +37,31 @@ interface Drag {
 }
 
 const HANDLE_RADIUS = 14;
+const SVG_NS = 'http://www.w3.org/2000/svg';
 
 export class ProtractorAppComponent {
     private _camera = di(CameraService).controller();
     private _drag: Drag | null = null;
+    // SVG parts are created once and only updated afterwards. Replacing them
+    // while a finger is on a handle ends the drag on iPhones, where touch
+    // events stay with the element the touch started on.
+    private _elements: { [name: string]: SVGElement } = {};
     private _frame: ReturnType<typeof requestAnimationFrame> | null = null;
+    // Size of the protractor's own drawing area. In portrait it's drawn
+    // turned on its side, so this is the stage's height by its width.
     private _height = 0;
     private _layout: Layout | null = null;
+    private _portrait = false;
     private _rayTop = 0;
+    // Drawing space kept clear at the left end (screen top in portrait) for
+    // the reading and any camera notice.
+    private _start = 0;
     private _rays: number[] = [...INITIAL_RAYS];
     private _resizeObserver: ResizeObserver | null = null;
+    // Fudgel's style scoping classes, copied onto created SVG elements.
+    private _scope = '';
     private _subject = new Subject();
+    private _track: MediaStreamTrack | null = null;
     private _width = 0;
     angle = '';
     cameraReady = false;
@@ -50,6 +71,8 @@ export class ProtractorAppComponent {
     showEnable = false;
     stage?: HTMLElement;
     svg?: SVGSVGElement;
+    torchAvailable = false;
+    torchEnabled = false;
     video?: HTMLVideoElement;
 
     onInit() {
@@ -64,13 +87,21 @@ export class ProtractorAppComponent {
     }
 
     onViewInit() {
-        if (!this.stage) {
+        if (!this.stage || !this.svg) {
             return;
         }
 
+        this._buildSvg(this.svg);
         // Covers rotation, window resizing and the toolbar moving sides.
         this._resizeObserver = new ResizeObserver(() => this._measure());
         this._resizeObserver.observe(this.stage);
+        // The reading grows when a camera notice appears.
+        const overlay = this.stage.querySelector('.top');
+
+        if (overlay) {
+            this._resizeObserver.observe(overlay);
+        }
+
         this._measure();
     }
 
@@ -98,6 +129,7 @@ export class ProtractorAppComponent {
             return;
         }
 
+        event.preventDefault();
         const angle = this._pointerAngle(event);
         const ray = nearestRay(this._rays, angle);
         this._drag = {
@@ -107,9 +139,10 @@ export class ProtractorAppComponent {
             rayStart: this._rays[ray],
         };
 
-        // Keep getting moves when the finger slides over the toolbar.
+        // Keep getting moves when the finger slides over the toolbar or off
+        // the handle.
         try {
-            (event.currentTarget as Element).setPointerCapture(event.pointerId);
+            this.stage?.setPointerCapture(event.pointerId);
         } catch (e) {
             // The pointer is already gone.
         }
@@ -122,6 +155,7 @@ export class ProtractorAppComponent {
             return;
         }
 
+        event.preventDefault();
         this._rays[drag.ray] = dragAngle(
             drag.rayStart,
             drag.pointerStart,
@@ -141,8 +175,22 @@ export class ProtractorAppComponent {
         this._scheduleDraw();
     }
 
+    toggleTorch() {
+        const track = this._track;
+
+        setTorch(track, !this.torchEnabled)
+            .catch(() => {})
+            .then(() => {
+                this.torchEnabled = isTorchOn(track);
+            });
+    }
+
     private _attach(stream: MediaStream | null) {
         this.cameraReady = !!stream;
+        const track = getVideoTrack(stream);
+        this._track = track;
+        this.torchAvailable = hasTorch(track);
+        this.torchEnabled = isTorchOn(track);
 
         if (!stream) {
             return;
@@ -154,6 +202,38 @@ export class ProtractorAppComponent {
                 this.video.srcObject = stream;
             }
         });
+    }
+
+    private _buildSvg(svg: SVGSVGElement) {
+        // Elements made here miss the classes Fudgel adds to template
+        // elements for style scoping. The svg has them, so copy them.
+        const scope = svg.getAttribute('class') || '';
+        const make = (tag: string, className: string, parent: Element) => {
+            const element = document.createElementNS(SVG_NS, tag) as SVGElement;
+            element.setAttribute('class', `${scope} ${className}`);
+            parent.appendChild(element);
+
+            return element;
+        };
+        const root = make('g', 'protractor', svg);
+        this._elements = {
+            root,
+            wedge: make('path', 'wedge', root),
+            arc: make('path', 'arc', root),
+            scale: make('path', 'scale', root),
+            ticks: make('path', 'ticks', root),
+            labels: make('g', 'labels', root),
+            base: make('line', 'base', root),
+            ray0: make('line', 'ray ray-0', root),
+            ray1: make('line', 'ray ray-1', root),
+            handle0: make('circle', 'handle', root),
+            handle1: make('circle', 'handle', root),
+            vertex: make('circle', 'vertex', root),
+        };
+        this._elements.handle0.setAttribute('r', `${HANDLE_RADIUS}`);
+        this._elements.handle1.setAttribute('r', `${HANDLE_RADIUS}`);
+        this._elements.vertex.setAttribute('r', '5');
+        this._scope = scope;
     }
 
     // The protractor works without the camera, so problems are a small note
@@ -187,72 +267,101 @@ export class ProtractorAppComponent {
     }
 
     private _draw() {
-        const svg = this.svg;
         const geometry = this._layout;
+        const e = this._elements;
         this._updateReadout();
 
-        if (!svg || !geometry) {
+        if (!geometry || !e.root) {
             return;
         }
 
-        const { vertex, radius, baseY } = geometry;
+        const { vertex, radius } = geometry;
         const [a, b] = this._rays;
-        const parts: string[] = [];
-        // Elements made here miss the classes Fudgel adds to template
-        // elements for style scoping. The svg has them, so copy them.
-        const scope = svg.getAttribute('class') || '';
-
-        parts.push(
-            `<path class="${scope} wedge" d="${wedgePath(vertex, radius, a, b)}"/>`,
-            `<path class="${scope} arc" d="${arcPath(
-                vertex,
-                radius * 0.32,
-                a,
-                b
-            )}"/>`,
-            `<path class="${scope} scale" d="${arcPath(vertex, radius, 0, 180)}"/>`
-        );
-
-        const tickPath = ticks(vertex, radius)
-            .map((t) => `M${t.from.x} ${t.from.y}L${t.to.x} ${t.to.y}`)
-            .join('');
-        parts.push(`<path class="${scope} ticks" d="${tickPath}"/>`);
-
-        for (const degrees of labelAngles(radius)) {
-            // 0 and 180 would sit on the base bar, so they go under it at
-            // the ends of the scale.
-            const flat = degrees === 0 || degrees === 180;
-            const p = pointAt(vertex, degrees, radius * (flat ? 1 : 0.8));
-            const y = flat ? baseY + 13 : p.y;
-            parts.push(
-                `<text class="${scope} scale-label" x="${p.x}" y="${y}">${degrees}</text>`
-            );
-        }
-
-        parts.push(
-            `<line class="${scope} base" x1="0" y1="${baseY}" x2="${this._width}" y2="${baseY}"/>`
-        );
+        e.wedge.setAttribute('d', wedgePath(vertex, radius, a, b));
+        e.arc.setAttribute('d', arcPath(vertex, radius * 0.32, a, b));
 
         this._rays.forEach((ray, index) => {
             const length = rayLength(
                 vertex,
                 ray,
                 this._width,
-                { side: HANDLE_RADIUS + 6, top: this._rayTop },
+                {
+                    side: HANDLE_RADIUS + 6,
+                    start: this._start,
+                    top: this._rayTop,
+                },
                 radius + 4
             );
             const end = pointAt(vertex, ray, length);
-            parts.push(
-                `<line class="${scope} ray ray-${index}" x1="${vertex.x}" y1="${vertex.y}" x2="${end.x}" y2="${end.y}"/>`,
-                `<circle class="${scope} handle" cx="${end.x}" cy="${end.y}" r="${HANDLE_RADIUS}"/>`
-            );
+            const line = e[`ray${index}`];
+            line.setAttribute('x1', `${vertex.x}`);
+            line.setAttribute('y1', `${vertex.y}`);
+            line.setAttribute('x2', `${end.x}`);
+            line.setAttribute('y2', `${end.y}`);
+            const handle = e[`handle${index}`];
+            handle.setAttribute('cx', `${end.x}`);
+            handle.setAttribute('cy', `${end.y}`);
         });
+    }
 
-        parts.push(
-            `<circle class="${scope} vertex" cx="${vertex.x}" cy="${vertex.y}" r="5"/>`
+    // Size-dependent parts that don't change while dragging.
+    private _drawScale() {
+        const geometry = this._layout;
+        const e = this._elements;
+
+        if (!geometry || !e.root || !this.svg) {
+            return;
+        }
+
+        const { vertex, radius, baseY } = geometry;
+        const stageWidth = this._portrait ? this._height : this._width;
+        const stageHeight = this._portrait ? this._width : this._height;
+        this.svg.setAttribute('viewBox', `0 0 ${stageWidth} ${stageHeight}`);
+        // Portrait: turn the drawing so its base runs along the long left
+        // edge and it opens to the right. Screen (x, y) = (height - y, x).
+        e.root.setAttribute(
+            'transform',
+            this._portrait ? `matrix(0 1 -1 0 ${this._height} 0)` : ''
         );
-        svg.setAttribute('viewBox', `0 0 ${this._width} ${this._height}`);
-        svg.innerHTML = parts.join('');
+        e.scale.setAttribute('d', arcPath(vertex, radius, 0, 180));
+        e.ticks.setAttribute(
+            'd',
+            ticks(vertex, radius)
+                .map((t) => `M${t.from.x} ${t.from.y}L${t.to.x} ${t.to.y}`)
+                .join('')
+        );
+        e.base.setAttribute('x1', '0');
+        e.base.setAttribute('y1', `${baseY}`);
+        e.base.setAttribute('x2', `${this._width}`);
+        e.base.setAttribute('y2', `${baseY}`);
+        e.vertex.setAttribute('cx', `${vertex.x}`);
+        e.vertex.setAttribute('cy', `${vertex.y}`);
+
+        const labels = e.labels;
+
+        while (labels.firstChild) {
+            labels.firstChild.remove();
+        }
+
+        for (const degrees of labelAngles(radius)) {
+            // 0 and 180 would sit on the base bar, so they go beside it at
+            // the ends of the scale.
+            const flat = degrees === 0 || degrees === 180;
+            const p = pointAt(vertex, degrees, radius * (flat ? 1 : 0.8));
+            const y = flat ? baseY + 13 : p.y;
+            const text = document.createElementNS(SVG_NS, 'text');
+            text.setAttribute('class', `${this._scope} scale-label`);
+            text.setAttribute('x', `${p.x}`);
+            text.setAttribute('y', `${y}`);
+
+            if (this._portrait) {
+                // Keep numbers upright when the drawing is turned.
+                text.setAttribute('transform', `rotate(-90 ${p.x} ${y})`);
+            }
+
+            text.textContent = `${degrees}`;
+            labels.appendChild(text);
+        }
     }
 
     private _measure() {
@@ -262,25 +371,52 @@ export class ProtractorAppComponent {
             return;
         }
 
-        this._width = rect.width;
-        this._height = rect.height;
-        this._layout = layout(rect.width, rect.height, {
-            bottom: 28,
-            side: 24,
-            top: Math.min(120, rect.height * 0.3),
-        });
-        // Keep handles out from under the reading at the top.
-        this._rayTop = Math.min(90, rect.height * 0.25);
+        // Use the long edge of the screen for the base, so the protractor
+        // is as big as possible.
+        this._portrait = rect.height > rect.width;
+        this._width = this._portrait ? rect.height : rect.width;
+        this._height = this._portrait ? rect.width : rect.height;
+
+        if (this._portrait) {
+            // The reading (and any camera notice) sits at the top of the
+            // screen, which is the 180° end of the base when turned. Center
+            // the protractor in the space below it.
+            const overlay = this.stage?.querySelector('.top') as HTMLElement | null;
+            this._start = (overlay?.offsetHeight || 80) + 8;
+            this._layout = layout(this._width - this._start, this._height, {
+                bottom: 28,
+                side: 24,
+                top: 24,
+            });
+            this._layout.vertex.x += this._start;
+            this._rayTop = HANDLE_RADIUS + 6;
+        } else {
+            this._start = HANDLE_RADIUS + 6;
+            this._layout = layout(this._width, this._height, {
+                bottom: 28,
+                side: 24,
+                top: Math.min(120, this._height * 0.3),
+            });
+            // Keep handles out from under the reading at the top.
+            this._rayTop = Math.min(90, this._height * 0.25);
+        }
+
+        this._drawScale();
         this._scheduleDraw();
     }
 
     private _pointerAngle(event: PointerEvent) {
         const rect = this.stage!.getBoundingClientRect();
+        const point = screenToProtractor(
+            {
+                x: event.clientX - rect.left,
+                y: event.clientY - rect.top,
+            },
+            this._portrait,
+            this._height
+        );
 
-        return pointerAngle(this._layout!.vertex, {
-            x: event.clientX - rect.left,
-            y: event.clientY - rect.top,
-        });
+        return pointerAngle(this._layout!.vertex, point);
     }
 
     private _scheduleDraw() {
@@ -336,6 +472,9 @@ component(
                 width: 100%;
                 user-select: none;
                 -webkit-user-select: none;
+                -webkit-touch-callout: none;
+                /* Dragging a ray must never scroll or zoom the page. */
+                touch-action: none;
                 cursor: grab;
             }
 
@@ -505,6 +644,14 @@ component(
                         </div>
                     </div>
                 </div>
+                <icon-button
+                    slot="more-buttons"
+                    *if="torchAvailable"
+                    href="/flashlight.svg"
+                    label-id="shared.torch"
+                    .active="torchEnabled"
+                    @click.stop.prevent="toggleTorch()"
+                ></icon-button>
                 <icon-button
                     slot="more-buttons"
                     href="/reset.svg"

@@ -124,7 +124,8 @@ export function rayLength(
     vertex: Point,
     degrees: number,
     width: number,
-    margins: { side: number; top: number },
+    // `start` overrides `side` at the left end (x = 0) of the drawing.
+    margins: { side: number; top: number; start?: number },
     minimum = 0
 ) {
     const radians = (clampAngle(degrees) * Math.PI) / 180;
@@ -135,7 +136,7 @@ export function rayLength(
     if (dx > 1e-9) {
         length = (width - margins.side - vertex.x) / dx;
     } else if (dx < -1e-9) {
-        length = (margins.side - vertex.x) / dx;
+        length = ((margins.start ?? margins.side) - vertex.x) / dx;
     }
 
     if (dy > 1e-9) {
@@ -226,4 +227,20 @@ export function labelAngles(radius: number) {
 
 function round(value: number) {
     return Math.round(value * 100) / 100;
+}
+
+// Converts a point on the screen into the protractor's own drawing space.
+// In portrait the drawing is turned so its base runs along the long left
+// edge: screen (x, y) = (drawingHeight - y, x), so the inverse is
+// drawing (x, y) = (screenY, drawingHeight - screenX).
+export function screenToProtractor(
+    point: Point,
+    portrait: boolean,
+    drawingHeight: number
+): Point {
+    if (!portrait) {
+        return point;
+    }
+
+    return { x: point.y, y: drawingHeight - point.x };
 }
