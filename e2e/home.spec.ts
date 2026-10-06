@@ -36,7 +36,7 @@ for (const scheme of ['light', 'dark'] as const) {
     });
 }
 
-test('long-press and drag rearranges tiles without moving others mid-drag', async ({
+test('long-press and drag moves the other tiles out of the way', async ({
     page,
 }) => {
     await page.goto('/');
@@ -63,10 +63,12 @@ test('long-press and drag rearranges tiles without moving others mid-drag', asyn
         { steps: 8 }
     );
 
-    // Mid-drag: the original spot is held and nothing else has moved.
+    // Mid-drag: the placeholder has moved to the target's slot, and the
+    // tiles in between have each slid back one place to make room.
     await expect(source).toHaveClass(/placeholder/);
-    await expect(target).toHaveClass(/drop-target/);
-    expect(await bystander.boundingBox()).toEqual(bystanderBefore);
+    await expect.poll(() => source.boundingBox()).toEqual(targetBox);
+    await expect.poll(() => bystander.boundingBox()).not.toEqual(bystanderBefore);
+    await expect.poll(() => tiles.nth(1).boundingBox()).toEqual(sourceBox);
 
     await page.mouse.up();
     const after = await tiles.evaluateAll((all) => all.map((t) => t.id));

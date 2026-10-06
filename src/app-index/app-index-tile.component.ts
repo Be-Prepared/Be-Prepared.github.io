@@ -28,8 +28,9 @@ component(
                 -webkit-touch-callout: none;
             }
 
-            /* While its tile is being dragged, the original spot stays in
-               the grid as an empty outline so nothing else moves. */
+            /* While its tile is being dragged, the tile stays in the grid as
+               an empty outline. It marks where the tile will land, and
+               moves as the finger does. */
             :host(.placeholder) button {
                 background: transparent;
                 border: 2px dashed var(--border);
@@ -38,12 +39,6 @@ component(
 
             :host(.placeholder) button > * {
                 visibility: hidden;
-            }
-
-            /* Where the dragged tile will go. */
-            :host(.drop-target) button {
-                border-color: var(--accent);
-                box-shadow: 0 0 0 3px var(--accent-soft);
             }
 
             /* The copy that follows the finger. */

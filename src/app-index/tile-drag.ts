@@ -2,11 +2,14 @@
 //
 // * A press has to stay still for LONG_PRESS_MS before dragging starts, so
 //   normal taps open tools and swipes still scroll the page.
-// * While dragging, the tile's original spot stays in the grid as a
-//   placeholder and a floating copy follows the finger. Nothing else moves
-//   until the tile is dropped, so the grid doesn't jiggle mid-drag.
-// * The tile under the finger is marked as the drop target. Dropping moves
-//   the dragged tile to that spot.
+// * While dragging, a floating copy follows the finger and the tile itself
+//   stays in the grid as an empty placeholder, so the tiles after it don't
+//   all slide forward a slot when it's picked up.
+// * The placeholder moves to whichever tile the finger is over, and the
+//   tiles in between slide over to make room. Dropping puts the tile where
+//   the placeholder is.
+// * Tiles are shifted with the CSS "order" property, not by moving them in
+//   the page, so the list the framework renders is untouched until the drop.
 
 const LONG_PRESS_MS = 450;
 // Moving more than this before the long press completes means scrolling.
@@ -14,6 +17,8 @@ const MOVE_TOLERANCE_PX = 10;
 // Distance from the top or bottom edge that scrolls the page while dragging.
 const EDGE_SCROLL_PX = 48;
 const EDGE_SCROLL_STEP = 10;
+// How long tiles take to slide out of the way.
+const SLIDE_MS = 160;
 
 export interface TileDragOptions {
     // Element containing the tiles.
@@ -38,10 +43,18 @@ interface Drag {
     from: number;
     ghost: HTMLElement;
     item: HTMLElement;
+    // Every tile, in the order the page has them.
+    items: HTMLElement[];
     offsetX: number;
     offsetY: number;
     pointerId: number;
-    target: HTMLElement | null;
+    // Where the placeholder is now.
+    slot: number;
+    // Each grid position, in the scroller's own coordinates.
+    slots: { bottom: number; left: number; right: number; top: number }[];
+    // Where the finger was last.
+    x: number;
+    y: number;
 }
 
 export class TileDrag {
@@ -108,13 +121,6 @@ export class TileDrag {
         );
     }
 
-    private _itemAt(x: number, y: number) {
-        const element = document.elementFromPoint(x, y);
-        const item = element?.closest<HTMLElement>(this._options.itemSelector);
-
-        return item && this._options.container.contains(item) ? item : null;
-    }
-
     private _pointerDown(event: PointerEvent) {
         if (this._press || this._drag || event.button > 0) {
             return;
@@ -164,7 +170,9 @@ export class TileDrag {
         drag.ghost.style.transform = `translate(${event.clientX - drag.offsetX}px, ${
             event.clientY - drag.offsetY
         }px) scale(1.06)`;
-        this._setTarget(this._itemAt(event.clientX, event.clientY));
+        drag.x = event.clientX;
+        drag.y = event.clientY;
+        this._follow(drag);
         this._edgeScroll(event.clientY);
     }
 
@@ -182,13 +190,13 @@ export class TileDrag {
             return;
         }
 
-        const items = this._items();
-        const target = drag.target;
+        // Tiles go back to their real places first; the new order then
+        // arrives from onDrop before the screen is drawn again.
         this._endDrag();
         this._suppressClickUntil = Date.now() + 400;
 
-        if (target && target !== drag.item) {
-            this._options.onDrop(drag.from, items.indexOf(target));
+        if (drag.slot !== drag.from) {
+            this._options.onDrop(drag.from, drag.slot);
         }
     }
 
@@ -215,6 +223,13 @@ export class TileDrag {
             this._options.scroller.scrollBy(0, -EDGE_SCROLL_STEP);
         } else if (y > rect.bottom - EDGE_SCROLL_PX) {
             this._options.scroller.scrollBy(0, EDGE_SCROLL_STEP);
+        } else {
+            return;
+        }
+
+        // A different slot is under the finger now.
+        if (this._drag) {
+            this._follow(this._drag);
         }
     }
 
@@ -228,7 +243,12 @@ export class TileDrag {
 
         drag.ghost.remove();
         drag.item.classList.remove('placeholder');
-        this._setTarget(null, drag);
+
+        for (const item of drag.items) {
+            item.style.order = '';
+            item.style.transition = '';
+            item.style.transform = '';
+        }
     }
 
     private _endPress() {
@@ -238,20 +258,54 @@ export class TileDrag {
         }
     }
 
-    private _setTarget(target: HTMLElement | null, drag = this._drag) {
-        if (!drag) {
+    // Puts the placeholder in the slot under the finger. Slots are the grid
+    // positions measured when the drag began; they don't change as tiles
+    // trade places, so tiles that are still sliding can't confuse this.
+    private _follow(drag: Drag) {
+        const y = drag.y + this._options.scroller.scrollTop;
+        const slot = drag.slots.findIndex(
+            (r) => drag.x >= r.left && drag.x < r.right && y >= r.top && y < r.bottom
+        );
+
+        if (slot >= 0) {
+            this._moveSlot(drag, slot);
+        }
+    }
+
+    // Moves the placeholder to a slot. The tiles between its old and new
+    // slots each shift one place, sliding from where they were.
+    private _moveSlot(drag: Drag, slot: number) {
+        if (slot === drag.slot) {
             return;
         }
 
-        const next = target === drag.item ? null : target;
+        const others = drag.items.filter((item) => item !== drag.item);
+        const before = others.map((item) => item.getBoundingClientRect());
+        drag.slot = slot;
+        this._applyOrder(drag);
 
-        if (next === drag.target) {
-            return;
-        }
+        others.forEach((item, i) => {
+            const after = item.getBoundingClientRect();
+            const dx = before[i].left - after.left;
+            const dy = before[i].top - after.top;
 
-        drag.target?.classList.remove('drop-target');
-        next?.classList.add('drop-target');
-        drag.target = next;
+            if (!dx && !dy) {
+                return;
+            }
+
+            // Start where it was, then let go.
+            item.style.transition = 'none';
+            item.style.transform = `translate(${dx}px, ${dy}px)`;
+            item.getBoundingClientRect();
+            item.style.transition = `transform ${SLIDE_MS}ms ease`;
+            item.style.transform = '';
+        });
+    }
+
+    private _applyOrder(drag: Drag) {
+        const order = drag.items.filter((item) => item !== drag.item);
+        order.splice(drag.slot, 0, drag.item);
+        order.forEach((item, i) => (item.style.order = `${i}`));
     }
 
     private _startDrag() {
@@ -282,15 +336,32 @@ export class TileDrag {
         document.body.appendChild(ghost);
         // The tile stays where it was, as a placeholder holding its spot.
         item.classList.add('placeholder');
+        const items = this._items();
+        const from = items.indexOf(item);
         this._drag = {
-            from: this._items().indexOf(item),
+            from,
             ghost,
             item,
+            items,
             offsetX: press.x - rect.left,
             offsetY: press.y - rect.top,
             pointerId: press.pointerId,
-            target: null,
+            slot: from,
+            slots: items.map((other) => {
+                const r = other.getBoundingClientRect();
+                const scrolled = this._options.scroller.scrollTop;
+
+                return {
+                    bottom: r.bottom + scrolled,
+                    left: r.left,
+                    right: r.right,
+                    top: r.top + scrolled,
+                };
+            }),
+            x: press.x,
+            y: press.y,
         };
+        this._applyOrder(this._drag);
 
         try {
             navigator.vibrate?.(15);
