@@ -86,7 +86,10 @@ export default defineConfig({
             },
             registerType: 'prompt',
             workbox: {
-                globPatterns: ['**/*.{js,css,html,svg,xml}'],
+                // Everything the app needs offline, including the city list
+                // for Sun & Moon and the WASM barcode reader that iPhones
+                // (no native barcode reader) depend on.
+                globPatterns: ['**/*.{js,mjs,css,html,svg,xml,txt,wasm,png,ico}'],
             },
         }),
     ],
