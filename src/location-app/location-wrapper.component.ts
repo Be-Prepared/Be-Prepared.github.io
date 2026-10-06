@@ -1,42 +1,32 @@
-import { AvailabilityState } from '../datatypes/availability-state';
+import { AccessState } from '../services/access/access-controller';
 import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import { GeolocationService } from '../services/geolocation.service';
 import { of, Subject } from 'rxjs';
-import { PermissionsService } from '../services/permissions.service';
 import { switchMap, takeUntil } from 'rxjs/operators';
 
 export class LocationWrapperComponent {
     private _geolocationService = di(GeolocationService);
-    private _permissionsService = di(PermissionsService);
     private _subject = new Subject();
     control = 'current';
-    explainAsk = false;
-    explainDeny = false;
-    explainError = false;
-    explainUnavailable = false;
-    showControls = false;
+    screenState = AccessState.CHECKING;
     waypointId?: number;
 
     onInit() {
         this._geolocationService
             .availabilityState()
             .pipe(
-                takeUntil(this._subject),
                 switchMap((value) => {
-                    this.explainAsk = value === AvailabilityState.PROMPT;
-                    this.explainDeny = value === AvailabilityState.DENIED;
-                    this.explainUnavailable =
-                        value === AvailabilityState.UNAVAILABLE;
-                    this.explainError = value === AvailabilityState.ERROR;
-                    this.showControls = value === AvailabilityState.ALLOWED;
+                    this.screenState = value;
 
-                    if (this.showControls) {
+                    if (value === AccessState.READY) {
                         return this._geolocationService.getPosition();
                     }
 
                     return of(null);
-                })
+                }),
+                // Last, so the inner position watch is stopped too.
+                takeUntil(this._subject)
             )
             .subscribe();
     }
@@ -47,8 +37,7 @@ export class LocationWrapperComponent {
     }
 
     grant() {
-        this.explainAsk = false;
-        this._permissionsService.geolocation(true);
+        this._geolocationService.request();
     }
 
     setControl(control: string, waypointId?: number) {
@@ -133,15 +122,15 @@ component('location-wrapper', {
         }
     `,
     template: html`
-        <permission-prompt
-            *if="explainAsk"
-            @grant.stop.prevent="grant()"
+        <access-screen
+            *if="screenState !== 'READY'"
+            state="{{screenState}}"
+            icon="/location.svg"
             message-id="location.explainAsk"
-        ></permission-prompt>
-        <permission-denied *if="explainDeny"></permission-denied>
-        <location-unavailable *if="explainUnavailable"></location-unavailable>
-        <permission-error *if="explainError"></permission-error>
-        <div *if="showControls" class="full">
+            unavailable-id="location.unavailableMessage"
+            @grant.stop.prevent="grant()"
+        ></access-screen>
+        <div *if="screenState === 'READY'" class="full">
             <slot></slot>
         </div>
     `,

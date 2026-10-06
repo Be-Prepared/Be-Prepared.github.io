@@ -1,4 +1,4 @@
-import { AvailabilityState } from '../datatypes/availability-state';
+import { AccessState } from '../services/access/access-controller';
 import { component, css, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
 import { di } from '../di';
@@ -31,8 +31,8 @@ export class SunMoonAppComponent {
             .pipe(takeUntil(this.subject))
             .subscribe((state) => {
                 if (
-                    state === AvailabilityState.PROMPT ||
-                    state === AvailabilityState.ALLOWED
+                    state === AccessState.PROMPT ||
+                    state === AccessState.READY
                 ) {
                     this.allowGetLocation = true;
                 } else {

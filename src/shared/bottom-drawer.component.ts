@@ -72,21 +72,26 @@ component('bottom-drawer', {
             top: 200vh;
             position: fixed;
             display: flex;
-            transition: bottom 1s ease-in-out 0s;
+            transition: bottom 0.5s ease-in-out 0s;
+            z-index: 10;
             left: 50%;
             transform: translate(-50%);
         }
 
         .tab {
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
-            border-top: 2px solid;
-            border-left: 2px solid;
-            border-right: 2px solid;
-            padding: 0.3em 0.6em;
-            background-color: var(--button-bg-color);
+            border-top-left-radius: var(--radius-l);
+            border-top-right-radius: var(--radius-l);
+            border: 1px solid var(--border);
+            border-bottom: 0;
+            padding: var(--space-3) var(--space-4);
+            padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
+            background-color: var(--surface);
+            box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.25);
             display: flex;
             align-items: center;
+            gap: var(--space-3);
+            min-width: min(22rem, 92vw);
+            box-sizing: border-box;
         }
     `,
     template: html`

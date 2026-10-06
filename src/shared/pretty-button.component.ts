@@ -1,44 +1,82 @@
 import { component, css, html } from 'fudgel';
 
+// variant: "primary" (filled accent), or omitted for a neutral button.
+// enabled: highlights the button as switched on.
 export class PrettyButtonComponent {
     button?: HTMLButtonElement;
-    padding = '0.5em';
+    buttonClass = '';
+    enabled = false;
+    padding = '';
+    variant = '';
+
+    onChange() {
+        this.buttonClass = [this.variant, this.enabled ? 'enabled' : '']
+            .filter(Boolean)
+            .join(' ');
+    }
 
     onViewInit() {
-        if (this.button) {
-            this.button.style.padding = this.padding || '0.5em';
+        if (this.button && this.padding) {
+            this.button.style.padding = this.padding;
         }
     }
 }
 
-component('pretty-button', {
-    attr: ['padding'],
-    prop: ['enabled'],
-    style: css`
-        :host {
-            display: block;
-        }
+component(
+    'pretty-button',
+    {
+        attr: ['padding', 'variant'],
+        prop: ['enabled'],
+        style: css`
+            :host {
+                display: block;
+            }
 
-        button {
-            background-color: var(--button-bg-color);
-            border: 2px solid var(--fg-color);
-            border-radius: 1em;
-            color: inherit;
-            font-size: inherit;
-            overflow: hidden;
-            cursor: pointer;
-            overflow: none;
-            user-select: none;
-        }
+            button {
+                width: 100%;
+                min-height: var(--tap);
+                padding: var(--space-2) var(--space-5);
+                background-color: var(--surface-2);
+                border: 1px solid var(--border);
+                border-radius: var(--radius-m);
+                color: inherit;
+                font-size: inherit;
+                font-family: inherit;
+                font-weight: 600;
+                cursor: pointer;
+                user-select: none;
+                transition: background-color 0.15s, transform 0.1s;
+            }
 
-        .enabled {
-            background-color: var(--button-bg-color-enabled);
-        }
-    `,
-    template: html`
-        <button class="{{enabled && 'enabled'}}" #ref="button">
-            <slot></slot>
-        </button>
-    `,
-    useShadow: true,
-}, PrettyButtonComponent);
+            button:active {
+                transform: scale(0.98);
+            }
+
+            button:focus-visible {
+                outline: 3px solid var(--accent);
+                outline-offset: 2px;
+            }
+
+            .primary {
+                background-color: var(--accent);
+                border-color: var(--accent);
+                color: var(--accent-fg);
+            }
+
+            .enabled {
+                background-color: var(--accent-soft);
+                border-color: var(--accent);
+            }
+        `,
+        template: html`
+            <button
+                class="{{buttonClass}}"
+                #ref="button"
+            >
+                <slot></slot>
+            </button>
+        `,
+        useShadow: true,
+    },
+    PrettyButtonComponent
+);

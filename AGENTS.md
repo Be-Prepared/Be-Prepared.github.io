@@ -1,0 +1,61 @@
+# Notes for agents working on Be Prepared
+
+An offline PWA toolbox (flashlight, compass, level, timers, and more). TypeScript, [Fudgel](https://github.com/fidian/fudgel) web components, RxJS, built with Vite. See README.md for what each tool does.
+
+## Rules of the project
+
+* Everything works offline. No network requests at runtime, no data leaves the device, no external libraries loaded from a CDN.
+* Never cache permission results or hardware probe results. Check the permission when a tool opens; only hide a home screen tile when the hardware is missing (see `hasHardware` in `src/tile-defs.ts`). A denied permission must stay recoverable with "Try Again".
+* Release hardware when a screen closes and when the app goes to the background. A camera stream that isn't stopped keeps the camera locked.
+* Be honest in the UI about what a web app can't do (accuracy, background limits, permissions). Timers and alarms show `<limits-notice>`.
+
+## Commands
+
+* `npm install`, then `npm start` (dev server on port 8080, exposed on the LAN).
+* `npm test` runs AVA unit tests (`src/**/*.test.ts`). CI runs tests before building and deploying `master` to GitHub Pages.
+* `npx tsc --noEmit -p .` type checks. `npm run build` type checks and builds.
+* `npm run generate-pwa-assets` regenerates launcher icons from `site/public/app-icon.svg`.
+
+## Layout
+
+* `src/<tool>-app/` — one directory per tool: `<tool>-app.component.ts`, `<tool>-app.module.ts` (exports), `<tool>-app.i18n.ts` (strings, keys prefixed with the tool name), plus pure logic modules and their tests.
+* `src/shared/` — shared components: `default-layout` (screen with toolbar and back button; `frame` and `overlay` attributes), `icon-button`, `pretty-button`, `access-screen` (permission / unavailable / error states), `limits-notice`, `show-modal`, `load-svg`.
+* `src/services/` — hardware and app services:
+    * `access/access-controller.ts` — permission-gated resource lifecycle (check, prompt, acquire, release on hidden/pagehide/destroy). Used by `CameraService.controller()`, `MicrophoneService.controller()`, `NfcService.controller()`.
+    * `camera.service.ts` — all camera streams go through here; torch helpers act on the open track.
+    * `compass.service.ts`, `motion.service.ts` — orientation sensors, including iOS's tap-to-allow permission. Math lives in `compass/` and `motion/` with tests.
+    * `reminder.service.ts` — the countdown timer and alarm clock, so they ring from any screen through `<reminder-ringer>`.
+    * `geolocation.service.ts`, `wake-lock.service.ts`, `alarm-sound.service.ts`, `preference.service.ts`, `local-storage.service.ts`.
+* `src/tile-defs.ts` — home screen tiles and routes. `src/index.ts` exports every module. `src/i18n/en-us.ts` holds shared strings and spreads each tool's i18n file.
+* `site/public/` — static files, including all icons.
+
+## Adding a tool
+
+1. Create `src/<tool>-app/` with component, module, and i18n files.
+2. Export the module from `src/index.ts`, import and spread the strings in `src/i18n/en-us.ts`, add a `tile.<name>` label there, and add a tile to `src/tile-defs.ts`.
+3. Draw an icon in `site/public/`.
+4. Put math and logic in pure modules (no DOM, no Fudgel imports) and test them.
+
+## Fudgel pitfalls
+
+* Template expressions do NOT support the ternary `?:` operator. It fails at runtime with a parse error. Compute strings and classes in the controller and bind those.
+* `attr` names are camelCase in the controller and kebab-case in HTML (`labelId` → `label-id`). Props are bound with `.prop="expr"`.
+* Only top-level controller properties trigger updates; reassign objects and arrays.
+* `#ref` elements inside `*if` exist a tick later. Attach things like a video `srcObject` in a `setTimeout`.
+* Lifecycle hooks: `onInit`, `onViewInit`, `onChange`, `onDestroy`. Clean up timers, animation frames, subscriptions, listeners, audio, and hardware in `onDestroy`.
+* Component styles are scoped to elements in the template. HTML injected with `i18n-html` doesn't get them; use inline styles there.
+* In RxJS pipes that `switchMap` into a long-lived source (like GPS), put `takeUntil` last, or the inner source keeps running after the screen closes.
+
+## Style
+
+* 4-space indent, single quotes, Prettier settings in `.prettierrc`. Comments explain why, not what.
+* Use the CSS variables from `site/index.html` (`--bg`, `--surface`, `--fg`, `--fg-muted`, `--accent`, `--border`, `--space-1..5`, `--radius-s/m/l`, and so on). Dark mode is pure black for OLED screens.
+* Icons: 24×24 viewBox, `fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"`, no hard-coded colors, so they follow the theme.
+* Every screen must work in portrait, landscape, light, and dark.
+* All user-visible text goes through i18n.
+
+## Testing in a browser
+
+* Headless Chrome can fake a camera and microphone: `--use-fake-device-for-media-stream --use-fake-ui-for-media-stream`. `--virtual-time-budget` screenshots hang on camera screens; drive Chrome over the DevTools protocol with a real wait instead.
+* Motion sensors can be simulated with `dispatchEvent(new DeviceOrientationEvent('deviceorientation', { alpha, beta, gamma }))`. Desktop Chrome also fires empty (null) orientation events, which the services treat as "no sensor" after a short grace period.
+* Nothing replaces a real phone for sensors, torch, NFC, GPS, and audio levels. Say so when reporting results.

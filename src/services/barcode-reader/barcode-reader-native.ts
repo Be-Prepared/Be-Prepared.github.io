@@ -9,8 +9,15 @@ export class BarcodeReaderNative implements BarcodeReaderInterface {
         });
     }
 
+    // Rejects when the browser has the API but can't read anything, which
+    // happens on Android devices without the needed system libraries. The
+    // caller falls back to the WASM reader.
     static create() {
         return BarcodeReaderNative._supportedFormats().then((formats) => {
+            if (!formats || !formats.length) {
+                throw new Error('No supported barcode formats');
+            }
+
             return new BarcodeReaderNative(formats);
         });
     }

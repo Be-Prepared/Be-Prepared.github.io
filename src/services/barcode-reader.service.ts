@@ -1,78 +1,19 @@
-import { AvailabilityState } from '../datatypes/availability-state';
 import { BarcodeReaderInterface } from './barcode-reader/barcode-reader-interface';
 import { BarcodeReaderNative } from './barcode-reader/barcode-reader-native';
 import { BarcodeReaderZBar } from './barcode-reader/barcode-reader-z-bar';
-import { di } from '../di';
-import { from, of } from 'rxjs';
-import { PermissionsService } from './permissions.service';
-import { PreferenceService } from './preference.service';
-import { switchMap } from 'rxjs/operators';
 
 export class BarcodeReaderService {
     private _canvas: HTMLCanvasElement | null = null;
     private _context: CanvasRenderingContext2D | null = null;
-    private _instancePromise: Promise<BarcodeReaderInterface>;
-    private _permissionsService = di(PermissionsService);
-    private _preferenceService = di(PreferenceService);
-
-    constructor() {
-        let instance: any = BarcodeReaderZBar;
-
-        if (BarcodeReaderNative.isSupported()) {
-            instance = BarcodeReaderNative;
-        }
-
-        this._instancePromise = instance.create();
-    }
-
-    availabilityState(useLiveValue: boolean) {
-        if (!navigator.mediaDevices) {
-            return of(AvailabilityState.UNAVAILABLE);
-        }
-
-        const whenGranted = () => {
-            return from(
-                this.getStream().then((stream) => {
-                    const tracks = stream.getVideoTracks();
-
-                    if (tracks.length) {
-                        this._preferenceService.barcodeReader.setItem(true);
-
-                        return AvailabilityState.ALLOWED;
-                    }
-
-                    this._preferenceService.barcodeReader.setItem(false);
-
-                    return AvailabilityState.UNAVAILABLE;
-                })
-            );
-        };
-
-        return this._permissionsService.camera().pipe(
-            switchMap((state) => {
-                if (!useLiveValue) {
-                    const cached =
-                        this._preferenceService.barcodeReader.getItem();
-
-                    if (cached === true) {
-                        return of(AvailabilityState.ALLOWED);
-                    }
-
-                    if (cached === false) {
-                        return of(AvailabilityState.UNAVAILABLE);
-                    }
-                }
-
-                return this._permissionsService.toAvailability(
-                    state,
-                    whenGranted
-                );
-            })
-        );
-    }
+    private _instancePromise: Promise<BarcodeReaderInterface> | null = null;
 
     detect(video: HTMLVideoElement) {
-        return this._instancePromise.then((instance) => {
+        // Nothing to look at until the video has a frame.
+        if (!video || !video.videoWidth || !video.videoHeight) {
+            return Promise.resolve([]);
+        }
+
+        return this._instance().then((instance) => {
             let canvas = this._canvas;
 
             if (!canvas) {
@@ -103,25 +44,25 @@ export class BarcodeReaderService {
         });
     }
 
-    getStream() {
-        return navigator.mediaDevices.getUserMedia({
-            video: {
-                facingMode: 'environment',
-            },
-        });
-    }
-
-    prompt() {
-        return this._permissionsService.camera(true);
-    }
-
     supportedFormats(): Promise<string[]> {
-        return this._instancePromise.then((instance) =>
+        return this._instance().then((instance) =>
             instance.supportedFormats()
         );
     }
 
     type() {
-        return this._instancePromise.then((instance) => instance.type());
+        return this._instance().then((instance) => instance.type());
+    }
+
+    // Created lazily so the WASM module isn't loaded until it's needed.
+    private _instance() {
+        if (!this._instancePromise) {
+            const zbar = () => BarcodeReaderZBar.create();
+            this._instancePromise = BarcodeReaderNative.isSupported()
+                ? BarcodeReaderNative.create().catch(zbar)
+                : zbar();
+        }
+
+        return this._instancePromise;
     }
 }

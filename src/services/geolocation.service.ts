@@ -1,12 +1,11 @@
-import { AvailabilityState } from '../datatypes/availability-state';
+import { AccessState } from './access/access-controller';
 import { CoordinateService } from './coordinate.service';
 import { di } from '../di';
-import { filter, finalize, share, switchMap } from 'rxjs/operators';
+import { distinctUntilChanged, filter, finalize, map, share } from 'rxjs/operators';
 import { KalmanFilterArray } from '@bencevans/kalman-filter';
 import { LatLon } from '../datatypes/lat-lon';
-import { of, timer } from 'rxjs';
-import { Observable, ReplaySubject, Subject } from 'rxjs';
-import { PermissionsService } from './permissions.service';
+import { combineLatest, Observable, of, ReplaySubject, Subject, timer } from 'rxjs';
+import { PermissionStatus, watchPermission } from './access/permission-status';
 
 const EXP = Math.exp(-1 / 5);
 const EXP_INV = 1 - EXP;
@@ -53,17 +52,56 @@ export type GeolocationCoordinateResult =
 export class GeolocationService {
     private _coordinateService = di(CoordinateService);
     private _observable: Observable<GeolocationCoordinateResult> | null = null;
-    private _permissionsService = di(PermissionsService);
+    // Outcome of the last request() during this run of the app. Only kept in
+    // memory because iOS doesn't report permission changes; never saved.
+    private _requestResult = new ReplaySubject<AccessState | null>(1);
 
-    availabilityState() {
-        if (!('geolocation' in navigator)) {
-            return of(AvailabilityState.UNAVAILABLE);
+    constructor() {
+        this._requestResult.next(null);
+    }
+
+    // Looks at the permission without asking for it.
+    availabilityState(): Observable<AccessState> {
+        if (!this.isSupported()) {
+            return of(AccessState.UNAVAILABLE);
         }
 
-        return this._permissionsService.geolocation().pipe(
-            switchMap((state) => {
-                return this._permissionsService.toAvailability(state);
-            })
+        return combineLatest([
+            watchPermission('geolocation'),
+            this._requestResult,
+        ]).pipe(
+            map(([status, requested]) => {
+                if (status === PermissionStatus.GRANTED) {
+                    return AccessState.READY;
+                }
+
+                if (status === PermissionStatus.DENIED) {
+                    return AccessState.DENIED;
+                }
+
+                return requested || AccessState.PROMPT;
+            }),
+            distinctUntilChanged()
+        );
+    }
+
+    isSupported() {
+        return 'geolocation' in navigator;
+    }
+
+    // Shows the browser's prompt. Call from a button press.
+    request() {
+        navigator.geolocation.getCurrentPosition(
+            () => this._requestResult.next(AccessState.READY),
+            (error) =>
+                this._requestResult.next(
+                    error.code === error.PERMISSION_DENIED
+                        ? AccessState.DENIED
+                        : // Allowed, just no fix yet. The location screens
+                          // show their own messages for that.
+                          AccessState.READY
+                ),
+            { timeout: 10000 }
         );
     }
 
@@ -180,12 +218,15 @@ export class GeolocationService {
         }
 
         current.isMoving = current.speed >= SPEED_THRESHOLD;
-        current.timeTotal = current.timestamp - previous.timestamp;
+        current.timeTotal =
+            previous.timeTotal + (current.timestamp - previous.timestamp);
         current.firstPosition = previous.firstPosition || previous;
         current.timeMoving = previous.timeMoving;
         current.timeStopped = previous.timeStopped;
         current.distanceTraveled = previous.distanceTraveled + distance;
-        current.speedAvg = current.distanceTraveled / current.timeTotal;
+        current.speedAvg = current.timeTotal
+            ? current.distanceTraveled / (current.timeTotal / 1000)
+            : 0;
 
         if (typeof current.altitude === 'number') {
             current.altitudeSum =
@@ -233,7 +274,8 @@ export class GeolocationService {
 
         const distance = this._coordinateService.distance(current, back1);
         const elapsedTime = current.timestamp - back1.timestamp;
-        const speed = elapsedTime ? distance / elapsedTime : 0;
+        // Timestamps are milliseconds; speeds are meters per second.
+        const speed = elapsedTime ? distance / (elapsedTime / 1000) : 0;
         (current.timestamp + first.timestamp) / 2 - first.timestamp;
         let heading = NaN;
 

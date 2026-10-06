@@ -27,9 +27,6 @@ component('nfc-scan-result', {
         <div *if="scanResult && scanResult.readError">
             <i18n-label id="nfc.scanResult.readError"></i18n-label>
         </div>
-        <div *if="scanResult && scanResult.initializeError">
-            <i18n-label id="nfc.scanResult.initializeError"></i18n-label>
-        </div>
         <div *if="scanResult && scanResult.serialNumber" class="breakWord">
             <i18n-label id="nfc.scanResult.serialNumber"></i18n-label>
             {{ scanResult.serialNumber }}

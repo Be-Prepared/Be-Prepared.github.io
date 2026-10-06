@@ -16,7 +16,8 @@ component('show-modal', {
             align-items: center;
             position: fixed;
             inset: 0;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 5;
             backdrop-filter: blur(5px);
         }
 

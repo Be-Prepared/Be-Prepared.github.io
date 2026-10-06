@@ -17,6 +17,10 @@ export class UpdatePwaComponent {
         this._callDrawer('hide');
     }
 
+    skip() {
+        this._callDrawer('hide');
+    }
+
     private _callDrawer(action: 'show' | 'hide') {
         if (this.drawer) {
             (this.drawer as any)[action]();
@@ -27,9 +31,8 @@ export class UpdatePwaComponent {
 component('update-pwa', {
     style: css`
         .load-svg-wrapper {
-            padding: 0 3%;
-            width: 5em;
-            background-color: var(--bg-color);
+            width: 2.5em;
+            color: var(--accent);
         }
 
         .update-text {

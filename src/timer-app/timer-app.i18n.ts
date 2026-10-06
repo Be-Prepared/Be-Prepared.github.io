@@ -1,0 +1,21 @@
+// Strings for this tool. Keys must start with "timer.".
+export const timerStrings = {
+    'timer.dismiss': 'Dismiss',
+    'timer.done': "Time's up!",
+    'timer.hours': 'Hours',
+    'timer.hoursDown': 'One hour less',
+    'timer.hoursUp': 'One hour more',
+    'timer.minutes': 'Minutes',
+    'timer.minutesDown': 'One minute less',
+    'timer.minutesUp': 'One minute more',
+    'timer.minutesShort': 'min',
+    'timer.pause': 'Pause',
+    'timer.paused': 'Paused',
+    'timer.reset': 'Reset',
+    'timer.restart': 'Restart',
+    'timer.resume': 'Resume',
+    'timer.seconds': 'Seconds',
+    'timer.secondsDown': 'One second less',
+    'timer.secondsUp': 'One second more',
+    'timer.start': 'Start',
+};

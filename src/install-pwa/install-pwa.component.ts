@@ -25,9 +25,8 @@ export class InstallPwaComponent {
 component('install-pwa', {
     style: css`
         .load-svg-wrapper {
-            padding: 0 3%;
-            width: 5em;
-            background-color: var(--bg-color);
+            width: 2.5em;
+            color: var(--accent);
         }
 
         .install-text {

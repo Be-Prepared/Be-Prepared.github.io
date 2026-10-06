@@ -223,11 +223,12 @@ component('location-list-app', {
                         ></i18n-label>
                     </div>
                 </div>
-                <scaling-icon
+                <icon-button
                     slot="more-buttons"
                     @click.stop.prevent="goToAdd()"
                     href="/add.svg"
-                ></scaling-icon>
+                    label-id="location.addWaypoint"
+                ></icon-button>
             </default-layout>
         </location-wrapper>
     `,

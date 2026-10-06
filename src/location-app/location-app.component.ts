@@ -1,4 +1,4 @@
-import { AvailabilityState } from '../datatypes/availability-state';
+import { AccessState } from '../services/access/access-controller';
 import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import { filter, switchMap } from 'rxjs/operators';
@@ -20,13 +20,14 @@ export class LocationAppComponent {
         this._geolocationService
             .availabilityState()
             .pipe(
-                takeUntil(this._subject),
                 filter((state) => {
-                    return state === AvailabilityState.ALLOWED;
+                    return state === AccessState.READY;
                 }),
                 switchMap(() => {
                     return this._geolocationService.getPosition();
-                })
+                }),
+                // Last, so the inner position watch is stopped too.
+                takeUntil(this._subject)
             )
             .subscribe((position) => {
                 this.position = position;
@@ -145,11 +146,12 @@ component('location-app', {
                         ></i18n-label>
                     </p>
                 </div>
-                <scaling-icon
+                <icon-button
                     slot="more-buttons"
                     @click="goToList()"
                     href="/list.svg"
-                ></scaling-icon>
+                    label-id="location.waypointList"
+                ></icon-button>
             </default-layout>
         </location-wrapper>
     `,

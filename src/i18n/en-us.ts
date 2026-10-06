@@ -1,21 +1,60 @@
 import { html } from 'fudgel';
 import type { LanguageData } from './language-data';
+import { mirrorStrings } from '../mirror-app/mirror-app.i18n';
+import { levelStrings } from '../level-app/level-app.i18n';
+import { pictureHangingStrings } from '../picture-hanging-app/picture-hanging-app.i18n';
+import { protractorStrings } from '../protractor-app/protractor-app.i18n';
+import { soundLevelStrings } from '../sound-level-app/sound-level-app.i18n';
+import { heartRateStrings } from '../heart-rate-app/heart-rate-app.i18n';
+import { alarmStrings } from '../alarm-app/alarm-app.i18n';
+import { alarmClockStrings } from '../alarm-clock-app/alarm-clock-app.i18n';
+import { timerStrings } from '../timer-app/timer-app.i18n';
+import { stopwatchStrings } from '../stopwatch-app/stopwatch-app.i18n';
+import { pedometerStrings } from '../pedometer-app/pedometer-app.i18n';
+import { rulerStrings } from '../ruler-app/ruler-app.i18n';
+import { metalDetectorStrings } from '../metal-detector-app/metal-detector-app.i18n';
 
 export const enUS: LanguageData = {
+    // Strings kept next to each tool
+    ...alarmStrings,
+    ...alarmClockStrings,
+    ...heartRateStrings,
+    ...levelStrings,
+    ...metalDetectorStrings,
+    ...mirrorStrings,
+    ...pedometerStrings,
+    ...pictureHangingStrings,
+    ...protractorStrings,
+    ...rulerStrings,
+    ...soundLevelStrings,
+    ...stopwatchStrings,
+    ...timerStrings,
+
     // Application-related and global strings
     'app.title': 'Be Prepared',
-    'app.currentPermissionStatus': 'Current permission status',
 
     // Barcode reader
     'barcodeReader.explainAsk':
         'To use the barcode reader, the camera permission is required.',
     'barcodeReader.NATIVE': 'Native',
     'barcodeReader.Z_BAR': 'ZBar',
+    'barcodeReader.scanAgain': 'Scan Again',
 
     // Compass
-    'compass.compassUnavailable.heading': 'No Compass',
-    'compass.compassUnavailable.message':
-        'This device does not have a compass or the compass direction is not able to be retrieved. The compass will be removed from the starting menu.',
+    'compass.calibrate':
+        'The compass looks inaccurate. Move your phone in a slow figure 8, twisting it in every direction, away from metal and magnets.',
+    'compass.explainAsk':
+        'The compass needs access to motion and orientation sensors.',
+    'compass.source.ABSOLUTE_ORIENTATION_SENSOR': 'Orientation sensor',
+    'compass.source.DEVICE_ORIENTATION': 'Device orientation',
+    'compass.source.DEVICE_ORIENTATION_ABSOLUTE':
+        'Device orientation (absolute)',
+    'compass.source.NONE': 'Waiting for sensor',
+    'compass.source.WEBKIT_COMPASS_HEADING': 'iOS compass',
+    'compass.unavailable':
+        'This device has no compass, or the browser does not share its direction.',
+    'compass.waiting':
+        'No compass readings yet. If Low Power Mode or Battery Saver is on, turn it off; it can stop motion sensors from reporting.',
 
     // File Transfer
     'fileTransfer.send': 'Send',
@@ -31,27 +70,18 @@ export const enUS: LanguageData = {
 
     // Flashlight
     'flashlight.explainAsk':
-        'In order to turn on the flashlight, the camera permission needs to be granted.',
-    'flashlight.explainDeny':
-        "The camera permission is required to access the camera's light. The permission was denied or your device does not have a light.",
-    'flashlight.unavailable': 'Not Available',
+        'The flashlight is part of the camera, so the camera permission is needed to turn it on. No pictures are taken.',
+    'flashlight.off': 'Off',
+    'flashlight.on': 'On',
     'flashlight.unavailableMessage':
-        'This device does not have a camera with a flashlight that is accessible to the application. Because this feature is not available, the button will be removed from the menu.',
+        'None of the cameras this app can use has a light it can control.',
 
     // Info
-    'info.availability.allowed': '✔ Allowed',
-    'info.availability.denied': '✖ Denied',
-    'info.availability.error': 'Error',
-    'info.availability.prompt': 'Prompt',
-    'info.availability.unavailable': 'Unavailable',
     'info.barcodes': 'Barcode support:',
     'info.barcodesNotSupported': 'Barcodes are not supported on this device.',
     'info.buildInformationHeader': 'Build Information',
     'info.camera': 'Camera:',
     'info.compass': 'Compass:',
-    'info.compass.ABSOLUTE_ORIENTATION_SENSOR': 'A',
-    'info.compass.DEVICE_ORIENTATION': 'DO',
-    'info.compass.DEVICE_ORIENTATION_ABSOLUTE': 'DOA',
     'info.contact.email': 'Email Developer',
     'info.contact.feedback':
         'To provide feedback, suggestions, and bug reports, you can go to the project site or email the developer directly.',
@@ -69,12 +99,14 @@ export const enUS: LanguageData = {
     'info.distances.METRIC': 'Metric',
     'info.framework': 'the framework driving this app',
     'info.geolocation': 'Geolocation:',
+    'info.hardware.no': 'Not found',
+    'info.hardware.yes': 'Present',
     'info.latestChangesHeader': 'Latest Changes:',
-    'info.nfc': 'NFC',
-    'info.permission.denied': '✖ Denied',
-    'info.permission.error': 'Error',
-    'info.permission.granted': '✔ Granted',
-    'info.permission.prompt': 'Prompt',
+    'info.nfc': 'NFC:',
+    'info.permission.DENIED': 'Blocked',
+    'info.permission.GRANTED': 'Allowed',
+    'info.permission.PROMPT': 'Will ask',
+    'info.permission.UNKNOWN': 'Asks when used',
     'info.permissionsAndFeaturesHeader': 'Permissions and Features:',
     'info.preferences': 'Preferences:',
     'info.preferences.reset': 'Reset Preferences',
@@ -89,7 +121,6 @@ export const enUS: LanguageData = {
     'info.timeSystem.24_HOUR': '24 Hour',
     'info.time12Hour.AM': 'AM',
     'info.time12Hour.PM': 'PM',
-    'info.torch': 'Torch:',
     'info.toolingHeader': 'Tooling:',
     'info.wakeLock': 'Wake Lock:',
 
@@ -103,6 +134,7 @@ export const enUS: LanguageData = {
     // Location
     'location.add.gettingCurrentLocation': 'Getting current location...',
     'location.add.waypointName': 'Unnamed Waypoint {{id}}',
+    'location.addWaypoint': 'Add waypoint',
     'location.average.currentEstimate': 'Current estimate:',
     'location.average.calculating': 'Calculating...',
     'location.average.heading': 'Averaging:',
@@ -203,6 +235,8 @@ export const enUS: LanguageData = {
             <li>25x 521873 9289265</li>
         </ul>
     `,
+    'location.keepScreenOn': 'Keep screen on',
+    'location.navigate': 'Navigate',
     'location.navigation.COMPASS': 'Compass',
     'location.navigation.DIRECTION_OF_TRAVEL': 'Direction of Travel',
     'location.navigation.NORTH_UP': 'North Up',
@@ -212,9 +246,10 @@ export const enUS: LanguageData = {
     'location.positionError': 'There was an error retrieving the location.',
     'location.positionUnavailable': 'Position unavailable.',
     'location.retrievingLocation': 'Retrieving location...',
-    'location.unavailable': 'Not Available',
+    'location.save': 'Save',
     'location.unavailableMessage':
-        'There is no GPS available on this device. The location tool will be removed from the starting menu.',
+        'There is no location service available on this device.',
+    'location.waypointList': 'Waypoints',
     'location.waypoints.location': 'Location',
     'location.waypoints.name': 'Name',
     'location.waypoints.noWaypoints': 'No waypoints have been saved.',
@@ -222,9 +257,15 @@ export const enUS: LanguageData = {
 
     // Magnifier
     'magnifier.explainAsk':
-        'The magnifier requires the camera permission to function.',
+        'The magnifier shows the camera\'s view, zoomed in. It needs the camera permission. Nothing is recorded.',
+    'magnifier.freeze': 'Freeze image',
+    'magnifier.resume': 'Resume',
+    'magnifier.zoomIn': 'Zoom in',
+    'magnifier.zoomOut': 'Zoom out',
 
     // NFC
+    'nfc.error':
+        'NFC could not start. Make sure NFC is turned on in your phone\'s settings, then try again.',
     'nfc.explainAsk': 'To use NFC, your permission is required.',
     'nfc.readNumber': 'Read number:',
     'nfc.record.encoding': 'Encoding:',
@@ -232,37 +273,93 @@ export const enUS: LanguageData = {
     'nfc.record.lang': 'Language:',
     'nfc.record.mediaType': 'Media type:',
     'nfc.record.recordType': 'Record type:',
-    'nfc.scanResult.initializeError': 'Error initializing NFC',
     'nfc.scanResult.numberOfRecords': 'Number of records:',
     'nfc.scanResult.readError': 'Error reading NFC tag',
     'nfc.scanResult.scanning': 'Scanning for NFC tags...',
     'nfc.scanResult.serialNumber': 'Serial number:',
     'nfc.scanResult.timestamp': 'Timestamp:',
-    'nfc.unavailable.heading': 'NFC Not Supported',
     'nfc.unavailable.message':
-        'There is no NFC support on this device. The NFC tool will be removed from the starting menu.',
+        'This browser or device does not support reading NFC tags.',
+
+    // Timer and alarm clock alert, shown over any screen
+    'ringer.alarm': 'Alarm',
+    'ringer.alarmHeading': 'Alarm',
+    'ringer.dismiss': 'Dismiss',
+    'ringer.missed': 'missed',
+    'ringer.missedExplain':
+        "Be Prepared was closed or the phone was asleep at the time, so it couldn't ring. Web apps can only make sound while they're open.",
+    'ringer.missedHeading': 'Missed While Closed',
+    'ringer.restartTimer': 'Restart Timer',
+    'ringer.snooze': 'Snooze 9 Minutes',
+    'ringer.timer': 'Timer',
+    'ringer.timerDone': 'Time\'s Up!',
+
+    // Limits of timers and alarms in a web app. Shown wherever someone might
+    // count on a sound later.
+    'reminderLimits.heading': 'Know the limits',
+    'reminderLimits.full.html': html`
+        <ul style="margin: 0; padding-left: 1.1em">
+            <li>
+                Alarms only ring while Be Prepared is open and the screen is
+                on. If you close the app, switch to another app, or the screen
+                turns off, it can't make a sound.
+            </li>
+            <li>
+                Web apps can't wake a sleeping phone or ring in the
+                background. Your phone may also put the app to sleep on its
+                own.
+            </li>
+            <li>
+                The sound uses your media volume. Silent mode, Do Not Disturb,
+                or a low media volume can keep you from hearing it.
+            </li>
+            <li>
+                Don't rely on this as your only wake-up alarm. Your phone's
+                built-in clock app can ring when the phone is asleep.
+            </li>
+            <li>
+                For overnight use, open Nightstand mode, plug the phone in,
+                and turn the media volume up.
+            </li>
+        </ul>
+    `,
+    'reminderLimits.editor':
+        "This alarm only rings if Be Prepared is open with the screen on when it's due. It can't wake a sleeping phone.",
+    'reminderLimits.nightstand':
+        'Keep this screen open, the phone plugged in, and the media volume up. Alarms cannot ring if the app is closed or the phone sleeps.',
+    'reminderLimits.timer':
+        "Keep Be Prepared open with the screen on until the timer ends. It can't ring if the app is closed, you switch apps, or the phone sleeps. Sound follows the media volume.",
 
     // Shared components
-    'shared.cameraUnavailable.heading': 'No Suitable Camera',
-    'shared.cameraUnavailable.message':
-        'There is no camera available that this app can use for the selected tool. This tool will be removed from the starting menu.',
-    'shared.permissionDenied.heading': 'Denied or Unavailable',
-    'shared.permissionDenied.message':
-        'Because the necessary permission was denied or the hardware is unavailable, the button in the menu will be removed.',
-    'shared.permissionError.heading': 'Error',
-    'shared.permissionError.message':
-        'There was an error obtaining the necessary permission or information. Perhaps the device is already in use. This may be temporary.',
-    'shared.permissionPrompt.goBack': 'Not Right Now',
-    'shared.permissionPrompt.grantPermission': 'Grant Permission',
-    'shared.permissionPrompt.heading': 'Permission Required',
+    'shared.access.allow': 'Allow',
+    'shared.access.back': 'Back',
+    'shared.access.denied.heading': 'Permission Blocked',
+    'shared.access.denied.message':
+        'This tool can\'t work without the permission. Nothing is remembered by this app, so you can try again at any time.',
+    'shared.access.deniedHint.android':
+        'If "Try Again" does nothing, the browser is blocking it. In Chrome, tap the icon to the left of the address (or open the installed app\'s info page), choose Permissions, and allow it. Then come back here.',
+    'shared.access.deniedHint.ios':
+        'If "Try Again" does nothing, iOS is blocking it. Open Settings → Apps → Safari (or Settings → Safari) and allow Camera, Location, or Motion & Orientation access. For motion and compass access, fully close and reopen the app as well.',
+    'shared.access.deniedHint.other':
+        'If "Try Again" does nothing, the browser is blocking it. Open the site settings (usually the icon next to the address) and allow the permission, then come back here.',
+    'shared.access.error.heading': 'Couldn\'t Start',
+    'shared.access.error.message':
+        'The hardware is there but could not be started. Another app may be using it. Close other apps that use it and try again.',
+    'shared.access.prompt.heading': 'Permission Needed',
+    'shared.access.prompt.hint':
+        'Your browser will ask next. Everything stays on this device.',
+    'shared.access.tryAgain': 'Try Again',
+    'shared.access.unavailable.heading': 'Not Available',
+    'shared.access.unavailable.message':
+        'This device doesn\'t have the hardware this tool needs.',
     'shared.prettyInput.close': 'Close Help',
+    'shared.torch': 'Light',
 
     // Speed
     'speed.average': 'Average:',
     'speed.maximum': 'Maximum:',
 
     // Services
-    'service.torch.deviceIssue': 'Flashlight issue - reload required',
     'service.wakeLock.released': 'Letting Screen Turn Off',
     'service.wakeLock.obtained': 'Keeping Screen On',
 
@@ -297,6 +394,8 @@ export const enUS: LanguageData = {
     'sunMoon.sunTimes.nadir': 'Nadir (sun is lowest):',
     'sunMoon.sunTimes.nauticalDawn': 'Nautical dawn:',
     'sunMoon.sunTimes.nauticalDusk': 'Nautical dusk:',
+    'sunMoon.sunTimes.neverRise': 'Sun does not rise today',
+    'sunMoon.sunTimes.neverSet': 'Sun does not set today',
     'sunMoon.sunTimes.nightEnd': 'Night end:',
     'sunMoon.sunTimes.night': 'Night:',
     'sunMoon.sunTimes.solarNoon': 'Solar noon:',
@@ -306,11 +405,14 @@ export const enUS: LanguageData = {
     'sunMoon.sunTimes.sunset': 'Sunset:',
 
     // Tile labels on index
+    'tile.alarm': 'Alarm',
+    'tile.alarmClock': 'Alarm Clock',
     'tile.barcodeReader': 'Read Barcodes',
     'tile.compass': 'Compass',
     'tile.fileTransfer': 'File Transfer',
     'tile.flashlight': 'Flashlight',
     'tile.frontLight': 'Front Light',
+    'tile.heartRate': 'Heart Rate',
     'tile.info': 'Info',
     'tile.largeText': 'Large Text',
     'tile.level': 'Level',
@@ -319,11 +421,14 @@ export const enUS: LanguageData = {
     'tile.metalDetector': 'Metal Detector',
     'tile.mirror': 'Mirror',
     'tile.nfc': 'NFC',
+    'tile.pedometer': 'Pedometer',
+    'tile.pictureHanging': 'Picture Hanging',
+    'tile.protractor': 'Protractor',
     'tile.ruler': 'Ruler',
+    'tile.soundLevel': 'Sound Level',
     'tile.speed': 'Speed',
     'tile.stopwatch': 'Stopwatch',
     'tile.sunMoon': 'Sun & Moon',
-    'tile.temperature': 'Temperature',
     'tile.timer': 'Timer',
 
     // Update

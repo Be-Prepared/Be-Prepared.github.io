@@ -6,7 +6,6 @@ export * from './location-edit-app.component.ts';
 export * from './location-field.component.ts';
 export * from './location-list-app.component.ts';
 export * from './location-navigate-app.component.ts';
-export * from './location-unavailable.component.ts';
 export * from './location-wrapper.component.ts';
 export * from './navigation-arrow.component.ts';
 export * from './navigation-type.component.ts';

@@ -15,10 +15,19 @@ export class TimeService {
     private _i18nService = di(I18nService);
     private _preferenceService = di(PreferenceService);
 
+    constructor() {
+        const saved = this._preferenceService.timeSystem.getItem();
+
+        if (saved && TIME_SYSTEMS.includes(saved)) {
+            this._currentSetting.next(saved);
+        }
+    }
+
+    // Elapsed time as H:MM:SS. Hours keep counting past 24.
     formatTime(time: number) {
         const seconds = Math.floor(time / 1000) % 60;
-        const minutes = Math.floor(seconds / 60000) % 60;
-        const hours = Math.floor(minutes / 3600000) % 24;
+        const minutes = Math.floor(time / 60000) % 60;
+        const hours = Math.floor(time / 3600000);
 
         return `${hours}:${this._pad(minutes)}:${this._pad(seconds)}`;
     }
@@ -40,6 +49,10 @@ export class TimeService {
         return `${this._pad(t.getHours())}:${this._pad(
             t.getMinutes()
         )}:${this._pad(t.getSeconds())}`;
+    }
+
+    isTwelveHour() {
+        return this._currentSetting.value === TimeSystem['12_HOUR'];
     }
 
     getCurrentSetting() {

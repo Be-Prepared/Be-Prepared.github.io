@@ -1,251 +1,330 @@
-import { AvailabilityState } from '../datatypes/availability-state';
+import { AccessState } from '../services/access/access-controller';
+import {
+    CameraService,
+    getVideoTrack,
+    hasTorch,
+    isTorchOn,
+    setTorch,
+} from '../services/camera.service';
 import { component, css, html } from 'fudgel';
 import { di } from '../di';
-import { MagnifierService } from '../services/magnifier.service';
+import {
+    formatZoom,
+    hardwareZoomFromCapabilities,
+    HardwareZoom,
+    initialZoom,
+    pinchZoom,
+    planZoom,
+    stepZoom,
+    zoomLimits,
+} from './zoom';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { TorchService } from '../services/torch.service';
 
 export class MagnifierAppComponent {
-    private _magnifierService = di(MagnifierService);
-    private _pointerInitialDiff: number | null = null;
-    private _pointerInitialZoom: number | null = null;
-    private _pointerEventCache: PointerEvent[] = [];
+    private _camera = di(CameraService).controller({ highResolution: true });
+    private _hardwareZoom: HardwareZoom | null = null;
+    private _hardwareZoomApplied: number | null = null;
+    private _hardwareZoomPending: number | null = null;
+    private _pinchStartDistance = 0;
+    private _pinchStartZoom = 1;
+    private _pointers = new Map<number, { x: number; y: number }>();
     private _subject = new Subject();
-    private _torchService = di(TorchService);
-    private _track?: MediaStreamTrack;
-    private _zoomCurrent: number | null = null;
-    private _zoomMax: number | null = null;
-    private _zoomMin: number | null = null;
-    private _zoomScale: number | null = null;
-    private _zoomStep: number | null = null;
-    explainAsk = false;
-    explainDeny = false;
-    explainUnavailable = false;
-    showControls = false;
+    private _track: MediaStreamTrack | null = null;
+    private _zoom = 1;
+    canZoomIn = true;
+    canZoomOut = false;
+    freezeIcon = '/pause.svg';
+    freezeLabel = 'magnifier.freeze';
+    frozen = false;
+    screenState = AccessState.CHECKING;
     torchAvailable = false;
-    torchClass = '';
     torchEnabled = false;
     video?: HTMLVideoElement;
+    zoomLabel = '';
 
     onInit() {
-        this._magnifierService
-            .availabilityState(true)
+        this._camera.state
             .pipe(takeUntil(this._subject))
-            .subscribe((value) => {
-                this.explainAsk = value === AvailabilityState.PROMPT;
-                this.explainDeny = value === AvailabilityState.DENIED;
-                this.explainUnavailable =
-                    value === AvailabilityState.UNAVAILABLE;
-                const showVideo = value === AvailabilityState.ALLOWED;
-
-                if (this.showControls !== showVideo) {
-                    this.showControls = showVideo;
-
-                    if (this.showControls) {
-                        this._startVideoStream();
-                    } else {
-                        this._endVideoStream();
-                    }
-                }
-            });
-        this._torchService
-            .availabilityState(true)
+            .subscribe((state) => (this.screenState = state));
+        this._camera.resourceChanges
             .pipe(takeUntil(this._subject))
-            .subscribe((value) => {
-                this.torchAvailable = value === AvailabilityState.ALLOWED;
-            });
+            .subscribe((stream) => this._attach(stream));
+        this._camera.init();
     }
 
     onDestroy() {
-        this._zoom(1);
         this._subject.next(null);
         this._subject.complete();
+        this._camera.destroy();
     }
 
     grant() {
-        this.explainAsk = false;
-        this._magnifierService.prompt();
+        this._camera.request();
     }
 
     pointerDown(event: PointerEvent) {
-        this._pointerEventCache.push(event);
-        this._pointerInitialDiff = this._pointerDiff();
-        this._pointerInitialZoom = this._zoomCurrent;
+        this._pointers.set(event.pointerId, {
+            x: event.clientX,
+            y: event.clientY,
+        });
+        this._startPinch();
     }
 
     pointerMove(event: PointerEvent) {
-        // Update the cached pointer
-        for (let i = 0; i < this._pointerEventCache.length; i += 1) {
-            if (this._pointerEventCache[i].pointerId === event.pointerId) {
-                this._pointerEventCache[i] = event;
-            }
-        }
-
-        const diff = this._pointerDiff();
-
-        if (
-            !diff ||
-            !this._pointerInitialDiff ||
-            !this._pointerInitialZoom ||
-            !this._zoomScale ||
-            !this._zoomMax ||
-            !this._zoomMin ||
-            !this._zoomStep
-        ) {
+        if (!this._pointers.has(event.pointerId)) {
             return;
         }
 
-        const change = diff - this._pointerInitialDiff;
-        const scaled = change / this._zoomScale;
-        const stepsTotal = (this._zoomMax - this._zoomMin) / this._zoomStep;
-        const stepsChange = scaled * stepsTotal;
-        const endZoom =
-            this._pointerInitialZoom + Math.floor(stepsChange) * this._zoomStep;
+        this._pointers.set(event.pointerId, {
+            x: event.clientX,
+            y: event.clientY,
+        });
 
-        this._zoom(endZoom);
+        if (this._pointers.size === 2) {
+            this._setZoom(
+                pinchZoom(
+                    this._pinchStartZoom,
+                    this._pinchStartDistance,
+                    this._pointerDistance()
+                )
+            );
+        }
     }
 
     pointerUp(event: PointerEvent) {
-        this._pointerEventCache = this._pointerEventCache.filter(
-            (previousEvent) => {
-                return previousEvent.pointerId !== event.pointerId;
+        this._pointers.delete(event.pointerId);
+        this._startPinch();
+    }
+
+    toggleFreeze() {
+        this._setFrozen(!this.frozen);
+
+        if (this.video) {
+            if (this.frozen) {
+                this.video.pause();
+            } else {
+                this.video.play().catch(() => {});
             }
-        );
+        }
     }
 
     toggleTorch() {
-        if (this.torchEnabled) {
-            this._torchService.turnOff();
-        } else {
-            this._torchService.turnOn();
-        }
+        const track = this._track;
 
-        this._setupTorch();
+        setTorch(track, !this.torchEnabled)
+            .catch(() => {})
+            .then(() => {
+                this.torchEnabled = isTorchOn(track);
+            });
     }
 
-    private _endVideoStream() {
-        this._zoomCurrent = null;
-        this._zoomMin = null;
-        this._zoomMax = null;
-        this._zoomStep = null;
+    zoomIn() {
+        this._setZoom(stepZoom(this._zoom, 1));
     }
 
-    private _pointerDiff() {
-        if (this._pointerEventCache.length === 2) {
-            const first = this._pointerEventCache[0];
-            const second = this._pointerEventCache[1];
-
-            return Math.sqrt(
-                Math.pow(second.clientX - first.clientX, 2) +
-                    Math.pow(second.clientY - first.clientY, 2)
-            );
-        }
-
-        return null;
+    zoomOut() {
+        this._setZoom(stepZoom(this._zoom, -1));
     }
 
-    private _setupTorch() {
-        this._torchService.currentStatus().then((enabled) => {
-            this.torchEnabled = enabled;
-            this.torchClass = enabled ? 'enabled' : '';
-        });
-    }
-
-    private _startVideoStream() {
-        this._magnifierService.getStream().then((stream) => {
-            const track = stream.getVideoTracks()[0];
-
-            if (!track) {
-                return;
-            }
-
-            const zoom = (track.getCapabilities() as any).zoom;
-
-            if (zoom) {
-                this._zoomMin = zoom.min;
-                this._zoomMax = zoom.max;
-                this._zoomStep = zoom.step;
-                this._track = track;
-                this._zoom(this._zoomMax!);
-            }
-
-            if (this.video) {
-                this.video.srcObject = stream;
-            }
-
-            this._zoomScale =
-                Math.min(window.screen.width + window.screen.height) / 2;
-            this._setupTorch();
-        });
-    }
-
-    private _zoom(zoom: number) {
-        if (!this._zoomMax || !this._zoomMin || !this._track) {
+    private _applyHardwareZoom(value: number | null) {
+        if (value === null || !this._track) {
             return;
         }
 
-        zoom = Math.min(this._zoomMax, zoom);
-        zoom = Math.max(this._zoomMin, zoom);
-        this._zoomCurrent = zoom;
-        this._track.applyConstraints({
-            advanced: [
-                {
-                    zoom: zoom,
-                } as any,
-            ],
+        if (this._hardwareZoomPending !== null) {
+            // A change is in progress. Remember the latest value and apply it
+            // once the camera catches up.
+            this._hardwareZoomPending = value;
+
+            return;
+        }
+
+        if (value === this._hardwareZoomApplied) {
+            return;
+        }
+
+        const track = this._track;
+        this._hardwareZoomPending = value;
+        this._hardwareZoomApplied = value;
+        track
+            .applyConstraints({ advanced: [{ zoom: value } as any] })
+            .catch(() => {})
+            .then(() => {
+                const next = this._hardwareZoomPending;
+                this._hardwareZoomPending = null;
+
+                if (track === this._track && next !== value) {
+                    this._applyHardwareZoom(next);
+                }
+            });
+    }
+
+    private _attach(stream: MediaStream | null) {
+        const track = getVideoTrack(stream);
+        this._track = track;
+        this._hardwareZoomApplied = null;
+        this._hardwareZoomPending = null;
+        this._setFrozen(false);
+
+        if (!track) {
+            this.torchAvailable = false;
+            this.torchEnabled = false;
+
+            return;
+        }
+
+        const isFirst = this._hardwareZoom === null && !this.zoomLabel;
+        this._hardwareZoom = hardwareZoomFromCapabilities(
+            track.getCapabilities ? track.getCapabilities() : null
+        );
+        this.torchAvailable = hasTorch(track);
+        this.torchEnabled = isTorchOn(track);
+
+        // Wait a tick for the video element to be rendered.
+        setTimeout(() => {
+            if (this.video && this._track === track) {
+                this.video.srcObject = stream;
+            }
+
+            // Keep the zoom level when coming back from the background.
+            this._setZoom(isFirst ? initialZoom(this._hardwareZoom) : this._zoom);
         });
+    }
+
+    private _pointerDistance() {
+        const [a, b] = [...this._pointers.values()];
+
+        if (!a || !b) {
+            return 0;
+        }
+
+        return Math.hypot(a.x - b.x, a.y - b.y);
+    }
+
+    private _setFrozen(frozen: boolean) {
+        this.frozen = frozen;
+        this.freezeIcon = frozen ? '/play.svg' : '/pause.svg';
+        this.freezeLabel = frozen ? 'magnifier.resume' : 'magnifier.freeze';
+    }
+
+    private _setZoom(requested: number) {
+        const plan = planZoom(requested, this._hardwareZoom);
+        const limits = zoomLimits(this._hardwareZoom);
+        this._zoom = plan.total;
+        this.zoomLabel = formatZoom(plan.total);
+        this.canZoomIn = plan.total < limits.max - 1e-6;
+        this.canZoomOut = plan.total > limits.min + 1e-6;
+        this._applyHardwareZoom(plan.hardware);
+
+        if (this.video) {
+            this.video.style.transform = `scale(${plan.digital})`;
+        }
+    }
+
+    private _startPinch() {
+        if (this._pointers.size === 2) {
+            this._pinchStartDistance = this._pointerDistance();
+            this._pinchStartZoom = this._zoom;
+        }
     }
 }
 
-component('magnifier-app', {
-    style: css`
-        video {
-            height: 100%;
-            width: 100%;
-            object-fit: cover;
-        }
+component(
+    'magnifier-app',
+    {
+        style: css`
+            :host {
+                display: block;
+                height: 100%;
+                width: 100%;
+            }
 
-        /* Do not convert pointer events to touch events after 0.3 seconds */
-        default-layout {
-            touch-action: none;
-        }
+            .viewport {
+                position: absolute;
+                inset: 0;
+                overflow: hidden;
+                background: #000;
+                z-index: 0;
+            }
 
-        .enabled {
-            color: var(--button-fg-color-enabled);
-        }
-    `,
-    template: html`
-        <permission-prompt
-            *if="explainAsk"
-            @grant.stop.prevent="grant()"
-            message-id="magnifier.explainAsk"
-        ></permission-prompt>
-        <permission-denied *if="explainDeny"></permission-denied>
-        <camera-unavailable *if="explainUnavailable"></camera-unavailable>
-        <video
-            *if="showControls"
-            #ref="video"
-            autoplay
-            muted
-            playsinline
-        ></video>
-        <default-layout
-            *if="showControls"
-            @pointerdown.stop.prevent="pointerDown($event)"
-            @pointermove.stop.prevent="pointerMove($event)"
-            @pointerup.stop.prevent="pointerUp($event)"
-            @pointercancel.stop.prevent="pointerUp($event)"
-            @pointerout.stop.prevent="pointerUp($event)"
-            @pointerleave.stop.prevent="pointerUp($event)"
-        >
-            <scaling-icon
-                slot="more-buttons"
-                *if="torchAvailable"
-                @click.stop.prevent="toggleTorch()"
-                class="{{torchClass}}"
-                href="/flashlight.svg"
-            ></scaling-icon>
-        </default-layout>
-    `,
-}, MagnifierAppComponent);
+            video {
+                height: 100%;
+                width: 100%;
+                object-fit: cover;
+                transform-origin: center center;
+            }
+
+            /* Do not convert pointer events to touch events */
+            default-layout {
+                touch-action: none;
+            }
+
+            .zoom-label {
+                position: absolute;
+                top: var(--space-3);
+                left: 50%;
+                transform: translateX(-50%);
+                padding: var(--space-1) var(--space-3);
+                border-radius: 999px;
+                background: var(--overlay-bg);
+                color: #fff;
+                font-weight: 700;
+                font-variant-numeric: tabular-nums;
+                pointer-events: none;
+            }
+        `,
+        template: html`
+            <access-screen
+                *if="screenState !== 'READY'"
+                state="{{screenState}}"
+                icon="/camera.svg"
+                message-id="magnifier.explainAsk"
+                @grant.stop.prevent="grant()"
+            ></access-screen>
+            <div *if="screenState === 'READY'" class="viewport">
+                <video #ref="video" autoplay muted playsinline></video>
+                <div class="zoom-label">{{zoomLabel}}</div>
+            </div>
+            <default-layout
+                *if="screenState === 'READY'"
+                overlay
+                @pointerdown="pointerDown($event)"
+                @pointermove="pointerMove($event)"
+                @pointerup="pointerUp($event)"
+                @pointercancel="pointerUp($event)"
+            >
+                <icon-button
+                    slot="more-buttons"
+                    href="/zoom-out.svg"
+                    label-id="magnifier.zoomOut"
+                    .disabled="!canZoomOut"
+                    @click.stop.prevent="zoomOut()"
+                ></icon-button>
+                <icon-button
+                    slot="more-buttons"
+                    href="/zoom-in.svg"
+                    label-id="magnifier.zoomIn"
+                    .disabled="!canZoomIn"
+                    @click.stop.prevent="zoomIn()"
+                ></icon-button>
+                <icon-button
+                    slot="more-buttons"
+                    href="{{freezeIcon}}"
+                    label-id="{{freezeLabel}}"
+                    .active="frozen"
+                    @click.stop.prevent="toggleFreeze()"
+                ></icon-button>
+                <icon-button
+                    slot="more-buttons"
+                    *if="torchAvailable"
+                    href="/flashlight.svg"
+                    label-id="shared.torch"
+                    .active="torchEnabled"
+                    @click.stop.prevent="toggleTorch()"
+                ></icon-button>
+            </default-layout>
+        `,
+    },
+    MagnifierAppComponent
+);

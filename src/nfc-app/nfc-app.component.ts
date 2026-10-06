@@ -1,72 +1,33 @@
-import { AvailabilityState } from '../datatypes/availability-state';
+import { AccessState } from '../services/access/access-controller';
 import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import { NfcScanResult, NfcService } from '../services/nfc.service';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 export class NfcAppComponent {
-    private _nfcService = di(NfcService);
-    private _scanSubscription?: Subscription;
+    private _nfc = di(NfcService).controller(
+        (result) => (this.lastRead = result)
+    );
     private _subject = new Subject();
-    explainAsk = false;
-    explainDeny = false;
-    explainUnavailable = false;
     lastRead?: NfcScanResult;
-    scanning = false;
-    showControls = false;
+    screenState = AccessState.CHECKING;
 
     onInit() {
-        this._nfcService
-            .availabilityState(true)
+        this._nfc.state
             .pipe(takeUntil(this._subject))
-            .subscribe((value) => {
-                this.explainAsk = value === AvailabilityState.PROMPT;
-                this.explainDeny = value === AvailabilityState.DENIED;
-                this.explainUnavailable =
-                    value === AvailabilityState.UNAVAILABLE ||
-                    value === AvailabilityState.ERROR;
-                this.showControls = value === AvailabilityState.ALLOWED;
-
-                if (this.showControls) {
-                    this._startScanning();
-                } else {
-                    this._stopScanning();
-                }
-            });
+            .subscribe((state) => (this.screenState = state));
+        this._nfc.init();
     }
 
     onDestroy() {
         this._subject.next(null);
         this._subject.complete();
+        this._nfc.destroy();
     }
 
     grant() {
-        this.explainAsk = false;
-        this._nfcService.prompt();
-    }
-
-    private _startScanning() {
-        if (this.scanning) {
-            return;
-        }
-
-        this.scanning = true;
-        this._scanSubscription = this._nfcService
-            .scan()
-            .pipe(takeUntil(this._subject))
-            .subscribe((event) => {
-                this.lastRead = event;
-            });
-    }
-
-    private _stopScanning() {
-        if (!this.scanning) {
-            return;
-        }
-
-        this.scanning = false;
-        this._scanSubscription!.unsubscribe();
+        this._nfc.request();
     }
 }
 
@@ -85,14 +46,16 @@ component('nfc-app', {
         }
     `,
     template: html`
-        <permission-prompt
-            *if="explainAsk"
-            @grant.stop.prevent="grant()"
+        <access-screen
+            *if="screenState !== 'READY'"
+            state="{{screenState}}"
+            icon="/nfc.svg"
             message-id="nfc.explainAsk"
-        ></permission-prompt>
-        <permission-denied *if="explainDeny"></permission-denied>
-        <nfc-unavailable *if="explainUnavailable"></nfc-unavailable>
-        <default-layout *if="showControls" frame>
+            unavailable-id="nfc.unavailable.message"
+            error-id="nfc.error"
+            @grant.stop.prevent="grant()"
+        ></access-screen>
+        <default-layout *if="screenState === 'READY'" frame>
             <nfc-scan-result .scan-result="lastRead"></nfc-scan-result>
         </default-layout>
     `,

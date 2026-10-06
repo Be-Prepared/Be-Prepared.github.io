@@ -7,12 +7,17 @@ export class BackButtonComponent {
     }
 }
 
-component('back-button', {
-    style: css``,
-    template: html`
-        <scaling-icon
-            @click.stop.prevent="back()"
-            href="/back.svg"
-        ></scaling-icon>
-    `,
-}, BackButtonComponent);
+component(
+    'back-button',
+    {
+        style: css``,
+        template: html`
+            <icon-button
+                @click.stop.prevent="back()"
+                href="/back.svg"
+                label-id="shared.access.back"
+            ></icon-button>
+        `,
+    },
+    BackButtonComponent
+);

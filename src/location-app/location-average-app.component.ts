@@ -1,4 +1,4 @@
-import { AvailabilityState } from '../datatypes/availability-state';
+import { AccessState } from '../services/access/access-controller';
 import { component, css, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
 import { di } from '../di';
@@ -54,13 +54,14 @@ export class LocationAverageComponent {
         this._geolocationService
             .availabilityState()
             .pipe(
-                takeUntil(this._geolocationStopSubject),
                 filter((state) => {
-                    return state === AvailabilityState.ALLOWED;
+                    return state === AccessState.READY;
                 }),
                 switchMap(() => {
                     return this._geolocationService.getPosition();
-                })
+                }),
+                // Last, so the inner position watch is stopped too.
+                takeUntil(this._geolocationStopSubject)
             )
             .subscribe((position) => {
                 this._addPoint(position);
@@ -223,11 +224,12 @@ component('location-average-app', {
                         </div>
                     </div>
                 </div>
-                <scaling-icon
+                <icon-button
                     slot="more-buttons"
                     @click.stop.prevent="save()"
                     href="/save.svg"
-                ></scaling-icon>
+                    label-id="location.save"
+                ></icon-button>
             </default-layout>
         </location-wrapper>
     `,

@@ -1,4 +1,3 @@
-import { AvailabilityState } from '../datatypes/availability-state';
 import { component, css, emit, html } from 'fudgel';
 import { di } from '../di';
 import { first } from 'rxjs/operators';
@@ -24,7 +23,7 @@ export class LocationNavigateAppComponent {
     startPosition: GeolocationCoordinateResultSuccess | null = null;
     startTime = Date.now();
     point: WaypointSaved | null = null;
-    wakeLockClass = '';
+    wakeLockEnabled = false;
 
     onInit() {
         const id = this.id;
@@ -39,15 +38,16 @@ export class LocationNavigateAppComponent {
             return;
         }
 
-        this._wakeLockService.availabilityState().subscribe((state) => {
-            if (state === AvailabilityState.ALLOWED) {
-                this.allowWakeLock = true;
+        if (this._wakeLockService.isSupported()) {
+            this.allowWakeLock = true;
 
-                if (this._preferenceService.navigationWakeLock.getItem() && !this._enabled) {
-                    this.toggleWakeLock();
-                }
+            if (
+                this._preferenceService.navigationWakeLock.getItem() &&
+                !this._enabled
+            ) {
+                this.toggleWakeLock();
             }
-        });
+        }
 
         this._subscription = this._geolocationService
             .getPositionSuccess()
@@ -68,10 +68,10 @@ export class LocationNavigateAppComponent {
         this._preferenceService.navigationWakeLock.setItem(this._enabled);
 
         if (this._enabled) {
-            this.wakeLockClass = 'enabled';
+            this.wakeLockEnabled = true;
             this._wakeLockService.request();
         } else {
-            this.wakeLockClass = '';
+            this.wakeLockEnabled = false;
             this._wakeLockService.release();
         }
     }
@@ -222,14 +222,14 @@ component('location-navigate-app', {
                         </div>
                     </div>
                 </div>
-                <div slot="more-buttons">
-                    <scaling-icon
-                        *if="allowWakeLock"
-                        class="{{wakeLockClass}}"
-                        @click.stop.prevent="toggleWakeLock()"
-                        href="/wake-lock.svg"
-                    ></scaling-icon>
-                </div>
+                <icon-button
+                    slot="more-buttons"
+                    *if="allowWakeLock"
+                    .active="wakeLockEnabled"
+                    @click.stop.prevent="toggleWakeLock()"
+                    href="/wake-lock.svg"
+                    label-id="location.keepScreenOn"
+                ></icon-button>
             </default-layout>
         </location-wrapper>
     `,

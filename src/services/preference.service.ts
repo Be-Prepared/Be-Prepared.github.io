@@ -10,18 +10,14 @@ import { WaypointSaved } from '../datatypes/waypoint-saved';
 import { TimeSystem } from '../datatypes/time-system';
 
 export class PreferenceService {
-    barcodeReader: LocalStorageInterface<boolean>;
     coordinateSystem: LocalStorageInterface<CoordinateSystem>;
     distanceSystem: LocalStorageInterface<DistanceSystem>;
     // fields are not stored here
-    magnifier: LocalStorageInterface<boolean>;
     navigationType: LocalStorageInterface<NavigationType>;
     navigationWakeLock: LocalStorageInterface<boolean>;
-    nfc: LocalStorageInterface<boolean>;
     points: LocalStorageInterface<WaypointSaved[]>;
     sunMoonLocation: LocalStorageInterface<string>;
     timeSystem: LocalStorageInterface<TimeSystem>;
-    torch: LocalStorageInterface<boolean>;
 
     constructor() {
         // 2024-08-24 Clean up old preferences
@@ -41,7 +37,14 @@ export class PreferenceService {
             preferenceVersion.setItem(1);
         }
 
-        this.barcodeReader = LocalStorageService.boolean('barcodeReader');
+        // 2026-10-05 Hardware and permission results used to be cached,
+        // which meant a denied permission or a failed probe hid a tool
+        // forever. Nothing is cached any more; remove the old values.
+        // Remove after at least one year
+        for (const name of ['barcodeReader', 'magnifier', 'nfc', 'torch']) {
+            storage.removeItem(name);
+        }
+
         this.coordinateSystem = LocalStorageService.enum<CoordinateSystem>(
             'coordinateSystem',
             CoordinateSystem
@@ -50,14 +53,12 @@ export class PreferenceService {
             'distanceSystem',
             DistanceSystem
         );
-        this.magnifier = LocalStorageService.boolean('magnifier');
         this.navigationType = LocalStorageService.enum<NavigationType>(
             'navigationType',
             NavigationType
         );
         this.navigationWakeLock =
             LocalStorageService.boolean('navigationWakeLock');
-        this.nfc = LocalStorageService.boolean('nfc');
         this.points = LocalStorageService.json('points', 1, (value) => {
             return Array.isArray(value) && value.every((item) => {
                 return typeof item === 'object' && item && 'lat' in item && 'lon' in item;
@@ -68,7 +69,6 @@ export class PreferenceService {
             'time',
             TimeSystem
         );
-        this.torch = LocalStorageService.boolean('torch');
     }
 
     field<T>(id: string, allowedValues: T[]): LocalStorageInterface<T> {

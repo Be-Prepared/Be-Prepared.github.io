@@ -264,12 +264,13 @@ component('location-edit-app', {
                         </div>
                     </div>
                 </div>
-                <scaling-icon
+                <icon-button
                     slot="more-buttons"
                     *if="validPoint"
                     @click.stop.prevent="navigate()"
                     href="/navigate.svg"
-                ></scaling-icon>
+                    label-id="location.navigate"
+                ></icon-button>
             </default-layout>
             <show-modal *if="showQr" @clickoutside="closeQrCode()">
                 <big-qr

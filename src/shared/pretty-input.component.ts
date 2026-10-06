@@ -29,28 +29,37 @@ component('pretty-input', {
         .wrapper {
             display: flex;
             align-items: center;
-            border: 1px solid var(--fg-color);
-            padding: 0em;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-s);
+            background-color: var(--surface);
+            padding: 0 var(--space-1);
+            overflow: hidden;
+        }
+
+        .wrapper:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-soft);
         }
 
         input {
             font: inherit;
             width: 100%;
             text-align: center;
-            color: var(--fg-color);
-            background-color: var(--bg-color);
+            color: var(--fg);
+            background-color: transparent;
             border: 0;
+            padding: var(--space-2) var(--space-1);
         }
 
         input:focus {
             outline: none;
-            background-color: var(--active-background-color);
         }
 
         .help-icon {
             cursor: pointer;
             margin: 0 0.3em;
-            height: 1em;
+            height: 1.1em;
+            color: var(--fg-muted);
             aspect-ratio: 1;
         }
 
@@ -68,9 +77,10 @@ component('pretty-input', {
         .help {
             flex-grow: 1;
             overflow: auto;
-            background-color: var(--bg-color);
-            border: 1px solid var(--fg-color);
-            padding: 0 0.5em;
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-m);
+            padding: 0 var(--space-4);
         }
     `,
     template: html`

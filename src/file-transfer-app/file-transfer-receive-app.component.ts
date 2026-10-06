@@ -1,6 +1,14 @@
-import { AvailabilityState } from '../datatypes/availability-state';
+import { AccessState } from '../services/access/access-controller';
 import { BarcodeReaderService } from '../services/barcode-reader.service';
+import {
+    CameraService,
+    getVideoTrack,
+    hasTorch,
+    isTorchOn,
+    setTorch,
+} from '../services/camera.service';
 import { component, css, html } from 'fudgel';
+import { DetectedBarcodeData } from '../services/barcode-reader/barcode-reader-interface';
 import KalmanFilter from '@bencevans/kalman-filter';
 import {
     LtDecoder,
@@ -8,112 +16,126 @@ import {
     createDecoder,
     readFileHeaderMetaFromBuffer,
 } from 'luby-transform';
+import { ScanLoop } from '../services/barcode-reader/scan-loop';
 import { Subject } from 'rxjs';
-import { TorchService } from '../services/torch.service';
 import { di } from '../di';
 import { takeUntil } from 'rxjs/operators';
 import { toUint8Array } from 'js-base64';
 
 export class FileTransferReceiveAppComponent {
-    private _animationFrame: ReturnType<typeof requestAnimationFrame> | null =
-        null;
     private _barcodeReaderService = di(BarcodeReaderService);
+    private _camera = di(CameraService).controller();
     private _decoder: LtDecoder | null = null;
+    private _lastValue = '';
+    private _scanLoop = new ScanLoop<DetectedBarcodeData>({
+        detect: () =>
+            this.video
+                ? this._barcodeReaderService.detect(this.video)
+                : Promise.resolve([]),
+        onResult: (results) => this._onResult(results),
+        // QR codes change quickly; scan as fast as possible.
+        intervalMs: 0,
+    });
     private _subject = new Subject();
-    private _torchService = di(TorchService);
+    private _track: MediaStreamTrack | null = null;
     checksum: number | null = null;
     data: Uint8Array | null = null;
     decodedCount = 0;
     encodedCount = 0;
     endTime: number | null = null;
-    explainAsk = false;
-    explainDeny = false;
-    explainUnavailable = false;
     fps: number | null = 0;
     k: number = 0;
     lastFrameTime: number | null = null;
     meta: any;
-    showControls = false;
+    screenState = AccessState.CHECKING;
     startTime: number | null = null;
     timeFilter: KalmanFilter | null = null;
     torchAvailable = false;
-    torchClass = '';
     torchEnabled = false;
     video?: HTMLVideoElement;
 
-    onViewInit() {
-        this._barcodeReaderService
-            .availabilityState(true)
+    onInit() {
+        this._camera.state
             .pipe(takeUntil(this._subject))
-            .subscribe((value) => {
-                this.explainAsk = value === AvailabilityState.PROMPT;
-                this.explainDeny = value === AvailabilityState.DENIED;
-                this.explainUnavailable =
-                    value === AvailabilityState.UNAVAILABLE;
-                const showVideo = value === AvailabilityState.ALLOWED;
-
-                if (this.showControls !== showVideo) {
-                    this.showControls = showVideo;
-
-                    if (this.showControls) {
-                        this._startVideoStream();
-                    }
-                }
-            });
-        this._torchService
-            .availabilityState(true)
+            .subscribe((state) => (this.screenState = state));
+        this._camera.resourceChanges
             .pipe(takeUntil(this._subject))
-            .subscribe((value) => {
-                this.torchAvailable = value === AvailabilityState.ALLOWED;
-            });
+            .subscribe((stream) => this._attach(stream));
+        this._camera.init();
     }
 
     onDestroy() {
         this._subject.next(null);
         this._subject.complete();
-        this._barcodeDetectionStop();
+        this._scanLoop.stop();
+        this._camera.destroy();
     }
 
     grant() {
-        this.explainAsk = false;
-        this._barcodeReaderService.prompt();
+        this._camera.request();
     }
 
     toggleTorch() {
-        if (this.torchEnabled) {
-            this._torchService.turnOff();
-        } else {
-            this._torchService.turnOn();
-        }
+        const track = this._track;
 
-        this._setupTorch();
-    }
-
-    private _barcodeDetectionStart() {
-        let last = '';
-
-        const performDetection = () => {
-            this._barcodeReaderService.detect(this.video!).then((result) => {
-                if (result.length && result[0].rawValue !== last) {
-                    last = result[0].rawValue;
-                    const stop = this._processBarcode(result[0].rawValue);
-
-                    if (stop) {
-                        return;
-                    }
-                }
-
-                this._animationFrame = requestAnimationFrame(performDetection);
+        setTorch(track, !this.torchEnabled)
+            .catch(() => {})
+            .then(() => {
+                this.torchEnabled = isTorchOn(track);
             });
-        };
-
-        this._animationFrame = requestAnimationFrame(performDetection);
     }
 
-    private _barcodeDetectionStop() {
-        if (this._animationFrame !== null) {
-            cancelAnimationFrame(this._animationFrame);
+    private _attach(stream: MediaStream | null) {
+        const track = getVideoTrack(stream);
+        this._track = track;
+        this.torchAvailable = hasTorch(track);
+        this.torchEnabled = isTorchOn(track);
+
+        if (!track) {
+            this._scanLoop.stop();
+
+            return;
         }
+
+        const zoom = (track.getCapabilities?.() as any)?.zoom;
+
+        if (zoom) {
+            const desiredZoom = Math.min(Math.max(1, zoom.min), zoom.max);
+            track
+                .applyConstraints({ advanced: [{ zoom: desiredZoom } as any] })
+                .catch(() => {});
+        }
+
+        // Wait a tick for the video element to be rendered.
+        setTimeout(() => {
+            if (this.video && this._track === track && !this.data) {
+                this.video.srcObject = stream;
+                this._scanLoop.start();
+            }
+        });
+    }
+
+    private _onResult(results: DetectedBarcodeData[]) {
+        const value = results[0].rawValue;
+
+        if (value === this._lastValue) {
+            return false;
+        }
+
+        this._lastValue = value;
+
+        try {
+            if (this._processBarcode(value)) {
+                // The whole file arrived. The camera is no longer needed.
+                this._camera.release();
+
+                return true;
+            }
+        } catch (_ignore) {
+            // Not one of our QR codes, or a damaged read. Keep going.
+        }
+
+        return false;
     }
 
     private _processBarcode(strData: string) {
@@ -164,45 +186,6 @@ export class FileTransferReceiveAppComponent {
 
         return success;
     }
-
-    private _setupTorch() {
-        this._torchService.currentStatus().then((enabled) => {
-            this.torchEnabled = enabled;
-            this.torchClass = enabled ? 'enabled' : '';
-        });
-    }
-
-    private _startVideoStream() {
-        this._barcodeReaderService.getStream().then((stream) => {
-            const track = stream.getVideoTracks()[0];
-
-            if (!track) {
-                return;
-            }
-
-            const zoom = (track.getCapabilities() as any).zoom;
-
-            if (zoom) {
-                const desiredZoom = Math.min(Math.max(1, zoom.min), zoom.max);
-                track.applyConstraints({
-                    advanced: [
-                        {
-                            zoom: desiredZoom,
-                        } as any,
-                    ],
-                });
-            }
-
-            if (this.video) {
-                this.video.srcObject = stream;
-                this.video.addEventListener('loadedmetadata', () => {
-                    this._barcodeDetectionStart();
-                });
-            }
-
-            this._setupTorch();
-        });
-    }
 }
 
 component('file-transfer-receive-app', {
@@ -230,7 +213,9 @@ component('file-transfer-receive-app', {
             aspect-ratio: 1/1;
             box-sizing: border-box;
             margin: 2em;
-            border: 1px solid;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-l);
+            overflow: hidden;
         }
 
         .center {
@@ -247,14 +232,14 @@ component('file-transfer-receive-app', {
         }
     `,
     template: html`
-        <permission-prompt
-            *if="explainAsk"
-            @grant.stop.prevent="grant()"
+        <access-screen
+            *if="screenState !== 'READY' && !data"
+            state="{{screenState}}"
+            icon="/camera.svg"
             message-id="fileTransfer.receive.explainAsk"
-        ></permission-prompt>
-        <permission-denied *if="explainDeny"></permission-denied>
-        <camera-unavailable *if="explainUnavailable"></camera-unavailable>
-        <default-layout *if="showControls">
+            @grant.stop.prevent="grant()"
+        ></access-screen>
+        <default-layout *if="screenState === 'READY' || data">
             <div *if="!data" class="wrapper">
                 <div class="qr">
                     <video #ref="video" autoplay muted playsinline></video>
@@ -269,13 +254,14 @@ component('file-transfer-receive-app', {
                 .data="data"
                 .meta="meta"
             ></file-transfer-receive-view>
-            <scaling-icon
+            <icon-button
                 slot="more-buttons"
-                *if="torchAvailable"
-                @click.stop.prevent="toggleTorch()"
-                class="{{torchClass}}"
+                *if="torchAvailable && !data"
                 href="/flashlight.svg"
-            ></scaling-icon>
+                label-id="shared.torch"
+                .active="torchEnabled"
+                @click.stop.prevent="toggleTorch()"
+            ></icon-button>
         </default-layout>
     `,
 }, FileTransferReceiveAppComponent);

@@ -1,4 +1,3 @@
-import { AvailabilityState } from '../datatypes/availability-state';
 import { CompassService } from '../services/compass.service';
 import { component, css, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
@@ -10,7 +9,7 @@ import {
 } from '../services/geolocation.service';
 import { NavigationType } from '../datatypes/navigation-type';
 import { NavigationTypeService } from './navigation-type.service';
-import { switchMap, takeUntil } from 'rxjs/operators';
+import { switchMap, takeUntil, tap } from 'rxjs/operators';
 
 export class NavigationArrowComponent {
     private _compassService = di(CompassService);
@@ -48,21 +47,17 @@ export class NavigationArrowComponent {
             });
         this._navigationTypeService
             .getObservable()
-            .pipe(takeUntil(this._subject))
-            .subscribe((navigationType) => {
-                this._currentNavigationType = navigationType;
-                this._updateCompassRose();
-            });
-        this._compassService
-            .availabilityState()
             .pipe(
-                switchMap((state) => {
-                    if (state === AvailabilityState.ALLOWED) {
-                        return this._compassService.getCompassBearing();
-                    }
-
-                    return EMPTY;
+                tap((navigationType) => {
+                    this._currentNavigationType = navigationType;
+                    this._updateCompassRose();
                 }),
+                // Only run the compass sensors when they're being used.
+                switchMap((navigationType) =>
+                    navigationType === NavigationType.COMPASS
+                        ? this._compassService.getCompassBearing()
+                        : EMPTY
+                ),
                 takeUntil(this._subject)
             )
             .subscribe((bearing) => {
@@ -71,7 +66,7 @@ export class NavigationArrowComponent {
             });
     }
 
-    ngOnDestroy() {
+    onDestroy() {
         this._subject.next(null);
         this._subject.complete();
     }

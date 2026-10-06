@@ -1,21 +1,51 @@
 import { Controller, component, css, emit, metadata } from 'fudgel';
 
+// Cache the parsed files so toolbar icons don't refetch on every screen.
+const cache = new Map<string, Promise<Element | null>>();
+
+function fetchSvg(href: string) {
+    let promise = cache.get(href);
+
+    if (!promise) {
+        promise = new Promise((resolve) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('get', href, true);
+            xhr.onreadystatechange = () => {
+                if (xhr.readyState === 4) {
+                    resolve(xhr.responseXML?.documentElement || null);
+                }
+            };
+            xhr.send();
+        });
+        promise.then((result) => {
+            if (!result) {
+                cache.delete(href);
+            }
+        });
+        cache.set(href, promise);
+    }
+
+    return promise;
+}
+
 export class LoadSvgComponent {
     href?: string;
-    private _svg: HTMLElement | null = null;
+    private _loaded: string | undefined;
+    private _svg: Element | null = null;
+    private _viewReady = false;
 
     onChange() {
-        if (this._svg) {
-            this._clearImage();
+        if (this._viewReady) {
             this._loadImage(this.href);
         }
     }
 
     onViewInit() {
+        this._viewReady = true;
         this._loadImage(this.href);
     }
 
-    private _apply(svgContent: HTMLElement) {
+    private _apply(svgContent: Element) {
         const svg = document.importNode(svgContent, true);
         const root = (this as Controller)[metadata]?.root;
 
@@ -23,9 +53,10 @@ export class LoadSvgComponent {
             return;
         }
 
+        this._clearImage();
         root.appendChild(svg);
-        emit(this, 'loadsvg');
         this._svg = svg;
+        emit(this, 'loadsvg');
     }
 
     private _clearImage() {
@@ -36,18 +67,24 @@ export class LoadSvgComponent {
     }
 
     private _loadImage(href: string | undefined) {
-        if (!href) {
+        if (href === this._loaded) {
             return;
         }
 
-        const xhr = new XMLHttpRequest();
-        xhr.open('get', href, true);
-        xhr.onreadystatechange = () => {
-            if (xhr.readyState === 4 && xhr.responseXML) {
-                this._apply(xhr.responseXML.documentElement);
+        this._loaded = href;
+
+        if (!href) {
+            this._clearImage();
+
+            return;
+        }
+
+        fetchSvg(href).then((svg) => {
+            // Ignore responses for an href that has since changed.
+            if (svg && this._loaded === href) {
+                this._apply(svg);
             }
-        };
-        xhr.send();
+        });
     }
 }
 
@@ -56,6 +93,12 @@ component('load-svg', {
     style: css`
         :host {
             display: block;
+        }
+
+        :host > svg {
+            display: block;
+            width: 100%;
+            height: 100%;
         }
     `,
     template: '',
