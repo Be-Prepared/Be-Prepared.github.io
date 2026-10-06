@@ -38,7 +38,62 @@ export const enUS: LanguageData = {
         'To use the barcode reader, the camera permission is required.',
     'barcodeReader.NATIVE': 'Native',
     'barcodeReader.Z_BAR': 'ZBar',
+    'barcodeReader.engine': 'Barcode library',
+    'barcodeReader.engine.AUTOMATIC': 'Automatic',
+    'barcodeReader.engine.NATIVE': 'Native (built into the browser)',
+    'barcodeReader.engine.Z_BAR': 'ZBar (included with this app)',
+    'barcodeReader.engine.done': 'Done',
+    'barcodeReader.engine.help':
+        'Automatic uses the reader built into the browser when it works on this device, and ZBar otherwise. They read different barcode types, so if a code is not recognized, try the other one. This also applies to File Transfer.',
+    'barcodeReader.engine.nativeUnavailable':
+        'This browser has no built-in barcode reader that works on this device, so ZBar is used.',
+    'barcodeReader.engine.using': 'Reading with:',
     'barcodeReader.scanAgain': 'Scan Again',
+
+    // Browser detection, shown in Info and in the home screen notice
+    'browser.browser': 'Browser:',
+    'browser.detected': 'Detected:',
+    'browser.header': 'Browser:',
+    'browser.name.BRAVE': 'Brave',
+    'browser.name.CHROME': 'Chrome',
+    'browser.name.CHROMIUM': 'A Chromium-based browser',
+    'browser.name.DUCKDUCKGO': 'DuckDuckGo',
+    'browser.name.EDGE': 'Microsoft Edge',
+    'browser.name.FIREFOX': 'Firefox',
+    'browser.name.GOOGLE_APP': 'Google app',
+    'browser.name.HOME_SCREEN': 'Home Screen app',
+    'browser.name.IN_APP': "Another app's built-in browser",
+    'browser.name.OPERA': 'Opera',
+    'browser.name.OTHER': 'Another browser',
+    'browser.name.SAFARI': 'Safari',
+    'browser.name.SAMSUNG': 'Samsung Internet',
+    'browser.name.UC': 'UC Browser',
+    'browser.name.UNKNOWN': 'Unknown',
+    'browser.name.WEBVIEW': "Another app's built-in browser",
+    'browser.name.YANDEX': 'Yandex Browser',
+    'browser.platform': 'Platform:',
+    'browser.platform.ANDROID': 'Android',
+    'browser.platform.IOS': 'iPhone or iPad',
+    'browser.platform.OTHER': 'Computer or other',
+    'browser.recommended': 'Works best in:',
+    'browser.recommended.ANDROID': 'Chrome',
+    'browser.recommended.IOS': 'Safari',
+    'browser.recommended.OTHER': 'Chrome on Android, Safari on iOS',
+    'browser.status.NOT_RECOMMENDED':
+        'This is not the recommended browser. Some permissions and installing the app may not work.',
+    'browser.status.PROBABLY_RECOMMENDED':
+        'This looks like the recommended browser. Some other browsers look identical, so this is a best guess.',
+    'browser.status.RECOMMENDED': 'This is the recommended browser.',
+    'browser.status.UNKNOWN':
+        'The browser could not be identified with confidence.',
+    'browserNotice.body.ANDROID':
+        'This app works best in Chrome on Android. Other browsers often do not grant permissions like the camera, motion sensors, and NFC reliably, and they add the app as a shortcut instead of installing it.',
+    'browserNotice.body.IOS':
+        'This app works best in Safari on iPhone and iPad. Other browsers and in-app browsers handle permissions like motion sensors differently and may not be able to add the app to your Home Screen.',
+    'browserNotice.body.OTHER':
+        'This app works best in Chrome on Android and Safari on iOS.',
+    'browserNotice.dismiss': 'Got it',
+    'browserNotice.heading': 'Some tools may not work in this browser',
 
     // Compass
     'compass.calibrate':
@@ -77,8 +132,13 @@ export const enUS: LanguageData = {
         'None of the cameras this app can use has a light it can control.',
 
     // Info
+    'info.barcodeEngine': 'Barcode library:',
     'info.barcodes': 'Barcode support:',
     'info.barcodesNotSupported': 'Barcodes are not supported on this device.',
+    'info.barcodes.inUse': 'In use:',
+    'info.barcodes.nativeEmpty':
+        'Present, but it reads no barcode types on this device.',
+    'info.barcodes.nativeMissing': 'Not available in this browser.',
     'info.buildInformationHeader': 'Build Information',
     'info.camera': 'Camera:',
     'info.compass': 'Compass:',
@@ -93,6 +153,7 @@ export const enUS: LanguageData = {
     'info.coordinates.DDM': 'Degrees Decimal Minutes',
     'info.coordinates.DMS': 'Degrees Minutes Seconds',
     'info.coordinates.MGRS': 'MGRS',
+    'info.coordinates.PLUSCODE': 'Plus Code',
     'info.coordinates.UTM/UPS': 'UTM/UPS',
     'info.distances': 'Distances:',
     'info.distances.IMPERIAL': 'Imperial',
@@ -133,6 +194,7 @@ export const enUS: LanguageData = {
 
     // Location
     'location.add.gettingCurrentLocation': 'Getting current location...',
+    'location.add.noLocation': 'Could not get your current location',
     'location.add.waypointName': 'Unnamed Waypoint {{id}}',
     'location.addWaypoint': 'Add waypoint',
     'location.average.currentEstimate': 'Current estimate:',
@@ -141,10 +203,10 @@ export const enUS: LanguageData = {
     'location.average.help':
         'It is best to collect points for over an hour to improve accuracy. Points will collect at 1 point per second, so 3,600 per hour. The screen must stay on for the app to be able to access the GPS, so it is recommended to use dark mode, dim your screen, and use an external battery if needed.',
     'location.average.help2':
-        'The distance to 95% of the collected points is shown. The value is essentially meaningless with fewer than a few hundred points. After collecting a thousand points, the value here shows how well clustered the points are.',
+        'The accuracy is the radius that should contain the true spot 95% of the time. It uses the accuracy the GPS reports for each reading and how scattered the readings are. GPS errors drift slowly, so readings a second apart mostly repeat the same error; the accuracy improves with time spent collecting more than with the number of points.',
     'location.average.lat': 'Latitude:',
     'location.average.lon': 'Longitude:',
-    'location.average.ninetyFive': '95% Distance:',
+    'location.average.ninetyFive': 'Accuracy (95%):',
     'location.average.pointsCollected': 'Points collected:',
     'location.average.xDelta': 'X Delta:',
     'location.average.yDelta': 'Y Delta:',
@@ -153,6 +215,7 @@ export const enUS: LanguageData = {
     'location.coordinates.DMS': 'Degrees Minutes Seconds',
     'location.coordinates.empty': 'No coordinates available.',
     'location.coordinates.MGRS': 'MGRS',
+    'location.coordinates.PLUSCODE': 'Plus Code',
     'location.coordinates.UTMUPS': 'UTM/UPS',
     'location.edit.average': 'Average',
     'location.edit.badLocation': 'Invalid location',
@@ -168,12 +231,28 @@ export const enUS: LanguageData = {
     'location.field.ALTITUDE_MINIMUM': 'Altitude Minimum',
     'location.field.ALTITUDE_MAXIMUM': 'Altitude Maximum',
     'location.field.ALTITUDE': 'Altitude',
+    'location.field.ASCENT_AVERAGE': 'Ascent Rate (Avg)',
+    'location.field.ASCENT_MAXIMUM': 'Ascent Rate (Max)',
+    'location.field.ASCENT_MINIMUM': 'Ascent Rate (Min)',
+    'location.field.ASCENT_TOTAL': 'Total Ascent',
     'location.field.BEARING': 'Bearing',
+    'location.field.DESCENT_AVERAGE': 'Descent Rate (Avg)',
+    'location.field.DESCENT_MAXIMUM': 'Descent Rate (Max)',
+    'location.field.DESCENT_MINIMUM': 'Descent Rate (Min)',
+    'location.field.DESCENT_TOTAL': 'Total Descent',
     'location.field.DESTINATION': 'Name',
     'location.field.DISTANCE': 'Distance',
     'location.field.DISTANCE_TRAVELED': 'Distance Traveled',
+    'location.field.GLIDE_RATIO': 'Glide Ratio',
+    'location.field.glideRatioNotDescending': '—',
+    'location.field.glideRatioValue': '{{ratio}}:1',
     'location.field.HEADING': 'Heading',
     'location.field.HEADING_SMOOTHED': 'Heading (Smoothed)',
+    'location.field.RELATIVE_BEARING': 'Relative Bearing',
+    'location.field.relativeBearingAHEAD': 'Straight ahead',
+    'location.field.relativeBearingBEHIND': '180° behind',
+    'location.field.relativeBearingLEFT': '{{degrees}}° left',
+    'location.field.relativeBearingRIGHT': '{{degrees}}° right',
     'location.field.SPEED': 'Speed',
     'location.field.SPEED_AVERAGE': 'Speed (Average)',
     'location.field.SPEED_MAXIMUM': 'Speed (Max)',
@@ -186,6 +265,8 @@ export const enUS: LanguageData = {
     'location.field.TIME_REMAINING': 'Time Remaining',
     'location.field.TIME_STOPPED': 'Time Stopped',
     'location.field.UNKNOWN': 'Unknown',
+    'location.field.VELOCITY_MADE_GOOD': 'Velocity Made Good',
+    'location.field.VERTICAL_SPEED': 'Vertical Speed',
     'location.field.unknownValue': 'Unknown',
     'location.help.html': html`
         <p>
@@ -203,9 +284,9 @@ export const enUS: LanguageData = {
         </ul>
         <p>Decimal degrees:</p>
         <ul>
-            <li>N 40° 26' 118.432" W 79° 58' 18.110"</li>
-            <li>40 26 118.432 N 79 58 18.110 W</li>
-            <li>40 26 118.432 -79 58 18.110</li>
+            <li>N 40.435401° W 79.971853°</li>
+            <li>40.435401 N 79.971853 W</li>
+            <li>40.435401, -79.971853</li>
         </ul>
         <p>Degrees decimal minutes:</p>
         <ul>
@@ -234,6 +315,23 @@ export const enUS: LanguageData = {
             <li>B 2226827 2818270</li>
             <li>25x 521873 9289265</li>
         </ul>
+        <p>Plus Codes:</p>
+        <ul>
+            <li>849VCWC8+R9</li>
+            <li>849VCWC8+R9X</li>
+            <li>CWC8+R9 Mountain View</li>
+        </ul>
+        <p>
+            Shorthand, which uses your current location to fill in what is
+            missing and picks the closest match:
+        </p>
+        <ul>
+            <li>UJ 2337 0651 (MGRS without the grid zone)</li>
+            <li>2337 0651 (MGRS without the grid zone and square)</li>
+            <li>T 582561 4478883 (UTM without the zone number)</li>
+            <li>582561 4478883 (UTM without the zone)</li>
+            <li>CWC8+R9 (Plus Code without the area)</li>
+        </ul>
     `,
     'location.keepScreenOn': 'Keep screen on',
     'location.navigate': 'Navigate',
@@ -241,6 +339,8 @@ export const enUS: LanguageData = {
     'location.navigation.DIRECTION_OF_TRAVEL': 'Direction of Travel',
     'location.navigation.NORTH_UP': 'North Up',
     'location.navigation.unknownValue': 'Unknown',
+    'location.needReference':
+        'Shorthand needs your current location to fill in the rest. Allow location access or enter the full coordinates.',
     'location.positionDenied':
         'Permission denied. This may have been denied by the operating system even though it was granted by the user.',
     'location.positionError': 'There was an error retrieving the location.',
@@ -250,6 +350,39 @@ export const enUS: LanguageData = {
     'location.unavailableMessage':
         'There is no location service available on this device.',
     'location.waypointList': 'Waypoints',
+    'location.share.apple-maps': 'Apple Maps',
+    'location.share.apple-maps-legacy': 'Apple Maps (older iPhones)',
+    'location.share.apple-maps-legacy.description':
+        'Pin with the name, for iOS 18.3 and earlier.',
+    'location.share.apple-maps.description':
+        'Pin with the name, for iPhones with iOS 18.4 or newer. Other devices open the Apple Maps website.',
+    'location.share.be-prepared': 'Be Prepared link',
+    'location.share.be-prepared.description':
+        'Opens Be Prepared and saves the waypoint with its name. Works on any phone with Be Prepared.',
+    'location.share.button': 'Share',
+    'location.share.close': 'Close',
+    'location.share.copied': 'Copied',
+    'location.share.copy': 'Copy',
+    'location.share.decimal-text': 'Decimal coordinates (text)',
+    'location.share.decimal-text.description':
+        'Plain numbers to paste into any map\'s search box.',
+    'location.share.display-text': 'Name and coordinates (text)',
+    'location.share.display-text.description':
+        'Uses your coordinate format setting (for example UTM or MGRS), for GPS units or reading aloud.',
+    'location.share.geo-basic': 'Geo link, coordinates only',
+    'location.share.geo-basic.description':
+        'The most widely understood geo link, for Android map apps and GPS apps. No name.',
+    'location.share.geo-full': 'Geo link with name',
+    'location.share.geo-full.description':
+        'Labeled pin in Android map apps. iPhones don\'t open geo links in Apple Maps, so use an Apple Maps link for them.',
+    'location.share.google-maps': 'Google Maps',
+    'location.share.google-maps.description':
+        'Coordinates only, no name. Opens Google Maps on any phone or computer.',
+    'location.share.heading': 'Share Location',
+    'location.share.openstreetmap': 'OpenStreetMap',
+    'location.share.openstreetmap.description':
+        'Coordinates only, no name. Opens the OpenStreetMap website.',
+    'location.share.share': 'Share',
     'location.waypoints.location': 'Location',
     'location.waypoints.name': 'Name',
     'location.waypoints.noWaypoints': 'No waypoints have been saved.',
@@ -268,11 +401,22 @@ export const enUS: LanguageData = {
         'NFC could not start. Make sure NFC is turned on in your phone\'s settings, then try again.',
     'nfc.explainAsk': 'To use NFC, your permission is required.',
     'nfc.readNumber': 'Read number:',
+    'nfc.record.action.DO': 'Action: open it',
+    'nfc.record.action.EDIT': 'Action: open for editing',
+    'nfc.record.action.SAVE': 'Action: save for later',
+    'nfc.record.action.UNKNOWN': 'Action: unknown',
+    'nfc.record.bytes': 'bytes',
+    'nfc.record.dataSize': 'Data size:',
+    'nfc.record.empty': 'No data',
     'nfc.record.encoding': 'Encoding:',
     'nfc.record.id': 'ID:',
     'nfc.record.lang': 'Language:',
     'nfc.record.mediaType': 'Media type:',
     'nfc.record.recordType': 'Record type:',
+    'nfc.record.type.action': 'Action',
+    'nfc.record.type.size': 'Size of linked content',
+    'nfc.record.type.smartPoster': 'Smart poster',
+    'nfc.record.type.type': 'Type of linked content',
     'nfc.scanResult.numberOfRecords': 'Number of records:',
     'nfc.scanResult.readError': 'Error reading NFC tag',
     'nfc.scanResult.scanning': 'Scanning for NFC tags...',
@@ -364,45 +508,81 @@ export const enUS: LanguageData = {
     'service.wakeLock.obtained': 'Keeping Screen On',
 
     // Sun & Moon
-    'sunMoon.enterCoordinates': 'Enter location:',
-    'sunMoon.enterDate': 'Enter date and time:',
+    'sunMoon.altitude': 'Altitude',
+    'sunMoon.atTime': 'At',
+    'sunMoon.backToNow': 'Back to now',
+    'sunMoon.band.astronomical': 'Astronomical twilight',
+    'sunMoon.band.civil': 'Civil twilight',
+    'sunMoon.band.day': 'Daylight',
+    'sunMoon.band.golden': 'Golden hour',
+    'sunMoon.band.nautical': 'Nautical twilight',
+    'sunMoon.band.night': 'Night',
+    'sunMoon.belowHorizon': 'below horizon',
+    'sunMoon.dayLength': 'Day length',
+    'sunMoon.direction': 'Direction',
+    'sunMoon.done': 'Done',
+    'sunMoon.enterCoordinates': 'Place or coordinates',
+    'sunMoon.enterDate': 'Date and time',
+    'sunMoon.evening': 'Evening',
     'sunMoon.geolocation': 'Getting current location...',
     'sunMoon.geolocationError': 'Error getting current position',
+    'sunMoon.illuminated': 'Illuminated',
+    'sunMoon.legend.astronomical': 'Astronomical',
+    'sunMoon.legend.civil': 'Civil',
+    'sunMoon.legend.day': 'Day',
+    'sunMoon.legend.golden': 'Golden hour',
+    'sunMoon.legend.nautical': 'Nautical',
+    'sunMoon.legend.night': 'Night',
+    'sunMoon.location': 'Location',
+    'sunMoon.locationNotFound': 'Could not find that place',
+    'sunMoon.locationPrompt':
+        'Enter a city or coordinates, or use your current location.',
     'sunMoon.locationUnknown': 'Location needed',
-    'sunMoon.nearestMajorCity.label': 'Nearest major city:',
+    'sunMoon.midnightSun': 'Midnight sun',
+    'sunMoon.moon': 'Moon',
     'sunMoon.moonIllumination.firstQuarter': 'First quarter',
     'sunMoon.moonIllumination.fullMoon': 'Full moon',
-    'sunMoon.moonIllumination.label': 'Moon phase:',
+    'sunMoon.moonIllumination.label': 'Phase',
     'sunMoon.moonIllumination.lastQuarter': 'Last quarter',
     'sunMoon.moonIllumination.newMoon': 'New moon',
     'sunMoon.moonIllumination.waningCrescent': 'Waning crescent',
     'sunMoon.moonIllumination.waningGibbous': 'Waning gibbous',
     'sunMoon.moonIllumination.waxingCrescent': 'Waxing crescent',
     'sunMoon.moonIllumination.waxingGibbous': 'Waxing gibbous',
-    'sunMoon.moonPosition.label': 'Moon position:',
-    'sunMoon.moonTimes.alwaysDown': 'Moon does not rise today',
-    'sunMoon.moonTimes.alwaysUp': 'Moon does not set today',
-    'sunMoon.moonTimes.neverRise': 'Moon does not rise today',
-    'sunMoon.moonTimes.neverSet': 'Moon does not set today',
-    'sunMoon.moonTimes.rise': 'Moon rise:',
-    'sunMoon.moonTimes.set': 'Moon set:',
-    'sunMoon.sunPosition.label': 'Sun position:',
-    'sunMoon.sunTimes.dawn': 'Dawn:',
-    'sunMoon.sunTimes.dusk': 'Dusk:',
-    'sunMoon.sunTimes.goldenHourEnd': 'Golden hour end:',
-    'sunMoon.sunTimes.goldenHour': 'Golden hour start:',
-    'sunMoon.sunTimes.nadir': 'Nadir (sun is lowest):',
-    'sunMoon.sunTimes.nauticalDawn': 'Nautical dawn:',
-    'sunMoon.sunTimes.nauticalDusk': 'Nautical dusk:',
-    'sunMoon.sunTimes.neverRise': 'Sun does not rise today',
-    'sunMoon.sunTimes.neverSet': 'Sun does not set today',
-    'sunMoon.sunTimes.nightEnd': 'Night end:',
-    'sunMoon.sunTimes.night': 'Night:',
-    'sunMoon.sunTimes.solarNoon': 'Solar noon:',
-    'sunMoon.sunTimes.sunriseEnd': 'Sunrise end:',
-    'sunMoon.sunTimes.sunrise': 'Sunrise:',
-    'sunMoon.sunTimes.sunsetStart': 'Sunset start:',
-    'sunMoon.sunTimes.sunset': 'Sunset:',
+    'sunMoon.moonRises': 'Rises',
+    'sunMoon.moonSets': 'Sets',
+    'sunMoon.moonStaysDown': 'Stays down all day',
+    'sunMoon.moonStaysUp': 'Stays up all day',
+    'sunMoon.moonTimes.alwaysDown': 'The moon does not rise today',
+    'sunMoon.moonTimes.alwaysUp': 'The moon does not set today',
+    'sunMoon.moonTimes.rise': 'Moonrise',
+    'sunMoon.moonTimes.set': 'Moonset',
+    'sunMoon.morning': 'Morning',
+    'sunMoon.nearestMajorCity.label': 'Nearest major city',
+    'sunMoon.nextFullMoon': 'Next full moon',
+    'sunMoon.nextNewMoon': 'Next new moon',
+    'sunMoon.noneToday': 'None today',
+    'sunMoon.noSunrise24h': 'No sunrise in the next 24 hours',
+    'sunMoon.noSunset24h': 'No sunset in the next 24 hours',
+    'sunMoon.now': 'Now',
+    'sunMoon.nowTitle': 'Right now',
+    'sunMoon.polarNight': 'Polar night',
+    'sunMoon.position': 'Position in the sky',
+    'sunMoon.sun': 'Sun',
+    'sunMoon.sunTimes.nadir': 'Sun lowest (nadir)',
+    'sunMoon.sunTimes.neverRise': 'The sun does not rise today',
+    'sunMoon.sunTimes.neverSet': 'The sun does not set today',
+    'sunMoon.sunTimes.solarNoon': 'Solar noon',
+    'sunMoon.sunTimes.sunrise': 'Sunrise',
+    'sunMoon.sunTimes.sunriseSunset': 'Sunrise, sunset',
+    'sunMoon.sunTimes.sunset': 'Sunset',
+    'sunMoon.timelineTitle': 'Daylight and twilight',
+    'sunMoon.timeZoneNote': 'Times use this device\'s time zone:',
+    'sunMoon.unitHour': 'h',
+    'sunMoon.unitMinute': 'min',
+    'sunMoon.untilSunrise': 'until sunrise',
+    'sunMoon.untilSunset': 'until sunset',
+    'sunMoon.useMyLocation': 'Use my location',
 
     // Tile labels on index
     'tile.alarm': 'Alarm',

@@ -25,6 +25,8 @@ The app updates itself when you are online. When a new version has downloaded, a
 
 What each tool needs is listed after the description. Tools are only hidden from the home screen when your device doesn't have the hardware.
 
+**Rearranging the home screen:** press and hold a tool, then drag it to a new spot. The tool's old spot stays open until you let go, then it moves. Reset preferences in Info to go back to the original order.
+
 ### Light and signaling
 
 | Tool | What it does |
@@ -40,7 +42,7 @@ What each tool needs is listed after the description. Tools are only hidden from
 | Tool | What it does |
 | --- | --- |
 | **Compass** | Works flat, upright, and in landscape. Warns when the compass needs calibration and when Low Power Mode is stopping the sensors. *Compass sensor.* |
-| **Location** | Your coordinates in DMS, DDM, DDD, UTM/UPS, or MGRS; saved waypoints; navigation to a waypoint; and averaging many readings for an accurate position. Fields are configurable (see [Location fields](#location-fields)). *GPS.* |
+| **Location** | Your coordinates in DMS, DDM, DDD, UTM/UPS, MGRS, or Plus Codes; saved waypoints; navigation to a waypoint; and averaging many readings for an accurate position. Coordinates can be typed in shorthand (see [Entering coordinates](#entering-coordinates)), and waypoints can be shared several ways (see [Sharing a waypoint](#sharing-a-waypoint)). Fields are configurable (see [Location fields](#location-fields)). *GPS.* |
 | **Pedometer** | Distance traveled by GPS with start, pause, and reset, pace, and an estimated step count from your stride length. Filters out GPS jitter so standing still doesn't add distance. *GPS.* |
 | **Speed** | Current, average, and maximum speed in mph or km/h. *GPS.* |
 | **Sun & Moon** | Sunrise, sunset, twilight, moonrise, moonset, positions, and moon phase for any place and date. Find places by coordinates or the name of a major city. |
@@ -69,11 +71,11 @@ What each tool needs is listed after the description. Tools are only hidden from
 
 | Tool | What it does |
 | --- | --- |
-| **Read Barcodes** | Reads the 1D and 2D barcodes your device supports, falling back to a built-in reader when the browser has none. Links are tappable. *Camera.* |
-| **NFC** | Reads NFC tags and shows what's on them. *NFC, Chrome on Android.* |
+| **Read Barcodes** | Reads the 1D and 2D barcodes your device supports, falling back to a built-in reader when the browser has none. You can also choose the reader yourself. Links are tappable. *Camera.* |
+| **NFC** | Reads NFC tags and shows what's on them, including smart posters with several records inside. *NFC, Chrome on Android.* |
 | **File Transfer** | Send a file from one device to another with a stream of QR codes, no network needed. See [File Transfer](#file-transfer). *Camera to receive.* |
 | **Large Text** | Shows a message as large as the screen allows, readable from a distance. |
-| **Info** | Share the app, see which hardware and permissions are available, change preferences (coordinates, units, 12/24-hour time), and view build details. |
+| **Info** | Share the app, see which hardware and permissions are available and which browser was detected, change preferences (coordinates, units, 12/24-hour time, barcode reader), and view build details. |
 
 ## Permissions
 
@@ -98,20 +100,51 @@ The Location tool can show many different fields; tap a field to change it. Fiel
 * **Accuracy:** How far off the GPS position could be. Whoever gave you coordinates could also have been off a bit, so expect to be close to the spot rather than exactly on it.
 * **Altitude** and **Altitude Accuracy:** Height above sea level, and how accurate it is. Accuracy is often not available.
 * **Arrival Time** (navigation only): When you're expected to arrive.
+* **Ascent** and **Descent** (Total, Average, Min, and Max): How much you've climbed and dropped, and how fast. GPS altitude wanders by 5 to 15 m even when you stand still, so the altitude is smoothed and a climb or drop only counts once it moves at least 3 to 10 m (based on the reported altitude accuracy) from the last counted altitude. Average is the total divided by the time spent climbing (or descending), so rests don't lower it. Min and Max are the slowest and fastest rates measured over stretches of about 30 seconds. Rates are in m/s or ft/min. Without a barometer, slow GPS drift can still add a little phantom climbing, and each summit or valley can be off by a few meters.
 * **Bearing** (navigation only): The direction to the waypoint.
 * **Current Time:** In 12-hour or 24-hour format.
 * **Destination** (navigation only): The waypoint's name.
 * **Distance** (navigation only): How far away the waypoint is.
 * **Distance Traveled:** How far you've moved while the GPS was on.
+* **Glide Ratio:** Distance covered forward for each unit of altitude lost over the last minute, such as "12:1". Shows "—" unless you've dropped at least 3 m in that time.
 * **Heading:** Your direction of travel as reported by the GPS, or calculated when it isn't reported.
 * **Heading (Smoothed):** Direction of travel over the last five readings, using a [Kalman filter] that accounts for GPS accuracy to remove jumps and spikes.
+* **Relative Bearing** (navigation only): Which way to turn to face the waypoint compared to your direction of travel, such as "35° right". Unknown while standing still, because GPS has no heading then.
 * **Speed:** As reported by the GPS, or calculated when it isn't reported.
 * **Speed (Smoothed):** An exponential moving average of the last five speeds, which removes spikes and dips.
 * **Time Elapsed** (navigation only): How long you've been navigating.
 * **Time Moving** and **Time Stopped:** Time spent at or above 0.35 m/s (just under 0.8 mph), and below it. These accumulate while you're on any Location screen and reset if you leave for more than a few seconds.
 * **Time Remaining** (navigation only): How much longer until you arrive.
+* **Velocity Made Good** (navigation only): How fast you're closing in on the waypoint: your speed times the cosine of the angle between your direction of travel and the waypoint. Negative when moving away.
+* **Vertical Speed:** How fast you're climbing (positive) or descending (negative), from the smoothed altitude. Shown in m/s or ft/min.
 
-**Averaging a location:** Location averaging takes a weighted average of the readings in Earth-centered (ECEF) coordinates, then reports the distance that contains 95% of them. Because of atmospheric changes, it's best to collect readings for at least an hour. Each averaging session starts fresh.
+**Averaging a location:** Location averaging takes a weighted average of the readings in Earth-centered (ECEF) coordinates. Each reading is weighted by the inverse square of its reported accuracy (treated as a 68% radius, as Android defines it), so a 5 m reading counts four times as much as a 10 m reading. The accuracy shown is a 95% radius for the average itself. If GPS errors were independent it would shrink with the square root of the number of readings, but satellite, atmosphere, and reflection errors drift over many minutes, so a reading every second mostly repeats the same error. The app assumes errors become independent after about 10 minutes and counts an effective 1 + (minutes collected ÷ 10) readings; after an hour that's 7. It also never reports better than the actual scatter of the readings supports. The radius is about 2.45 times the per-axis standard error, which covers 95% for a circular error. Because of this, it's best to collect readings for at least an hour. Each averaging session starts fresh.
+
+### Entering coordinates
+
+Anywhere you type a location (waypoints, Sun & Moon), these work:
+
+* Decimal degrees, degrees and minutes, or degrees, minutes, and seconds, with or without N/S/E/W.
+* UTM/UPS (`17T 630084 4833438`) and MGRS/USNG (`18S UJ 23371 06519`).
+* Plus Codes, full (`849VCWC8+R9`) or short with a city (`CWC8+R9 Mountain View`).
+* The name of a major city.
+* **Shorthand** that fills in the rest from your current location: MGRS without the zone (`UJ 2337 0651`, or just `2337 0651`), UTM without the zone (`123456 1234567`), and short Plus Codes (`CWC8+R9`). The closest matching place to you is used. Shorthand needs location access.
+
+### Sharing a waypoint
+
+Map apps don't agree on how to read a shared location. Notably, iPhones don't open `geo:` links in Apple Maps and treat their name as a search. The Share button on a waypoint lets you pick a format, then shows a QR code with Share and Copy buttons:
+
+| Format | Name included | Best for |
+|---|---|---|
+| Be Prepared link | Yes | Anyone with Be Prepared; adds the waypoint directly. |
+| Apple Maps | Yes | iPhones with iOS 18.4 or newer. |
+| Apple Maps (older iPhones) | Yes | iOS 18.3 and earlier. |
+| Geo link with name | Yes | Android map apps (labeled pin). |
+| Geo link, coordinates only | No | Android map apps and GPS apps. |
+| Google Maps | No | Any phone or computer. |
+| OpenStreetMap | No | Any web browser. |
+| Decimal coordinates | No | Pasting into any map's search box. |
+| Name and coordinates | Yes | GPS units or reading aloud, in your coordinate format. |
 
 ### File Transfer
 
@@ -142,11 +175,14 @@ The dev server runs at `http://localhost:8080/` and is reachable from other devi
 | --- | --- |
 | `npm start` | Development server with live reload. |
 | `npm test` | Type checks and runs the unit tests with Node's built-in test runner. Tests live next to the code as `*.test.ts`. |
+| `npm run test:e2e:docker` | Browser tests in Chromium, Firefox, and WebKit (desktop and phone sizes), inside Playwright's Docker image so screenshots match CI. Add `-- --update-snapshots` after an intended visual change. |
+| `npm run test:e2e` | The same browser tests without Docker. Screenshot comparisons may fail because fonts differ. |
+| `npm run size` | How much each feature, library, and file adds to the app. |
 | `npm run build` | Type checks and builds the site into `dist/`. |
 | `npm run generate-pwa-assets` | Regenerates the launcher icons from `site/public/app-icon.svg`. |
 | `npm run tunnel` | Shares your dev server over HTTPS on the internet (see below). |
 
-Pushing to `master` runs the tests, builds, and deploys to GitHub Pages.
+Pushing to `master` runs the unit tests and the browser tests, and deploys to GitHub Pages only if both pass.
 
 The app is written in TypeScript with [Fudgel](https://github.com/fidian/fudgel), an extremely lightweight web component library, plus RxJS, and built into a PWA with Vite. **[AGENTS.md](AGENTS.md) describes the project layout, conventions, and pitfalls** and is worth reading before making changes, whether you're a person or an AI agent.
 

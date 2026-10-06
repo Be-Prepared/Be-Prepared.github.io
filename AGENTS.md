@@ -15,6 +15,9 @@ An offline PWA toolbox (flashlight, compass, level, timers, and more). TypeScrip
 * `npm test` type checks the tests (`tsconfig.test.json`) and runs them with Node's built-in test runner (`node:test` and `node:assert/strict`), loading TypeScript through `tsx`. Tests are `src/**/*.test.ts`. CI runs them before building and deploying `master` to GitHub Pages. Requires Node 22 or newer.
 * `npx tsc --noEmit -p .` type checks the app. Test files are excluded there because they use Node's types; `tsconfig.test.json` covers them. `npm run build` type checks and builds.
 * `npm run generate-pwa-assets` regenerates launcher icons from `site/public/app-icon.svg`.
+* `npm run test:e2e:docker` runs the Playwright browser tests (`e2e/`) in Chromium, Firefox, and WebKit inside Playwright's Docker image, which is what CI uses. Screenshot baselines live in `e2e/__screenshots__/<project>/`; regenerate them with `npm run test:e2e:docker -- --update-snapshots` after an intended visual change, and look at the new images before committing. Keep the image version in `package.json`, `.github/workflows/main.yml`, and `@playwright/test` in step.
+* `npm run size` reports the size each feature, library, and static file adds. Check it when adding data files or libraries; the app should stay small.
+* Anything needed offline must be precached: see `workbox.globPatterns` in `vite.config.ts`. A file type missing there silently breaks offline use.
 
 ## Layout
 
@@ -60,6 +63,9 @@ An offline PWA toolbox (flashlight, compass, level, timers, and more). TypeScrip
 * All user-visible text goes through i18n.
 
 ## Testing in a browser
+
+* `e2e/helpers.ts` fakes a working or blocked camera for any browser. Use Playwright's `geolocation` and `permissions` options for location.
+* Seeding localStorage in tests: set `preferenceVersion` to `[1, 1]` too, or the old preference migration rewraps saved values.
 
 * Headless Chrome can fake a camera and microphone: `--use-fake-device-for-media-stream --use-fake-ui-for-media-stream`. `--virtual-time-budget` screenshots hang on camera screens; drive Chrome over the DevTools protocol with a real wait instead.
 * Motion sensors can be simulated with `dispatchEvent(new DeviceOrientationEvent('deviceorientation', { alpha, beta, gamma }))`. Desktop Chrome also fires empty (null) orientation events, which the services treat as "no sensor" after a short grace period.
