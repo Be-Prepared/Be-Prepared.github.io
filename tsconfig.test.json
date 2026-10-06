@@ -1,0 +1,13 @@
+{
+    // Type checks the unit tests, which run in Node.
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "types": [
+            "node",
+            "vite-plugin-pwa/client",
+            "@types/w3c-generic-sensor"
+        ]
+    },
+    "include": ["src"],
+    "exclude": []
+}

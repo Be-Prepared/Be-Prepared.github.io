@@ -30,5 +30,8 @@
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true
     },
-    "include": ["src"]
+    "include": ["src"],
+    // Tests are type checked with tsconfig.test.json, which adds Node's
+    // types. Keeping them out of here stops app code from using Node APIs.
+    "exclude": ["src/**/*.test.ts"]
 }

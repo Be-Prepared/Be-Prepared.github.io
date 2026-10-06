@@ -12,8 +12,8 @@ An offline PWA toolbox (flashlight, compass, level, timers, and more). TypeScrip
 ## Commands
 
 * `npm install`, then `npm start` (dev server on port 8080, exposed on the LAN).
-* `npm test` runs AVA unit tests (`src/**/*.test.ts`). CI runs tests before building and deploying `master` to GitHub Pages.
-* `npx tsc --noEmit -p .` type checks. `npm run build` type checks and builds.
+* `npm test` type checks the tests (`tsconfig.test.json`) and runs them with Node's built-in test runner (`node:test` and `node:assert/strict`), loading TypeScript through `tsx`. Tests are `src/**/*.test.ts`. CI runs them before building and deploying `master` to GitHub Pages. Requires Node 22 or newer.
+* `npx tsc --noEmit -p .` type checks the app. Test files are excluded there because they use Node's types; `tsconfig.test.json` covers them. `npm run build` type checks and builds.
 * `npm run generate-pwa-assets` regenerates launcher icons from `site/public/app-icon.svg`.
 
 ## Layout
@@ -45,6 +45,11 @@ An offline PWA toolbox (flashlight, compass, level, timers, and more). TypeScrip
 * Lifecycle hooks: `onInit`, `onViewInit`, `onChange`, `onDestroy`. Clean up timers, animation frames, subscriptions, listeners, audio, and hardware in `onDestroy`.
 * Component styles are scoped to elements in the template. HTML injected with `i18n-html` doesn't get them; use inline styles there.
 * In RxJS pipes that `switchMap` into a long-lived source (like GPS), put `takeUntil` last, or the inner source keeps running after the screen closes.
+
+## Test pitfalls
+
+* Await asynchronous results (for example `await firstValueFrom(observable)`) before asserting. An assertion inside a `subscribe` callback can run after the test has already passed.
+* `assert.deepEqual(array, [])` narrows the array's type to `never[]` for the rest of the test. Check `array.length` instead when you keep using the array.
 
 ## Style
 

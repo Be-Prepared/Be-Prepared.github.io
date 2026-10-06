@@ -11,7 +11,8 @@ import {
     summarize,
     waveform,
 } from './ppg';
-import test from 'ava';
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
 
 // Deterministic noise so tests never flake.
 function random(seed: number) {
@@ -67,29 +68,29 @@ function noise(seconds: number, seed: number): Sample[] {
     return samples;
 }
 
-test('frameStats averages channels', (t) => {
+test('frameStats averages channels', () => {
     const data = [200, 10, 20, 255, 100, 30, 40, 255];
     const stats = frameStats(data);
-    t.is(stats.red, 150);
-    t.is(stats.green, 20);
-    t.is(stats.blue, 30);
-    t.is(stats.redSpread, 50);
-    t.deepEqual(frameStats([]), { red: 0, green: 0, blue: 0, redSpread: 0 });
+    assert.equal(stats.red, 150);
+    assert.equal(stats.green, 20);
+    assert.equal(stats.blue, 30);
+    assert.equal(stats.redSpread, 50);
+    assert.deepEqual(frameStats([]), { red: 0, green: 0, blue: 0, redSpread: 0 });
 });
 
-test('isFingerPresent', (t) => {
-    t.true(isFingerPresent({ red: 220, green: 40, blue: 30, redSpread: 5 }));
+test('isFingerPresent', () => {
+    assert.ok(isFingerPresent({ red: 220, green: 40, blue: 30, redSpread: 5 }));
     // A gray room.
-    t.false(
-        isFingerPresent({ red: 120, green: 110, blue: 100, redSpread: 40 })
+    assert.equal(
+        isFingerPresent({ red: 120, green: 110, blue: 100, redSpread: 40 }), false
     );
     // Dark.
-    t.false(isFingerPresent({ red: 20, green: 2, blue: 2, redSpread: 2 }));
+    assert.equal(isFingerPresent({ red: 20, green: 2, blue: 2, redSpread: 2 }), false);
     // Partly covered lens: red but uneven.
-    t.false(isFingerPresent({ red: 150, green: 40, blue: 30, redSpread: 70 }));
+    assert.equal(isFingerPresent({ red: 150, green: 40, blue: 30, redSpread: 70 }), false);
 });
 
-test('resample makes an even grid ending at the last sample', (t) => {
+test('resample makes an even grid ending at the last sample', () => {
     const result = resample(
         [
             { t: 0, v: 0 },
@@ -97,44 +98,44 @@ test('resample makes an even grid ending at the last sample', (t) => {
         ],
         20
     );
-    t.deepEqual(result, [0, 5, 10]);
-    t.deepEqual(resample([{ t: 0, v: 1 }]), []);
+    assert.deepEqual(result, [0, 5, 10]);
+    assert.deepEqual(resample([{ t: 0, v: 1 }]), []);
 });
 
-test('bandPass removes a constant and drift', (t) => {
+test('bandPass removes a constant and drift', () => {
     const values = Array.from({ length: 300 }, (_, i) => 100 + i * 0.5);
     const filtered = bandPass(values);
     const middle = filtered.slice(60, 240);
-    t.true(Math.max(...middle.map(Math.abs)) < 0.5);
+    assert.ok(Math.max(...middle.map(Math.abs)) < 0.5);
 });
 
-test('detectPeaks honors the refractory gap', (t) => {
+test('detectPeaks honors the refractory gap', () => {
     const values = [0, 1, 0, 2, 0, 0, 0, 0, 3, 0, 1, 0];
-    t.deepEqual(detectPeaks(values, 4), [3, 8]);
+    assert.deepEqual(detectPeaks(values, 4), [3, 8]);
 });
 
 for (const bpm of [45, 60, 72, 90, 120, 150, 180, 200]) {
-    test(`estimateBpm finds ${bpm} BPM with noise and drift`, (t) => {
+    test(`estimateBpm finds ${bpm} BPM with noise and drift`, () => {
         const estimate = estimateBpm(
             pulse(bpm, { drift: 2, noise: 0.6, seed: bpm })
         );
-        t.true(
+        assert.ok(
             Math.abs(estimate.bpm - bpm) <= 3,
             `got ${estimate.bpm.toFixed(1)}`
         );
-        t.true(
+        assert.ok(
             estimate.quality >= GOOD_QUALITY,
             `quality ${estimate.quality.toFixed(2)}`
         );
     });
 }
 
-test('estimateBpm does not halve a fast pulse in heavy noise', (t) => {
+test('estimateBpm does not halve a fast pulse in heavy noise', () => {
     const estimate = estimateBpm(pulse(120, { noise: 1.5, seed: 120 }));
-    t.true(Math.abs(estimate.bpm - 120) <= 3, `got ${estimate.bpm.toFixed(1)}`);
+    assert.ok(Math.abs(estimate.bpm - 120) <= 3, `got ${estimate.bpm.toFixed(1)}`);
 });
 
-test('estimateBpm does not double a pulse with a strong second harmonic', (t) => {
+test('estimateBpm does not double a pulse with a strong second harmonic', () => {
     const samples: Sample[] = [];
 
     for (let time = 0; time < 10000; time += 33.3) {
@@ -145,45 +146,45 @@ test('estimateBpm does not double a pulse with a strong second harmonic', (t) =>
         });
     }
 
-    t.true(Math.abs(estimateBpm(samples).bpm - 60) <= 3);
+    assert.ok(Math.abs(estimateBpm(samples).bpm - 60) <= 3);
 });
 
-test('estimateBpm gives low quality for a flat signal', (t) => {
+test('estimateBpm gives low quality for a flat signal', () => {
     const flat = Array.from({ length: 300 }, (_, i) => ({ t: i * 33, v: 180 }));
-    t.is(estimateBpm(flat).quality, 0);
+    assert.equal(estimateBpm(flat).quality, 0);
 });
 
-test('estimateBpm gives low quality for noise', (t) => {
+test('estimateBpm gives low quality for noise', () => {
     for (let seed = 1; seed <= 20; seed += 1) {
         const estimate = estimateBpm(noise(12, seed));
-        t.true(
+        assert.ok(
             estimate.quality < GOOD_QUALITY,
             `seed ${seed} quality ${estimate.quality.toFixed(2)}`
         );
     }
 });
 
-test('estimateBpm needs enough signal', (t) => {
-    t.is(estimateBpm(pulse(70, { seconds: 3 })).quality, 0);
-    t.is(estimateBpm([]).quality, 0);
+test('estimateBpm needs enough signal', () => {
+    assert.equal(estimateBpm(pulse(70, { seconds: 3 })).quality, 0);
+    assert.equal(estimateBpm([]).quality, 0);
 });
 
-test('lastSeconds keeps the newest window', (t) => {
+test('lastSeconds keeps the newest window', () => {
     const samples = [0, 1000, 2000, 3000].map((time) => ({ t: time, v: 0 }));
-    t.deepEqual(
+    assert.deepEqual(
         lastSeconds(samples, 2).map((s) => s.t),
         [1000, 2000, 3000]
     );
 });
 
-test('waveform is scaled to -1..1', (t) => {
+test('waveform is scaled to -1..1', () => {
     const wave = waveform(pulse(70), 5);
-    t.is(wave.length, 150);
-    t.is(Math.max(...wave.map(Math.abs)), 1);
+    assert.equal(wave.length, 150);
+    assert.equal(Math.max(...wave.map(Math.abs)), 1);
 });
 
-test('summarize takes the median of good estimates', (t) => {
-    t.is(
+test('summarize takes the median of good estimates', () => {
+    assert.equal(
         summarize([
             { bpm: 70, quality: 0.9 },
             { bpm: 72, quality: 0.8 },
@@ -192,5 +193,5 @@ test('summarize takes the median of good estimates', (t) => {
         ]),
         71
     );
-    t.is(summarize([{ bpm: 70, quality: 0.9 }]), null);
+    assert.equal(summarize([{ bpm: 70, quality: 0.9 }]), null);
 });

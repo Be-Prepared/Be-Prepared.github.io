@@ -1,5 +1,6 @@
 import { CameraService } from './camera.service';
-import test from 'ava';
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
 
 function fakeTrack(options: { torch?: boolean; applyHangs?: boolean }) {
     const log: string[] = [];
@@ -24,21 +25,21 @@ function fakeStream(track: any) {
     return { getTracks: () => [track] } as any as MediaStream;
 }
 
-test('close stops a track without a torch right away', async (t) => {
+test('close stops a track without a torch right away', async () => {
     const track = fakeTrack({});
     await new CameraService().close(fakeStream(track));
-    t.deepEqual(track.log, ['stop']);
+    assert.deepEqual(track.log, ['stop']);
 });
 
-test('close turns the torch off before stopping', async (t) => {
+test('close turns the torch off before stopping', async () => {
     // Leaving the magnifier with the light on must turn the light off.
     const track = fakeTrack({ torch: true });
     await new CameraService().close(fakeStream(track));
-    t.deepEqual(track.log, ['apply {"torch":false}', 'stop']);
+    assert.deepEqual(track.log, ['apply {"torch":false}', 'stop']);
 });
 
-test('close still stops when the torch never answers', async (t) => {
+test('close still stops when the torch never answers', async () => {
     const track = fakeTrack({ torch: true, applyHangs: true });
     await new CameraService().close(fakeStream(track));
-    t.deepEqual(track.log, ['apply {"torch":false}', 'stop']);
+    assert.deepEqual(track.log, ['apply {"torch":false}', 'stop']);
 });

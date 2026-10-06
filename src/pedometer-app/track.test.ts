@@ -17,7 +17,8 @@ import {
     STRIDE_DEFAULT,
     Track,
 } from './track';
-import test from 'ava';
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
 
 const METERS_PER_DEGREE = (6371008.8 * Math.PI) / 180;
 const START = { lat: 45, lon: -93 };
@@ -61,37 +62,37 @@ function random(seed: number) {
     };
 }
 
-test('haversine', (t) => {
-    t.is(haversine(START, START), 0);
+test('haversine', () => {
+    assert.equal(haversine(START, START), 0);
     const d = haversine(fixAt(0, 0, 0), fixAt(100, 0, 0));
-    t.true(Math.abs(d - 100) < 0.01);
+    assert.ok(Math.abs(d - 100) < 0.01);
     const e = haversine(fixAt(0, 0, 0), fixAt(30, 40, 0));
-    t.true(Math.abs(e - 50) < 0.01);
+    assert.ok(Math.abs(e - 50) < 0.01);
 });
 
-test('first fix only anchors', (t) => {
+test('first fix only anchors', () => {
     const { track, results } = run([fixAt(0, 0, 0)]);
-    t.deepEqual(results, [FixResult.ANCHORED]);
-    t.is(track.distance, 0);
+    assert.deepEqual(results, [FixResult.ANCHORED]);
+    assert.equal(track.distance, 0);
 });
 
-test('inaccurate fixes are ignored', (t) => {
+test('inaccurate fixes are ignored', () => {
     const { track, results } = run([
         fixAt(0, 0, 0, 50),
         fixAt(0, 0, 1, 5),
         fixAt(100, 0, 20, 31),
         fixAt(0, 0, 21, NaN),
     ]);
-    t.deepEqual(results, [
+    assert.deepEqual(results, [
         FixResult.INACCURATE,
         FixResult.ANCHORED,
         FixResult.INACCURATE,
         FixResult.INACCURATE,
     ]);
-    t.is(track.distance, 0);
+    assert.equal(track.distance, 0);
 });
 
-test('standing still with jitter adds nothing', (t) => {
+test('standing still with jitter adds nothing', () => {
     const rand = random(42);
     const fixes: Fix[] = [];
 
@@ -112,20 +113,20 @@ test('standing still with jitter adds nothing', (t) => {
     }
 
     const { track } = run(fixes);
-    t.is(track.distance, 0);
+    assert.equal(track.distance, 0);
 });
 
-test('small wobbles below the minimum step add nothing', (t) => {
+test('small wobbles below the minimum step add nothing', () => {
     const { track } = run([
         fixAt(0, 0, 0, 2),
         fixAt(2.5, 0, 1, 2),
         fixAt(0, 2.5, 2, 2),
         fixAt(-2.5, 0, 3, 2),
     ]);
-    t.is(track.distance, 0);
+    assert.equal(track.distance, 0);
 });
 
-test('walking in a straight line is counted', (t) => {
+test('walking in a straight line is counted', () => {
     const fixes: Fix[] = [];
 
     // 1.4 m/s for 10 minutes, one fix per second. Each step is smaller than
@@ -135,11 +136,11 @@ test('walking in a straight line is counted', (t) => {
     }
 
     const { track } = run(fixes);
-    t.true(track.distance > 840 - 3, `${track.distance}`);
-    t.true(track.distance <= 840 + 0.01, `${track.distance}`);
+    assert.ok(track.distance > 840 - 3, `${track.distance}`);
+    assert.ok(track.distance <= 840 + 0.01, `${track.distance}`);
 });
 
-test('walking with jitter stays close to the true distance', (t) => {
+test('walking with jitter stays close to the true distance', () => {
     const rand = random(7);
     const fixes: Fix[] = [];
 
@@ -152,80 +153,80 @@ test('walking with jitter stays close to the true distance', (t) => {
     // Sideways noise makes each counted segment a bit longer than the real
     // path, so expect a small overcount but nothing runaway.
     const { track } = run(fixes);
-    t.true(track.distance > 840 * 0.97, `${track.distance}`);
-    t.true(track.distance < 840 * 1.1, `${track.distance}`);
+    assert.ok(track.distance > 840 * 0.97, `${track.distance}`);
+    assert.ok(track.distance < 840 * 1.1, `${track.distance}`);
 });
 
-test('a better fix replaces the anchor while still', (t) => {
+test('a better fix replaces the anchor while still', () => {
     const first = addFix(newTrack(), fixAt(0, 0, 0, 25));
     const second = addFix(first.track, fixAt(5, 0, 1, 4));
-    t.is(second.result, FixResult.STILL);
-    t.is(second.track.anchor?.accuracy, 4);
-    t.is(second.track.distance, 0);
+    assert.equal(second.result, FixResult.STILL);
+    assert.equal(second.track.anchor?.accuracy, 4);
+    assert.equal(second.track.distance, 0);
 });
 
-test('impossible jumps are ignored', (t) => {
+test('impossible jumps are ignored', () => {
     const { track, results } = run([
         fixAt(0, 0, 0),
         fixAt(500, 0, 1),
         fixAt(10, 0, 5),
     ]);
-    t.deepEqual(results, [
+    assert.deepEqual(results, [
         FixResult.ANCHORED,
         FixResult.JUMP,
         FixResult.MOVED,
     ]);
-    t.true(Math.abs(track.distance - 10) < 0.01);
+    assert.ok(Math.abs(track.distance - 10) < 0.01);
 });
 
-test('pausing forgets the anchor', (t) => {
+test('pausing forgets the anchor', () => {
     let { track } = run([fixAt(0, 0, 0), fixAt(10, 0, 10)]);
-    t.true(Math.abs(track.distance - 10) < 0.01);
+    assert.ok(Math.abs(track.distance - 10) < 0.01);
     track = pauseTrack(track);
-    t.is(track.anchor, null);
+    assert.equal(track.anchor, null);
     // Walked 200 m while paused; only movement after resuming counts.
     ({ track } = run([fixAt(210, 0, 300), fixAt(220, 0, 310)], track));
-    t.true(Math.abs(track.distance - 20) < 0.01, `${track.distance}`);
+    assert.ok(Math.abs(track.distance - 20) < 0.01, `${track.distance}`);
 });
 
-test('stopwatch only runs while started', (t) => {
+test('stopwatch only runs while started', () => {
     let watch = newStopwatch();
-    t.is(elapsed(watch, 1000), 0);
+    assert.equal(elapsed(watch, 1000), 0);
     watch = startStopwatch(watch, 1000);
-    t.is(elapsed(watch, 4000), 3000);
+    assert.equal(elapsed(watch, 4000), 3000);
     // Starting again does nothing.
     watch = startStopwatch(watch, 3000);
-    t.is(elapsed(watch, 4000), 3000);
+    assert.equal(elapsed(watch, 4000), 3000);
     watch = stopStopwatch(watch, 5000);
-    t.is(elapsed(watch, 60000), 4000);
+    assert.equal(elapsed(watch, 60000), 4000);
     watch = startStopwatch(watch, 70000);
-    t.is(elapsed(watch, 71000), 5000);
+    assert.equal(elapsed(watch, 71000), 5000);
 });
 
-test('formatDuration', (t) => {
-    t.is(formatDuration(0), '0:00');
-    t.is(formatDuration(5999), '0:05');
-    t.is(formatDuration(754000), '12:34');
-    t.is(formatDuration(3723000), '1:02:03');
-    t.is(formatDuration(-5), '0:00');
+test('formatDuration', () => {
+    assert.equal(formatDuration(0), '0:00');
+    assert.equal(formatDuration(5999), '0:05');
+    assert.equal(formatDuration(754000), '12:34');
+    assert.equal(formatDuration(3723000), '1:02:03');
+    assert.equal(formatDuration(-5), '0:00');
 });
 
-test('formatPace', (t) => {
+test('formatPace', () => {
     // 1 km in 10 minutes
-    t.is(formatPace(1000, 600000, 1000), '10:00');
+    assert.equal(formatPace(1000, 600000, 1000), '10:00');
     // Same pace per mile
-    t.is(formatPace(1000, 600000, METERS_PER_MILE), '16:05');
-    t.is(formatPace(5, 600000, 1000), '');
-    t.is(formatPace(1000, 0, 1000), '');
-    t.is(formatPace(11, 36000000, 1000), '');
+    assert.equal(formatPace(1000, 600000, METERS_PER_MILE), '16:05');
+    assert.equal(formatPace(5, 600000, 1000), '');
+    assert.equal(formatPace(1000, 0, 1000), '');
+    assert.equal(formatPace(11, 36000000, 1000), '');
 });
 
-test('estimateSteps and clampStride', (t) => {
-    t.is(estimateSteps(750, 0.75), 1000);
-    t.is(estimateSteps(750, 0), 0);
-    t.is(clampStride(null), STRIDE_DEFAULT);
-    t.is(clampStride(NaN), STRIDE_DEFAULT);
-    t.is(clampStride(0.1), 0.3);
-    t.is(clampStride(3), 1.5);
-    t.is(clampStride(0.8), 0.8);
+test('estimateSteps and clampStride', () => {
+    assert.equal(estimateSteps(750, 0.75), 1000);
+    assert.equal(estimateSteps(750, 0), 0);
+    assert.equal(clampStride(null), STRIDE_DEFAULT);
+    assert.equal(clampStride(NaN), STRIDE_DEFAULT);
+    assert.equal(clampStride(0.1), 0.3);
+    assert.equal(clampStride(3), 1.5);
+    assert.equal(clampStride(0.8), 0.8);
 });

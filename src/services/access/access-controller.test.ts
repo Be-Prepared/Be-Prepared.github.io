@@ -5,7 +5,8 @@ import {
 } from './access-controller';
 import { BehaviorSubject } from 'rxjs';
 import { PermissionStatus } from './permission-status';
-import test from 'ava';
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
 
 class FakeDocument {
     visibilityState: 'visible' | 'hidden' = 'visible';
@@ -101,44 +102,44 @@ function setup(
 
 const tick = () => new Promise((resolve) => setTimeout(resolve, 0));
 
-test('classifyMediaError', (t) => {
-    t.is(classifyMediaError(error('NotAllowedError')), AccessState.DENIED);
-    t.is(classifyMediaError(error('SecurityError')), AccessState.DENIED);
-    t.is(classifyMediaError(error('NotFoundError')), AccessState.UNAVAILABLE);
-    t.is(
+test('classifyMediaError', () => {
+    assert.equal(classifyMediaError(error('NotAllowedError')), AccessState.DENIED);
+    assert.equal(classifyMediaError(error('SecurityError')), AccessState.DENIED);
+    assert.equal(classifyMediaError(error('NotFoundError')), AccessState.UNAVAILABLE);
+    assert.equal(
         classifyMediaError(error('OverconstrainedError')),
         AccessState.UNAVAILABLE
     );
-    t.is(classifyMediaError(error('NotReadableError')), AccessState.ERROR);
-    t.is(classifyMediaError(null), AccessState.ERROR);
+    assert.equal(classifyMediaError(error('NotReadableError')), AccessState.ERROR);
+    assert.equal(classifyMediaError(null), AccessState.ERROR);
 });
 
-test('granted permission acquires right away', async (t) => {
+test('granted permission acquires right away', async () => {
     const { controller, resources } = setup(PermissionStatus.GRANTED);
     controller.init();
     await tick();
-    t.is(controller.currentState, AccessState.READY);
-    t.is(controller.resource, resources[0]);
+    assert.equal(controller.currentState, AccessState.READY);
+    assert.equal(controller.resource, resources[0]);
 });
 
-test('prompt permission waits for a request and acquires nothing', async (t) => {
+test('prompt permission waits for a request and acquires nothing', async () => {
     const { acquireCalls, controller } = setup(PermissionStatus.PROMPT);
     controller.init();
     await tick();
-    t.is(controller.currentState, AccessState.PROMPT);
-    t.is(acquireCalls.count, 0);
+    assert.equal(controller.currentState, AccessState.PROMPT);
+    assert.equal(acquireCalls.count, 0);
     await controller.request();
-    t.is(controller.currentState, AccessState.READY);
+    assert.equal(controller.currentState, AccessState.READY);
 });
 
-test('unknown permission tries right away', async (t) => {
+test('unknown permission tries right away', async () => {
     const { controller } = setup(PermissionStatus.UNKNOWN);
     controller.init();
     await tick();
-    t.is(controller.currentState, AccessState.READY);
+    assert.equal(controller.currentState, AccessState.READY);
 });
 
-test('denied permission can be tried again', async (t) => {
+test('denied permission can be tried again', async () => {
     let allow = false;
     const { controller } = setup(PermissionStatus.DENIED, () =>
         allow
@@ -147,58 +148,58 @@ test('denied permission can be tried again', async (t) => {
     );
     controller.init();
     await tick();
-    t.is(controller.currentState, AccessState.DENIED);
+    assert.equal(controller.currentState, AccessState.DENIED);
 
     await controller.request();
-    t.is(controller.currentState, AccessState.DENIED);
+    assert.equal(controller.currentState, AccessState.DENIED);
 
     // The person fixes it in settings and tries again.
     allow = true;
     await controller.request();
-    t.is(controller.currentState, AccessState.READY);
+    assert.equal(controller.currentState, AccessState.READY);
 });
 
-test('permission re-enabled in settings is picked up', async (t) => {
+test('permission re-enabled in settings is picked up', async () => {
     const { controller, permission } = setup(PermissionStatus.DENIED);
     controller.init();
     await tick();
-    t.is(controller.currentState, AccessState.DENIED);
+    assert.equal(controller.currentState, AccessState.DENIED);
     permission.next(PermissionStatus.GRANTED);
     await tick();
-    t.is(controller.currentState, AccessState.READY);
+    assert.equal(controller.currentState, AccessState.READY);
 });
 
-test('permission revoked while in use releases the resource', async (t) => {
+test('permission revoked while in use releases the resource', async () => {
     const { controller, permission, resources } = setup(
         PermissionStatus.GRANTED
     );
     controller.init();
     await tick();
     permission.next(PermissionStatus.DENIED);
-    t.is(controller.currentState, AccessState.DENIED);
-    t.true(resources[0].released);
-    t.is(controller.resource, null);
+    assert.equal(controller.currentState, AccessState.DENIED);
+    assert.ok(resources[0].released);
+    assert.equal(controller.resource, null);
 });
 
-test('declining the browser prompt shows denied', async (t) => {
+test('declining the browser prompt shows denied', async () => {
     const { controller } = setup(PermissionStatus.PROMPT, () =>
         Promise.reject(error('NotAllowedError'))
     );
     controller.init();
     await controller.request();
-    t.is(controller.currentState, AccessState.DENIED);
+    assert.equal(controller.currentState, AccessState.DENIED);
 });
 
-test('missing hardware shows unavailable', async (t) => {
+test('missing hardware shows unavailable', async () => {
     const { controller } = setup(PermissionStatus.GRANTED, () =>
         Promise.reject(error('NotFoundError'))
     );
     controller.init();
     await tick();
-    t.is(controller.currentState, AccessState.UNAVAILABLE);
+    assert.equal(controller.currentState, AccessState.UNAVAILABLE);
 });
 
-test('hardware in use shows error and can be retried', async (t) => {
+test('hardware in use shows error and can be retried', async () => {
     let busy = true;
     const { controller } = setup(PermissionStatus.GRANTED, () =>
         busy
@@ -207,25 +208,25 @@ test('hardware in use shows error and can be retried', async (t) => {
     );
     controller.init();
     await tick();
-    t.is(controller.currentState, AccessState.ERROR);
+    assert.equal(controller.currentState, AccessState.ERROR);
     busy = false;
     await controller.request();
-    t.is(controller.currentState, AccessState.READY);
+    assert.equal(controller.currentState, AccessState.READY);
 });
 
-test('destroy releases the resource and listeners', async (t) => {
+test('destroy releases the resource and listeners', async () => {
     const { controller, doc, resources, win } = setup(
         PermissionStatus.GRANTED
     );
     controller.init();
     await tick();
     controller.destroy();
-    t.true(resources[0].released);
-    t.is(doc.listenerCount(), 0);
-    t.is(win.listenerCount(), 0);
+    assert.ok(resources[0].released);
+    assert.equal(doc.listenerCount(), 0);
+    assert.equal(win.listenerCount(), 0);
 });
 
-test('destroy while acquiring releases the late resource', async (t) => {
+test('destroy while acquiring releases the late resource', async () => {
     let finish: (r: FakeResource) => void = () => {};
     const late = { id: 99, released: false };
     const { controller } = setup(
@@ -236,34 +237,34 @@ test('destroy while acquiring releases the late resource', async (t) => {
     controller.destroy();
     finish(late);
     await tick();
-    t.true(late.released);
+    assert.ok(late.released);
 });
 
-test('hidden page releases the camera and gets it back when visible', async (t) => {
+test('hidden page releases the camera and gets it back when visible', async () => {
     const { controller, doc, resources } = setup(PermissionStatus.GRANTED);
     const seen: (FakeResource | null)[] = [];
     controller.resourceChanges.subscribe((r) => seen.push(r));
     controller.init();
     await tick();
-    t.is(resources.length, 1);
+    assert.equal(resources.length, 1);
 
     doc.visibilityState = 'hidden';
     doc.dispatch('visibilitychange');
-    t.true(resources[0].released);
-    t.is(controller.resource, null);
+    assert.ok(resources[0].released);
+    assert.equal(controller.resource, null);
 
     doc.visibilityState = 'visible';
     doc.dispatch('visibilitychange');
     await tick();
-    t.is(resources.length, 2);
-    t.is(controller.resource, resources[1]);
-    t.deepEqual(
+    assert.equal(resources.length, 2);
+    assert.equal(controller.resource, resources[1]);
+    assert.deepEqual(
         seen.map((r) => r && r.id),
         [null, 1, null, 2]
     );
 });
 
-test('releaseWhenHidden false keeps the resource', async (t) => {
+test('releaseWhenHidden false keeps the resource', async () => {
     const { controller, doc, resources } = setup(
         PermissionStatus.GRANTED,
         undefined,
@@ -273,10 +274,10 @@ test('releaseWhenHidden false keeps the resource', async (t) => {
     await tick();
     doc.visibilityState = 'hidden';
     doc.dispatch('visibilitychange');
-    t.false(resources[0].released);
+    assert.equal(resources[0].released, false);
 });
 
-test('pagehide always releases and pageshow gets it back', async (t) => {
+test('pagehide always releases and pageshow gets it back', async () => {
     const { controller, resources, win } = setup(
         PermissionStatus.GRANTED,
         undefined,
@@ -285,15 +286,15 @@ test('pagehide always releases and pageshow gets it back', async (t) => {
     controller.init();
     await tick();
     win.dispatch('pagehide');
-    t.true(resources[0].released);
-    t.is(controller.resource, null);
+    assert.ok(resources[0].released);
+    assert.equal(controller.resource, null);
     win.dispatch('pageshow');
     await tick();
-    t.is(controller.resource, resources[1]);
-    t.false(resources[1].released);
+    assert.equal(controller.resource, resources[1]);
+    assert.equal(resources[1].released, false);
 });
 
-test('acquire finishing while hidden releases and resumes later', async (t) => {
+test('acquire finishing while hidden releases and resumes later', async () => {
     let finish: (r: FakeResource) => void = () => {};
     const { controller, doc } = setup(
         PermissionStatus.GRANTED,
@@ -305,29 +306,29 @@ test('acquire finishing while hidden releases and resumes later', async (t) => {
     const first = { id: 1, released: false };
     finish(first);
     await tick();
-    t.true(first.released);
-    t.is(controller.resource, null);
+    assert.ok(first.released);
+    assert.equal(controller.resource, null);
     doc.visibilityState = 'visible';
     doc.dispatch('visibilitychange');
     const second = { id: 2, released: false };
     finish(second);
     await tick();
-    t.is(controller.resource, second);
+    assert.equal(controller.resource, second);
 });
 
-test('opened while hidden waits until visible', async (t) => {
+test('opened while hidden waits until visible', async () => {
     const { acquireCalls, controller, doc } = setup(PermissionStatus.GRANTED);
     doc.visibilityState = 'hidden';
     controller.init();
     await tick();
-    t.is(acquireCalls.count, 0);
+    assert.equal(acquireCalls.count, 0);
     doc.visibilityState = 'visible';
     doc.dispatch('visibilitychange');
     await tick();
-    t.is(controller.currentState, AccessState.READY);
+    assert.equal(controller.currentState, AccessState.READY);
 });
 
-test('release during acquire then request again gets a fresh resource', async (t) => {
+test('release during acquire then request again gets a fresh resource', async () => {
     const pending: ((r: FakeResource) => void)[] = [];
     const { controller } = setup(
         PermissionStatus.PROMPT,
@@ -337,22 +338,22 @@ test('release during acquire then request again gets a fresh resource', async (t
     controller.request();
     controller.release();
     controller.request();
-    t.is(pending.length, 2);
+    assert.equal(pending.length, 2);
     const stale = { id: 1, released: false };
     const fresh = { id: 2, released: false };
     pending[0](stale);
     pending[1](fresh);
     await tick();
-    t.true(stale.released);
-    t.is(controller.resource, fresh);
+    assert.ok(stale.released);
+    assert.equal(controller.resource, fresh);
 });
 
-test('duplicate requests do not acquire twice', async (t) => {
+test('duplicate requests do not acquire twice', async () => {
     const { acquireCalls, controller } = setup(PermissionStatus.PROMPT);
     controller.init();
     controller.request();
     controller.request();
     await tick();
     controller.request();
-    t.is(acquireCalls.count, 1);
+    assert.equal(acquireCalls.count, 1);
 });

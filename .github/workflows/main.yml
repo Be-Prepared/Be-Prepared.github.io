@@ -28,6 +28,13 @@ jobs:
             # the 'build' folder. Replace with the commands required to build
             # your project, or remove this step entirely if your site is
             # pre-built.
+            # The test runner needs Node 22 or newer for glob patterns.
+            - name: Set up Node ⚙️
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 'lts/*'
+                  cache: npm
+
             - name: Install and Build 🔧
               run: |
                   npm ci

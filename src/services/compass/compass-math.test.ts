@@ -8,7 +8,8 @@ import {
     matrixFromQuaternion,
     normalize360,
 } from './compass-math';
-import test from 'ava';
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
 
 const close = (actual: number, expected: number, epsilon = 1e-6) =>
     Math.abs(angleDifference(actual, expected)) < epsilon;
@@ -34,21 +35,21 @@ function multiply(a: number[], b: number[]) {
     ];
 }
 
-test('normalize360', (t) => {
-    t.is(normalize360(0), 0);
-    t.is(normalize360(360), 0);
-    t.is(normalize360(-90), 270);
-    t.is(normalize360(725), 5);
+test('normalize360', () => {
+    assert.equal(normalize360(0), 0);
+    assert.equal(normalize360(360), 0);
+    assert.equal(normalize360(-90), 270);
+    assert.equal(normalize360(725), 5);
 });
 
-test('angleDifference takes the short way around', (t) => {
-    t.is(angleDifference(350, 10), 20);
-    t.is(angleDifference(10, 350), -20);
-    t.is(angleDifference(0, 180), 180);
-    t.is(angleDifference(90, 90), 0);
+test('angleDifference takes the short way around', () => {
+    assert.equal(angleDifference(350, 10), 20);
+    assert.equal(angleDifference(10, 350), -20);
+    assert.equal(angleDifference(0, 180), 180);
+    assert.equal(angleDifference(90, 90), 0);
 });
 
-test('matrixFromEuler and matrixFromQuaternion agree', (t) => {
+test('matrixFromEuler and matrixFromQuaternion agree', () => {
     // alpha=40 around Z, then beta=30 around X, then gamma=-20 around Y.
     const q = multiply(
         multiply(quaternion([0, 0, 1], 40), quaternion([1, 0, 0], 30)),
@@ -58,18 +59,18 @@ test('matrixFromEuler and matrixFromQuaternion agree', (t) => {
     const b = matrixFromQuaternion(q);
 
     for (let i = 0; i < 9; i += 1) {
-        t.true(Math.abs(a[i] - b[i]) < 1e-9, `element ${i}`);
+        assert.ok(Math.abs(a[i] - b[i]) < 1e-9, `element ${i}`);
     }
 });
 
 for (const alpha of [0, 45, 90, 135, 180, 270, 359]) {
-    test(`flat device: alpha ${alpha} is bearing ${normalize360(-alpha)}`, (t) => {
+    test(`flat device: alpha ${alpha} is bearing ${normalize360(-alpha)}`, () => {
         // alpha increases counterclockwise, compass bearings clockwise.
-        t.true(close(bearingFromEuler(alpha, 0, 0), normalize360(-alpha)));
+        assert.ok(close(bearingFromEuler(alpha, 0, 0), normalize360(-alpha)));
     });
 }
 
-test('flat device does not jitter with tiny tilts', (t) => {
+test('flat device does not jitter with tiny tilts', () => {
     // The old formula only looked at the back of the device. When flat, the
     // result was decided by sensor noise. These readings are all "facing
     // east" with a tiny bit of noise.
@@ -81,46 +82,46 @@ test('flat device does not jitter with tiny tilts', (t) => {
     ];
 
     for (const bearing of readings) {
-        t.true(close(bearing, 90, 1), `${bearing}`);
+        assert.ok(close(bearing, 90, 1), `${bearing}`);
     }
 });
 
 for (const beta of [0, 20, 45, 70, 89, 90]) {
-    test(`tilting up toward upright (beta ${beta}) keeps the bearing`, (t) => {
+    test(`tilting up toward upright (beta ${beta}) keeps the bearing`, () => {
         // Facing east, tilting the top of the phone up. The back of the
         // phone keeps looking east.
-        t.true(close(bearingFromEuler(270, beta, 0), 90, 1e-6));
+        assert.ok(close(bearingFromEuler(270, beta, 0), 90, 1e-6));
     });
 }
 
-test('upright device uses the direction of the back camera', (t) => {
+test('upright device uses the direction of the back camera', () => {
     // Held upright, screen facing the person, who is facing south.
-    t.true(close(bearingFromEuler(180, 90, 0), 180));
+    assert.ok(close(bearingFromEuler(180, 90, 0), 180));
 });
 
-test('straight up or down has no direction', (t) => {
+test('straight up or down has no direction', () => {
     // Upright and rolled 90 degrees: top points up, back points sideways.
     // Construct a matrix where both candidates are vertical.
     const m = [1, 0, 0, 0, 0, 1, 0, 1, 0] as any;
     // Top = (0, 0, 1) [vertical], back = -Z = (0, -1, 0) [horizontal south]
-    t.true(close(bearingFromMatrix(m), 180));
+    assert.ok(close(bearingFromMatrix(m), 180));
     const vertical = [1, 0, 0, 0, 0, 0, 0, 1, 1] as any;
     // Top = column 1 = (0, 0, 1), back = -column 2 = (0, 0, -1)
-    t.true(isNaN(bearingFromMatrix(vertical)));
+    assert.ok(isNaN(bearingFromMatrix(vertical)));
 });
 
-test('screen rotated to landscape', (t) => {
+test('screen rotated to landscape', () => {
     // Device flat, top of the device pointing north, but the screen is
     // rotated 90 degrees counterclockwise so the top of the screen is the
     // device's right edge, which points east.
-    t.true(close(bearingFromEuler(0, 0, 0, 90), 90));
-    t.true(close(bearingFromEuler(0, 0, 0, 270), 270));
-    t.true(close(bearingFromEuler(0, 0, 0, 180), 180));
+    assert.ok(close(bearingFromEuler(0, 0, 0, 90), 90));
+    assert.ok(close(bearingFromEuler(0, 0, 0, 270), 270));
+    assert.ok(close(bearingFromEuler(0, 0, 0, 180), 180));
 });
 
-test('bearingFromQuaternion matches Euler for a plain rotation', (t) => {
+test('bearingFromQuaternion matches Euler for a plain rotation', () => {
     for (const degrees of [0, 30, 90, 200, 300]) {
-        t.true(
+        assert.ok(
             close(
                 bearingFromQuaternion(quaternion([0, 0, 1], degrees)),
                 bearingFromEuler(degrees, 0, 0)
@@ -130,14 +131,14 @@ test('bearingFromQuaternion matches Euler for a plain rotation', (t) => {
     }
 });
 
-test('bearingFromQuaternion upright facing west', (t) => {
+test('bearingFromQuaternion upright facing west', () => {
     // Rotate 90 around Z (facing west), then 90 around the device's X
     // (tilted upright).
     const q = multiply(quaternion([0, 0, 1], 90), quaternion([1, 0, 0], 90));
-    t.true(close(bearingFromQuaternion(q), 270));
+    assert.ok(close(bearingFromQuaternion(q), 270));
 });
 
-test('bearingFromWebkitHeading adds the screen angle', (t) => {
-    t.is(bearingFromWebkitHeading(10), 10);
-    t.is(bearingFromWebkitHeading(300, 90), 30);
+test('bearingFromWebkitHeading adds the screen angle', () => {
+    assert.equal(bearingFromWebkitHeading(10), 10);
+    assert.equal(bearingFromWebkitHeading(300, 90), 30);
 });

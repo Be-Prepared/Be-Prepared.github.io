@@ -7,7 +7,8 @@ import {
     rollDirection,
 } from './picture-hanging-math';
 import { AccessState } from '../services/access/access-controller';
-import test from 'ava';
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
 
 const near = (a: number, b: number, e = 1e-6) => Math.abs(a - b) < e;
 
@@ -24,69 +25,69 @@ const held = (roll: number, pitch: number) => {
     };
 };
 
-test('hangingReading upright and level', (t) => {
+test('hangingReading upright and level', () => {
     const r = hangingReading(held(0, 0));
-    t.true(near(r.roll, 0) && near(r.pitch, 0) && near(r.rotation, 0));
-    t.true(r.upright);
+    assert.ok(near(r.roll, 0) && near(r.pitch, 0) && near(r.rotation, 0));
+    assert.ok(r.upright);
 });
 
-test('hangingReading turned and leaning', (t) => {
+test('hangingReading turned and leaning', () => {
     const r = hangingReading(held(2, -3));
-    t.true(near(r.roll, 2), `${r.roll}`);
-    t.true(near(r.rotation, -2));
-    t.true(near(r.pitch, -3), `${r.pitch}`);
+    assert.ok(near(r.roll, 2), `${r.roll}`);
+    assert.ok(near(r.rotation, -2));
+    assert.ok(near(r.pitch, -3), `${r.pitch}`);
 });
 
-test('hangingReading in landscape folds to the nearest axis', (t) => {
+test('hangingReading in landscape folds to the nearest axis', () => {
     const r = hangingReading(held(91, 0));
-    t.true(near(r.roll, 1));
-    t.true(near(r.rotation, -1));
+    assert.ok(near(r.roll, 1));
+    assert.ok(near(r.rotation, -1));
 });
 
-test('hangingReading not upright when flat', (t) => {
-    t.false(hangingReading({ x: 0, y: -0.1, z: -0.99 }).upright);
+test('hangingReading not upright when flat', () => {
+    assert.equal(hangingReading({ x: 0, y: -0.1, z: -0.99 }).upright, false);
 });
 
-test('nextIsLevel needs both axes and has hysteresis', (t) => {
-    t.true(nextIsLevel(false, hangingReading(held(0.3, 0.2))));
-    t.false(nextIsLevel(false, hangingReading(held(0.3, 0.6))));
-    t.false(nextIsLevel(false, hangingReading(held(0.6, 0))));
-    t.true(nextIsLevel(true, hangingReading(held(0.6, -0.6))));
-    t.false(nextIsLevel(true, hangingReading(held(0.8, 0))));
-    t.false(
-        nextIsLevel(true, { roll: 0, pitch: 0, rotation: 0, upright: false })
+test('nextIsLevel needs both axes and has hysteresis', () => {
+    assert.ok(nextIsLevel(false, hangingReading(held(0.3, 0.2))));
+    assert.equal(nextIsLevel(false, hangingReading(held(0.3, 0.6))), false);
+    assert.equal(nextIsLevel(false, hangingReading(held(0.6, 0))), false);
+    assert.ok(nextIsLevel(true, hangingReading(held(0.6, -0.6))));
+    assert.equal(nextIsLevel(true, hangingReading(held(0.8, 0))), false);
+    assert.equal(
+        nextIsLevel(true, { roll: 0, pitch: 0, rotation: 0, upright: false }), false
     );
 });
 
-test('combinedAccess asks for the camera first', (t) => {
-    t.deepEqual(combinedAccess(AccessState.PROMPT, AccessState.PROMPT), {
+test('combinedAccess asks for the camera first', () => {
+    assert.deepEqual(combinedAccess(AccessState.PROMPT, AccessState.PROMPT), {
         state: AccessState.PROMPT,
         source: 'camera',
     });
-    t.deepEqual(combinedAccess(AccessState.READY, AccessState.PROMPT), {
+    assert.deepEqual(combinedAccess(AccessState.READY, AccessState.PROMPT), {
         state: AccessState.PROMPT,
         source: 'motion',
     });
-    t.deepEqual(combinedAccess(AccessState.READY, AccessState.READY), {
+    assert.deepEqual(combinedAccess(AccessState.READY, AccessState.READY), {
         state: AccessState.READY,
         source: 'motion',
     });
-    t.deepEqual(combinedAccess(AccessState.DENIED, AccessState.READY), {
+    assert.deepEqual(combinedAccess(AccessState.DENIED, AccessState.READY), {
         state: AccessState.DENIED,
         source: 'camera',
     });
 });
 
-test('directions', (t) => {
-    t.is(rollDirection(0.02), null);
-    t.is(rollDirection(1), 'leftHigh');
-    t.is(rollDirection(-1), 'rightHigh');
-    t.is(pitchDirection(-0.04), null);
-    t.is(pitchDirection(2), 'topAway');
-    t.is(pitchDirection(-2), 'topToward');
+test('directions', () => {
+    assert.equal(rollDirection(0.02), null);
+    assert.equal(rollDirection(1), 'leftHigh');
+    assert.equal(rollDirection(-1), 'rightHigh');
+    assert.equal(pitchDirection(-0.04), null);
+    assert.equal(pitchDirection(2), 'topAway');
+    assert.equal(pitchDirection(-2), 'topToward');
 });
 
-test('formatDegrees', (t) => {
-    t.is(formatDegrees(-0.04), '0.0°');
-    t.is(formatDegrees(-2.26), '2.3°');
+test('formatDegrees', () => {
+    assert.equal(formatDegrees(-0.04), '0.0°');
+    assert.equal(formatDegrees(-2.26), '2.3°');
 });

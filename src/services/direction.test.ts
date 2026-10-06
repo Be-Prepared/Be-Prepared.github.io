@@ -1,5 +1,6 @@
 import { DirectionService } from './direction.service';
-import test from 'ava';
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
 
 const directionService = new DirectionService();
 
@@ -16,8 +17,8 @@ const radiansToDegreesNWScenarios = [
 ];
 
 for (const scenario of radiansToDegreesNWScenarios) {
-    test(`radiansToDegreesNW: ${scenario.radians}`, (t) => {
-        t.is(
+    test(`radiansToDegreesNW: ${scenario.radians}`, () => {
+        assert.equal(
             directionService.radiansToDegreesNW(scenario.radians),
             scenario.expected
         );
@@ -32,8 +33,8 @@ const radiansToDegreesSWScenarios = [
 ];
 
 for (const scenario of radiansToDegreesSWScenarios) {
-    test(`radiansToDegreesSW: ${scenario.radians}`, (t) => {
-        t.is(
+    test(`radiansToDegreesSW: ${scenario.radians}`, () => {
+        assert.equal(
             directionService.radiansToDegreesSW(scenario.radians),
             scenario.expected
         );
@@ -52,8 +53,8 @@ const standardize180Scenarios = [
 ];
 
 for (const scenario of standardize180Scenarios) {
-    test(`standardize180: ${scenario.degrees}`, (t) => {
-        t.is(
+    test(`standardize180: ${scenario.degrees}`, () => {
+        assert.equal(
             directionService.standardize180(scenario.degrees),
             scenario.expected
         );
@@ -72,8 +73,8 @@ const standardize360Scenarios = [
 ];
 
 for (const scenario of standardize360Scenarios) {
-    test(`standardize360: ${scenario.degrees}`, (t) => {
-        t.is(
+    test(`standardize360: ${scenario.degrees}`, () => {
+        assert.equal(
             directionService.standardize360(scenario.degrees),
             scenario.expected
         );
@@ -91,8 +92,8 @@ const standardizeLatitudeScenarios = [
 ];
 
 for (const scenario of standardizeLatitudeScenarios) {
-    test(`standardizeLatitude: ${scenario.latitude}`, (t) => {
-        t.is(
+    test(`standardizeLatitude: ${scenario.latitude}`, () => {
+        assert.equal(
             directionService.standardizeLatitude(scenario.latitude),
             scenario.expected
         );
@@ -107,8 +108,8 @@ const toCompassPointScenarios = [
 ];
 
 for (const scenario of toCompassPointScenarios) {
-    test(`toCompassPoint: ${scenario.degrees}`, (t) => {
-        t.is(
+    test(`toCompassPoint: ${scenario.degrees}`, () => {
+        assert.equal(
             directionService.toCompassPoint(scenario.degrees),
             scenario.expected
         );

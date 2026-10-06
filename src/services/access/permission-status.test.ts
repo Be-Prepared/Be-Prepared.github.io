@@ -3,7 +3,8 @@ import {
     toPermissionStatus,
     watchPermission,
 } from './permission-status';
-import test from 'ava';
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
 
 const tick = () => new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -37,15 +38,15 @@ function fakePermissions(state: string | Error) {
     };
 }
 
-test('toPermissionStatus', (t) => {
-    t.is(toPermissionStatus('granted'), PermissionStatus.GRANTED);
-    t.is(toPermissionStatus('denied'), PermissionStatus.DENIED);
-    t.is(toPermissionStatus('prompt'), PermissionStatus.PROMPT);
-    t.is(toPermissionStatus('weird'), PermissionStatus.UNKNOWN);
-    t.is(toPermissionStatus(undefined), PermissionStatus.UNKNOWN);
+test('toPermissionStatus', () => {
+    assert.equal(toPermissionStatus('granted'), PermissionStatus.GRANTED);
+    assert.equal(toPermissionStatus('denied'), PermissionStatus.DENIED);
+    assert.equal(toPermissionStatus('prompt'), PermissionStatus.PROMPT);
+    assert.equal(toPermissionStatus('weird'), PermissionStatus.UNKNOWN);
+    assert.equal(toPermissionStatus(undefined), PermissionStatus.UNKNOWN);
 });
 
-test('reports the current state and changes', async (t) => {
+test('reports the current state and changes', async () => {
     const fake = fakePermissions('prompt');
     const seen: PermissionStatus[] = [];
     const sub = watchPermission('camera', fake.permissions).subscribe((s) =>
@@ -55,33 +56,33 @@ test('reports the current state and changes', async (t) => {
     fake.change('granted');
     fake.change('granted');
     fake.change('denied');
-    t.deepEqual(seen, [
+    assert.deepEqual(seen, [
         PermissionStatus.PROMPT,
         PermissionStatus.GRANTED,
         PermissionStatus.DENIED,
     ]);
     sub.unsubscribe();
-    t.is(fake.status.onchange, null);
+    assert.equal(fake.status.onchange, null);
 });
 
-test('unknown when the permission name is not supported', async (t) => {
+test('unknown when the permission name is not supported', async () => {
     const fake = fakePermissions(new TypeError('bad name'));
     const seen: PermissionStatus[] = [];
     watchPermission('nfc', fake.permissions).subscribe((s) => seen.push(s));
     await tick();
-    t.deepEqual(seen, [PermissionStatus.UNKNOWN]);
+    assert.deepEqual(seen, [PermissionStatus.UNKNOWN]);
 });
 
-test('unknown without the Permissions API', (t) => {
+test('unknown without the Permissions API', () => {
     const seen: PermissionStatus[] = [];
     watchPermission('camera', undefined).subscribe((s) => seen.push(s));
-    t.deepEqual(seen, [PermissionStatus.UNKNOWN]);
+    assert.deepEqual(seen, [PermissionStatus.UNKNOWN]);
 });
 
-test('nothing is cached between subscriptions', async (t) => {
+test('nothing is cached between subscriptions', async () => {
     const fake = fakePermissions('denied');
     watchPermission('camera', fake.permissions).subscribe().unsubscribe();
     watchPermission('camera', fake.permissions).subscribe();
     await tick();
-    t.is(fake.queries, 2);
+    assert.equal(fake.queries, 2);
 });

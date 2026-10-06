@@ -127,6 +127,8 @@ Sun & Moon can look up about 10,000 of the world's largest cities by name. Use j
 
 ### Getting started
 
+You'll need Node.js 22 or newer.
+
 ```bash
 git clone https://github.com/fidian/be-prepared.git
 cd be-prepared
@@ -139,7 +141,7 @@ The dev server runs at `http://localhost:8080/` and is reachable from other devi
 | Command | What it does |
 | --- | --- |
 | `npm start` | Development server with live reload. |
-| `npm test` | Unit tests ([AVA](https://github.com/avajs/ava)). Tests live next to the code as `*.test.ts`. |
+| `npm test` | Type checks and runs the unit tests with Node's built-in test runner. Tests live next to the code as `*.test.ts`. |
 | `npm run build` | Type checks and builds the site into `dist/`. |
 | `npm run generate-pwa-assets` | Regenerates the launcher icons from `site/public/app-icon.svg`. |
 | `npm run tunnel` | Shares your dev server over HTTPS on the internet (see below). |

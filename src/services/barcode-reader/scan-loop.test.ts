@@ -1,5 +1,6 @@
 import { ScanLoop } from './scan-loop';
-import test from 'ava';
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
 
 // A manual clock and timer queue so tests control exactly when things run.
 class FakeTimers {
@@ -72,7 +73,7 @@ function setup(detect: () => Promise<string[]>, onResult = (_r: string[]) => tru
     return { loop, results, timers };
 }
 
-test('scans until something is found, then stops', async (t) => {
+test('scans until something is found, then stops', async () => {
     let calls = 0;
     const { loop, results, timers } = setup(() => {
         calls += 1;
@@ -81,13 +82,13 @@ test('scans until something is found, then stops', async (t) => {
     });
     loop.start();
     await timers.advance(1000);
-    t.is(calls, 3);
-    t.deepEqual(results, [['code']]);
-    t.false(loop.running);
-    t.is(timers.pending, 0);
+    assert.equal(calls, 3);
+    assert.deepEqual(results, [['code']]);
+    assert.equal(loop.running, false);
+    assert.equal(timers.pending, 0);
 });
 
-test('respects the interval', async (t) => {
+test('respects the interval', async () => {
     let calls = 0;
     const { loop, timers } = setup(() => {
         calls += 1;
@@ -97,11 +98,11 @@ test('respects the interval', async (t) => {
     loop.start();
     await timers.advance(1000);
     // At 0, 100, ..., 1000
-    t.is(calls, 11);
+    assert.equal(calls, 11);
     loop.stop();
 });
 
-test('keeps going when onResult returns false', async (t) => {
+test('keeps going when onResult returns false', async () => {
     let calls = 0;
     const { loop, results, timers } = setup(
         () => {
@@ -113,12 +114,12 @@ test('keeps going when onResult returns false', async (t) => {
     );
     loop.start();
     await timers.advance(250);
-    t.is(results.length, 3);
-    t.true(loop.running);
+    assert.equal(results.length, 3);
+    assert.ok(loop.running);
     loop.stop();
 });
 
-test('a failed detection does not end the loop', async (t) => {
+test('a failed detection does not end the loop', async () => {
     let calls = 0;
     const { loop, results, timers } = setup(() => {
         calls += 1;
@@ -131,11 +132,11 @@ test('a failed detection does not end the loop', async (t) => {
     });
     loop.start();
     await timers.advance(2000);
-    t.is(calls, 3);
-    t.deepEqual(results, [['code']]);
+    assert.equal(calls, 3);
+    assert.deepEqual(results, [['code']]);
 });
 
-test('a detector that throws synchronously does not end the loop', async (t) => {
+test('a detector that throws synchronously does not end the loop', async () => {
     let calls = 0;
     const { loop, results, timers } = setup(() => {
         calls += 1;
@@ -148,10 +149,10 @@ test('a detector that throws synchronously does not end the loop', async (t) => 
     });
     loop.start();
     await timers.advance(2000);
-    t.deepEqual(results, [['code']]);
+    assert.deepEqual(results, [['code']]);
 });
 
-test('start while running does not create a second loop', async (t) => {
+test('start while running does not create a second loop', async () => {
     let calls = 0;
     const { loop, timers } = setup(() => {
         calls += 1;
@@ -162,11 +163,11 @@ test('start while running does not create a second loop', async (t) => {
     loop.start();
     loop.start();
     await timers.advance(1000);
-    t.is(calls, 11);
+    assert.equal(calls, 11);
     loop.stop();
 });
 
-test('stop during an in-flight detection discards its result', async (t) => {
+test('stop during an in-flight detection discards its result', async () => {
     let resolveDetect: (value: string[]) => void = () => {};
     const { loop, results, timers } = setup(
         () => new Promise((resolve) => (resolveDetect = resolve))
@@ -176,11 +177,11 @@ test('stop during an in-flight detection discards its result', async (t) => {
     loop.stop();
     resolveDetect(['late']);
     await timers.advance(1000);
-    t.deepEqual(results, []);
-    t.is(timers.pending, 0);
+    assert.deepEqual(results, []);
+    assert.equal(timers.pending, 0);
 });
 
-test('restart after finding a code scans again', async (t) => {
+test('restart after finding a code scans again', async () => {
     let calls = 0;
     const { loop, results, timers } = setup(() => {
         calls += 1;
@@ -189,13 +190,13 @@ test('restart after finding a code scans again', async (t) => {
     });
     loop.start();
     await timers.advance(1000);
-    t.deepEqual(results, [['code1']]);
+    assert.deepEqual(results, [['code1']]);
     loop.start();
     await timers.advance(1000);
-    t.deepEqual(results, [['code1'], ['code2']]);
+    assert.deepEqual(results, [['code1'], ['code2']]);
 });
 
-test('stop then quick start does not leave two loops', async (t) => {
+test('stop then quick start does not leave two loops', async () => {
     let inFlight = 0;
     let maxInFlight = 0;
     const { loop, timers } = setup(() => {
@@ -216,8 +217,8 @@ test('stop then quick start does not leave two loops', async (t) => {
     await timers.advance(1000);
     // The stale detection may still be finishing when the new one starts,
     // but it must not schedule more work.
-    t.true(maxInFlight <= 2);
+    assert.ok(maxInFlight <= 2);
     loop.stop();
     await timers.advance(1000);
-    t.is(timers.pending, 0);
+    assert.equal(timers.pending, 0);
 });

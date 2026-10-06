@@ -1,8 +1,9 @@
 import { CitiesService, City } from './cities.service';
 import { CoordinateService } from './coordinate.service';
 import { diOverride } from 'fudgel/dist/di';
-import { Observable, of } from 'rxjs';
-import test from 'ava';
+import { firstValueFrom, Observable, of } from 'rxjs';
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
 
 class CitiesServiceMock {
     getCityByName(str: string): Observable<City | null> {
@@ -64,29 +65,18 @@ const fromStringScenarios = {
     '.': null,
 };
 
-for (const scenario of Object.entries(fromStringScenarios)) {
-    test(`fromString: ${scenario[0]}`, (t) => {
-        coordinateService.fromString(scenario[0]).subscribe(
-            (result) => {
-                if (result) {
-                    const lat = result.lat.toFixed(7);
-                    const lon = result.lon.toFixed(7);
-                    t.is<string | null, string | null>(
-                        `${lat},${lon}`,
-                        scenario[1]
-                    );
-                } else {
-                    t.is<string | null, string | null>(result, scenario[1]);
-                }
-            },
-            (error) => {
-                t.fail(error);
-            }
-        );
+for (const [input, expected] of Object.entries(fromStringScenarios)) {
+    test(`fromString: ${input}`, async () => {
+        // Await the result so the assertion runs before the test ends.
+        const result = await firstValueFrom(coordinateService.fromString(input));
+        const actual = result
+            ? `${result.lat.toFixed(7)},${result.lon.toFixed(7)}`
+            : null;
+        assert.equal(actual, expected);
     });
 }
 
-test(`bearing`, (t) => {
+test(`bearing`, () => {
     coordinateService.clearCache();
     const bearing = coordinateService.bearing(
         {
@@ -98,7 +88,7 @@ test(`bearing`, (t) => {
             lon: -110.3390909060057,
         }
     );
-    t.is(bearing.toFixed(7), `129.3247025`);
+    assert.equal(bearing.toFixed(7), `129.3247025`);
 
     const bearing2 = coordinateService.bearing(
         {
@@ -107,7 +97,7 @@ test(`bearing`, (t) => {
         },
         { lat: 78.55234791058881, lon: -111.80324056660511 }
     );
-    t.is(bearing2.toFixed(7), '2.5917353');
+    assert.equal(bearing2.toFixed(7), '2.5917353');
 
     const bearing3 = coordinateService.bearing(
         {
@@ -119,5 +109,5 @@ test(`bearing`, (t) => {
             lon: 146.22486843038413,
         }
     );
-    t.is(bearing3.toFixed(7), '258.3226296');
+    assert.equal(bearing3.toFixed(7), '258.3226296');
 });
