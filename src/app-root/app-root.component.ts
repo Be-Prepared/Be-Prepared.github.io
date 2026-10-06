@@ -33,7 +33,7 @@ component('app-root', {
                 path="/location-navigate/:id"
                 component="location-navigate-app"
             ></div>
-            <!-- qrs uses short URLs for smaller QR codes -->
+            <!-- File transfer frames start with this short URL, so a phone camera opens the receiver -->
             <div path="/r" component="file-transfer-receive-app"></div>
             <div path="/file-transfer-send" component="file-transfer-send-app"></div>
             <div path="**" component="app-index"></div>

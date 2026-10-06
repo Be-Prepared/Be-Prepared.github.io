@@ -32,6 +32,7 @@ export class LocationAverageComponent {
     ninetyFive = ''; // 95% radius around the average
     point: WaypointSaved | null = null;
     pointCount = 0;
+    ignoredCount = 0;
     xDelta = '';
     yDelta = '';
 
@@ -115,13 +116,15 @@ export class LocationAverageComponent {
         this.dataPoints.push(dataPoint);
         this.pointCount = this.dataPoints.length;
 
-        // See location-average-math.ts for the weighting and how the 95%
-        // radius accounts for GPS errors persisting for minutes.
+        // See location-average-math.ts for how outliers are handled and how
+        // the 95% radius accounts for GPS errors persisting for many minutes.
         const result = averageSamples(this.dataPoints);
 
         if (!result) {
             return;
         }
+
+        this.ignoredCount = result.rejectedCount;
 
         const xyz: XYZ = { x: result.x, y: result.y, z: result.z };
         this.averagedDataPoint = {
@@ -190,6 +193,12 @@ component('location-average-app', {
                                     id="location.average.pointsCollected"
                                 ></i18n-label>
                                 {{pointCount}}
+                            </div>
+                            <div>
+                                <i18n-label
+                                    id="location.average.pointsIgnored"
+                                ></i18n-label>
+                                {{ignoredCount}}
                             </div>
                             <div>
                                 <i18n-label

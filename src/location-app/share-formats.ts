@@ -4,8 +4,8 @@
 // What we know (October 2026):
 // * iPhone: Safari doesn't open geo: links in Apple Maps, and a geo: link's
 //   "q" is treated as a search, so the name wins over the coordinates.
-//   Apple Maps links do work: the unified /place URL (iOS 18.4+) and the
-//   older ll/q form, where q labels the pin when ll is given.
+//   Apple Maps links do work. The unified /place URL is used (iOS 18.4,
+//   from 2025, and later); older iPhones open the Apple Maps website.
 // * Android: geo: opens the default map app. "geo:lat,lon?q=lat,lon(Name)"
 //   drops a labeled pin; "geo:lat,lon?q=Name" searches for Name instead.
 // * Google Maps links take coordinates but no label.
@@ -13,23 +13,24 @@
 
 export type ShareFormatId =
     | 'be-prepared'
-    | 'apple-maps'
-    | 'apple-maps-legacy'
     | 'geo-full'
     | 'geo-basic'
     | 'google-maps'
-    | 'openstreetmap'
+    | 'apple-maps'
     | 'decimal-text'
     | 'display-text';
 
+// Most phones are Android, so their options come first; Apple Maps is
+// listed just before the plain text options. Each option opens something
+// different: geo: links open the default map or GPS app (Android, works
+// offline), the Google Maps link is a web address that works on any
+// device, and the Apple Maps link opens Apple Maps on iPhones.
 export const SHARE_FORMATS: ShareFormatId[] = [
     'be-prepared',
-    'apple-maps',
-    'apple-maps-legacy',
     'geo-full',
     'geo-basic',
     'google-maps',
-    'openstreetmap',
+    'apple-maps',
     'decimal-text',
     'display-text',
 ];
@@ -84,9 +85,6 @@ export function buildShare(
                 name ? `&name=${label}` : ''
             }`;
 
-        case 'apple-maps-legacy':
-            return `https://maps.apple.com/?ll=${lat},${lon}${name ? `&q=${label}` : ''}`;
-
         case 'geo-full':
             return name
                 ? `geo:${lat},${lon}?q=${lat},${lon}(${label})`
@@ -97,9 +95,6 @@ export function buildShare(
 
         case 'google-maps':
             return `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
-
-        case 'openstreetmap':
-            return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=17/${lat}/${lon}`;
 
         case 'decimal-text':
             return `${lat}, ${lon}`;

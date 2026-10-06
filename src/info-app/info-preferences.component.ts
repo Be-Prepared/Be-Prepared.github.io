@@ -18,6 +18,8 @@ import {
     DistanceSystemDefault,
 } from '../services/distance.service';
 import { DistanceSystem } from '../datatypes/distance-system';
+import { languagePreference } from '../i18n/i18n.service';
+import { LANGUAGES } from '../i18n/languages';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import {
@@ -43,6 +45,8 @@ export class InfoPreferencesComponent {
     coordinateSystems = COORDINATE_SYSTEMS;
     distanceSystem: DistanceSystem = DistanceSystemDefault;
     distanceSystems = DISTANCE_SYSTEMS;
+    language = languagePreference.getItem() || 'auto';
+    languages = ['auto', ...Object.keys(LANGUAGES)];
     timeSystem: TimeSystem = TimeSystemDefault;
     timeSystems = TIME_SYSTEMS;
 
@@ -86,6 +90,20 @@ export class InfoPreferencesComponent {
         this._coordinateService.setCoordinateSystem(value);
     }
 
+    // Every label is read once when shown, so a reload is the simplest way
+    // to switch everything at once.
+    changeLanguage(value: string) {
+        if (value === 'auto') {
+            languagePreference.reset();
+        } else {
+            languagePreference.setItem(value);
+        }
+
+        if (value !== this.language) {
+            location.reload();
+        }
+    }
+
     changeDistanceSystem(value: DistanceSystem) {
         this._distanceService.setDistanceSystem(value);
     }
@@ -109,6 +127,15 @@ component('info-preferences', {
     template: html`
         <info-header id="info.preferences"></info-header>
         <ul>
+            <li>
+                <i18n-label id="info.language"></i18n-label>
+                <pretty-select
+                    i18n-base="language"
+                    value="{{language}}"
+                    .options="languages"
+                    @change="changeLanguage($event.detail)"
+                ></pretty-select>
+            </li>
             <li>
                 <i18n-label id="info.coordinates"></i18n-label>
                 <pretty-select

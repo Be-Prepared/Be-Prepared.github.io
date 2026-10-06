@@ -176,7 +176,7 @@ component(
                 border: 1px solid var(--border);
                 border-radius: var(--radius-m);
                 padding: var(--space-3);
-                text-align: left;
+                text-align: start;
             }
 
             .actions {

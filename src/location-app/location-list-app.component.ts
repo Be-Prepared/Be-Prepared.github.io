@@ -99,7 +99,7 @@ export class LocationListAppComponent {
                 true
             );
             const compassPoint =
-                this._directionService.toCompassPoint(direction);
+                this._directionService.compassPointLabel(direction);
 
             return {
                 ...point,
@@ -182,7 +182,7 @@ component('location-list-app', {
         }
 
         .name {
-            text-align: left;
+            text-align: start;
             flex-shrink: 1;
             text-overflow: ellipsis;
             overflow: hidden;

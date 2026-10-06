@@ -1,5 +1,9 @@
 # File Transfer App
 
+How it works today is described in `fountain.ts` (the code), `frame-format.ts` (what's in each QR code), and [experiments/transfer](../../experiments/transfer/README.md) (why, with numbers). In short: seeded frames, a robust soliton degree distribution plus 2% dense frames, inactivation decoding, and the payload in a QR alphanumeric segment.
+
+The rest of this file is the history of the first version, which listed up to 16 block numbers in each frame and was compatible with QRS. The 16-block cap turned out to be what limited it.
+
 The first file transfer code used an ideal Soliton distribution to determine the chunk sizes for the encoded blocks. Its distribution looks like the following.
 
 | Size |   Prob   | Visualization                                      |

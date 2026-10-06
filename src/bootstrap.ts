@@ -4,8 +4,10 @@ import { InstallPwaService } from './install-pwa/install-pwa.service';
 import { ReminderService } from './services/reminder.service';
 import { UpdatePwaService } from './update-pwa/update-pwa.service';
 
-export const bootstrap = () => {
-    di(I18nService).set(
+// Resolves once the translation is loaded, so the first screen is already
+// in the right language.
+export const bootstrap = async () => {
+    await di(I18nService).init(
         navigator.languages?.length
             ? navigator.languages
             : [navigator.language || '']

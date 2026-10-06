@@ -284,7 +284,7 @@ component(
                 background: var(--surface);
                 color: var(--fg);
                 font-family: inherit;
-                text-align: left;
+                text-align: start;
                 cursor: pointer;
                 box-shadow: var(--shadow);
                 -webkit-tap-highlight-color: transparent;

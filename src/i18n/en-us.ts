@@ -1,4 +1,3 @@
-import { html } from 'fudgel';
 import type { LanguageData } from './language-data';
 import { mirrorStrings } from '../mirror-app/mirror-app.i18n';
 import { levelStrings } from '../level-app/level-app.i18n';
@@ -112,6 +111,32 @@ export const enUS: LanguageData = {
         'No compass readings yet. If Low Power Mode or Battery Saver is on, turn it off; it can stop motion sensors from reporting.',
 
     // File Transfer
+    // Compass points, shortest form, as on a compass rose.
+    'direction.N': 'N',
+    'direction.NNE': 'NNE',
+    'direction.NE': 'NE',
+    'direction.ENE': 'ENE',
+    'direction.E': 'E',
+    'direction.ESE': 'ESE',
+    'direction.SE': 'SE',
+    'direction.SSE': 'SSE',
+    'direction.S': 'S',
+    'direction.SSW': 'SSW',
+    'direction.SW': 'SW',
+    'direction.WSW': 'WSW',
+    'direction.W': 'W',
+    'direction.WNW': 'WNW',
+    'direction.NW': 'NW',
+    'direction.NNW': 'NNW',
+    // Unit symbols, as written after a number.
+    'unit.cm': 'cm',
+    'unit.ft': 'ft',
+    'unit.in': 'in',
+    'unit.km': 'km',
+    'unit.km/h': 'km/h',
+    'unit.m': 'm',
+    'unit.mi': 'mi',
+    'unit.mph': 'mph',
     'fileTransfer.send': 'Send',
     'fileTransfer.send.fps': 'FPS:',
     'fileTransfer.send.loading': 'Loading',
@@ -121,6 +146,9 @@ export const enUS: LanguageData = {
     'fileTransfer.receive.download': 'Download:',
     'fileTransfer.receive.explainAsk':
         'To use the barcode reader to receive a file, the camera permission is required.',
+    'fileTransfer.receive.failed':
+        'The file arrived, but this browser is too old to unpack it. Update the browser, or ask the sender to use a newer one.',
+    'fileTransfer.receive.finishing': 'Finishing…',
     'fileTransfer.receive.fps': 'FPS',
 
     // Flashlight
@@ -149,6 +177,7 @@ export const enUS: LanguageData = {
     'info.contact.specificBrowsers':
         'Important: This app works best in Chrome on Android and Safari on iOS. There are permissions and installation issues with other browsers.',
     'info.coordinates': 'Coordinates:',
+    'info.language': 'Language:',
     'info.coordinates.DDD': 'Decimal Degrees',
     'info.coordinates.DDM': 'Degrees Decimal Minutes',
     'info.coordinates.DMS': 'Degrees Minutes Seconds',
@@ -193,6 +222,8 @@ export const enUS: LanguageData = {
     'largeText.placeholder': 'Type Here',
 
     // Location
+    // Shown in the language picker. Other languages show their own names.
+    'language.auto': 'Automatic',
     'location.add.gettingCurrentLocation': 'Getting current location...',
     'location.add.noLocation': 'Could not get your current location',
     'location.add.waypointName': 'Unnamed Waypoint {{id}}',
@@ -203,11 +234,12 @@ export const enUS: LanguageData = {
     'location.average.help':
         'It is best to collect points for over an hour to improve accuracy. Points will collect at 1 point per second, so 3,600 per hour. The screen must stay on for the app to be able to access the GPS, so it is recommended to use dark mode, dim your screen, and use an external battery if needed.',
     'location.average.help2':
-        'The accuracy is the radius that should contain the true spot 95% of the time. It uses the accuracy the GPS reports for each reading and how scattered the readings are. GPS errors drift slowly, so readings a second apart mostly repeat the same error; the accuracy improves with time spent collecting more than with the number of points.',
+        'The accuracy is the radius that should contain the true spot 95% of the time. It uses the accuracy the GPS reports for each reading and how scattered the readings are. Readings that jump far away or report a much worse accuracy count less or are ignored. GPS errors drift slowly, so readings a second apart mostly repeat the same error; the accuracy improves with time spent collecting more than with the number of points, and levels off after a few hours.',
     'location.average.lat': 'Latitude:',
     'location.average.lon': 'Longitude:',
     'location.average.ninetyFive': 'Accuracy (95%):',
     'location.average.pointsCollected': 'Points collected:',
+    'location.average.pointsIgnored': 'Points ignored:',
     'location.average.xDelta': 'X Delta:',
     'location.average.yDelta': 'Y Delta:',
     'location.coordinates.DDD': 'Decimal Degrees',
@@ -268,7 +300,7 @@ export const enUS: LanguageData = {
     'location.field.VELOCITY_MADE_GOOD': 'Velocity Made Good',
     'location.field.VERTICAL_SPEED': 'Vertical Speed',
     'location.field.unknownValue': 'Unknown',
-    'location.help.html': html`
+    'location.help.html': `
         <p>
             Locations may be entered using a variety of common formats.
             Capitalization does not matter, most symbols can be ignored, and
@@ -351,11 +383,8 @@ export const enUS: LanguageData = {
         'There is no location service available on this device.',
     'location.waypointList': 'Waypoints',
     'location.share.apple-maps': 'Apple Maps',
-    'location.share.apple-maps-legacy': 'Apple Maps (older iPhones)',
-    'location.share.apple-maps-legacy.description':
-        'Pin with the name, for iOS 18.3 and earlier.',
     'location.share.apple-maps.description':
-        'Pin with the name, for iPhones with iOS 18.4 or newer. Other devices open the Apple Maps website.',
+        'Pin with the name on iPhones. Older iPhones and other devices open the Apple Maps website.',
     'location.share.be-prepared': 'Be Prepared link',
     'location.share.be-prepared.description':
         'Opens Be Prepared and saves the waypoint with its name. Works on any phone with Be Prepared.',
@@ -379,9 +408,6 @@ export const enUS: LanguageData = {
     'location.share.google-maps.description':
         'Coordinates only, no name. Opens Google Maps on any phone or computer.',
     'location.share.heading': 'Share Location',
-    'location.share.openstreetmap': 'OpenStreetMap',
-    'location.share.openstreetmap.description':
-        'Coordinates only, no name. Opens the OpenStreetMap website.',
     'location.share.share': 'Share',
     'location.waypoints.location': 'Location',
     'location.waypoints.name': 'Name',
@@ -441,8 +467,8 @@ export const enUS: LanguageData = {
     // Limits of timers and alarms in a web app. Shown wherever someone might
     // count on a sound later.
     'reminderLimits.heading': 'Know the limits',
-    'reminderLimits.full.html': html`
-        <ul style="margin: 0; padding-left: 1.1em">
+    'reminderLimits.full.html': `
+        <ul style="margin: 0; padding-inline-start: 1.1em">
             <li>
                 Alarms only ring while Be Prepared is open and the screen is
                 on. If you close the app, switch to another app, or the screen

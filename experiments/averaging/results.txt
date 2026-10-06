@@ -1,0 +1,192 @@
+
+### Open sky, 10 min (open10, 500 runs)
+
+| Estimator | Median error (m) | 95th pct error (m) | Coverage of 95% radius | Median radius (m) | Fixes rejected |
+|---|---:|---:|---:|---:|---:|
+| current | 1.94 | 4.46 | 85.0% | 3.52 | 0.0% |
+| mean | 1.93 | 4.42 | 0.2% | 0.16 | 0.0% |
+| median | 1.94 | 4.30 | 1.2% | 0.20 | 0.0% |
+| weighted | 1.94 | 4.46 | 1.4% | 0.20 | 0.0% |
+| meanBatch | 1.93 | 4.42 | 22.6% | 1.05 | 0.0% |
+| meanSokal | 1.93 | 4.42 | 21.4% | 1.00 | 0.0% |
+| huberBatch | 1.93 | 4.37 | 12.0% | 0.75 | 10.2% |
+| tukeyBatch | 1.96 | 4.37 | 9.4% | 0.66 | 10.2% |
+| huberAccBatch | 1.97 | 4.45 | 11.8% | 0.76 | 10.2% |
+| hybrid | 1.90 | 4.29 | 96.4% | 5.36 | 1.6% |
+| + drop first minute | 1.93 | 4.37 | 96.0% | 5.37 | 10.2% |
+| + batch means floor | 1.90 | 4.29 | 96.4% | 5.36 | 1.6% |
+| - accuracy gate | 1.90 | 4.29 | 96.4% | 5.36 | 0.0% |
+| Tukey not Huber | 1.91 | 4.35 | 96.4% | 5.36 | 1.6% |
+| - scatter correction | 1.90 | 4.29 | 90.4% | 4.04 | 1.6% |
+| - bias share | 1.90 | 4.29 | 96.0% | 5.29 | 1.6% |
+| 10 min correlation | 1.90 | 4.29 | 90.4% | 3.93 | 1.6% |
+| 30 min correlation | 1.90 | 4.29 | 98.6% | 5.68 | 1.6% |
+| app | 1.90 | 4.29 | 96.4% | 5.36 | 1.6% |
+
+### Open sky, 60 min (open60, 500 runs)
+
+| Estimator | Median error (m) | 95th pct error (m) | Coverage of 95% radius | Median radius (m) | Fixes rejected |
+|---|---:|---:|---:|---:|---:|
+| current | 1.32 | 3.10 | 75.2% | 2.00 | 0.0% |
+| mean | 1.33 | 3.05 | 0.2% | 0.08 | 0.0% |
+| median | 1.38 | 3.08 | 0.6% | 0.10 | 0.0% |
+| weighted | 1.32 | 3.10 | 0.4% | 0.08 | 0.0% |
+| meanBatch | 1.33 | 3.05 | 39.8% | 1.13 | 0.0% |
+| meanSokal | 1.33 | 3.05 | 38.0% | 1.10 | 0.0% |
+| huberBatch | 1.36 | 3.06 | 35.4% | 1.05 | 1.7% |
+| tukeyBatch | 1.35 | 3.08 | 31.0% | 0.93 | 1.7% |
+| huberAccBatch | 1.35 | 3.07 | 38.0% | 1.08 | 1.7% |
+| hybrid | 1.35 | 3.06 | 94.4% | 3.18 | 0.3% |
+| + drop first minute | 1.36 | 3.06 | 94.2% | 3.17 | 1.7% |
+| + batch means floor | 1.35 | 3.06 | 94.4% | 3.18 | 0.3% |
+| - accuracy gate | 1.35 | 3.05 | 94.4% | 3.18 | 0.0% |
+| Tukey not Huber | 1.35 | 3.10 | 94.0% | 3.15 | 0.3% |
+| - scatter correction | 1.35 | 3.06 | 91.6% | 2.69 | 0.3% |
+| - bias share | 1.35 | 3.06 | 91.6% | 2.89 | 0.3% |
+| 10 min correlation | 1.35 | 3.06 | 85.6% | 2.39 | 0.3% |
+| 30 min correlation | 1.35 | 3.06 | 97.0% | 3.81 | 0.3% |
+| app | 1.35 | 3.06 | 94.4% | 3.18 | 0.3% |
+
+### Open sky, 120 min (open120, 500 runs)
+
+| Estimator | Median error (m) | 95th pct error (m) | Coverage of 95% radius | Median radius (m) | Fixes rejected |
+|---|---:|---:|---:|---:|---:|
+| current | 1.02 | 2.35 | 75.4% | 1.49 | 0.0% |
+| mean | 1.00 | 2.37 | 0.4% | 0.06 | 0.0% |
+| median | 1.03 | 2.40 | 0.0% | 0.07 | 0.0% |
+| weighted | 1.02 | 2.35 | 0.4% | 0.06 | 0.0% |
+| meanBatch | 1.00 | 2.37 | 54.6% | 1.13 | 0.0% |
+| meanSokal | 1.00 | 2.37 | 52.0% | 1.05 | 0.0% |
+| huberBatch | 1.02 | 2.38 | 50.4% | 1.07 | 0.9% |
+| tukeyBatch | 1.03 | 2.35 | 42.8% | 0.94 | 0.9% |
+| huberAccBatch | 1.02 | 2.39 | 52.0% | 1.09 | 0.9% |
+| hybrid | 1.01 | 2.37 | 95.8% | 2.46 | 0.2% |
+| + drop first minute | 1.02 | 2.38 | 95.8% | 2.47 | 0.9% |
+| + batch means floor | 1.01 | 2.37 | 95.8% | 2.46 | 0.2% |
+| - accuracy gate | 1.01 | 2.37 | 96.0% | 2.46 | 0.0% |
+| Tukey not Huber | 1.03 | 2.34 | 95.6% | 2.45 | 0.2% |
+| - scatter correction | 1.01 | 2.37 | 94.4% | 2.22 | 0.2% |
+| - bias share | 1.01 | 2.37 | 91.8% | 2.11 | 0.2% |
+| 10 min correlation | 1.01 | 2.37 | 88.8% | 1.93 | 0.2% |
+| 30 min correlation | 1.01 | 2.37 | 97.6% | 2.90 | 0.2% |
+| app | 1.01 | 2.37 | 95.8% | 2.46 | 0.2% |
+
+### Urban canyon / trees, 10 min (urban10, 500 runs)
+
+| Estimator | Median error (m) | 95th pct error (m) | Coverage of 95% radius | Median radius (m) | Fixes rejected |
+|---|---:|---:|---:|---:|---:|
+| current | 5.15 | 11.82 | 94.0% | 12.67 | 0.0% |
+| mean | 6.01 | 12.80 | 2.0% | 1.06 | 0.0% |
+| median | 4.20 | 9.37 | 8.4% | 1.38 | 0.0% |
+| weighted | 5.15 | 11.82 | 1.8% | 0.48 | 0.0% |
+| meanBatch | 6.01 | 12.80 | 57.0% | 7.00 | 0.0% |
+| meanSokal | 6.01 | 12.80 | 42.8% | 5.57 | 0.0% |
+| huberBatch | 4.18 | 9.58 | 17.4% | 2.17 | 13.2% |
+| tukeyBatch | 4.06 | 9.19 | 12.6% | 1.56 | 13.2% |
+| huberAccBatch | 4.17 | 9.65 | 16.8% | 1.97 | 13.2% |
+| hybrid | 4.21 | 9.45 | 97.8% | 12.34 | 6.3% |
+| + drop first minute | 4.18 | 9.58 | 97.6% | 12.26 | 13.2% |
+| + batch means floor | 4.21 | 9.45 | 97.8% | 12.34 | 6.3% |
+| - accuracy gate | 4.44 | 9.42 | 98.8% | 13.41 | 0.0% |
+| Tukey not Huber | 4.04 | 9.32 | 96.8% | 11.83 | 6.3% |
+| - scatter correction | 4.21 | 9.45 | 91.0% | 9.46 | 6.3% |
+| - bias share | 4.21 | 9.45 | 97.4% | 12.04 | 6.3% |
+| 10 min correlation | 4.21 | 9.45 | 93.0% | 9.47 | 6.3% |
+| 30 min correlation | 4.21 | 9.45 | 99.0% | 14.30 | 6.3% |
+| app | 4.21 | 9.45 | 97.8% | 12.34 | 6.3% |
+
+### Urban canyon / trees, 60 min (urban60, 500 runs)
+
+| Estimator | Median error (m) | 95th pct error (m) | Coverage of 95% radius | Median radius (m) | Fixes rejected |
+|---|---:|---:|---:|---:|---:|
+| current | 3.18 | 7.32 | 96.6% | 8.23 | 0.0% |
+| mean | 3.25 | 7.36 | 1.2% | 0.49 | 0.0% |
+| median | 2.86 | 6.56 | 4.2% | 0.62 | 0.0% |
+| weighted | 3.18 | 7.32 | 0.2% | 0.20 | 0.0% |
+| meanBatch | 3.25 | 7.36 | 66.6% | 4.37 | 0.0% |
+| meanSokal | 3.25 | 7.36 | 64.4% | 4.05 | 0.0% |
+| huberBatch | 2.85 | 6.53 | 39.4% | 2.33 | 4.5% |
+| tukeyBatch | 2.81 | 6.37 | 34.0% | 2.00 | 4.5% |
+| huberAccBatch | 2.88 | 6.66 | 40.2% | 2.34 | 4.5% |
+| hybrid | 2.84 | 6.49 | 95.0% | 6.99 | 3.2% |
+| + drop first minute | 2.85 | 6.53 | 95.2% | 7.00 | 4.5% |
+| + batch means floor | 2.84 | 6.49 | 95.0% | 6.99 | 3.2% |
+| - accuracy gate | 2.84 | 6.56 | 95.2% | 7.16 | 0.0% |
+| Tukey not Huber | 2.80 | 6.40 | 94.8% | 6.98 | 3.2% |
+| - scatter correction | 2.84 | 6.49 | 91.8% | 6.44 | 3.2% |
+| - bias share | 2.84 | 6.49 | 93.2% | 6.50 | 3.2% |
+| 10 min correlation | 2.84 | 6.49 | 86.2% | 5.59 | 3.2% |
+| 30 min correlation | 2.84 | 6.49 | 97.8% | 8.31 | 3.2% |
+| app | 2.84 | 6.49 | 95.0% | 6.99 | 3.2% |
+
+### Urban canyon / trees, 120 min (urban120, 500 runs)
+
+| Estimator | Median error (m) | 95th pct error (m) | Coverage of 95% radius | Median radius (m) | Fixes rejected |
+|---|---:|---:|---:|---:|---:|
+| current | 2.57 | 5.66 | 95.2% | 6.07 | 0.0% |
+| mean | 2.54 | 5.87 | 0.2% | 0.35 | 0.0% |
+| median | 2.34 | 5.35 | 2.8% | 0.44 | 0.0% |
+| weighted | 2.57 | 5.66 | 0.2% | 0.14 | 0.0% |
+| meanBatch | 2.54 | 5.87 | 68.0% | 3.47 | 0.0% |
+| meanSokal | 2.54 | 5.87 | 67.0% | 3.30 | 0.0% |
+| huberBatch | 2.32 | 5.35 | 49.0% | 2.25 | 3.3% |
+| tukeyBatch | 2.31 | 5.27 | 40.4% | 2.01 | 3.3% |
+| huberAccBatch | 2.33 | 5.46 | 48.6% | 2.27 | 3.3% |
+| hybrid | 2.33 | 5.37 | 95.4% | 5.59 | 2.8% |
+| + drop first minute | 2.32 | 5.35 | 94.8% | 5.61 | 3.3% |
+| + batch means floor | 2.33 | 5.37 | 95.4% | 5.59 | 2.8% |
+| - accuracy gate | 2.32 | 5.32 | 95.4% | 5.59 | 0.0% |
+| Tukey not Huber | 2.29 | 5.27 | 95.4% | 5.59 | 2.8% |
+| - scatter correction | 2.33 | 5.37 | 92.8% | 5.27 | 2.8% |
+| - bias share | 2.33 | 5.37 | 89.6% | 4.90 | 2.8% |
+| 10 min correlation | 2.33 | 5.37 | 86.4% | 4.55 | 2.8% |
+| 30 min correlation | 2.33 | 5.37 | 97.8% | 6.38 | 2.8% |
+| app | 2.33 | 5.37 | 95.4% | 5.59 | 2.8% |
+
+### Open sky, fast-changing errors, 60 min (openFast60, 500 runs)
+
+| Estimator | Median error (m) | 95th pct error (m) | Coverage of 95% radius | Median radius (m) | Fixes rejected |
+|---|---:|---:|---:|---:|---:|
+| current | 0.52 | 1.27 | 99.6% | 1.97 | 0.0% |
+| mean | 0.54 | 1.18 | 2.0% | 0.09 | 0.0% |
+| median | 0.55 | 1.23 | 4.6% | 0.11 | 0.0% |
+| weighted | 0.52 | 1.27 | 3.6% | 0.07 | 0.0% |
+| meanBatch | 0.54 | 1.18 | 85.6% | 0.91 | 0.0% |
+| meanSokal | 0.54 | 1.18 | 81.4% | 0.81 | 0.0% |
+| huberBatch | 0.53 | 1.23 | 82.0% | 0.84 | 1.7% |
+| tukeyBatch | 0.53 | 1.23 | 73.4% | 0.74 | 1.7% |
+| huberAccBatch | 0.52 | 1.30 | 83.0% | 0.87 | 1.7% |
+| hybrid | 0.53 | 1.20 | 100.0% | 3.20 | 0.4% |
+| + drop first minute | 0.53 | 1.23 | 100.0% | 3.23 | 1.7% |
+| + batch means floor | 0.53 | 1.20 | 100.0% | 3.20 | 0.4% |
+| - accuracy gate | 0.53 | 1.20 | 100.0% | 3.21 | 0.0% |
+| Tukey not Huber | 0.54 | 1.25 | 100.0% | 3.20 | 0.4% |
+| - scatter correction | 0.53 | 1.20 | 100.0% | 2.70 | 0.4% |
+| - bias share | 0.53 | 1.20 | 100.0% | 2.91 | 0.4% |
+| 10 min correlation | 0.53 | 1.20 | 100.0% | 2.41 | 0.4% |
+| 30 min correlation | 0.53 | 1.20 | 100.0% | 3.84 | 0.4% |
+| app | 0.53 | 1.20 | 100.0% | 3.20 | 0.4% |
+
+### Open sky, slow multipath, 60 min (openSlow60, 500 runs)
+
+| Estimator | Median error (m) | 95th pct error (m) | Coverage of 95% radius | Median radius (m) | Fixes rejected |
+|---|---:|---:|---:|---:|---:|
+| current | 1.66 | 3.84 | 58.8% | 1.81 | 0.0% |
+| mean | 1.62 | 3.77 | 0.0% | 0.07 | 0.0% |
+| median | 1.61 | 3.97 | 0.2% | 0.08 | 0.0% |
+| weighted | 1.66 | 3.84 | 0.4% | 0.08 | 0.0% |
+| meanBatch | 1.62 | 3.77 | 22.8% | 0.95 | 0.0% |
+| meanSokal | 1.62 | 3.77 | 26.0% | 0.99 | 0.0% |
+| huberBatch | 1.62 | 3.92 | 20.2% | 0.88 | 1.7% |
+| tukeyBatch | 1.63 | 4.00 | 17.6% | 0.78 | 1.7% |
+| huberAccBatch | 1.66 | 3.88 | 21.0% | 0.89 | 1.7% |
+| hybrid | 1.61 | 3.86 | 81.2% | 2.61 | 0.3% |
+| + drop first minute | 1.62 | 3.92 | 81.2% | 2.62 | 1.7% |
+| + batch means floor | 1.61 | 3.86 | 81.2% | 2.61 | 0.3% |
+| - accuracy gate | 1.61 | 3.86 | 81.2% | 2.61 | 0.0% |
+| Tukey not Huber | 1.63 | 4.02 | 80.8% | 2.61 | 0.3% |
+| - scatter correction | 1.61 | 3.86 | 78.6% | 2.61 | 0.3% |
+| - bias share | 1.61 | 3.86 | 77.8% | 2.44 | 0.3% |
+| 10 min correlation | 1.61 | 3.86 | 70.4% | 2.10 | 0.3% |
+| 30 min correlation | 1.61 | 3.86 | 86.6% | 2.96 | 0.3% |
+| app | 1.61 | 3.86 | 81.2% | 2.61 | 0.3% |

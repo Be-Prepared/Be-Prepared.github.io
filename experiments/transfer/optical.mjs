@@ -17,11 +17,10 @@
 // This is a model, not a phone. Use it to rank options and find where
 // decoding falls off a cliff, then confirm the winners on real devices.
 
-import QRCodeModule from '@tofandel/qrcode-svg';
+import qrcode from 'qrcode-generator';
 import { mulberry32 } from './lib/prng.mjs';
 import { scanImageData } from '@undecaf/zbar-wasm';
 
-const QRCode = QRCodeModule.default || QRCodeModule;
 const options = Object.fromEntries(
     process.argv
         .slice(2)
@@ -183,15 +182,21 @@ async function trial(version, sigma, run) {
     const low = version > 1 ? byteCapacity(version - 1) + 1 : 1;
     const length = Math.floor(low + (byteCapacity(version) - low) * 0.9);
     const content = randomContent(length, rng);
-    const qr = new QRCode({ content, ecl, padding: 0 }).qrcode;
-    const image = blur(rasterize(qr.modules, rng), sigma);
+    const qr = qrcode(0, ecl);
+    qr.addData(content);
+    qr.make();
+    const count = qr.getModuleCount();
+    const modules = Array.from({ length: count }, (_, row) =>
+        Array.from({ length: count }, (_, col) => qr.isDark(row, col))
+    );
+    const image = blur(rasterize(modules, rng), sigma);
     const imageData = toImageData(image, rng);
     const start = process.hrtime.bigint();
     const symbols = await scanImageData(imageData);
     const ms = Number(process.hrtime.bigint() - start) / 1e6;
     const ok = symbols.some((s) => s.decode() === content);
 
-    return { actualVersion: qr.typeNumber, length, modulePixels: image.modulePixels, ms, ok };
+    return { actualVersion: (count - 17) / 4, length, modulePixels: image.modulePixels, ms, ok };
 }
 
 console.log(

@@ -39,7 +39,7 @@ component(
                 background: var(--warning-bg);
                 border: 1px solid var(--warning);
                 font-size: 0.9rem;
-                text-align: left;
+                text-align: start;
                 line-height: 1.4;
             }
 

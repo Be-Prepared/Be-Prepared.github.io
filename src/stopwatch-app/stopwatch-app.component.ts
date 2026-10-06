@@ -239,20 +239,20 @@ component(
                 color: var(--fg-muted);
                 text-transform: uppercase;
                 letter-spacing: 0.05em;
-                text-align: right;
+                text-align: end;
                 padding: var(--space-2) var(--space-3);
                 border-bottom: 1px solid var(--border);
             }
 
             .laps td {
                 padding: var(--space-2) var(--space-3);
-                text-align: right;
+                text-align: end;
                 border-bottom: 1px solid var(--border);
                 font-size: 1.1rem;
             }
 
             .laps .num {
-                text-align: left;
+                text-align: start;
                 color: var(--fg-muted);
             }
 

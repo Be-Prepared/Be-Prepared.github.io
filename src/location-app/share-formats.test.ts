@@ -26,15 +26,16 @@ test('Be Prepared link round-trips through its parameters', () => {
     assert.deepEqual(pointFromParams(url.search), point);
 });
 
-test('Apple Maps links carry coordinates and the name', () => {
+test('Apple Maps link carries coordinates and the name', () => {
     assert.equal(
         buildShare('apple-maps', point, context),
         'https://maps.apple.com/place?coordinate=38.8894838,-77.0352791&name=Washington%20Monument'
     );
-    assert.equal(
-        buildShare('apple-maps-legacy', point, context),
-        'https://maps.apple.com/?ll=38.8894838,-77.0352791&q=Washington%20Monument'
-    );
+});
+
+test('Apple Maps is listed just before the text options', () => {
+    const appleIndex = SHARE_FORMATS.indexOf('apple-maps');
+    assert.equal(SHARE_FORMATS[appleIndex + 1], 'decimal-text');
 });
 
 test('full geo link uses the labeled-pin form', () => {

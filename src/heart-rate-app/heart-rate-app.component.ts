@@ -450,7 +450,7 @@ component(
 
             .steps {
                 margin: 0;
-                padding-left: 1.4em;
+                padding-inline-start: 1.4em;
                 display: flex;
                 flex-direction: column;
                 gap: var(--space-2);

@@ -30,6 +30,7 @@ An offline PWA toolbox (flashlight, compass, level, timers, and more). TypeScrip
     * `reminder.service.ts` — the countdown timer and alarm clock, so they ring from any screen through `<reminder-ringer>`.
     * `geolocation.service.ts`, `wake-lock.service.ts`, `alarm-sound.service.ts`, `preference.service.ts`, `local-storage.service.ts`.
 * `src/tile-defs.ts` — home screen tiles and routes. `src/index.ts` exports every module. `src/i18n/en-us.ts` holds shared strings and spreads each tool's i18n file.
+* `src/i18n/translations/<tag>.ts` — one file per language, listed in `src/i18n/languages.ts` and loaded on demand. `translations.test.ts` fails if any language is missing a key or changes a `{{placeholder}}` or HTML tag. When you add or change an English string, update every translation (or ask for help); never leave a translation with English text silently.
 * `site/public/` — static files, including all icons.
 
 ## Adding a tool
@@ -60,7 +61,8 @@ An offline PWA toolbox (flashlight, compass, level, timers, and more). TypeScrip
 * Use the CSS variables from `site/index.html` (`--bg`, `--surface`, `--fg`, `--fg-muted`, `--accent`, `--border`, `--space-1..5`, `--radius-s/m/l`, and so on). Dark mode is pure black for OLED screens.
 * Icons: 24×24 viewBox, `fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"`, no hard-coded colors, so they follow the theme.
 * Every screen must work in portrait, landscape, light, and dark.
-* All user-visible text goes through i18n.
+* All user-visible text goes through i18n, including unit symbols (`unit.*`), compass points (`direction.*`), and AM/PM. Format dates with `Intl` and `I18nService.locale()`, not `navigator.language`, so they follow the language picked in the app.
+* Arabic is right to left. Use logical CSS (`margin-inline-start`, `text-align: start`) for anything that follows reading direction; keep physical `left`/`right` for geometry such as centering and gauges.
 
 ## Testing in a browser
 

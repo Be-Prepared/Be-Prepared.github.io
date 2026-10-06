@@ -59,7 +59,7 @@ export class SunMoonAppComponent {
     private _directionService = di(DirectionService);
     private _geolocationService = di(GeolocationService);
     private _i18nService = di(I18nService);
-    private _language = navigator.language || 'en-US';
+    private _language = di(I18nService).locale();
     private _preferenceService = di(PreferenceService);
     private _referenceLocationService = di(ReferenceLocationService);
     private _report: SkyReport | null = null;
@@ -739,7 +739,7 @@ component(
                 background: none;
                 color: inherit;
                 font: inherit;
-                text-align: left;
+                text-align: start;
                 cursor: pointer;
             }
 
@@ -782,7 +782,7 @@ component(
                 align-items: center;
                 gap: var(--space-1) var(--space-3);
                 color: var(--fg-muted);
-                padding-left: calc(1.6rem + var(--space-2));
+                padding-inline-start: calc(1.6rem + var(--space-2));
             }
 
             .clock {
@@ -924,11 +924,11 @@ component(
                 border-radius: 3px;
                 border: 1px solid var(--border);
                 vertical-align: -0.05rem;
-                margin-right: 0.35rem;
+                margin-inline-end: 0.35rem;
             }
 
             .state .swatch {
-                margin-right: 0;
+                margin-inline-end: 0;
             }
 
             .band-night {
@@ -1021,7 +1021,7 @@ component(
             }
 
             .fact-value {
-                text-align: right;
+                text-align: end;
                 font-weight: 600;
                 font-variant-numeric: tabular-nums;
             }
@@ -1040,7 +1040,7 @@ component(
             th,
             td {
                 padding: 0.35rem 0;
-                text-align: right;
+                text-align: end;
                 border-top: 1px solid var(--border);
             }
 
@@ -1053,15 +1053,15 @@ component(
             }
 
             tbody th {
-                text-align: left;
+                text-align: start;
                 font-weight: 400;
                 color: var(--fg-muted);
-                padding-right: var(--space-2);
+                padding-inline-end: var(--space-2);
             }
 
             td {
                 white-space: nowrap;
-                padding-left: var(--space-2);
+                padding-inline-start: var(--space-2);
             }
 
             .row-label {
@@ -1079,11 +1079,11 @@ component(
             }
 
             .sun-table td {
-                padding-left: 0.375rem;
+                padding-inline-start: 0.375rem;
             }
 
             .sun-table tbody th {
-                padding-right: var(--space-1);
+                padding-inline-end: var(--space-1);
             }
 
             .position td {

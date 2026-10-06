@@ -18,6 +18,8 @@ import {
 } from './ruler';
 import { calibrationStorage } from './ruler-storage';
 import { component, css, html } from 'fudgel';
+import { di } from '../di';
+import { I18nService } from '../i18n/i18n.service';
 
 // Tick lengths in CSS pixels, longest first.
 const METRIC_TICKS = [30, 21, 13];
@@ -40,6 +42,7 @@ function guessPxPerMm() {
 export class RulerAppComponent {
     private _darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
     private _frame: ReturnType<typeof requestAnimationFrame> | null = null;
+    private _i18nService = di(I18nService);
     private _lengthPx = 0;
     private _markerPx: number | null = null;
     private _portrait = true;
@@ -198,8 +201,8 @@ export class RulerAppComponent {
             this._placeCardHint(pxPerMm);
         }
 
-        this._drawScale(context, METRIC, METRIC_TICKS, false, 'cm', pxPerMm, ratio, fg, muted);
-        this._drawScale(context, IMPERIAL, IMPERIAL_TICKS, true, 'in', pxPerMm, ratio, fg, muted);
+        this._drawScale(context, METRIC, METRIC_TICKS, false, this._i18nService.get('unit.cm'), pxPerMm, ratio, fg, muted);
+        this._drawScale(context, IMPERIAL, IMPERIAL_TICKS, true, this._i18nService.get('unit.in'), pxPerMm, ratio, fg, muted);
 
         if (!this.calibrating && this._markerPx !== null) {
             this._drawMarker(context, this._markerPx, ratio, accent);

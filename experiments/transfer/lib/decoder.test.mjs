@@ -94,3 +94,21 @@ test('elimination solves what peeling cannot', () => {
     assert.equal(decodable(equations, 3, 3, 'peel').ok, false);
     assert.equal(decodable(equations, 3, 3, 'peel+ge').ok, true);
 });
+
+import { decodableByInactivation } from './decoder.mjs';
+
+test('inactivation decoding succeeds exactly when the matrix has full rank', () => {
+    const rng = mulberry32(99);
+
+    for (let trial = 0; trial < 1000; trial += 1) {
+        const k = 2 + Math.floor(rng() * 30);
+        const n = k + Math.floor(rng() * k);
+        const equations = randomSystem(rng, k, n, 1 + Math.floor(rng() * 8));
+        const expected = fullRank(equations, k) === k;
+        assert.equal(
+            decodableByInactivation(equations, n, k).ok,
+            expected,
+            `trial ${trial} k=${k} n=${n}`
+        );
+    }
+});

@@ -17,8 +17,9 @@ const startApp = () => {
     }
 
     started = true;
-    bootstrap();
-    document.body.append(document.createElement('app-root'));
+    bootstrap().then(() =>
+        document.body.append(document.createElement('app-root'))
+    );
 };
 
 // Enable Eruda (a developer console) when "eruda" is in the URL or flagged via

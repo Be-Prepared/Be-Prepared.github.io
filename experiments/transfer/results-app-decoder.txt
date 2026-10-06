@@ -1,0 +1,20 @@
+block 450 bytes, 50% of frames lost, 10 runs
+
+| k | file size | received ÷ k mean / worst | CPU ms while receiving, mean / worst | slowest frame ms | finishing ms mean / worst |
+|---:|---:|---:|---:|---:|---:|
+| 1000 | 0.4 MB | 1.0038 / 1.0060 | 37 / 148 | 31 | 24 / 37 |
+| 5000 | 2.1 MB | 1.0028 / 1.0060 | 248 / 385 | 117 | 346 / 512 |
+| 10000 | 4.3 MB | 1.0020 / 1.0020 | 907 / 1061 | 429 | 1466 / 1711 |
+
+block 450 bytes, 90% of frames lost, 10 runs
+
+| k | file size | received ÷ k mean / worst | CPU ms while receiving, mean / worst | slowest frame ms | finishing ms mean / worst |
+|---:|---:|---:|---:|---:|---:|
+| 1000 | 0.4 MB | 1.0044 / 1.0080 | 23 / 49 | 18 | 18 / 32 |
+| 5000 | 2.1 MB | 1.0020 / 1.0020 | 201 / 276 | 147 | 316 / 432 |
+
+block 1400 bytes, 25% of frames lost, 10 runs
+
+| k | file size | received ÷ k mean / worst | CPU ms while receiving, mean / worst | slowest frame ms | finishing ms mean / worst |
+|---:|---:|---:|---:|---:|---:|
+| 2000 | 2.7 MB | 1.0024 / 1.0040 | 58 / 119 | 47 | 114 / 181 |

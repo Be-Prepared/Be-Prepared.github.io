@@ -95,7 +95,7 @@ component('location-field', {
 
         .field-label-wrapper {
             display: inline-block;
-            padding-right: 0.4em;
+            padding-inline-end: 0.4em;
         }
 
         .field-value-wrapper {

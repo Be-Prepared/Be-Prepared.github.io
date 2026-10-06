@@ -103,8 +103,8 @@ component('nfc-record', {
 
         .children {
             margin: var(--space-1) 0 0 var(--space-2);
-            padding-left: var(--space-3);
-            border-left: 3px solid var(--accent-soft);
+            padding-inline-start: var(--space-3);
+            border-inline-start: 3px solid var(--accent-soft);
         }
     `,
     template: html`

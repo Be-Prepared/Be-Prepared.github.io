@@ -1,0 +1,20 @@
+k=10000 runs=20 seed=2026
+
+### Seeded robust soliton, peel+GE
+
+| Channel | received ÷ k mean / worst | shown ÷ k mean / p99 / worst | ideal shown ÷ k | inactivated mean / worst |
+|---|---:|---:|---:|---:|
+| perfect | 1.001 / 1.002 | 1.001 / 1.002 / 1.002 | 1.000 | 201 / 232 |
+| iid:0.5 | 1.001 / 1.002 | 2.004 / 2.027 / 2.027 | 2.000 | 198 / 250 |
+| iid:0.9 | 1.001 / 1.002 | 10.021 / 10.237 / 10.237 | 10.000 | 193 / 216 |
+| late:10:0.5 | 1.001 / 1.002 | 12.004 / 12.027 / 12.027 | 12.000 | 194 / 228 |
+
+### Seeded robust soliton + 2% dense frames, peel+GE
+
+| Channel | received ÷ k mean / worst | shown ÷ k mean / p99 / worst | ideal shown ÷ k | inactivated mean / worst |
+|---|---:|---:|---:|---:|
+| perfect | 1.001 / 1.001 | 1.001 / 1.001 / 1.001 | 1.000 | 364 / 400 |
+| iid:0.5 | 1.001 / 1.001 | 2.004 / 2.027 / 2.027 | 2.000 | 355 / 391 |
+| iid:0.9 | 1.000 / 1.001 | 10.018 / 10.236 / 10.236 | 10.000 | 361 / 406 |
+| late:10:0.5 | 1.000 / 1.001 | 12.004 / 12.027 / 12.027 | 12.000 | 369 / 413 |
+

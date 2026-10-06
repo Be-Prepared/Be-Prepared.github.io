@@ -1,34 +1,22 @@
 import { component, css, html } from 'fudgel';
-import {
-    appendFileHeaderMetaToBuffer,
-    blockToBinary,
-    createEncoder,
-    LtEncoder,
-} from 'luby-transform';
-import { fromUint8Array } from 'js-base64';
+import { crc32, encodeFrame, packFile, splitBlocks } from './frame-format';
+import { FountainEncoder } from './fountain';
 
+// Shows the file as an endless stream of QR codes. Every frame combines a
+// random set of blocks, chosen by a random seed, so the receiver can start
+// watching at any time and miss any frames. See fountain.ts.
 export class FileTransferSendAppComponent {
-    _encoder: LtEncoder | null = null;
-    _probabilities: number[] = [1];
-    _timeout: ReturnType<typeof setTimeout> | null = null;
-    contentType = '';
+    private _checksum = 0;
+    private _encoder: FountainEncoder | null = null;
+    private _length = 0;
+    private _timeout: ReturnType<typeof setTimeout> | null = null;
     fileLoaded = false;
-    filename = '';
     fileSelected = false;
     fps = 10;
     qrContent = '';
-    size = 300;
-    degreeDistribution = [
-        [0.094470, 1],
-        [0.387097, 2],
-        [0.592166, 3],
-        [0.735023, 4],
-        [0.741935, 6],
-        [0.746543, 10],
-        [0.762672, 14],
-        [0.967741, 15],
-        [1.0, 16],
-    ];
+    // Bytes of the file per QR code. 450 makes about a version 15 code.
+    // Version 40, the largest, holds up to 2817.
+    size = 450;
 
     onDestroy() {
         if (this._timeout) {
@@ -47,15 +35,14 @@ export class FileTransferSendAppComponent {
 
         const file = files[0];
         this.fileSelected = true;
-        this.filename = file.name;
-        this.contentType = file.type;
-        const buffer = await file.arrayBuffer();
-        const data = appendFileHeaderMetaToBuffer(new Uint8Array(buffer), {
-            filename: this.filename,
-            contentType: this.contentType,
+        const container = await packFile(new Uint8Array(await file.arrayBuffer()), {
+            contentType: file.type,
+            filename: file.name,
         });
+        this._checksum = crc32(container);
+        this._length = container.length;
+        this._encoder = new FountainEncoder(splitBlocks(container, this.size));
         this.fileLoaded = true;
-        this._encoder = createEncoder(data, this.size);
         this._encode();
     }
 
@@ -65,69 +52,18 @@ export class FileTransferSendAppComponent {
 
     private _encode() {
         const startTime = Date.now();
-        const degree = this._getDegree(this._encoder!.k);
-        const indices = this._getIndices(this._encoder!.k, degree);
-
-        // Build a block from the indices.
-        const block = this._encoder!.createBlock(indices);
-
-        // Convert the block to numbers.
-        // 4 bytes for number of indices
-        // 4n bytes for indices (4 bytes per index).
-        // 4 bytes for the total number of blocks.
-        // 4 bytes for the number of bytes in the payload
-        // 4 bytes for a checksum of the whole file.
-        // So, the maximum is 16 indices in this implementation, which
-        // means 4 + 4*16 + 4 + 4 + 4 bytes (80 bytes) max for block header,
-        // leaving 2110 (max) bytes for the block data and the UI allows blocks
-        // up to 2100 bytes in case the URL need a minor change.
-        const binary = blockToBinary(block);
-
-        // Base64 encoding changes 3 bytes to 4 characters
-        // 2190 bytes will fit into 2921 characters.
-        const base64 = fromUint8Array(binary);
-
-        // Max size for QR code content is 2953 bytes
-        // URL prefix is 32 bytes. 2921 bytes remain for content.
-        this.qrContent = `https://be-prepared.github.io/r#${base64}`;
-        const endTime = Date.now();
+        const seed = crypto.getRandomValues(new Uint32Array(1))[0];
+        this.qrContent = encodeFrame({
+            block: this._encoder!.frame(seed),
+            checksum: this._checksum,
+            length: this._length,
+            seed,
+        });
         const desiredDuration = 1000 / this.fps;
         this._timeout = setTimeout(
             () => this._encode(),
-            Math.max(10, desiredDuration - (endTime - startTime))
+            Math.max(10, desiredDuration - (Date.now() - startTime))
         );
-    }
-
-    /**
-     * This returns the number of source blocks to combine into
-     * an encoded block.
-     *
-     * See README.md for details about the distribution.
-     */
-    private _getDegree(k: number) {
-        const r = Math.random();
-
-        for (const [cumulativeProbability, degree] of this.degreeDistribution) {
-            if (r < cumulativeProbability) {
-                return Math.min(degree, k);
-            }
-        }
-
-        // Fallback, should not happen.
-        return 1;
-    }
-
-    // In practice, forcing a specific index to get picked for each block
-    // doesn't seem to have a positive or negative effect when some blocks are
-    // lost during transmission.
-    private _getIndices(k: number, degree: number) {
-        const indices = new Set<number>();
-
-        while (indices.size < degree) {
-            indices.add(Math.floor(Math.random() * k));
-        }
-
-        return Array.from(indices);
     }
 }
 
@@ -205,7 +141,7 @@ component('file-transfer-send-app', {
                     <input
                         type="range"
                         min="100"
-                        max="2100"
+                        max="2800"
                         step="50"
                         value="{{size}}"
                         @change.stop.prevent="sizeChange($event.target.value)"

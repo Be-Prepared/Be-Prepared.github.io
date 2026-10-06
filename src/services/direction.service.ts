@@ -1,3 +1,6 @@
+import { di } from '../di';
+import { I18nService } from '../i18n/i18n.service';
+
 export class DirectionService {
     // Measured from north to west, so 0 is north, Math.PI / 2 is west.
     radiansToDegreesNW(azimuth: number): number {
@@ -101,5 +104,10 @@ export class DirectionService {
             cardinals[((Math.round((direction * n) / 360) % n) * 16) / n];
 
         return cardinal;
+    }
+
+    // The compass point in the person's language, such as "NE" or "СВ".
+    compassPointLabel(direction: number, precision = 2) {
+        return di(I18nService).get(`direction.${this.toCompassPoint(direction, precision)}`);
     }
 }

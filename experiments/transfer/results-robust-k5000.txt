@@ -1,0 +1,44 @@
+k=5000 runs=40 seed=2026
+
+### Today: cap 16, peel
+
+| Channel | received ÷ k mean / worst | shown ÷ k mean / p99 / worst | ideal shown ÷ k | inactivated mean / worst |
+|---|---:|---:|---:|---:|
+| perfect | 1.584 / 2.494 | 1.584 / 2.494 / 2.494 | 1.000 | 0 / 0 |
+| iid:0.5 | 1.566 / 1.951 | 3.135 / 3.927 / 3.927 | 2.000 | 0 / 0 |
+| iid:0.9 | 1.583 / 1.991 | 15.826 / 19.941 / 19.941 | 10.000 | 0 / 0 |
+| late:3:0.25 | 1.658 / 2.162 | 5.209 / 5.866 / 5.866 | 4.333 | 0 / 0 |
+| late:10:0.5 | 1.655 / 2.833 | 13.313 / 15.684 / 15.684 | 12.000 | 0 / 0 |
+| burst:0.5:30 | 1.583 / 2.039 | 3.164 / 4.089 / 4.089 | 2.000 | 0 / 0 |
+
+### Seeded robust soliton, peel+GE
+
+| Channel | received ÷ k mean / worst | shown ÷ k mean / p99 / worst | ideal shown ÷ k | inactivated mean / worst |
+|---|---:|---:|---:|---:|
+| perfect | 1.001 / 1.003 | 1.001 / 1.003 / 1.003 | 1.000 | 122 / 157 |
+| iid:0.5 | 1.002 / 1.027 | 2.005 / 2.047 / 2.047 | 2.000 | 119 / 158 |
+| iid:0.9 | 1.002 / 1.034 | 10.014 / 10.485 / 10.485 | 10.000 | 120 / 149 |
+| late:3:0.25 | 1.001 / 1.005 | 4.336 / 4.360 / 4.360 | 4.333 | 117 / 158 |
+| late:10:0.5 | 1.001 / 1.003 | 12.003 / 12.040 / 12.040 | 12.000 | 120 / 160 |
+| burst:0.5:30 | 1.001 / 1.003 | 2.002 / 2.364 / 2.364 | 2.000 | 122 / 147 |
+
+### Seeded robust soliton + 2% dense frames, peel+GE
+
+| Channel | received ÷ k mean / worst | shown ÷ k mean / p99 / worst | ideal shown ÷ k | inactivated mean / worst |
+|---|---:|---:|---:|---:|
+| perfect | 1.001 / 1.002 | 1.001 / 1.002 / 1.002 | 1.000 | 202 / 225 |
+| iid:0.5 | 1.001 / 1.002 | 2.003 / 2.040 / 2.040 | 2.000 | 199 / 242 |
+| iid:0.9 | 1.001 / 1.002 | 10.000 / 10.395 / 10.395 | 10.000 | 198 / 239 |
+| late:3:0.25 | 1.001 / 1.002 | 4.335 / 4.360 / 4.360 | 4.333 | 198 / 222 |
+| late:10:0.5 | 1.001 / 1.002 | 12.003 / 12.042 / 12.042 | 12.000 | 204 / 234 |
+| burst:0.5:30 | 1.001 / 1.003 | 2.001 / 2.364 / 2.364 | 2.000 | 201 / 249 |
+
+### Systematic + dense repair, peel+GE
+
+| Channel | received ÷ k mean / worst | shown ÷ k mean / p99 / worst | ideal shown ÷ k | inactivated mean / worst |
+|---|---:|---:|---:|---:|
+| perfect | 1.000 / 1.000 | 1.000 / 1.000 / 1.000 | 1.000 | 0 / 0 |
+| iid:0.5 | 1.000 / 1.001 | 2.002 / 2.039 / 2.039 | 2.000 | 2472 / 2538 |
+| iid:0.9 | 1.000 / 1.001 | 9.996 / 10.391 / 10.391 | 10.000 | 4472 / 4511 |
+
+(Stopped here: the systematic strategy inactivates most blocks under loss, so each check is slow at k = 5000. The rows above are complete.)

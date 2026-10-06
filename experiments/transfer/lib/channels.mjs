@@ -25,7 +25,21 @@ export function burst(p, burstLength, rng) {
     };
 }
 
-export function parseChannel(spec, rng) {
+// The receiver starts late: everything shown before `skip` frames is
+// missed, then each frame is lost with probability p. Models aiming the
+// camera minutes after the sender started.
+export function late(skip, p, rng) {
+    let shown = 0;
+
+    return () => {
+        shown += 1;
+
+        return shown > skip && rng() >= p;
+    };
+}
+
+// `k` is needed for late:<multiple of k>:<loss>.
+export function parseChannel(spec, rng, k = 0) {
     const [name, a, b] = spec.split(':');
 
     switch (name) {
@@ -37,6 +51,9 @@ export function parseChannel(spec, rng) {
 
         case 'burst':
             return burst(+a, +b, rng);
+
+        case 'late':
+            return late(Math.round(+a * k), +b, rng);
 
         default:
             throw new Error(`Unknown channel: ${spec}`);

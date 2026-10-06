@@ -110,3 +110,15 @@ export function carouselDense(k, _table, rng, every = 4) {
         return [index];
     };
 }
+
+// Random LT frames, but a small share (`denseShare`) are dense instead.
+// Every frame is still independent and identically distributed, so loss
+// and late starts don't matter. The dense frames close the rare gap where
+// some block never landed in any LT frame, which is what causes the LT
+// worst case. They join the small elimination system at the end.
+export function mixed(k, table, rng, denseShare = 0.02) {
+    return () =>
+        rng() < denseShare
+            ? denseIndices(k, rng)
+            : randomIndices(k, Math.min(k, sampleDegree(table, rng)), rng);
+}

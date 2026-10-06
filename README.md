@@ -83,6 +83,12 @@ What each tool needs is listed after the description. Tools are only hidden from
 * Nothing about permissions is remembered by the app. If you deny one, the tool stays on the home screen, explains how to allow it again in your browser's settings, and offers a "Try Again" button.
 * The camera and microphone are only on while their tool is open. They turn off when you leave the tool or switch away from the app.
 
+## Languages
+
+Be Prepared is available in English, Arabic, Chinese (Simplified), French, German, Indonesian, Japanese, Portuguese, Russian, and Spanish. It uses the first language in your browser's list that it has, and you can pick another on the Info screen. Every language is stored on the phone, so switching works offline.
+
+**Help wanted:** the translations other than English were machine-assisted and haven't been reviewed by native speakers yet. If you spot an awkward or wrong phrase, or want to add a language, please [open an issue](https://github.com/Be-Prepared/Be-Prepared.github.io/issues) or a pull request. Translations are in `src/i18n/translations/`, one file per language, with the English in `src/i18n/en-us.ts` and the `*.i18n.ts` file next to each tool. `npm test` checks that every language has every string with the same `{{placeholders}}` and HTML tags.
+
 ## Limits to know about
 
 A web app can do a lot, but not everything a native app can. Be Prepared tries to be upfront about this in the app itself.
@@ -118,7 +124,7 @@ The Location tool can show many different fields; tap a field to change it. Fiel
 * **Velocity Made Good** (navigation only): How fast you're closing in on the waypoint: your speed times the cosine of the angle between your direction of travel and the waypoint. Negative when moving away.
 * **Vertical Speed:** How fast you're climbing (positive) or descending (negative), from the smoothed altitude. Shown in m/s or ft/min.
 
-**Averaging a location:** Location averaging takes a weighted average of the readings in Earth-centered (ECEF) coordinates. Each reading is weighted by the inverse square of its reported accuracy (treated as a 68% radius, as Android defines it), so a 5 m reading counts four times as much as a 10 m reading. The accuracy shown is a 95% radius for the average itself. If GPS errors were independent it would shrink with the square root of the number of readings, but satellite, atmosphere, and reflection errors drift over many minutes, so a reading every second mostly repeats the same error. The app assumes errors become independent after about 10 minutes and counts an effective 1 + (minutes collected ÷ 10) readings; after an hour that's 7. It also never reports better than the actual scatter of the readings supports. The radius is about 2.45 times the per-axis standard error, which covers 95% for a circular error. Because of this, it's best to collect readings for at least an hour. Each averaging session starts fresh.
+**Averaging a location:** Location averaging first ignores readings that report an accuracy more than three times worse than the median (usually Wi-Fi or cell tower fixes). It then takes a robust (Huber) average of the rest on a flat east/north map around the spot: readings near the middle count fully, and readings that jump far away, as reflections off buildings and trees cause, count less the farther out they are. The accuracy shown is a 95% radius for the average itself. If GPS errors were independent it would shrink with the square root of the number of readings, but reflection and satellite geometry errors drift over many minutes and atmosphere errors over hours, so a reading every second mostly repeats the same error. The app assumes errors become independent after about 20 minutes, counting an effective 1 + (minutes collected ÷ 20) readings (4 after an hour), and assumes 5% of the error never averages away within a session. The size of a single reading's error is the larger of the reported accuracy (treated as a 68% radius, as Android defines it) and the actual scatter of the readings, corrected for the part of the error all of them share. The radius is about 2.45 times the resulting standard error. In simulations of open sky and urban conditions this radius held the true spot 94–98% of the time, where the previous method's held it only 75% of the time in open sky; see `experiments/averaging/README.md`. Expect the radius to keep shrinking for a couple of hours and then level off at about a third of a single reading's reported accuracy. Each averaging session starts fresh.
 
 ### Entering coordinates
 
@@ -137,20 +143,19 @@ Map apps don't agree on how to read a shared location. Notably, iPhones don't op
 | Format | Name included | Best for |
 |---|---|---|
 | Be Prepared link | Yes | Anyone with Be Prepared; adds the waypoint directly. |
-| Apple Maps | Yes | iPhones with iOS 18.4 or newer. |
-| Apple Maps (older iPhones) | Yes | iOS 18.3 and earlier. |
-| Geo link with name | Yes | Android map apps (labeled pin). |
-| Geo link, coordinates only | No | Android map apps and GPS apps. |
-| Google Maps | No | Any phone or computer. |
-| OpenStreetMap | No | Any web browser. |
+| Geo link with name | Yes | Android map apps (labeled pin). Some apps search for the name instead. |
+| Geo link, coordinates only | No | Android GPS and offline map apps that mishandle the name. |
+| Google Maps | No | Any phone or computer with a web browser. |
+| Apple Maps | Yes | iPhones. Other devices open the Apple Maps website. |
 | Decimal coordinates | No | Pasting into any map's search box. |
 | Name and coordinates | Yes | GPS units or reading aloud, in your coordinate format. |
 
 ### File Transfer
 
-* The sender shows an endless stream of QR codes made with [Luby transform codes](https://en.wikipedia.org/wiki/Luby_transform_code). The receiver doesn't need every code, just enough of them, so missed frames don't matter.
-* While receiving, a status like "2/1700 (+ 104) @ 7.98 FPS" means 2 of 1,700 blocks are decoded, and 104 more captured frames will help decode more blocks as pieces arrive. Frame rates are approximate.
-* Compatible with [QRS](https://github.com/qifi-dev/qrs#readme). Be Prepared limits each frame to 16 blocks and uses a different distribution, so transfers finish about 30% faster on average.
+* The sender shows an endless stream of QR codes. Each one mixes a random set of the file's blocks (a [fountain code](https://en.wikipedia.org/wiki/Fountain_code)), so the receiver doesn't need any particular frame, just enough of them: about 0.5% more frames than the file has blocks. That holds whatever the loss: 90% of frames missed, bursts of missed frames, or a receiver that only starts pointing its camera minutes later. Missed frames only cost time. The numbers are in [experiments/transfer](experiments/transfer/README.md).
+* While receiving, a status like "2/1700 (+ 104) @ 7.98 FPS" means 2 of 1,700 blocks are decoded, and 104 captured frames are waiting for more pieces. The last blocks usually all arrive at once. Frame rates are approximate.
+* Larger sizes put more of the file in each QR code. They're faster when the receiving camera can read them, and slower when it can't. Files are compressed when that makes them smaller.
+* Protocol version 2 isn't compatible with the old format or with [QRS](https://github.com/qifi-dev/qrs#readme), so both phones need a current version of Be Prepared.
 
 ### Major cities
 

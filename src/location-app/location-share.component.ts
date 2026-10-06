@@ -170,7 +170,7 @@ component(
                 flex-direction: column;
                 gap: 0.15rem;
                 padding: var(--space-2) var(--space-3);
-                text-align: left;
+                text-align: start;
                 font: inherit;
                 color: inherit;
                 background: var(--surface-2);

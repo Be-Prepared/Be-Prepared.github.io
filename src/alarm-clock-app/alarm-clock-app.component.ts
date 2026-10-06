@@ -62,7 +62,7 @@ export class AlarmClockAppComponent {
     private _clockTimer: ReturnType<typeof setTimeout> | null = null;
     private _editDays: number[] = [];
     private _i18nService = di(I18nService);
-    private _language = navigator.language || 'en-US';
+    private _language = di(I18nService).locale();
     private _order = weekOrder(firstDayOfWeek(this._language));
     private _reminderService = di(ReminderService);
     private _subscription: Subscription | null = null;
@@ -331,7 +331,7 @@ component(
             .suffix {
                 font-size: 1.5rem;
                 font-weight: 600;
-                margin-left: 0.25em;
+                margin-inline-start: 0.25em;
                 color: var(--fg-muted);
             }
 
@@ -375,7 +375,7 @@ component(
                 border: none;
                 color: inherit;
                 font: inherit;
-                text-align: left;
+                text-align: start;
                 padding: 0;
                 cursor: pointer;
                 opacity: 0.55;
@@ -394,7 +394,7 @@ component(
 
             .alarm-time small {
                 font-size: 1rem;
-                margin-left: 0.25em;
+                margin-inline-start: 0.25em;
                 color: var(--fg-muted);
             }
 

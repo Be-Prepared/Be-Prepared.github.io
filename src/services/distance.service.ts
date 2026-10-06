@@ -1,6 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
 import { di } from '../di';
 import { DistanceSystem } from '../datatypes/distance-system';
+import { I18nService } from '../i18n/i18n.service';
 import { PreferenceService } from './preference.service';
 
 export interface DistanceOptions {
@@ -126,6 +127,6 @@ export class DistanceService {
             return `${value}`;
         }
 
-        return `${value} ${label}`;
+        return `${value} ${di(I18nService).get(`unit.${label}`)}`;
     }
 }

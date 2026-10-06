@@ -10,22 +10,19 @@ import {
 import { component, css, html } from 'fudgel';
 import { DetectedBarcodeData } from '../services/barcode-reader/barcode-reader-interface';
 import KalmanFilter from '@bencevans/kalman-filter';
-import {
-    LtDecoder,
-    binaryToBlock,
-    createDecoder,
-    readFileHeaderMetaFromBuffer,
-} from 'luby-transform';
+import { crc32, decodeFrame, FileMeta, joinBlocks, unpackFile } from './frame-format';
+import { FountainDecoder } from './fountain';
 import { ScanLoop } from '../services/barcode-reader/scan-loop';
 import { Subject } from 'rxjs';
 import { di } from '../di';
 import { takeUntil } from 'rxjs/operators';
-import { toUint8Array } from 'js-base64';
 
 export class FileTransferReceiveAppComponent {
     private _barcodeReaderService = di(BarcodeReaderService);
     private _camera = di(CameraService).controller();
-    private _decoder: LtDecoder | null = null;
+    private _blockSize = 0;
+    private _decoder: FountainDecoder | null = null;
+    private _length = 0;
     private _lastValue = '';
     private _scanLoop = new ScanLoop<DetectedBarcodeData>({
         detect: () =>
@@ -42,11 +39,13 @@ export class FileTransferReceiveAppComponent {
     data: Uint8Array | null = null;
     decodedCount = 0;
     encodedCount = 0;
+    failed = false;
+    finishing = false;
     endTime: number | null = null;
     fps: number | null = 0;
     k: number = 0;
     lastFrameTime: number | null = null;
-    meta: any;
+    meta: FileMeta | null = null;
     screenState = AccessState.CHECKING;
     startTime: number | null = null;
     timeFilter: KalmanFilter | null = null;
@@ -138,19 +137,22 @@ export class FileTransferReceiveAppComponent {
         return false;
     }
 
-    private _processBarcode(strData: string) {
-        if (strData.startsWith('http')) {
-            strData = strData.slice(strData.indexOf('#') + 1);
-        }
+    // Returns true once the whole file has arrived.
+    private _processBarcode(text: string) {
+        const frame = decodeFrame(text);
 
-        const binary = toUint8Array(strData);
-        const data = binaryToBlock(binary);
-
-        if (this.checksum !== data.checksum || this.k !== data.k) {
-            // RESET
-            this.checksum = data.checksum;
-            this.k = data.k;
-            this._decoder = createDecoder();
+        if (
+            !this._decoder ||
+            this.checksum !== frame.checksum ||
+            this._length !== frame.length ||
+            this._blockSize !== frame.block.length
+        ) {
+            // A different file, or the same file with another block size.
+            this.checksum = frame.checksum;
+            this._length = frame.length;
+            this._blockSize = frame.block.length;
+            this.k = Math.ceil(frame.length / frame.block.length);
+            this._decoder = new FountainDecoder(this.k);
             this.decodedCount = 0;
             this.encodedCount = 0;
             this.fps = null;
@@ -172,19 +174,50 @@ export class FileTransferReceiveAppComponent {
         }
 
         this.lastFrameTime = Date.now();
-        const success = this._decoder!.addBlock(data);
-        this.decodedCount = this._decoder!.decodedCount;
-        this.encodedCount = this._decoder!.encodedCount;
+        const decoder = this._decoder;
+        const done = decoder.add(frame.seed, frame.block);
+        this.decodedCount = decoder.decodedCount;
+        // Frames held until more blocks are known.
+        this.encodedCount = Math.max(0, decoder.receivedCount - decoder.decodedCount);
 
-        if (success) {
-            const merged = this._decoder!.getDecoded()!;
-            const [data, meta] = readFileHeaderMetaFromBuffer(merged);
-            this.endTime = Date.now();
-            this.data = data;
-            this.meta = meta;
+        if (!done) {
+            return false;
         }
 
-        return success;
+        // Rebuilding a large file can take a few seconds on a slow phone.
+        // Let "Finishing" show first.
+        this.finishing = true;
+        setTimeout(() => this._finish(decoder), 50);
+
+        return true;
+    }
+
+    private _finish(decoder: FountainDecoder) {
+        const container = joinBlocks(decoder.blocks(), this._length);
+
+        if (crc32(container) !== this.checksum) {
+            // A misread frame got through. Start over.
+            this.finishing = false;
+            this._decoder = null;
+            this._camera.request();
+
+            return;
+        }
+
+        unpackFile(container).then(
+            ([data, meta]) => {
+                this.endTime = Date.now();
+                this.finishing = false;
+                this.meta = meta;
+                this.data = data;
+            },
+            // The file arrived but this browser can't unpack it (no
+            // DecompressionStream, so older than about 2023).
+            () => {
+                this.finishing = false;
+                this.failed = true;
+            }
+        );
     }
 }
 
@@ -240,7 +273,13 @@ component('file-transfer-receive-app', {
             @grant.stop.prevent="grant()"
         ></access-screen>
         <default-layout *if="screenState === 'READY' || data">
-            <div *if="!data" class="wrapper">
+            <div *if="failed" class="wrapper">
+                <i18n-label id="fileTransfer.receive.failed"></i18n-label>
+            </div>
+            <div *if="finishing" class="wrapper">
+                <i18n-label id="fileTransfer.receive.finishing"></i18n-label>
+            </div>
+            <div *if="!data && !failed && !finishing" class="wrapper">
                 <div class="qr">
                     <video #ref="video" autoplay muted playsinline></video>
                 </div>

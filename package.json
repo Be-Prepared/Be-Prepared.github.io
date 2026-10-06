@@ -33,15 +33,13 @@
     "dependencies": {
         "@bencevans/kalman-filter": "^1.0.0",
         "@lit-labs/rollup-plugin-minify-html-literals": "^0.2.0",
-        "@tofandel/qrcode-svg": "^1.2.0",
         "@types/ecef-projector": "^1.0.2",
         "@types/suncalc": "^1.9.2",
         "@types/w3c-generic-sensor": "^1.0.10",
         "@undecaf/zbar-wasm": "^0.11.0",
         "cheap-ruler": "^4.1.0",
         "ecef-projector": "^1.0.1",
-        "js-base64": "^3.9.1",
-        "luby-transform": "^0.2.0",
+        "qrcode-generator": "^2.0.4",
         "suncalc": "^2.0.1",
         "usng.js": "^0.4.5"
     }

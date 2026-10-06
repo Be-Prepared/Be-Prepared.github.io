@@ -71,7 +71,7 @@ component(
             }
 
             .value {
-                text-align: right;
+                text-align: end;
                 font-weight: 600;
             }
 

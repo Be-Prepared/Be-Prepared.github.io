@@ -305,7 +305,7 @@ component(
                 font-size: 1.6rem;
                 font-weight: 700;
                 font-variant-numeric: tabular-nums;
-                text-align: right;
+                text-align: end;
             }
 
             .is-level .value,

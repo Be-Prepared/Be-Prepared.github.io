@@ -105,7 +105,7 @@ export class CompassAppComponent {
             Math.round(update.bearing)
         );
         this.degrees = `${rounded}°`;
-        this.compassPoint = this._directionService.toCompassPoint(rounded, 2);
+        this.compassPoint = this._directionService.compassPointLabel(rounded, 2);
 
         // Track total rotation instead of jumping from 359 to 0, so the rose
         // never spins the long way around.
@@ -208,7 +208,7 @@ component(
                 border-radius: var(--radius-m);
                 background: var(--warning-bg);
                 border: 1px solid var(--warning);
-                text-align: left;
+                text-align: start;
                 font-size: 0.95rem;
             }
 

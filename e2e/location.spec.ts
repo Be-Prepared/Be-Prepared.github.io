@@ -36,7 +36,7 @@ test('share sheet offers links that keep the coordinates', async ({ page }) => {
     const content = page.locator('location-share .content');
     await expect(content).toContainText('location-add?lat=38.8894838&lon=-77.0352791');
 
-    await page.getByRole('radio', { name: /^Apple Maps Pin/ }).click();
+    await page.getByRole('radio', { name: /^Apple Maps/ }).click();
     await expect(content).toHaveText(
         'https://maps.apple.com/place?coordinate=38.8894838,-77.0352791&name=Washington%20Monument'
     );

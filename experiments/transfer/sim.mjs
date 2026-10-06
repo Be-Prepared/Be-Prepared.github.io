@@ -71,7 +71,7 @@ function table(dist) {
 function stream(strategy, channelSpec, runSeed) {
     const rng = mulberry32(runSeed);
     const nextFrame = encoders[strategy.encoder](k, table(strategy.dist), rng);
-    const channel = parseChannel(channelSpec, mulberry32(runSeed ^ 0x5bd1e995));
+    const channel = parseChannel(channelSpec, mulberry32(runSeed ^ 0x5bd1e995), k);
     const received = [];
     const shownAt = [];
     let shown = 0;
