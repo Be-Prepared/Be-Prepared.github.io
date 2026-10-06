@@ -20,6 +20,8 @@
 const SOLITON_C = 0.03;
 const SOLITON_DELTA = 0.5;
 export const DENSE_SHARE = 0.02;
+// Share of all blocks in each dense frame.
+export const DENSE_DENSITY = 0.5;
 
 // Small, fast, and identical everywhere. Not for cryptography.
 export function mulberry32(seed: number) {
@@ -59,7 +61,7 @@ export function robustSoliton(k: number) {
 }
 
 // Builds the function that turns a seed into the source block indices.
-export function frameIndexer(k: number) {
+export function frameIndexer(k: number, density = DENSE_DENSITY) {
     const cumulative = robustSoliton(k);
 
     return (seed: number): number[] => {
@@ -69,7 +71,7 @@ export function frameIndexer(k: number) {
             const indices: number[] = [];
 
             for (let i = 0; i < k; i += 1) {
-                if (rng() < 0.5) {
+                if (rng() < density) {
                     indices.push(i);
                 }
             }
@@ -134,10 +136,10 @@ export class FountainEncoder {
     private _blocks: Uint8Array[];
     private _indexer: (seed: number) => number[];
 
-    constructor(blocks: Uint8Array[]) {
+    constructor(blocks: Uint8Array[], density = DENSE_DENSITY) {
         this.k = blocks.length;
         this._blocks = blocks;
-        this._indexer = frameIndexer(this.k);
+        this._indexer = frameIndexer(this.k, density);
     }
 
     frame(seed: number) {
@@ -173,9 +175,9 @@ export class FountainDecoder {
     private _values: (Uint8Array | null)[];
     private _waiting: number[][];
 
-    constructor(k: number) {
+    constructor(k: number, density = DENSE_DENSITY) {
         this.k = k;
-        this._indexer = frameIndexer(k);
+        this._indexer = frameIndexer(k, density);
         this._values = new Array(k).fill(null);
         this._waiting = Array.from({ length: k }, () => []);
     }

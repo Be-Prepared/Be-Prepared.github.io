@@ -16,6 +16,7 @@ node sim.mjs --k=1000 --runs=40                # coding strategies vs. loss
 node sim.mjs --k=5000 --runs=12                # slower; closer to a 1.5 MB file
 node robust.mjs --k=1000 --runs=200            # heavy loss, late starts, bursts
 node robust.mjs --k=5000 --runs=40 --strategies=app,seeded,mixed
+node robust.mjs --k=10000 --runs=200 --channels=iid:0.95 --densities=0.2,0.35,0.5
 node --import tsx app-decoder.mjs --k=1000,5000 --runs=10   # the app's decoder, real data
 node capacity.mjs --fps=10 --file=1048576      # bytes per frame and time per MB
 node optical.mjs --runs=12                     # QR decode rates under blur
@@ -87,6 +88,24 @@ Larger files, seeded + 2% dense, frames received ÷ k (mean / worst; blocks inac
 | 10,000 (4.3 MB), 20 runs | 1.001 / 1.001 | 1.001 / 1.001 | 1.000 / 1.001 | 1.000 / 1.001 | about 360 |
 
 Today's format at k = 5000 needs 1.58 × k on average and up to 2.83 × k (`results-robust-k5000.txt`).
+
+### 1b. How dense should the dense frames be?
+
+Dense frames hold a random half of all blocks. Fewer would be cheaper to build, so `robust.mjs --densities=...` tried 20% to 60% in steps of 5%, with 10,000 blocks, 95% of frames lost, and 200 runs each (`results-density-k10000.txt`):
+
+| Dense frame holds | Extra frames beyond k: mean / p99 / worst |
+|---:|---:|
+| 20% | 4.2 / 19 / 21 |
+| 25% | 4.1 / 14 / 17 |
+| 30% | 4.2 / 13 / 17 |
+| 35% | 4.2 / 15 / 19 |
+| 40% | 4.1 / 16 / 18 |
+| 45% | 4.3 / 19 / 20 |
+| 50% (app) | 4.3 / 14 / 19 |
+| 55% | 4.3 / 13 / 18 |
+| 60% | 3.9 / 14 / 17 |
+
+They're all the same within noise: about 4 extra frames for 10,000 blocks (1.0004 × k), and at most about 21 (1.002). With thousands of blocks, even a 20% frame is random enough that each one fixes a missing piece about as surely as a 50% frame. A fully dense code averages about 1.6 extra frames, so this design is already within about 3 frames of the best possible; the small remainder comes from the sparse frames that keep decoding cheap. The app keeps 50%.
 
 ### 2. The app's decoder on real data
 

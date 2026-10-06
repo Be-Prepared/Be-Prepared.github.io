@@ -19,8 +19,9 @@ const ks = (options.k || '1000,5000,10000').split(',').map(Number);
 const runs = +(options.runs || 10);
 const blockSize = +(options.block || 450);
 const loss = +(options.loss || 0.5);
+const density = options.density ? +options.density : undefined;
 
-console.log(`block ${blockSize} bytes, ${Math.round(loss * 100)}% of frames lost, ${runs} runs\n`);
+console.log(`dense frames hold ${Math.round((density ?? 0.5) * 100)}% of blocks, block ${blockSize} bytes, ${Math.round(loss * 100)}% of frames lost, ${runs} runs\n`);
 console.log('| k | file size | received ÷ k mean / worst | CPU ms while receiving, mean / worst | slowest frame ms | finishing ms mean / worst |');
 console.log('|---:|---:|---:|---:|---:|---:|');
 
@@ -41,8 +42,8 @@ for (const k of ks) {
 
             return block;
         });
-        const encoder = new FountainEncoder(blocks);
-        const decoder = new FountainDecoder(k);
+        const encoder = new FountainEncoder(blocks, density);
+        const decoder = new FountainDecoder(k, density);
         let total = 0;
 
         for (;;) {

@@ -82,7 +82,17 @@ const ALL = {
     },
     dense: { name: 'Dense (random linear), GE', encoder: 'dense', table: () => null, decoder: 'peel+ge' },
 };
-const strategies = (
+// --densities=0.2,0.25 compares dense frames holding 20%, 25%, ... of all
+// blocks (2% of frames dense, as in the app).
+const densityStrategies = options.densities
+    ? options.densities.split(',').map((d) => ({
+          name: `Seeded + 2% dense frames, each holding ${Math.round(+d * 100)}% of blocks`,
+          encoder: (k, table, rng) => baseEncoders.mixed(k, table, rng, 0.02, +d),
+          table: () => distributions.robustSoliton(k, 0.03, 0.5),
+          decoder: 'peel+ge',
+      }))
+    : null;
+const strategies = densityStrategies || (
     options.strategies || (k <= 2000 ? Object.keys(ALL).join(',') : 'app,seeded,seeded-wide,mixed,mixed-5,systematic-dense')
 )
     .split(',')
@@ -90,7 +100,8 @@ const strategies = (
 
 function run(strategy, channelSpec, runSeed) {
     const rng = mulberry32(runSeed);
-    const nextFrame = encoders[strategy.encoder](k, strategy.table(), rng);
+    const encoder = typeof strategy.encoder === 'function' ? strategy.encoder : encoders[strategy.encoder];
+    const nextFrame = encoder(k, strategy.table(), rng);
     const channel = parseChannel(channelSpec, mulberry32(runSeed ^ 0x5bd1e995), k);
     const received = [];
     const shownAt = [];
@@ -164,8 +175,8 @@ console.log(`k=${k} runs=${runs} seed=${seed}\n`);
 
 for (const strategy of strategies) {
     console.log(`### ${strategy.name}\n`);
-    console.log('| Channel | received ÷ k mean / worst | shown ÷ k mean / p99 / worst | ideal shown ÷ k | inactivated mean / worst |');
-    console.log('|---|---:|---:|---:|---:|');
+    console.log('| Channel | received ÷ k mean / worst | extra frames mean / p99 / worst | shown ÷ k mean / p99 / worst | ideal shown ÷ k | inactivated mean / worst |');
+    console.log('|---|---:|---:|---:|---:|---:|');
 
     for (const channel of channels) {
         const results = [];
@@ -178,12 +189,13 @@ for (const strategy of strategies) {
         const received = stats(results.map((r) => r.received / k));
         const shown = stats(results.map((r) => r.shown / k));
         const inactive = stats(results.map((r) => r.inactive));
+        const extra = stats(results.map((r) => r.received - k));
         const [name, a, b] = channel.split(':');
         const loss = name === 'perfect' ? 0 : name === 'late' ? +b : +a;
         const ideal = (name === 'late' ? +a : 0) + 1 / (1 - loss);
 
         console.log(
-            `| ${channel} | ${f(received.mean)} / ${f(received.max)} | ${f(shown.mean)} / ${f(shown.p99)} / ${f(shown.max)} | ${f(ideal)} | ${Math.round(inactive.mean)} / ${inactive.max} |`
+            `| ${channel} | ${f(received.mean)} / ${f(received.max)} | ${extra.mean.toFixed(1)} / ${extra.p99} / ${extra.max} | ${f(shown.mean)} / ${f(shown.p99)} / ${f(shown.max)} | ${f(ideal)} | ${Math.round(inactive.mean)} / ${inactive.max} |`
         );
     }
 

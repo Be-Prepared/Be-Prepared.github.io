@@ -60,11 +60,11 @@ export function systematicInterleaved(k, table, rng) {
 // (the indices come from a seed, not a list in the header). Any k + a few
 // of these are almost certainly enough with Gaussian elimination, no matter
 // which ones were lost.
-function denseIndices(k, rng) {
+function denseIndices(k, rng, density = 0.5) {
     const indices = [];
 
     for (let i = 0; i < k; i += 1) {
-        if (rng() < 0.5) {
+        if (rng() < density) {
             indices.push(i);
         }
     }
@@ -116,9 +116,10 @@ export function carouselDense(k, _table, rng, every = 4) {
 // and late starts don't matter. The dense frames close the rare gap where
 // some block never landed in any LT frame, which is what causes the LT
 // worst case. They join the small elimination system at the end.
-export function mixed(k, table, rng, denseShare = 0.02) {
+// `density` is the share of all blocks in each dense frame.
+export function mixed(k, table, rng, denseShare = 0.02, density = 0.5) {
     return () =>
         rng() < denseShare
-            ? denseIndices(k, rng)
+            ? denseIndices(k, rng, density)
             : randomIndices(k, Math.min(k, sampleDegree(table, rng)), rng);
 }
