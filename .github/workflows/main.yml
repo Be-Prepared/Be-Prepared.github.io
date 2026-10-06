@@ -63,7 +63,12 @@ jobs:
               # Firefox refuses to run when HOME belongs to another user.
               env:
                   HOME: /root
-              run: npx playwright test
+              # The container's user doesn't own the checkout, so git
+              # refuses to read it until told it's safe. The build needs
+              # git to stamp the commit into the app.
+              run: |
+                  git config --global --add safe.directory "$GITHUB_WORKSPACE"
+                  npx playwright test
 
             - name: Keep the report when something fails 📋
               if: failure()
