@@ -21,6 +21,36 @@ component(
         style: css`
             :host {
                 display: block;
+                /* Long presses rearrange tiles; don't select text or show
+                   the system's link menu. */
+                user-select: none;
+                -webkit-user-select: none;
+                -webkit-touch-callout: none;
+            }
+
+            /* While its tile is being dragged, the original spot stays in
+               the grid as an empty outline so nothing else moves. */
+            :host(.placeholder) button {
+                background: transparent;
+                border: 2px dashed var(--border);
+                box-shadow: none;
+            }
+
+            :host(.placeholder) button > * {
+                visibility: hidden;
+            }
+
+            /* Where the dragged tile will go. */
+            :host(.drop-target) button {
+                border-color: var(--accent);
+                box-shadow: 0 0 0 3px var(--accent-soft);
+            }
+
+            /* The copy that follows the finger. */
+            :host(.drag-ghost) button {
+                border-color: var(--accent);
+                box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+                opacity: 0.95;
             }
 
             button {

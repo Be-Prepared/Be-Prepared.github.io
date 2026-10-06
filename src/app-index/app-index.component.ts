@@ -1,11 +1,15 @@
-import { component, css, html } from 'fudgel';
+import { Controller, component, css, html, metadata } from 'fudgel';
 import { di } from '../di';
+import { moveItem } from './tile-order';
 import { Subscription } from 'rxjs';
 import { TileDefResolved, TileService } from '../services/tile.service';
+import { TileDrag } from './tile-drag';
 
 export class AppIndex {
+    private _drag: TileDrag | null = null;
     private _subscription?: Subscription;
     private _tileService = di(TileService);
+    grid?: HTMLElement;
     tiles?: TileDefResolved[];
 
     constructor() {
@@ -14,10 +18,35 @@ export class AppIndex {
             .subscribe((tiles) => (this.tiles = tiles));
     }
 
+    onViewInit() {
+        const host = (this as Controller)[metadata]?.host;
+
+        if (this.grid && host) {
+            // Long-press a tile and drag it to rearrange the home screen.
+            this._drag = new TileDrag({
+                container: this.grid,
+                itemSelector: 'app-index-tile',
+                scroller: host,
+                onDrop: (from, to) => this._move(from, to),
+            });
+        }
+    }
+
     onDestroy() {
+        this._drag?.destroy();
+
         if (this._subscription) {
             this._subscription.unsubscribe();
         }
+    }
+
+    private _move(from: number, to: number) {
+        if (!this.tiles) {
+            return;
+        }
+
+        const ids = this.tiles.map((tile) => tile.id);
+        this._tileService.setVisibleOrder(moveItem(ids, from, to));
     }
 }
 
@@ -75,7 +104,8 @@ component(
                     <load-svg class="logo" href="/toolbox.svg"></load-svg>
                     <h1><i18n-label id="app.title" ws=""></i18n-label></h1>
                 </header>
-                <div class="grid">
+                <browser-notice></browser-notice>
+                <div class="grid" #ref="grid">
                     <app-index-tile
                         *for="tile of tiles"
                         id="{{tile.id}}"

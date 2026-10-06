@@ -1,3 +1,9 @@
+import {
+    BARCODE_ENGINES,
+    BarcodeEngine,
+    BarcodeEngineDefault,
+} from '../services/barcode-reader/engine-selection';
+import { BarcodeReaderService } from '../services/barcode-reader.service';
 import { component, css, html } from 'fudgel';
 import {
     CoordinateService,
@@ -20,14 +26,19 @@ import {
     TimeSystemDefault,
 } from '../services/time.service';
 import { TimeSystem } from '../datatypes/time-system';
+import { TileService } from '../services/tile.service';
 import { ToastService } from '../services/toast.service';
 
 export class InfoPreferencesComponent {
+    private _barcodeReaderService = di(BarcodeReaderService);
     private _coordinateService = di(CoordinateService);
     private _distanceService = di(DistanceService);
     private _subject = new Subject();
     private _timeService = di(TimeService);
+    private _tileService = di(TileService);
     private _toastService = di(ToastService);
+    barcodeEngine: BarcodeEngine = BarcodeEngineDefault;
+    barcodeEngines = BARCODE_ENGINES;
     coordinateSystem: CoordinateSystem = CoordinateSystemDefault;
     coordinateSystems = COORDINATE_SYSTEMS;
     distanceSystem: DistanceSystem = DistanceSystemDefault;
@@ -36,6 +47,12 @@ export class InfoPreferencesComponent {
     timeSystems = TIME_SYSTEMS;
 
     onInit() {
+        this._barcodeReaderService
+            .getPreference()
+            .pipe(takeUntil(this._subject))
+            .subscribe((value) => {
+                this.barcodeEngine = value;
+            });
         this._coordinateService
             .getCurrentSetting()
             .pipe(takeUntil(this._subject))
@@ -61,6 +78,10 @@ export class InfoPreferencesComponent {
         this._subject.complete();
     }
 
+    changeBarcodeEngine(value: BarcodeEngine) {
+        this._barcodeReaderService.setPreference(value);
+    }
+
     changeCoordinateSystem(value: CoordinateSystem) {
         this._coordinateService.setCoordinateSystem(value);
     }
@@ -76,6 +97,9 @@ export class InfoPreferencesComponent {
     reset() {
         this._coordinateService.reset();
         this._distanceService.reset();
+        this._timeService.reset();
+        this._barcodeReaderService.setPreference(BarcodeEngineDefault);
+        this._tileService.resetOrder();
         this._toastService.popI18n('info.preferences.resetComplete');
     }
 }
@@ -110,6 +134,15 @@ component('info-preferences', {
                     value="{{timeSystem}}"
                     .options="timeSystems"
                     @change="changeTimeSystem($event.detail)"
+                ></pretty-select>
+            </li>
+            <li>
+                <i18n-label id="info.barcodeEngine"></i18n-label>
+                <pretty-select
+                    i18n-base="barcodeReader.engine"
+                    value="{{barcodeEngine}}"
+                    .options="barcodeEngines"
+                    @change="changeBarcodeEngine($event.detail)"
                 ></pretty-select>
             </li>
             <li>

@@ -23,6 +23,19 @@ export class PrettySelectComponent {
         this.label = this._labelForValue(this.value);
     }
 
+    // The value attribute changes when the setting is changed elsewhere, such
+    // as Info's reset button.
+    onChange(prop: string) {
+        if (prop === 'value' && this.sorted.length) {
+            this._confirmValue();
+            this.label = this._labelForValue(this.value);
+
+            if (this.select) {
+                this.select.value = this.value;
+            }
+        }
+    }
+
     onViewInit() {
         if (this.select) {
             this.select.value = this.value;

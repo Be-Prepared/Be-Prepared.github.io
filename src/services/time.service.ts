@@ -59,6 +59,11 @@ export class TimeService {
         return this._currentSetting.asObservable();
     }
 
+    reset() {
+        this._preferenceService.timeSystem.reset();
+        this._currentSetting.next(TimeSystemDefault);
+    }
+
     setTimeSystem(value: TimeSystem) {
         if (TIME_SYSTEMS.includes(value)) {
             this._currentSetting.next(value);
