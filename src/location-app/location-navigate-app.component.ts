@@ -1,12 +1,13 @@
+import { AccessState } from '../services/access/access-controller';
 import { component, css, emit, html } from 'fudgel';
 import { di } from '../di';
-import { first } from 'rxjs/operators';
+import { first, switchMap, takeUntil } from 'rxjs/operators';
 import {
     GeolocationCoordinateResultSuccess,
     GeolocationService,
 } from '../services/geolocation.service';
 import { PreferenceService } from '../services/preference.service';
-import { Subscription } from 'rxjs';
+import { EMPTY, Subject } from 'rxjs';
 import { WakeLockService } from '../services/wake-lock.service';
 import { WaypointSaved } from '../datatypes/waypoint-saved';
 import { WaypointService } from './waypoint.service';
@@ -15,7 +16,7 @@ export class LocationNavigateAppComponent {
     private _enabled = false;
     private _geolocationService = di(GeolocationService);
     private _preferenceService = di(PreferenceService);
-    private _subscription: Subscription | null = null;
+    private _subject = new Subject();
     private _wakeLockService = di(WakeLockService);
     private _waypointService = di(WaypointService);
     allowWakeLock = false;
@@ -23,6 +24,7 @@ export class LocationNavigateAppComponent {
     startPosition: GeolocationCoordinateResultSuccess | null = null;
     startTime = Date.now();
     point: WaypointSaved | null = null;
+    ready = false;
     wakeLockEnabled = false;
 
     onInit() {
@@ -49,9 +51,25 @@ export class LocationNavigateAppComponent {
             }
         }
 
-        this._subscription = this._geolocationService
-            .getPositionSuccess()
-            .pipe(first())
+        // Nothing here may start the GPS before permission is granted; the
+        // prompt must come from the "Allow" button in location-wrapper.
+        this._geolocationService
+            .availabilityState()
+            .pipe(
+                switchMap((state) => {
+                    this.ready = state === AccessState.READY;
+
+                    if (!this.ready || this.startPosition) {
+                        return EMPTY;
+                    }
+
+                    return this._geolocationService
+                        .getPositionSuccess()
+                        .pipe(first());
+                }),
+                // Last, so the inner position watch is stopped too.
+                takeUntil(this._subject)
+            )
             .subscribe((position) => (this.startPosition = position));
     }
 
@@ -60,7 +78,8 @@ export class LocationNavigateAppComponent {
             this._wakeLockService.release();
         }
 
-        this._subscription && this._subscription.unsubscribe();
+        this._subject.next(null);
+        this._subject.complete();
     }
 
     toggleWakeLock() {
@@ -160,7 +179,7 @@ component('location-navigate-app', {
     template: html`
         <location-wrapper>
             <default-layout>
-                <div class="content">
+                <div *if="ready" class="content">
                     <div class="type-and-arrow">
                         <navigation-type></navigation-type>
                         <navigation-arrow
@@ -177,6 +196,7 @@ component('location-navigate-app', {
                                 lat="{{point.lat}}"
                                 lon="{{point.lon}}"
                                 start-time="{{startTime}}"
+                                .start-position="startPosition"
                                 name="{{point.name}}"
                             ></location-field>
                         </div>
@@ -187,6 +207,7 @@ component('location-navigate-app', {
                                 lat="{{point.lat}}"
                                 lon="{{point.lon}}"
                                 start-time="{{startTime}}"
+                                .start-position="startPosition"
                                 name="{{point.name}}"
                             ></location-field>
                         </div>
@@ -197,6 +218,7 @@ component('location-navigate-app', {
                                 lat="{{point.lat}}"
                                 lon="{{point.lon}}"
                                 start-time="{{startTime}}"
+                                .start-position="startPosition"
                                 name="{{point.name}}"
                             ></location-field>
                         </div>
@@ -207,6 +229,7 @@ component('location-navigate-app', {
                                 lat="{{point.lat}}"
                                 lon="{{point.lon}}"
                                 start-time="{{startTime}}"
+                                .start-position="startPosition"
                                 name="{{point.name}}"
                             ></location-field>
                         </div>
@@ -217,6 +240,7 @@ component('location-navigate-app', {
                                 lat="{{point.lat}}"
                                 lon="{{point.lon}}"
                                 start-time="{{startTime}}"
+                                .start-position="startPosition"
                                 name="{{point.name}}"
                             ></location-field>
                         </div>

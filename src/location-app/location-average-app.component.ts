@@ -1,4 +1,5 @@
 import { AccessState } from '../services/access/access-controller';
+import { AverageSample, averageSamples } from './location-average-math';
 import { component, css, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
 import { di } from '../di';
@@ -15,9 +16,7 @@ import { WaypointSaved } from '../datatypes/waypoint-saved';
 import { WaypointService } from './waypoint.service';
 import { XYZ } from '../datatypes/xyz';
 
-interface DataPoint extends XYZ, LatLon {
-    accuracy: number;
-}
+interface DataPoint extends XYZ, LatLon, AverageSample {}
 
 export class LocationAverageComponent {
     private _coordinateService = di(CoordinateService);
@@ -30,7 +29,7 @@ export class LocationAverageComponent {
     dataPoints: DataPoint[] = [];
     debug = '';
     id?: string;
-    ninetyFive = ''; // Distance to 95% of points
+    ninetyFive = ''; // 95% radius around the average
     point: WaypointSaved | null = null;
     pointCount = 0;
     xDelta = '';
@@ -97,46 +96,39 @@ export class LocationAverageComponent {
             return;
         }
 
-        let dataPoint: DataPoint = {
+        const last = this.dataPoints[this.dataPoints.length - 1];
+
+        // The cached fix replayed on subscribe, or the initial
+        // getCurrentPosition() answer, can repeat a fix. Counting it twice
+        // would overstate how much data there is.
+        if (last && last.timestamp === position.timestamp) {
+            return;
+        }
+
+        const dataPoint: DataPoint = {
             ...this._coordinateService.latLonToXYZ(position),
             lat: position.lat,
             lon: position.lon,
-            accuracy: position.accuracy || 20, // Default to 20m
+            accuracy: position.accuracy,
+            timestamp: position.timestamp,
         };
         this.dataPoints.push(dataPoint);
         this.pointCount = this.dataPoints.length;
 
-        let weightedX = 0;
-        let weightedY = 0;
-        let weightedZ = 0;
-        let totalWeight = 0;
+        // See location-average-math.ts for the weighting and how the 95%
+        // radius accounts for GPS errors persisting for minutes.
+        const result = averageSamples(this.dataPoints);
 
-        for (const point of this.dataPoints) {
-            const weight = 1 / point.accuracy;
-            weightedX += point.x * weight;
-            weightedY += point.y * weight;
-            weightedZ += point.z * weight;
-            totalWeight += weight;
+        if (!result) {
+            return;
         }
 
-        const xyz: XYZ = {
-            x: weightedX / totalWeight,
-            y: weightedY / totalWeight,
-            z: weightedZ / totalWeight,
-        };
-        const latLon = this._coordinateService.xyzToLatLon(xyz);
-        let deviationSquaredSum = 0;
-
-        for (const point of this.dataPoints) {
-            deviationSquaredSum += Math.pow(this._coordinateService.distance(latLon, point), 2);
-        }
-
-        const stdDev = Math.sqrt(deviationSquaredSum / this.dataPoints.length);
+        const xyz: XYZ = { x: result.x, y: result.y, z: result.z };
         this.averagedDataPoint = {
             ...xyz,
-            ...latLon,
-            // Multiplying by 20 allows the accuracy to be seen but is not correct.
-            accuracy: stdDev * 20
+            ...this._coordinateService.xyzToLatLon(xyz),
+            accuracy: result.radius95,
+            timestamp: position.timestamp,
         };
         this._recalc();
     }

@@ -2,6 +2,23 @@ import { di } from '../di';
 import { PreferenceService } from '../services/preference.service';
 import { WaypointSaved } from '../datatypes/waypoint-saved';
 
+// Checks numbers by type, not truthiness: a waypoint on the equator or the
+// prime meridian has a coordinate of 0, and one bad point would otherwise
+// throw away every saved waypoint.
+export function isValidPoint(point: any): point is WaypointSaved {
+    const finite = (n: any) => typeof n === 'number' && isFinite(n);
+
+    return (
+        typeof point === 'object' &&
+        !!point &&
+        finite(point.id) &&
+        finite(point.lat) &&
+        finite(point.lon) &&
+        finite(point.created) &&
+        typeof point.name === 'string'
+    );
+}
+
 export class WaypointService {
     private _maxId = 0;
     private _points: WaypointSaved[] = [];
@@ -64,22 +81,6 @@ export class WaypointService {
         this._save();
     }
 
-    private _isValidPoint(point: any): boolean {
-        if (typeof point !== 'object' || !point) {
-            return false;
-        }
-
-        if (
-            point.lat &&
-            point.lon &&
-            point.created &&
-            typeof point.name === 'string'
-        ) {
-            return true;
-        }
-
-        return false;
-    }
 
     private _load() {
         const points = this._preferenceService.points.getItem();
@@ -87,7 +88,7 @@ export class WaypointService {
 
         if (
             Array.isArray(points) &&
-            points.every((point) => this._isValidPoint(point))
+            points.every(isValidPoint)
         ) {
             for (const point of points) {
                 maxId = Math.max(maxId, point.id);

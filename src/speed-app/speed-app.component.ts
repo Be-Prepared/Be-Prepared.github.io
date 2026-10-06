@@ -1,3 +1,4 @@
+import { AccessState } from '../services/access/access-controller';
 import { component, css, html } from 'fudgel';
 import { di } from '../di';
 import {
@@ -11,7 +12,7 @@ import {
     GeolocationService,
 } from '../services/geolocation.service';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { filter, switchMap, takeUntil } from 'rxjs/operators';
 
 export class SpeedAppComponent {
     private _distanceService = di(DistanceService);
@@ -33,9 +34,16 @@ export class SpeedAppComponent {
                 this._updateDisplay();
             });
 
+        // Wait for permission so the GPS only starts (and the browser only
+        // prompts) after the "Allow" button in location-wrapper.
         this._geolocationService
-            .getPositionSuccess()
-            .pipe(takeUntil(this._subject))
+            .availabilityState()
+            .pipe(
+                filter((state) => state === AccessState.READY),
+                switchMap(() => this._geolocationService.getPositionSuccess()),
+                // Last, so the inner position watch is stopped too.
+                takeUntil(this._subject)
+            )
             .subscribe((position) => {
                 this._lastPosition = position;
                 this._updateDisplay();

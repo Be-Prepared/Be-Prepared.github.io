@@ -26,7 +26,16 @@ export class LocationFieldComponent {
             'ALTITUDE_AVERAGE',
             'ALTITUDE_MAXIMUM',
             'ALTITUDE_MINIMUM',
+            'ASCENT_AVERAGE',
+            'ASCENT_MAXIMUM',
+            'ASCENT_MINIMUM',
+            'ASCENT_TOTAL',
+            'DESCENT_AVERAGE',
+            'DESCENT_MAXIMUM',
+            'DESCENT_MINIMUM',
+            'DESCENT_TOTAL',
             'DISTANCE_TRAVELED',
+            'GLIDE_RATIO',
             'HEADING',
             'HEADING_SMOOTHED',
             'SPEED',
@@ -37,6 +46,7 @@ export class LocationFieldComponent {
             'TIME',
             'TIME_MOVING',
             'TIME_STOPPED',
+            'VERTICAL_SPEED',
         ];
 
         if (typeof this.lat === 'string' && typeof this.lon === 'string') {
@@ -44,9 +54,11 @@ export class LocationFieldComponent {
                 'BEARING',
                 'DESTINATION',
                 'DISTANCE',
+                'RELATIVE_BEARING',
                 'TIME_ARRIVAL',
                 'TIME_ELAPSED',
-                'TIME_REMAINING'
+                'TIME_REMAINING',
+                'VELOCITY_MADE_GOOD'
             );
         }
 
@@ -133,6 +145,38 @@ component('location-field', {
                 <location-field-altitude-minimum
                     *if="selectedValue === 'ALTITUDE_MINIMUM'"
                 ></location-field-altitude-minimum>
+                <location-field-climb
+                    *if="selectedValue === 'ASCENT_AVERAGE'"
+                    kind="ASCENT_AVERAGE"
+                ></location-field-climb>
+                <location-field-climb
+                    *if="selectedValue === 'ASCENT_MAXIMUM'"
+                    kind="ASCENT_MAXIMUM"
+                ></location-field-climb>
+                <location-field-climb
+                    *if="selectedValue === 'ASCENT_MINIMUM'"
+                    kind="ASCENT_MINIMUM"
+                ></location-field-climb>
+                <location-field-climb
+                    *if="selectedValue === 'ASCENT_TOTAL'"
+                    kind="ASCENT_TOTAL"
+                ></location-field-climb>
+                <location-field-climb
+                    *if="selectedValue === 'DESCENT_AVERAGE'"
+                    kind="DESCENT_AVERAGE"
+                ></location-field-climb>
+                <location-field-climb
+                    *if="selectedValue === 'DESCENT_MAXIMUM'"
+                    kind="DESCENT_MAXIMUM"
+                ></location-field-climb>
+                <location-field-climb
+                    *if="selectedValue === 'DESCENT_MINIMUM'"
+                    kind="DESCENT_MINIMUM"
+                ></location-field-climb>
+                <location-field-climb
+                    *if="selectedValue === 'DESCENT_TOTAL'"
+                    kind="DESCENT_TOTAL"
+                ></location-field-climb>
                 <location-field-bearing
                     *if="selectedValue === 'BEARING'"
                     lat="{{lat}}"
@@ -150,12 +194,20 @@ component('location-field', {
                 <location-field-distance-traveled
                     *if="selectedValue === 'DISTANCE_TRAVELED'"
                 ></location-field-distance-traveled>
+                <location-field-glide-ratio
+                    *if="selectedValue === 'GLIDE_RATIO'"
+                ></location-field-glide-ratio>
                 <location-field-heading
                     *if="selectedValue === 'HEADING'"
                 ></location-field-heading>
                 <location-field-heading-smoothed
                     *if="selectedValue === 'HEADING_SMOOTHED'"
                 ></location-field-heading-smoothed>
+                <location-field-relative-bearing
+                    *if="selectedValue === 'RELATIVE_BEARING'"
+                    lat="{{lat}}"
+                    lon="{{lon}}"
+                ></location-field-relative-bearing>
                 <location-field-speed
                     *if="selectedValue === 'SPEED'"
                 ></location-field-speed>
@@ -178,7 +230,7 @@ component('location-field', {
                     *if="selectedValue === 'TIME_ARRIVAL'"
                     lat="{{lat}}"
                     lon="{{lon}}"
-                    .start-position="{{startPosition}}"
+                    .start-position="startPosition"
                     start-time="{{startTime}}"
                 ></location-field-time-arrival>
                 <location-field-time-elapsed
@@ -192,11 +244,20 @@ component('location-field', {
                     *if="selectedValue === 'TIME_REMAINING'"
                     lat="{{lat}}"
                     lon="{{lon}}"
+                    .start-position="startPosition"
                     start-time="{{startTime}}"
                 ></location-field-time-remaining>
                 <location-field-time-stopped
                     *if="selectedValue === 'TIME_STOPPED'"
                 ></location-field-time-stopped>
+                <location-field-velocity-made-good
+                    *if="selectedValue === 'VELOCITY_MADE_GOOD'"
+                    lat="{{lat}}"
+                    lon="{{lon}}"
+                ></location-field-velocity-made-good>
+                <location-field-vertical-speed
+                    *if="selectedValue === 'VERTICAL_SPEED'"
+                ></location-field-vertical-speed>
             </div>
         </div>
     `,

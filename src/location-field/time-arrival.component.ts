@@ -7,6 +7,7 @@ import {
 } from '../services/geolocation.service';
 import { I18nService } from '../i18n/i18n.service';
 import { Subscription } from 'rxjs';
+import { estimateTimeRemaining } from './time-estimate';
 import { TimeService } from '../services/time.service';
 
 export class LocationFieldTimeArrivalComponent {
@@ -27,35 +28,26 @@ export class LocationFieldTimeArrivalComponent {
         );
         const lat = parseFloat(this.lat || '');
         const lon = parseFloat(this.lon || '');
-        const startTime = parseInt(this.startTime || '', 10);
         this.value = unknownValue;
 
         this._subscription = this._geolocationService
             .getPosition()
             .subscribe((position) => {
-                if (
+                const timeRemaining =
                     position &&
                     position.success &&
                     this.startPosition &&
-                    position !== this.startPosition
-                ) {
-                    const distanceAchieved = this._coordinateService.distance(
+                    estimateTimeRemaining(
                         this.startPosition,
-                        position
-                    );
-                    const distanceRemaining = this._coordinateService.distance(
+                        position,
                         { lat, lon },
-                        position
+                        (a, b) => this._coordinateService.distance(a, b)
                     );
-                    const timeElapsed = position.timestamp - startTime;
-                    const overallSpeed = distanceAchieved / timeElapsed;
 
-                    if (overallSpeed > 0) {
-                        const timeRemaining = distanceRemaining / overallSpeed;
-                        this.value = this._timeService.formatTimeOfDay(
-                            Date.now() + timeRemaining
-                        );
-                    }
+                if (typeof timeRemaining === 'number') {
+                    this.value = this._timeService.formatTimeOfDay(
+                        Date.now() + timeRemaining
+                    );
                 } else {
                     this.value = unknownValue;
                 }
@@ -72,7 +64,8 @@ export class LocationFieldTimeArrivalComponent {
 }
 
 component('location-field-time-arrival', {
-    attr: ['lat', 'lon', 'startPosition', 'startTime'],
+    attr: ['lat', 'lon', 'startTime'],
+    prop: ['startPosition'],
     style: css``,
     template: html`
         <changeable-setting @click="toggleTimeSystem()"

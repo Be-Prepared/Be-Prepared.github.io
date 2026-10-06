@@ -17,18 +17,20 @@ export class LocationFieldSpeedAvgComponent {
             'location.field.unknownValue'
         );
         this.value = unknownValue;
-        this._geolocationService.getPosition().subscribe((position) => {
-            if (position && position.success) {
-                this.value = this._distanceService.metersToString(
-                    position.speedAvg,
-                    {
-                        isSpeed: true,
-                    }
-                );
-            } else {
-                this.value = unknownValue;
-            }
-        });
+        this._subscription = this._geolocationService
+            .getPosition()
+            .subscribe((position) => {
+                if (position && position.success) {
+                    this.value = this._distanceService.metersToString(
+                        position.speedAvg,
+                        {
+                            isSpeed: true,
+                        }
+                    );
+                } else {
+                    this.value = unknownValue;
+                }
+            });
     }
 
     onDestroy() {

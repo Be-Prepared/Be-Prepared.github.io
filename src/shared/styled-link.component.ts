@@ -14,8 +14,10 @@ export class StyledLinkComponent {
     }
 
     private _setHref(href: string) {
-        if (href.startsWith('geo:')) {
-            this.hrefGeo = href.slice(4);
+        if (/^geo:/i.test(href)) {
+            // The whole URI, encoded like the manifest's protocol handler
+            // does, so its query and parameters reach location-add intact.
+            this.hrefGeo = encodeURIComponent(href);
             this.hijackGeo = true;
         } else {
             this.hijackGeo = false;

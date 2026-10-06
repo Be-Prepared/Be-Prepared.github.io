@@ -1,3 +1,4 @@
+import { AccessState } from '../services/access/access-controller';
 import { component, css, html } from 'fudgel';
 import { CoordinateService } from '../services/coordinate.service';
 import { di } from '../di';
@@ -9,7 +10,7 @@ import {
     GeolocationService,
 } from '../services/geolocation.service';
 import { I18nService } from '../i18n/i18n.service';
-import { first } from 'rxjs/operators';
+import { filter, first, switchMap } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { WaypointSaved } from '../datatypes/waypoint-saved';
 import { WaypointService } from './waypoint.service';
@@ -31,9 +32,17 @@ export class LocationListAppComponent {
     position: GeolocationCoordinateResult | null = null;
 
     onInit() {
+        // Wait for permission so the GPS only starts (and the browser only
+        // prompts) after the "Allow" button in location-wrapper.
         this._subscription = this._geolocationService
-            .getPosition()
-            .pipe(first())
+            .availabilityState()
+            .pipe(
+                filter((state) => state === AccessState.READY),
+                first(),
+                switchMap(() =>
+                    this._geolocationService.getPosition().pipe(first())
+                )
+            )
             .subscribe((position) => {
                 this.position = position;
                 this._updatePoints(this.points);

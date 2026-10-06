@@ -2,16 +2,11 @@ import { AccessState } from './access/access-controller';
 import { CoordinateService } from './coordinate.service';
 import { di } from '../di';
 import { distinctUntilChanged, filter, finalize, map, share } from 'rxjs/operators';
-import { KalmanFilterArray } from '@bencevans/kalman-filter';
 import { LatLon } from '../datatypes/lat-lon';
 import { combineLatest, Observable, of, ReplaySubject, Subject, timer } from 'rxjs';
 import { PermissionStatus, watchPermission } from './access/permission-status';
-
-const EXP = Math.exp(-1 / 5);
-const EXP_INV = 1 - EXP;
-
-// A very slow walk is about 1.2 km/h, which is around 0.35 m/s
-const SPEED_THRESHOLD = 0.35;
+import { calculateAttributes } from './geolocation/position-attributes';
+import { initialVerticalState, VerticalState } from './geolocation/vertical';
 
 export interface GeolocationCoordinateResultSuccess extends LatLon {
     success: true;
@@ -37,6 +32,9 @@ export interface GeolocationCoordinateResultSuccess extends LatLon {
     altitudeMinimum: number;
     altitudeMaximum: number;
     distanceTraveled: number;
+    // Smoothed altitude, ascent, descent, and glide window. Read it with the
+    // helpers in geolocation/vertical.ts.
+    vertical: VerticalState;
 }
 
 export interface GeolocationCoordinateResultError {
@@ -55,6 +53,7 @@ export class GeolocationService {
     // Outcome of the last request() during this run of the app. Only kept in
     // memory because iOS doesn't report permission changes; never saved.
     private _requestResult = new ReplaySubject<AccessState | null>(1);
+    private _restartDeniedWatch: (() => void) | null = null;
 
     constructor() {
         this._requestResult.next(null);
@@ -92,7 +91,10 @@ export class GeolocationService {
     // Shows the browser's prompt. Call from a button press.
     request() {
         navigator.geolocation.getCurrentPosition(
-            () => this._requestResult.next(AccessState.READY),
+            () => {
+                this._requestResult.next(AccessState.READY);
+                this._restartDeniedWatch && this._restartDeniedWatch();
+            },
             (error) =>
                 this._requestResult.next(
                     error.code === error.PERMISSION_DENIED
@@ -107,11 +109,19 @@ export class GeolocationService {
 
     getPosition() {
         if (this._observable) {
+            // A watch that was refused permission is dead. Start it again in
+            // case permission was granted since then.
+            this._restartDeniedWatch && this._restartDeniedWatch();
+
             return this._observable;
         }
 
         const subject = new Subject<GeolocationCoordinateResult>();
         const lastPositions: GeolocationCoordinateResultSuccess[] = [];
+        // Last good fix before an error, so totals survive a tunnel.
+        let carried: GeolocationCoordinateResultSuccess | null = null;
+        let watch: number | null = null;
+        let denied = false;
         const success = (position: GeolocationPosition) => {
             const thisPosition: GeolocationCoordinateResultSuccess = {
                 success: true,
@@ -141,10 +151,12 @@ export class GeolocationService {
                 altitudeMinimum: NaN,
                 altitudeMaximum: NaN,
                 distanceTraveled: 0,
+                vertical: initialVerticalState(),
             };
 
             lastPositions.push(thisPosition);
-            this._calculateAttributes(lastPositions);
+            calculateAttributes(lastPositions, this._coordinateService, carried);
+            carried = null;
             subject.next(thisPosition);
 
             if (lastPositions.length > 4) {
@@ -152,27 +164,58 @@ export class GeolocationService {
             }
         };
         const error = (error: GeolocationPositionError) => {
+            // Only the speed and heading baseline is reset; the totals carry
+            // on from the last good fix.
+            carried = lastPositions[lastPositions.length - 1] || carried;
             lastPositions.splice(0, lastPositions.length);
+
+            if (error.code === error.PERMISSION_DENIED) {
+                // The browser never reports anything on this watch again.
+                denied = true;
+                stopWatch();
+            }
+
             subject.next({
                 success: false,
                 timestamp: Date.now(),
                 error,
             });
         };
+        const stopWatch = () => {
+            if (watch !== null) {
+                navigator.geolocation.clearWatch(watch);
+                watch = null;
+            }
+        };
+        const startWatch = () => {
+            denied = false;
+            navigator.geolocation.getCurrentPosition(success, error);
+            watch = navigator.geolocation.watchPosition(success, error, {
+                enableHighAccuracy: true,
+            });
+
+            // In case the denial was reported before watchPosition returned.
+            if (denied) {
+                stopWatch();
+            }
+        };
+        this._restartDeniedWatch = () => {
+            if (denied) {
+                startWatch();
+            }
+        };
         this._observable = subject.asObservable().pipe(
             finalize(() => {
-                navigator.geolocation.clearWatch(watch);
+                stopWatch();
                 this._observable = null;
+                this._restartDeniedWatch = null;
             }),
             share({
                 connector: () => new ReplaySubject(1),
                 resetOnRefCountZero: () => timer(5000),
             })
         );
-        navigator.geolocation.getCurrentPosition(success, error);
-        const watch = navigator.geolocation.watchPosition(success, error, {
-            enableHighAccuracy: true,
-        });
+        startWatch();
 
         return this._observable;
     }
@@ -181,128 +224,5 @@ export class GeolocationService {
         return this.getPosition().pipe(
             filter((result) => result && result.success)
         ) as Observable<GeolocationCoordinateResultSuccess>;
-    }
-
-    private _calculateAttributes(
-        lastPositions: GeolocationCoordinateResultSuccess[]
-    ) {
-        const isNotSet = (value: any) => !value && value !== 0;
-        const current = lastPositions[lastPositions.length - 1];
-        const previous = lastPositions[lastPositions.length - 2] || current;
-        let speed = 0;
-        let heading = NaN;
-        let distance = 0;
-
-        if (lastPositions.length > 1) {
-            const result = this._calculateAverages(lastPositions);
-            speed = result.speed;
-            heading = result.heading;
-            distance = result.distance;
-        }
-
-        current.speedSmoothed = this._exponentialMovingAverage(
-            previous.speedSmoothed,
-            speed
-        );
-        current.speedMax = Math.max(current.speed, previous.speedMax);
-        current.speedSmoothedMax = Math.max(current.speedSmoothed, previous.speedSmoothedMax);
-        current.isMovingSmoothed = current.speedSmoothed >= SPEED_THRESHOLD;
-        current.headingSmoothed = heading;
-
-        if (isNotSet(current.speed)) {
-            current.speed = speed;
-        }
-
-        if (isNotSet(current.heading)) {
-            current.heading = heading;
-        }
-
-        current.isMoving = current.speed >= SPEED_THRESHOLD;
-        current.timeTotal =
-            previous.timeTotal + (current.timestamp - previous.timestamp);
-        current.firstPosition = previous.firstPosition || previous;
-        current.timeMoving = previous.timeMoving;
-        current.timeStopped = previous.timeStopped;
-        current.distanceTraveled = previous.distanceTraveled + distance;
-        current.speedAvg = current.timeTotal
-            ? current.distanceTraveled / (current.timeTotal / 1000)
-            : 0;
-
-        if (typeof current.altitude === 'number') {
-            current.altitudeSum =
-                previous.altitudeSum + (current.altitude || 0);
-            current.altitudeCount = previous.altitudeCount + 1;
-            current.altitudeMinimum = isNaN(previous.altitudeMinimum)
-                ? current.altitude
-                : Math.min(previous.altitudeMinimum, current.altitude);
-            current.altitudeMaximum = isNaN(previous.altitudeMaximum)
-                ? current.altitude
-                : Math.max(previous.altitudeMaximum, current.altitude);
-        } else {
-            current.altitudeSum = previous.altitudeSum;
-            current.altitudeCount = previous.altitudeCount;
-            current.altitudeMinimum = previous.altitudeMinimum;
-            current.altitudeMaximum = previous.altitudeMaximum;
-        }
-
-        if (current.isMoving) {
-            current.timeMoving += current.timestamp - previous.timestamp;
-        } else {
-            current.timeStopped += current.timestamp - previous.timestamp;
-        }
-    }
-
-    private _calculateAverages(
-        lastPositions: GeolocationCoordinateResultSuccess[]
-    ) {
-        const first = lastPositions[0];
-        const back1 = lastPositions[lastPositions.length - 2];
-        const current = lastPositions[lastPositions.length - 1];
-        const filter = new KalmanFilterArray({
-            initialEstimate: [first.lon, first.lat],
-            initialErrorInEstimate: first.accuracy,
-        });
-
-        let estimate: [number[], number] = [[0, 0], 0];
-
-        for (let i = 1; i < lastPositions.length; i += 1) {
-            estimate = filter.update({
-                measurement: [lastPositions[i].lon, lastPositions[i].lat],
-                errorInMeasurement: lastPositions[i].accuracy,
-            }) as [number[], number];
-        }
-
-        const distance = this._coordinateService.distance(current, back1);
-        const elapsedTime = current.timestamp - back1.timestamp;
-        // Timestamps are milliseconds; speeds are meters per second.
-        const speed = elapsedTime ? distance / (elapsedTime / 1000) : 0;
-        (current.timestamp + first.timestamp) / 2 - first.timestamp;
-        let heading = NaN;
-
-        if (speed > 0) {
-            heading = this._coordinateService.bearing(
-                {
-                    lat: estimate[0][1],
-                    lon: estimate[0][0],
-                },
-                current
-            );
-        }
-
-        return {
-            distance,
-            heading,
-            speed,
-        };
-    }
-
-    // Big props to Linux's load average calculation and this guide
-    // https://www.fortra.com/resources/guides/unix-load-average-reweighed
-    private _exponentialMovingAverage(previous: number, current: number) {
-        // L(t) = L(t-1) * exp + n(t)(1 - exp)
-        // L is load, t is time, exp is e^(-1/60) for the 1 minute average
-        // sampled at 1 second intervals, n(t) is the new value.
-        // exp and (1 - exp) are precalculated for performance.
-        return previous * EXP + current * EXP_INV;
     }
 }
