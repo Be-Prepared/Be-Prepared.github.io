@@ -98,3 +98,51 @@ export async function expectNoHorizontalScroll(page: Page) {
     );
     expect(overflow).toBeLessThanOrEqual(1);
 }
+
+// A camera that shows whatever SVG the test hands to window.__show, on a
+// white background. For pointing the app's scanner at real QR codes.
+function installPictureCamera() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 720;
+    canvas.height = 720;
+    const context = canvas.getContext('2d')!;
+    context.fillStyle = '#fff';
+    context.fillRect(0, 0, 720, 720);
+    // Browsers only send a new frame when the canvas changes.
+    setInterval(() => {
+        context.fillStyle = '#fff';
+        context.fillRect(0, 0, 4, 4);
+    }, 50);
+    (window as any).__show = (svg: string) =>
+        new Promise<void>((resolve, reject) => {
+            const image = new Image();
+            image.onload = () => {
+                context.fillStyle = '#fff';
+                context.fillRect(0, 0, 720, 720);
+                context.drawImage(image, 40, 40, 640, 640);
+                resolve();
+            };
+            image.onerror = () => reject(new Error('Bad SVG'));
+            image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+        });
+
+    if (typeof MediaDevices !== 'undefined') {
+        MediaDevices.prototype.enumerateDevices = async () =>
+            [{ kind: 'videoinput', deviceId: 'fake', label: '', groupId: '' }] as any;
+        MediaDevices.prototype.getUserMedia = async () =>
+            (canvas as any).captureStream(30) as MediaStream;
+    }
+
+    if (typeof Permissions !== 'undefined') {
+        const query = Permissions.prototype.query;
+        Permissions.prototype.query = function (descriptor: any) {
+            return descriptor.name === 'camera'
+                ? Promise.resolve({ state: 'granted', onchange: null } as any)
+                : query.call(this, descriptor);
+        };
+    }
+}
+
+export async function pictureCamera(page: Page) {
+    await page.addInitScript(installPictureCamera);
+}

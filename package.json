@@ -31,7 +31,6 @@
         "vite-plugin-version-mark": "^0.2.2"
     },
     "dependencies": {
-        "@bencevans/kalman-filter": "^1.0.0",
         "@lit-labs/rollup-plugin-minify-html-literals": "^0.2.0",
         "@types/ecef-projector": "^1.0.2",
         "@types/suncalc": "^1.9.2",

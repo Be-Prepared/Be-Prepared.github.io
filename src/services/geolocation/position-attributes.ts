@@ -3,7 +3,7 @@
 
 import type { GeolocationCoordinateResultSuccess } from '../geolocation.service';
 import { initialVerticalState, updateVertical } from './vertical';
-import { KalmanFilterArray } from '@bencevans/kalman-filter';
+import { KalmanFilterArray } from '../../util/kalman-filter';
 import { LatLon } from '../../datatypes/lat-lon';
 
 const EXP = Math.exp(-1 / 5);

@@ -9,7 +9,7 @@ import {
 } from '../services/camera.service';
 import { component, css, html } from 'fudgel';
 import { DetectedBarcodeData } from '../services/barcode-reader/barcode-reader-interface';
-import KalmanFilter from '@bencevans/kalman-filter';
+import { KalmanFilter } from '../util/kalman-filter';
 import { crc32, decodeFrame, FileMeta, joinBlocks, unpackFile } from './frame-format';
 import { FountainDecoder } from './fountain';
 import { ScanLoop } from '../services/barcode-reader/scan-loop';
