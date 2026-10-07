@@ -73,9 +73,12 @@ component('file-transfer-send-app', {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-evenly;
+            justify-content: center;
+            gap: var(--space-4);
             height: 100%;
             width: 100%;
+            box-sizing: border-box;
+            padding: var(--space-4);
             overflow: hidden;
         }
 
@@ -85,58 +88,111 @@ component('file-transfer-send-app', {
             }
         }
 
+        /* Square, as big as fits. White with its own margin, so the code
+           scans in dark mode too. */
         .qr {
-            max-height: 95vmin;
-            max-width: 95vmin;
-            flex-grow: 1;
-            aspect-ratio: 1/1;
+            width: min(92vmin, 100%);
+            max-height: 100%;
+            aspect-ratio: 1 / 1;
             box-sizing: border-box;
-            margin: 2em;
-            border: 1px solid;
+            flex-shrink: 1;
+            min-height: 0;
+            background: #fff;
+            border-radius: var(--radius-l);
+            overflow: hidden;
         }
 
-        .center {
+        .pick {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
+            gap: var(--space-3);
+            width: min(92vmin, 100%, 24rem);
+            aspect-ratio: 1 / 1;
+            max-height: 100%;
+            min-height: 0;
+            box-sizing: border-box;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--fg);
+            background: var(--surface);
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-l);
+            cursor: pointer;
         }
 
-        .range {
-            width: 50vw;
+        .pick load-svg {
+            width: 3.5rem;
+            height: 3.5rem;
+            color: var(--accent);
         }
 
         .file-input {
             display: none;
         }
 
-        .full {
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+            width: min(100%, 24rem);
+            box-sizing: border-box;
+            padding: var(--space-3) var(--space-4);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-l);
+            flex-shrink: 0;
+        }
+
+        @media (orientation: landscape) {
+            .controls {
+                width: min(40%, 20rem);
+            }
+        }
+
+        .setting {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            color: var(--fg-muted);
+        }
+
+        .value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            color: var(--fg);
+        }
+
+        .range {
             width: 100%;
-            height: 100%;
+            accent-color: var(--accent);
+        }
+
+        .loading {
+            color: var(--fg-muted);
         }
     `,
     template: html`
         <default-layout>
             <div *if="!fileSelected && !fileLoaded" class="wrapper">
-                <div class="qr">
-                    <label class="full center">
-                        <input
-                            type="file"
-                            class="file-input"
-                            @change="selectFile($event.target.files)"
-                        />
-                        <i18n-label
-                            id="fileTransfer.send.selectFile"
-                        ></i18n-label>
-                    </label>
-                </div>
+                <label class="pick">
+                    <input
+                        type="file"
+                        class="file-input"
+                        @change="selectFile($event.target.files)"
+                    />
+                    <load-svg href="/file-transfer.svg"></load-svg>
+                    <i18n-label
+                        id="fileTransfer.send.selectFile"
+                        ws=""
+                    ></i18n-label>
+                </label>
                 <div class="controls">
-                    <div class="center">
-                        <span
-                            ><i18n-label
-                                id="fileTransfer.send.size"
-                            ></i18n-label>
-                            {{size}}</span
-                        >
+                    <div class="setting">
+                        <i18n-label id="fileTransfer.send.size" ws=""></i18n-label>
+                        <span class="value">{{size}}</span>
                     </div>
                     <input
                         type="range"
@@ -144,12 +200,13 @@ component('file-transfer-send-app', {
                         max="2800"
                         step="50"
                         value="{{size}}"
+                        @input.stop.prevent="sizeChange($event.target.value)"
                         @change.stop.prevent="sizeChange($event.target.value)"
                         class="range"
                     />
                 </div>
             </div>
-            <div *if="!fileLoaded && fileSelected" class="wrapper">
+            <div *if="!fileLoaded && fileSelected" class="wrapper loading">
                 <i18n-label id="fileTransfer.send.loading"></i18n-label>
             </div>
             <div *if="fileLoaded" class="wrapper">
@@ -157,13 +214,9 @@ component('file-transfer-send-app', {
                     <qr-code content="{{qrContent}}"></qr-code>
                 </div>
                 <div class="controls">
-                    <div class="center">
-                        <span
-                            ><i18n-label
-                                id="fileTransfer.send.fps"
-                            ></i18n-label>
-                            {{fps}}</span
-                        >
+                    <div class="setting">
+                        <i18n-label id="fileTransfer.send.fps" ws=""></i18n-label>
+                        <span class="value">{{fps}}</span>
                     </div>
                     <input
                         type="range"
@@ -171,6 +224,7 @@ component('file-transfer-send-app', {
                         max="30"
                         step="1"
                         value="{{fps}}"
+                        @input.stop.prevent="fpsChange($event.target.value)"
                         @change.stop.prevent="fpsChange($event.target.value)"
                         class="range"
                     />

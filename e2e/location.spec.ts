@@ -1,3 +1,4 @@
+import { expectNoHorizontalScroll } from './helpers';
 import { expect, test } from '@playwright/test';
 
 test.use({
@@ -32,6 +33,8 @@ test.beforeEach(async ({ page }) => {
 
 test('share sheet offers links that keep the coordinates', async ({ page }) => {
     await page.goto('/location-edit/1');
+    await expect(page.getByRole('button', { name: 'Delete' })).toBeVisible();
+    await expectNoHorizontalScroll(page);
     await page.getByRole('button', { name: 'Share' }).first().click();
     const content = page.locator('location-share .content');
     await expect(content).toContainText('location-add?lat=38.8894838&lon=-77.0352791');

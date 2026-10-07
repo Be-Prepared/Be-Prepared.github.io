@@ -132,41 +132,43 @@ component('location-list-app', {
             display: flex;
             height: 100%;
             width: 100%;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .content {
-            height: 100%;
-            width: 100%;
-            padding: 1em;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            max-width: 40rem;
+            margin: 0 auto;
             box-sizing: border-box;
-            overflow: hidden;
+            padding: var(--space-4);
+            justify-content: center;
+            align-items: center;
+            /* Location screens scale their text up; a list reads better at
+               a steady size. */
+            font-size: 1.125rem;
+            color: var(--fg-muted);
+            text-align: center;
         }
 
         .point-list-wrapper {
             width: 100%;
             max-height: 100%;
-            border: var(--table-border);
             display: flex;
             flex-direction: column;
             box-sizing: border-box;
+            overflow: hidden;
+            color: var(--fg);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-l);
         }
 
+        /* Tap a heading to sort by it. */
         .point-list-weader {
             flex-shrink: 0;
-            width: 100%;
-            padding: 0.5em;
-            box-sizing: border-box;
+            padding: var(--space-2) var(--space-4);
             display: flex;
             justify-content: space-between;
-            border: var(--table-border);
-            font-weight: bold;
-            overflow: hidden;
+            font-size: 0.8em;
+            color: var(--fg-muted);
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
         }
 
         .point-list {
@@ -174,26 +176,43 @@ component('location-list-app', {
         }
 
         .point-list-line {
-            width: 100%;
+            padding: var(--space-3) var(--space-4);
             justify-content: space-between;
+            align-items: baseline;
+            gap: var(--space-3);
             display: flex;
-            border: var(--table-border);
-            box-sizing: border-box;
+            cursor: pointer;
+        }
+
+        .point-list-line + .point-list-line {
+            border-top: 1px solid var(--border);
+        }
+
+        .point-list-line:active {
+            background: var(--surface-2);
         }
 
         .name {
             text-align: start;
             flex-shrink: 1;
+            min-width: 0;
             text-overflow: ellipsis;
             overflow: hidden;
             white-space: nowrap;
-            padding: 0 0.2em;
+            font-weight: 600;
         }
 
         .location {
-            box-sizing: border-box;
+            flex-shrink: 0;
             white-space: nowrap;
-            padding: 0 0.2em 0 0.8em;
+            color: var(--fg-muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .point-list-weader .name,
+        .point-list-weader .location {
+            font-weight: 400;
+            color: inherit;
         }
     `,
     template: html`

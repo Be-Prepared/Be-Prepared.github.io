@@ -64,19 +64,32 @@ component('file-transfer-receive-view', {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-evenly;
+            justify-content: center;
+            gap: var(--space-4);
             height: 100%;
             width: 100%;
+            box-sizing: border-box;
+            padding: var(--space-4);
             overflow: hidden;
         }
 
         .preview {
             max-width: 100%;
-            max-height: 100%;
-            border: 1px solid;
+            min-height: 0;
             flex-shrink: 1;
             overflow: auto;
             display: flex;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-l);
+        }
+
+        pre {
+            margin: 0;
+            padding: var(--space-3);
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
         }
 
         img,
@@ -85,6 +98,29 @@ component('file-transfer-receive-view', {
             max-width: 100%;
             max-height: 100%;
             flex-shrink: 1;
+        }
+
+        .download {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.15rem;
+            max-width: 100%;
+            box-sizing: border-box;
+            padding: var(--space-3) var(--space-5);
+            color: var(--accent-fg);
+            background: var(--accent);
+            border-radius: var(--radius-m);
+            font-weight: 700;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .filename {
+            font-weight: 400;
+            font-size: 0.9rem;
+            overflow-wrap: anywhere;
+            text-align: center;
         }
     `,
     template: html`
@@ -103,9 +139,14 @@ component('file-transfer-receive-view', {
             <div *if="contentTypeFirst === 'text'" class="preview">
                 <pre>{{text}}</pre>
             </div>
-            <a *if="downloadUrl" .href="downloadUrl" download="{{filename}}">
-                <i18n-label id="fileTransfer.receive.download"></i18n-label>
-                {{ filename }}
+            <a
+                *if="downloadUrl"
+                class="download"
+                .href="downloadUrl"
+                download="{{filename}}"
+            >
+                <i18n-label id="fileTransfer.receive.download" ws=""></i18n-label>
+                <span class="filename">{{ filename }}</span>
             </a>
         </div>
     `,

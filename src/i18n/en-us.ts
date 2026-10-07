@@ -383,31 +383,16 @@ export const enUS: LanguageData = {
         'There is no location service available on this device.',
     'location.waypointList': 'Waypoints',
     'location.share.apple-maps': 'Apple Maps',
-    'location.share.apple-maps.description':
-        'Pin with the name on iPhones. Older iPhones and other devices open the Apple Maps website.',
     'location.share.be-prepared': 'Be Prepared link',
-    'location.share.be-prepared.description':
-        'Opens Be Prepared and saves the waypoint with its name. Works on any phone with Be Prepared.',
     'location.share.button': 'Share',
     'location.share.close': 'Close',
     'location.share.copied': 'Copied',
     'location.share.copy': 'Copy',
     'location.share.decimal-text': 'Decimal coordinates (text)',
-    'location.share.decimal-text.description':
-        'Plain numbers to paste into any map\'s search box.',
     'location.share.display-text': 'Name and coordinates (text)',
-    'location.share.display-text.description':
-        'Uses your coordinate format setting (for example UTM or MGRS), for GPS units or reading aloud.',
     'location.share.geo-basic': 'Geo link, coordinates only',
-    'location.share.geo-basic.description':
-        'The most widely understood geo link, for Android map apps and GPS apps. No name.',
     'location.share.geo-full': 'Geo link with name',
-    'location.share.geo-full.description':
-        'Labeled pin in Android map apps. iPhones don\'t open geo links in Apple Maps, so use an Apple Maps link for them.',
     'location.share.google-maps': 'Google Maps',
-    'location.share.google-maps.description':
-        'Coordinates only, no name. Opens Google Maps on any phone or computer.',
-    'location.share.heading': 'Share Location',
     'location.share.share': 'Share',
     'location.waypoints.location': 'Location',
     'location.waypoints.name': 'Name',

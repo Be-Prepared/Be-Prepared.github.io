@@ -150,17 +150,33 @@ component('location-navigate-app', {
         }
 
         .field {
-            display: flex;
-            max-width: 100%;
+            padding: var(--space-2) 0;
         }
 
+        .field + .field {
+            border-top: 1px solid var(--border);
+        }
+
+        /* Rows of readings in a card, smaller than the arrow's label. */
         .fields {
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            max-width: 100%;
+            width: 100%;
+            max-width: 30rem;
+            box-sizing: border-box;
+            padding: var(--space-2) var(--space-4);
+            font-size: 0.7em;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-l);
+        }
+
+        @media (orientation: landscape) {
+            .fields {
+                width: 45%;
+                flex-shrink: 0;
+            }
         }
 
         .navigation-arrow {
@@ -188,7 +204,7 @@ component('location-navigate-app', {
                             lon="{{point.lon}}"
                         ></navigation-arrow>
                     </div>
-                    <div class="gap-above fields">
+                    <div class="fields">
                         <div class="field">
                             <location-field
                                 id="navigate.1"

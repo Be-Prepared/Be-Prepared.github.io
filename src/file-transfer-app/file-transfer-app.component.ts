@@ -16,26 +16,67 @@ component('file-transfer-app', {
         .wrapper {
             height: 100%;
             width: 100%;
+            max-width: 32rem;
+            margin: 0 auto;
+            box-sizing: border-box;
+            padding: var(--space-4);
             display: flex;
-            justify-content: space-evenly;
-            align-items: center;
+            justify-content: center;
+            align-items: stretch;
             flex-direction: column;
-            font-size: 2em;
+            gap: var(--space-4);
+        }
+
+        @media (orientation: landscape) {
+            .wrapper {
+                flex-direction: row;
+                align-items: center;
+                max-width: 44rem;
+            }
+        }
+
+        .choice {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-3);
+            min-height: 9rem;
+            max-height: 14rem;
+            padding: var(--space-4);
+            font: inherit;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--fg);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-l);
+            box-shadow: var(--shadow);
+            cursor: pointer;
+        }
+
+        .choice:active {
+            background: var(--surface-2);
+        }
+
+        .choice load-svg {
+            width: 3rem;
+            height: 3rem;
+            color: var(--accent);
         }
     `,
     template: html`
         <default-layout>
             <div class="wrapper">
-                <div></div>
-                <pretty-labeled-button
-                    @click.stop.prevent="send()"
-                    id="fileTransfer.send"
-                ></pretty-labeled-button>
-                <pretty-labeled-button
-                    @click.stop.prevent="receive()"
-                    id="fileTransfer.receive"
-                ></pretty-labeled-button>
-                <div></div>
+                <button class="choice" @click.stop.prevent="send()">
+                    <load-svg href="/share-1.svg"></load-svg>
+                    <i18n-label id="fileTransfer.send" ws=""></i18n-label>
+                </button>
+                <button class="choice" @click.stop.prevent="receive()">
+                    <load-svg href="/camera.svg"></load-svg>
+                    <i18n-label id="fileTransfer.receive" ws=""></i18n-label>
+                </button>
             </div>
         </default-layout>
     `,

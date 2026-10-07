@@ -151,78 +151,147 @@ component('location-average-app', {
         .content {
             height: 100%;
             width: 100%;
+            max-width: 36rem;
+            margin: 0 auto;
             display: flex;
             flex-direction: column;
+            gap: var(--space-3);
             box-sizing: border-box;
+            padding: var(--space-4);
+            overflow: auto;
+            /* Location screens scale their text up; this one has a lot to
+               say, so it sets its own sizes. */
+            font-size: 1rem;
         }
 
-        .wrapper {
-            padding-top: 1em;
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
+        .heading {
+            color: var(--fg-muted);
+        }
+
+        .name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--fg);
+            overflow-wrap: anywhere;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: var(--space-2);
+        }
+
+        .card {
+            box-sizing: border-box;
+            padding: var(--space-3);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-l);
+        }
+
+        .stat {
             display: flex;
-            box-sizing: border-box;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 0.25rem;
+            text-align: center;
         }
 
-        .wrapper-inner {
-            flex-grow: 1;
-            padding: 0.3em;
-            border-style: solid;
-            box-sizing: border-box;
-            border-width: 1px;
-            overflow-x: auto;
-            height: 100%;
-            width: 100%;
+        .label {
+            font-size: 0.8rem;
+            color: var(--fg-muted);
+        }
+
+        .value {
+            font-size: 1.35rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .coordinates {
+            font-size: 1.35rem;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            text-align: center;
+        }
+
+        .help {
+            font-size: 0.9rem;
+            line-height: 1.45;
+            color: var(--fg-muted);
+        }
+
+        .help p {
+            margin: 0;
+        }
+
+        .help p + p {
+            margin-top: var(--space-2);
         }
     `,
     template: html`
         <location-wrapper>
             <default-layout *if="point">
                 <div class="content">
-                    <div>
+                    <div class="heading">
                         <i18n-label
                             id="location.average.heading"
+                            ws=""
                         ></i18n-label>
-                        <div>{{point.name}}</div>
+                        <div class="name">{{point.name}}</div>
                     </div>
-                    <div class="wrapper">
-                        <div class="wrapper-inner">
-                            <div>
-                                <i18n-label
+                    <div class="stats">
+                        <div class="card stat">
+                            <span class="label"
+                                ><i18n-label
                                     id="location.average.pointsCollected"
-                                ></i18n-label>
-                                {{pointCount}}
-                            </div>
-                            <div>
-                                <i18n-label
+                                    ws=""
+                                ></i18n-label
+                            ></span>
+                            <span class="value">{{pointCount}}</span>
+                        </div>
+                        <div class="card stat">
+                            <span class="label"
+                                ><i18n-label
                                     id="location.average.pointsIgnored"
-                                ></i18n-label>
-                                {{ignoredCount}}
-                            </div>
-                            <div>
-                                <i18n-label
+                                    ws=""
+                                ></i18n-label
+                            ></span>
+                            <span class="value">{{ignoredCount}}</span>
+                        </div>
+                        <div class="card stat">
+                            <span class="label"
+                                ><i18n-label
                                     id="location.average.ninetyFive"
-                                ></i18n-label>
-                                <changeable-setting
+                                    ws=""
+                                ></i18n-label
+                            ></span>
+                            <span class="value"
+                                ><changeable-setting
                                     @click="toggleDistanceSystem()"
                                     >{{ninetyFive}}</changeable-setting
-                                >
-                            </div>
-                            <location-coordinates
-                                .coords="averagedDataPoint"
-                            ></location-coordinates>
-                            <p>
-                                <i18n-label
-                                    id="location.average.help"
-                                ></i18n-label>
-                            </p>
-                            <p>
-                                <i18n-label
-                                    id="location.average.help2"
-                                ></i18n-label>
-                            </p>
+                                ></span
+                            >
                         </div>
+                    </div>
+                    <div class="card coordinates">
+                        <location-coordinates
+                            .coords="averagedDataPoint"
+                        ></location-coordinates>
+                    </div>
+                    <div class="help">
+                        <p>
+                            <i18n-label
+                                id="location.average.help"
+                                ws=""
+                            ></i18n-label>
+                        </p>
+                        <p>
+                            <i18n-label
+                                id="location.average.help2"
+                                ws=""
+                            ></i18n-label>
+                        </p>
                     </div>
                 </div>
                 <icon-button

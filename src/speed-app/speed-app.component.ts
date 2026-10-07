@@ -85,15 +85,21 @@ component('speed-app', {
             display: flex;
             flex-direction: column;
             align-items: stretch;
+            gap: var(--space-3);
             height: 100%;
             width: 100%;
+            box-sizing: border-box;
+            padding: var(--space-4);
             overflow: hidden;
             text-align: center;
+            /* Location screens scale their text up; set a known size. */
+            font-size: 1rem;
         }
 
         @media (orientation: landscape) {
             .wrapper {
                 flex-direction: row;
+                align-items: center;
             }
         }
 
@@ -101,37 +107,50 @@ component('speed-app', {
             flex: 2;
             min-height: 0;
             min-width: 0;
+            font-variant-numeric: tabular-nums;
         }
 
         .speed-info {
-            flex: 1;
-            flex-grow: 1;
+            flex-shrink: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            min-height: 0;
-            min-width: 0;
-            gap: 0.3em;
+            gap: var(--space-3);
         }
 
-        .info-item {
-            display: flex;
-            flex-direction: row;
-            gap: 0.4em;
-            align-items: baseline;
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-3);
+            width: min(100%, 26rem);
         }
 
         @media (orientation: landscape) {
-            .speed-info {
-                gap: 0.6em;
+            .stats {
+                grid-template-columns: 1fr;
+                width: 12rem;
             }
+        }
 
-            .info-item {
-                flex-direction: column;
-                gap: 0;
-                align-items: center;
-            }
+        .stat {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+            padding: var(--space-3);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-l);
+        }
+
+        .label {
+            font-size: 0.85rem;
+            color: var(--fg-muted);
+        }
+
+        .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
         }
     `,
     template: html`
@@ -144,17 +163,25 @@ component('speed-app', {
                         >
                     </div>
                     <div class="speed-info">
-                        <div class="info-item">
-                            <span
-                                ><i18n-label id="speed.average"></i18n-label
-                            ></span>
-                            <span>{{averageSpeed}}</span>
-                        </div>
-                        <div class="info-item">
-                            <span
-                                ><i18n-label id="speed.maximum"></i18n-label
-                            ></span>
-                            <span>{{maximumSpeed}}</span>
+                        <div class="stats">
+                            <div class="stat">
+                                <span class="label"
+                                    ><i18n-label
+                                        id="speed.average"
+                                        ws=""
+                                    ></i18n-label
+                                ></span>
+                                <span class="value">{{averageSpeed}}</span>
+                            </div>
+                            <div class="stat">
+                                <span class="label"
+                                    ><i18n-label
+                                        id="speed.maximum"
+                                        ws=""
+                                    ></i18n-label
+                                ></span>
+                                <span class="value">{{maximumSpeed}}</span>
+                            </div>
                         </div>
                         <pretty-select
                             i18n-base="info.distances"

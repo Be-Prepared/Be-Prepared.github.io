@@ -46,6 +46,8 @@ export class FileTransferReceiveAppComponent {
     k: number = 0;
     lastFrameTime: number | null = null;
     meta: FileMeta | null = null;
+    // Percent of the frames needed that have arrived.
+    progress = 0;
     screenState = AccessState.CHECKING;
     startTime: number | null = null;
     timeFilter: KalmanFilter | null = null;
@@ -155,6 +157,7 @@ export class FileTransferReceiveAppComponent {
             this._decoder = new FountainDecoder(this.k);
             this.decodedCount = 0;
             this.encodedCount = 0;
+            this.progress = 0;
             this.fps = null;
             this.startTime = Date.now();
             this.timeFilter = new KalmanFilter({
@@ -179,6 +182,9 @@ export class FileTransferReceiveAppComponent {
         this.decodedCount = decoder.decodedCount;
         // Frames held until more blocks are known.
         this.encodedCount = Math.max(0, decoder.receivedCount - decoder.decodedCount);
+        // Blocks mostly decode together at the end, so frames received is
+        // the honest measure of how far along the transfer is.
+        this.progress = Math.min(100, Math.round((decoder.receivedCount / this.k) * 100));
 
         if (!done) {
             return false;
@@ -227,10 +233,14 @@ component('file-transfer-receive-app', {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-evenly;
+            justify-content: center;
+            gap: var(--space-4);
             height: 100%;
             width: 100%;
+            box-sizing: border-box;
+            padding: var(--space-4);
             overflow: hidden;
+            text-align: center;
         }
 
         @media (orientation: landscape) {
@@ -240,21 +250,15 @@ component('file-transfer-receive-app', {
         }
 
         .qr {
-            max-height: 95vmin;
-            max-width: 95vmin;
-            flex-grow: 1;
-            aspect-ratio: 1/1;
+            width: min(92vmin, 100%);
+            max-height: 100%;
+            min-height: 0;
+            flex-shrink: 1;
+            aspect-ratio: 1 / 1;
             box-sizing: border-box;
-            margin: 2em;
             border: 1px solid var(--border);
             border-radius: var(--radius-l);
             overflow: hidden;
-        }
-
-        .center {
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
 
         video {
@@ -262,6 +266,36 @@ component('file-transfer-receive-app', {
             width: 100%;
             object-fit: cover;
             touch-action: none;
+        }
+
+        .status {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+            width: min(100%, 24rem);
+            box-sizing: border-box;
+            padding: var(--space-3) var(--space-4);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-l);
+            flex-shrink: 0;
+        }
+
+        @media (orientation: landscape) {
+            .status {
+                width: min(40%, 20rem);
+            }
+        }
+
+        .bar {
+            width: 100%;
+            height: 0.5rem;
+            accent-color: var(--accent);
+        }
+
+        .center {
+            font-variant-numeric: tabular-nums;
+            color: var(--fg-muted);
         }
     `,
     template: html`
@@ -283,9 +317,14 @@ component('file-transfer-receive-app', {
                 <div class="qr">
                     <video #ref="video" autoplay muted playsinline></video>
                 </div>
-                <div class="center">
-                    {{ decodedCount }} / {{ k }} (+ {{ encodedCount }}) @ {{ fps
-                    }}&nbsp;<i18n-label id="fileTransfer.receive.fps"></i18n-label>
+                <div class="status">
+                    <progress class="bar" max="100" value="{{progress}}"></progress>
+                    <div class="center">
+                        {{ decodedCount }} / {{ k }} (+ {{ encodedCount }}) @
+                        {{ fps }}&nbsp;<i18n-label
+                            id="fileTransfer.receive.fps"
+                        ></i18n-label>
+                    </div>
                 </div>
             </div>
             <file-transfer-receive-view

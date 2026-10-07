@@ -82,38 +82,35 @@ component('location-field', {
     prop: ['startPosition'],
     style: css`
         :host {
+            display: block;
+            width: 100%;
             max-width: 100%;
         }
 
+        /* A row: what it is on one side, the reading on the other. */
         .field-line {
             display: flex;
             overflow: hidden;
             width: 100%;
-            justify-content: center;
-            align-items: center;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: var(--space-3);
         }
 
         .field-label-wrapper {
-            display: inline-block;
-            padding-inline-end: 0.4em;
+            flex-shrink: 0;
+            color: var(--fg-muted);
         }
 
         .field-value-wrapper {
             flex-shrink: 1;
+            min-width: 0;
             overflow: hidden;
-        }
-
-        .field-label {
-            position: relative;
-            display: inline-block;
-        }
-
-        .hidden-select {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            font-size: inherit;
-            cursor: pointer;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: end;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
         }
     `,
     template: html`

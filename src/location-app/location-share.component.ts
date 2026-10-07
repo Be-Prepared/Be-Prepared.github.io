@@ -13,7 +13,6 @@ import { ToastService } from '../services/toast.service';
 interface FormatOption {
     checked: string;
     className: string;
-    description: string;
     id: ShareFormatId;
     title: string;
 }
@@ -88,7 +87,6 @@ export class LocationShareComponent {
         this.options = SHARE_FORMATS.map((id) => ({
             checked: `${id === this.selected}`,
             className: id === this.selected ? 'format selected' : 'format',
-            description: get(`location.share.${id}.description`),
             id,
             title: get(`location.share.${id}`),
         }));
@@ -108,45 +106,50 @@ component(
     {
         attr: ['lat', 'lon', 'name'],
         style: css`
+            /* Never taller than the screen: the QR code shrinks, and the
+               list of formats scrolls if it has to. On a wide, short screen
+               (a phone on its side) the list sits beside the QR code. */
             .sheet {
                 /* Location screens scale their text up; the sheet doesn't
                    need to. */
                 font-size: 1rem;
-                display: flex;
-                flex-direction: column;
-                gap: var(--space-3);
-                width: min(30rem, 100%);
-                max-height: 100%;
+                display: grid;
+                grid-template-columns: minmax(0, 1fr);
+                grid-template-rows: auto auto auto minmax(4rem, 1fr);
+                gap: var(--space-2);
+                width: min(26rem, 100%);
+                /* Measured against the screen: the element around the sheet
+                   has no height of its own for a percentage to use. */
+                max-height: 90vh;
+                max-height: 90dvh;
                 box-sizing: border-box;
-                padding: var(--space-4);
-                overflow: auto;
+                padding: var(--space-3);
+                overflow: hidden;
                 background: var(--surface);
                 color: var(--fg);
                 border: 1px solid var(--border);
                 border-radius: var(--radius-l);
             }
 
-            h2 {
-                margin: 0;
-                font-size: 1.25rem;
-            }
-
             .qr {
-                align-self: center;
-                width: min(60vmin, 16rem);
+                justify-self: center;
+                width: min(42vmin, 13rem);
                 aspect-ratio: 1 / 1;
-                padding: var(--space-2);
+                padding: var(--space-1);
                 background: #fff;
                 border-radius: var(--radius-m);
-                flex-shrink: 0;
             }
 
             .content {
                 font-family: ui-monospace, monospace;
-                font-size: 0.8rem;
+                font-size: 0.75rem;
+                line-height: 1.3;
+                /* Two lines at most; the QR code and Copy have the rest. */
+                max-height: 2.6em;
+                overflow: hidden;
                 overflow-wrap: anywhere;
-                white-space: pre-wrap;
                 color: var(--fg-muted);
+                text-align: center;
                 user-select: text;
             }
 
@@ -162,13 +165,13 @@ component(
             .formats {
                 display: flex;
                 flex-direction: column;
-                gap: var(--space-2);
+                gap: var(--space-1);
+                min-height: 0;
+                overflow-y: auto;
             }
 
             .format {
-                display: flex;
-                flex-direction: column;
-                gap: 0.15rem;
+                flex-shrink: 0;
                 padding: var(--space-2) var(--space-3);
                 text-align: start;
                 font: inherit;
@@ -181,21 +184,39 @@ component(
 
             .format.selected {
                 border-color: var(--accent);
-                box-shadow: 0 0 0 2px var(--accent-soft);
-            }
-
-            .format-title {
+                box-shadow: inset 0 0 0 1px var(--accent);
                 font-weight: 700;
             }
 
-            .format-description {
-                font-size: 0.85rem;
-                color: var(--fg-muted);
+            @media (orientation: landscape) and (max-height: 34rem) {
+                .sheet {
+                    width: min(44rem, 100%);
+                    grid-template-columns: auto minmax(0, 1fr);
+                    grid-template-rows: auto auto minmax(0, 1fr);
+                    column-gap: var(--space-3);
+                }
+
+                .qr {
+                    grid-row: 1 / span 3;
+                    align-self: center;
+                    width: min(60vmin, 13rem);
+                }
+
+                .content {
+                    grid-column: 2;
+                }
+
+                .actions {
+                    grid-column: 2;
+                }
+
+                .formats {
+                    grid-column: 2;
+                }
             }
         `,
         template: html`
             <div class="sheet" role="dialog">
-                <h2><i18n-label id="location.share.heading" ws=""></i18n-label></h2>
                 <div class="qr"><qr-code content="{{content}}"></qr-code></div>
                 <div class="content">{{content}}</div>
                 <div class="actions">
@@ -220,10 +241,7 @@ component(
                         aria-checked="{{option.checked}}"
                         @click.stop.prevent="select(option.id)"
                     >
-                        <span class="format-title">{{option.title}}</span>
-                        <span class="format-description"
-                            >{{option.description}}</span
-                        >
+                        {{option.title}}
                     </button>
                 </div>
             </div>

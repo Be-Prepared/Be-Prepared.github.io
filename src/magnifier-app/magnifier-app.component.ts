@@ -294,6 +294,15 @@ component(
                 @pointerup="pointerUp($event)"
                 @pointercancel="pointerUp($event)"
             >
+                <!-- Same order as the mirror: light, zoom, freeze. -->
+                <icon-button
+                    slot="more-buttons"
+                    *if="torchAvailable"
+                    href="/flashlight.svg"
+                    label-id="shared.torch"
+                    .active="torchEnabled"
+                    @click.stop.prevent="toggleTorch()"
+                ></icon-button>
                 <icon-button
                     slot="more-buttons"
                     href="/zoom-out.svg"
@@ -314,14 +323,6 @@ component(
                     label-id="{{freezeLabel}}"
                     .active="frozen"
                     @click.stop.prevent="toggleFreeze()"
-                ></icon-button>
-                <icon-button
-                    slot="more-buttons"
-                    *if="torchAvailable"
-                    href="/flashlight.svg"
-                    label-id="shared.torch"
-                    .active="torchEnabled"
-                    @click.stop.prevent="toggleTorch()"
                 ></icon-button>
             </default-layout>
         `,

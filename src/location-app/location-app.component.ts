@@ -61,65 +61,105 @@ component('location-app', {
         .content {
             height: 100%;
             width: 100%;
-            padding: 1em;
+            max-width: 34rem;
+            margin: 0 auto;
+            padding: var(--space-4);
             display: flex;
             flex-direction: column;
             justify-content: center;
-            align-items: center;
+            align-items: stretch;
+            gap: var(--space-3);
             box-sizing: border-box;
             overflow: hidden;
-        }
-
-        .gap-above {
-            padding-top: 0.4em;
-        }
-
-        .multi-line {
-            display: flex;
-            flex-direction: column;
             text-align: center;
         }
 
-        .full-width {
-            width: 100%;
+        @media (orientation: landscape) {
+            .content.reading {
+                flex-direction: row;
+                align-items: center;
+                max-width: 60rem;
+            }
+
+            .content.reading > * {
+                flex: 1;
+                min-width: 0;
+            }
+        }
+
+        .card {
+            box-sizing: border-box;
+            padding: var(--space-3) var(--space-4);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-l);
+        }
+
+        .coordinates {
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Rows of readings, smaller than the coordinates above them. */
+        .fields {
+            display: flex;
+            flex-direction: column;
+            font-size: 0.7em;
+        }
+
+        .fields > div {
+            padding: var(--space-2) 0;
+        }
+
+        .fields > div + div {
+            border-top: 1px solid var(--border);
+        }
+
+        p {
+            margin: 0;
+            color: var(--fg-muted);
         }
     `,
     template: html`
         <location-wrapper>
             <default-layout>
-                <div *if="latLon" class="content">
-                    <location-coordinates
-                        .coords="latLon"
-                    ></location-coordinates>
-                    <div class="gap-above full-width">
+                <div *if="latLon" class="content reading">
+                    <div class="card coordinates">
+                        <location-coordinates
+                            .coords="latLon"
+                        ></location-coordinates>
+                    </div>
+                    <div class="card fields">
+                    <div>
                         <location-field
                             id="current.1"
                             default="ACCURACY"
                         ></location-field>
                     </div>
-                    <div class="full-width">
+                    <div>
                         <location-field
                             id="current.2"
                             default="SPEED"
                         ></location-field>
                     </div>
-                    <div class="full-width">
+                    <div>
                         <location-field
                             id="current.3"
                             default="HEADING"
                         ></location-field>
                     </div>
-                    <div class="full-width">
+                    <div>
                         <location-field
                             id="current.4"
                             default="ALTITUDE"
                         ></location-field>
                     </div>
-                    <div class="full-width">
+                    <div>
                         <location-field
                             id="current.5"
                             default="ALTITUDE_ACCURACY"
                         ></location-field>
+                    </div>
                     </div>
                 </div>
                 <div *if="position && position.error" class="content">

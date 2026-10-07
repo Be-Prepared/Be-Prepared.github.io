@@ -139,83 +139,43 @@ export class LocationEditComponent {
 component('location-edit-app', {
     attr: ['id'],
     style: css`
-        .share-content {
-            display: flex;
-            align-items: center;
-            gap: var(--space-2);
-        }
-
-        .share-icon {
-            width: 1.5em;
-            height: 1.5em;
-        }
-
-        .gapAbove {
-            padding-top: 0.7em;
-        }
-
-        .centered-text {
-            width: 100%;
-            text-align: center;
-        }
-
         .content {
-            height: 100%;
-            width: 100%;
+            /* Location screens scale their text up; a form doesn't need to. */
+            font-size: 1.125rem;
             display: flex;
             flex-direction: column;
-            box-sizing: border-box;
-        }
-
-        .detail {
-            height: 100%;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
-            box-sizing: border-box;
-            overflow: hidden;
-        }
-
-        .actions {
+            gap: var(--space-4);
             box-sizing: border-box;
             width: 100%;
-            display: flex;
-            justify-content: space-between;
+            max-width: 32rem;
+            min-height: 100%;
+            margin: 0 auto;
+            padding: var(--space-4);
         }
 
-        .landscape-buttons {
+        .field {
             display: flex;
-            justify-content: space-around;
+            flex-direction: column;
+            gap: var(--space-1);
+            /* Lets long coordinates shrink instead of widening the page. */
+            min-width: 0;
+        }
+
+        .label {
+            font-size: 0.85em;
+            color: var(--fg-muted);
+        }
+
+        pretty-input {
             width: 100%;
-            padding-top: 0.4em;
+            min-width: 0;
         }
 
-        @media (orientation: portrait) {
-            .landscape {
-                display: none;
-            }
-        }
-
-        @media (orientation: landscape) {
-            .portrait {
-                display: none;
-            }
-        }
-
-        .no-shrink {
-            flex-shrink: 0;
-        }
-
-        .space-between-bottom {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-
-        .full-width {
-            width: 100%;
+        .help {
+            font-size: 0.85em;
+            color: var(--fg-muted);
+            text-align: center;
         }
 
         .getting-location {
@@ -229,80 +189,31 @@ component('location-edit-app', {
         <location-wrapper>
             <default-layout *if="point">
                 <div class="content">
-                    <div class="actions">
-                        <pretty-button
-                            class="share-button"
-                            @click="openQrCode()"
-                        >
-                            <span class="share-content">
-                                <load-svg
-                                    class="share-icon"
-                                    href="/share-1.svg"
-                                ></load-svg>
-                                <i18n-label
-                                    id="location.share.button"
-                                    ws=""
-                                ></i18n-label>
-                            </span>
-                        </pretty-button>
-                        <div class="centered-text landscape">
-                            <i18n-label
-                                id="location.edit.helpSave"
-                            ></i18n-label>
-                        </div>
-                        <pretty-labeled-button
-                            @click="averagePoint()"
-                            class="portrait"
-                            id="location.edit.average"
-                        ></pretty-labeled-button>
-                        <pretty-labeled-button
-                            @click="deletePoint()"
-                            class="portrait"
-                            id="location.edit.delete"
-                        ></pretty-labeled-button>
+                    <div class="field">
+                        <span class="label"
+                            ><i18n-label id="location.edit.name" ws=""></i18n-label
+                        ></span>
+                        <pretty-input
+                            value="{{point.name}}"
+                            @change="nameChange($event.detail)"
+                        ></pretty-input>
                     </div>
-                    <div class="detail">
-                        <div class="full-width">
-                            <div class="no-shrink">
-                                <i18n-label
-                                    id="location.edit.name"
-                                ></i18n-label>
-                            </div>
-                            <pretty-input
-                                class="full-width"
-                                value="{{point.name}}"
-                                @change="nameChange($event.detail)"
-                            ></pretty-input>
-                        </div>
-                        <div class="full-width gapAbove">
-                            <div class="no-shrink space-between-bottom">
-                                <i18n-label
-                                    id="location.edit.location"
-                                ></i18n-label>
-                            </div>
-                            <pretty-input
-                                class="full-width"
-                                value="{{location}}"
-                                @change="locationChange($event.detail)"
-                                #ref="locationInput"
-                                help-html="location.help.html"
-                            ></pretty-input>
-                        </div>
-                        <div class="gapAbove centered-text portrait">
-                            <i18n-label
-                                id="location.edit.helpSave"
-                            ></i18n-label>
-                        </div>
-                        <div class="landscape landscape-buttons">
-                            <pretty-labeled-button
-                                @click="deletePoint()"
-                                id="location.edit.delete"
-                            ></pretty-labeled-button>
-                            <pretty-labeled-button
-                                @click="averagePoint()"
-                                id="location.edit.average"
-                            ></pretty-labeled-button>
-                        </div>
+                    <div class="field">
+                        <span class="label"
+                            ><i18n-label
+                                id="location.edit.location"
+                                ws=""
+                            ></i18n-label
+                        ></span>
+                        <pretty-input
+                            value="{{location}}"
+                            @change="locationChange($event.detail)"
+                            #ref="locationInput"
+                            help-html="location.help.html"
+                        ></pretty-input>
+                    </div>
+                    <div class="help">
+                        <i18n-label id="location.edit.helpSave" ws=""></i18n-label>
                     </div>
                 </div>
                 <icon-button
@@ -311,6 +222,24 @@ component('location-edit-app', {
                     @click.stop.prevent="navigate()"
                     href="/navigate.svg"
                     label-id="location.navigate"
+                ></icon-button>
+                <icon-button
+                    slot="more-buttons"
+                    @click.stop.prevent="openQrCode()"
+                    href="/share-1.svg"
+                    label-id="location.share.button"
+                ></icon-button>
+                <icon-button
+                    slot="more-buttons"
+                    @click.stop.prevent="averagePoint()"
+                    href="/average.svg"
+                    label-id="location.edit.average"
+                ></icon-button>
+                <icon-button
+                    slot="more-buttons"
+                    @click.stop.prevent="deletePoint()"
+                    href="/delete.svg"
+                    label-id="location.edit.delete"
                 ></icon-button>
             </default-layout>
             <show-modal *if="gettingLocation">

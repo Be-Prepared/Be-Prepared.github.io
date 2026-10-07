@@ -547,31 +547,16 @@ export const strings: LanguageData = {
         'No hay ningún servicio de ubicación disponible en este dispositivo.',
     'location.waypointList': 'Puntos de referencia',
     'location.share.apple-maps': 'Apple Maps',
-    'location.share.apple-maps.description':
-        'Marcador con el nombre en iPhone. Los iPhone antiguos y otros dispositivos abren el sitio web de Apple Maps.',
     'location.share.be-prepared': 'Enlace de Be Prepared',
-    'location.share.be-prepared.description':
-        'Abre Be Prepared y guarda el punto con su nombre. Funciona en cualquier teléfono con Be Prepared.',
     'location.share.button': 'Compartir',
     'location.share.close': 'Cerrar',
     'location.share.copied': 'Copiado',
     'location.share.copy': 'Copiar',
     'location.share.decimal-text': 'Coordenadas decimales (texto)',
-    'location.share.decimal-text.description':
-        'Números simples para pegar en el buscador de cualquier mapa.',
     'location.share.display-text': 'Nombre y coordenadas (texto)',
-    'location.share.display-text.description':
-        'Usa tu formato de coordenadas (por ejemplo UTM o MGRS), para equipos GPS o para leer en voz alta.',
     'location.share.geo-basic': 'Enlace geo, solo coordenadas',
-    'location.share.geo-basic.description':
-        'El enlace geo más compatible, para apps de mapas y de GPS en Android. Sin nombre.',
     'location.share.geo-full': 'Enlace geo con nombre',
-    'location.share.geo-full.description':
-        'Marcador con nombre en apps de mapas de Android. Los iPhone no abren enlaces geo en Apple Maps, así que usa un enlace de Apple Maps para ellos.',
     'location.share.google-maps': 'Google Maps',
-    'location.share.google-maps.description':
-        'Solo coordenadas, sin nombre. Abre Google Maps en cualquier teléfono o computadora.',
-    'location.share.heading': 'Compartir ubicación',
     'location.share.share': 'Compartir',
     'location.waypoints.location': 'Ubicación',
     'location.waypoints.name': 'Nombre',
