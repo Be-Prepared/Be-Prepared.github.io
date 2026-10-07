@@ -12,7 +12,10 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 export class MirrorAppComponent {
-    private _camera = di(CameraService).controller({ facing: 'user' });
+    private _camera = di(CameraService).controller({ facing: 'user', switchable: true });
+    // For the template: names starting with "_" are shortened by the
+    // production build, so templates can't use them.
+    cameraController = this._camera;
     private _subject = new Subject();
     private _zoom = 1;
     canZoomIn = true;
@@ -195,6 +198,11 @@ component(
                     .active="ring"
                     @click.stop.prevent="toggleRing()"
                 ></icon-button>
+                <camera-switch
+                    slot="more-buttons"
+                    .camera="cameraController"
+                    facing="user"
+                ></camera-switch>
                 <icon-button
                     slot="more-buttons"
                     href="/zoom-out.svg"

@@ -2,9 +2,26 @@ import {
     AccessController,
     AccessControllerConfig,
 } from './access/access-controller';
+import { camerasFacing, Facing, nextCamera } from './camera/camera-choice';
+import { LocalStorageService } from './local-storage.service';
 import { watchPermission } from './access/permission-status';
 
 const TORCH_OFF_TIMEOUT_MS = 500;
+
+// Which lens to use on each side of the phone, picked with the switch
+// camera button. A preference, not a permission: if that camera is gone,
+// the default is used again.
+const preferredCamera = {
+    environment: LocalStorageService.string('camera.environment'),
+    user: LocalStorageService.string('camera.user'),
+};
+
+export interface CameraChoices {
+    // How many cameras face this way.
+    count: number;
+    // Which of them is in use, counting from 0.
+    index: number;
+}
 
 export interface CameraOptions {
     // "user" is the selfie camera. Defaults to the rear camera.
@@ -12,6 +29,10 @@ export interface CameraOptions {
     // Ask for a high resolution stream. Useful for digital zoom.
     highResolution?: boolean;
     releaseWhenHidden?: boolean;
+    // Open the lens picked with the switch camera button. Only for screens
+    // that show the picture and have that button. Tools that just need the
+    // light must keep the default camera, which is the one that has it.
+    switchable?: boolean;
 }
 
 // Every camera stream goes through here so that streams are always stopped.
@@ -114,22 +135,72 @@ export class CameraService {
             return Promise.reject(error);
         }
 
-        const video: MediaTrackConstraints = {
-            facingMode: options.facing || 'environment',
-        };
+        const facing = options.facing || 'environment';
+        const size: MediaTrackConstraints = options.highResolution
+            ? { width: { ideal: 1920 }, height: { ideal: 1080 } }
+            : {};
+        const get = (video: MediaTrackConstraints) =>
+            navigator.mediaDevices.getUserMedia({ audio: false, video });
+        const preferred = options.switchable ? preferredCamera[facing].getItem() : null;
+        const byDefault = () => get({ ...size, facingMode: facing });
+        const opening = preferred
+            ? get({ ...size, deviceId: { exact: preferred } }).catch((error) => {
+                  // The chosen camera is gone (ids change when site data
+                  // is cleared). Anything else, such as a refusal, is real.
+                  if (
+                      error?.name !== 'OverconstrainedError' &&
+                      error?.name !== 'NotFoundError'
+                  ) {
+                      throw error;
+                  }
 
-        if (options.highResolution) {
-            video.width = { ideal: 1920 };
-            video.height = { ideal: 1080 };
+                  preferredCamera[facing].reset();
+
+                  return byDefault();
+              })
+            : byDefault();
+
+        return opening.then((stream) => {
+            this._openStreams.add(stream);
+
+            return stream;
+        });
+    }
+
+    // The cameras that face the same way as the open one. Only meaningful
+    // while a stream is open, because browsers hide camera names until then.
+    choices(facing: Facing, stream: MediaStream | null): Promise<CameraChoices> {
+        return this._ids(facing, stream).then(({ ids, current }) => ({
+            count: ids.length,
+            index: Math.max(0, ids.indexOf(current)),
+        }));
+    }
+
+    // Remembers the next camera on this side as the one to open. The caller
+    // reopens the camera. Resolves with the new position.
+    chooseNext(facing: Facing, stream: MediaStream | null): Promise<CameraChoices> {
+        return this._ids(facing, stream).then(({ ids, current }) => {
+            const next = nextCamera(ids, current);
+
+            if (next) {
+                preferredCamera[facing].setItem(next);
+            }
+
+            return { count: ids.length, index: Math.max(0, ids.indexOf(next)) };
+        });
+    }
+
+    private _ids(facing: Facing, stream: MediaStream | null) {
+        const current = getVideoTrack(stream)?.getSettings?.().deviceId || '';
+
+        if (!stream || !navigator.mediaDevices?.enumerateDevices) {
+            return Promise.resolve({ ids: [] as string[], current });
         }
 
-        return navigator.mediaDevices
-            .getUserMedia({ audio: false, video })
-            .then((stream) => {
-                this._openStreams.add(stream);
-
-                return stream;
-            });
+        return navigator.mediaDevices.enumerateDevices().then(
+            (devices) => ({ ids: camerasFacing(devices, facing, current), current }),
+            () => ({ ids: [] as string[], current })
+        );
     }
 }
 

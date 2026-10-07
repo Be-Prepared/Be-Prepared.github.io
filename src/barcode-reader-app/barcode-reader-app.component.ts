@@ -26,7 +26,10 @@ const IGNORE_SAME_CODE_MS = 2000;
 
 export class BarcodeReaderAppComponent {
     private _barcodeReaderService = di(BarcodeReaderService);
-    private _camera = di(CameraService).controller();
+    private _camera = di(CameraService).controller({ switchable: true });
+    // For the template: names starting with "_" are shortened by the
+    // production build, so templates can't use them.
+    cameraController = this._camera;
     private _ignoreUntil = 0;
     private _ignoreValue: string | null = null;
     private _scanLoop = new ScanLoop<DetectedBarcodeData>({
@@ -340,6 +343,10 @@ component(
                     .active="torchEnabled"
                     @click.stop.prevent="toggleTorch()"
                 ></icon-button>
+                <camera-switch
+                    slot="more-buttons"
+                    .camera="cameraController"
+                ></camera-switch>
                 <icon-button
                     slot="more-buttons"
                     href="/barcode-reader.svg"

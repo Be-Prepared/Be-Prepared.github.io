@@ -146,3 +146,67 @@ function installPictureCamera() {
 export async function pictureCamera(page: Page) {
     await page.addInitScript(installPictureCamera);
 }
+
+// A phone with several cameras: two on the back and two on the front. Each
+// request is recorded on window.__opened, and each stream reports the
+// camera it came from, like a real one.
+function installManyCameras() {
+    const cameras = [
+        { deviceId: 'front-0', label: 'camera2 1, facing front' },
+        { deviceId: 'back-0', label: 'camera2 0, facing back' },
+        { deviceId: 'back-1', label: 'camera2 2, facing back' },
+        { deviceId: 'front-1', label: 'camera2 3, facing front' },
+    ];
+    const canvas = document.createElement('canvas');
+    canvas.width = 640;
+    canvas.height = 480;
+    const context = canvas.getContext('2d')!;
+    setInterval(() => {
+        context.fillStyle = `hsl(${Date.now() % 360} 40% 40%)`;
+        context.fillRect(0, 0, 640, 480);
+    }, 50);
+    (window as any).__opened = [];
+    (window as any).__streams = [];
+
+    if (typeof MediaDevices !== 'undefined') {
+        MediaDevices.prototype.enumerateDevices = async () =>
+            cameras.map((camera) => ({ ...camera, kind: 'videoinput', groupId: '' })) as any;
+        MediaDevices.prototype.getUserMedia = async (constraints: any) => {
+            const video = constraints.video || {};
+            const wanted = video.deviceId?.exact;
+            const deviceId =
+                wanted || (video.facingMode === 'user' ? 'front-0' : 'back-0');
+
+            if (!cameras.some((camera) => camera.deviceId === deviceId)) {
+                const error = new Error('No such camera');
+                error.name = 'OverconstrainedError';
+                throw error;
+            }
+
+            const stream = (canvas as any).captureStream(15) as MediaStream;
+            const track = stream.getVideoTracks()[0];
+            const settings = track.getSettings.bind(track);
+            track.getSettings = () => ({ ...settings(), deviceId });
+            // WebKit forgets the patch above when nothing keeps the track
+            // object alive, so keep it.
+            ((window as any).__tracks ??= []).push(track);
+            (window as any).__opened.push(deviceId);
+            (window as any).__streams.push(stream);
+
+            return stream;
+        };
+    }
+
+    if (typeof Permissions !== 'undefined') {
+        const query = Permissions.prototype.query;
+        Permissions.prototype.query = function (descriptor: any) {
+            return descriptor.name === 'camera'
+                ? Promise.resolve({ state: 'granted', onchange: null } as any)
+                : query.call(this, descriptor);
+        };
+    }
+}
+
+export async function manyCameras(page: Page) {
+    await page.addInitScript(installManyCameras);
+}

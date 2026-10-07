@@ -24,6 +24,14 @@ export class DefaultLayoutComponent {
 
         this.hostClasses = classes.join(' ');
     }
+
+    // The toolbar lays its buttons out from the far end (see the styles),
+    // so they are numbered backwards to keep reading in the order written.
+    order(slot: HTMLSlotElement) {
+        slot.assignedElements().forEach((element, index) => {
+            (element as HTMLElement).style.order = `${-index}`;
+        });
+    }
 }
 
 component(
@@ -78,16 +86,29 @@ component(
                 box-shadow: var(--shadow);
             }
 
+            /* Back sits in the corner. The other buttons line up beside
+               it, and when there are too many for one line the first ones
+               move to a second line, further from the thumb:
+
+                         V  W
+                   <  X  Y  Z
+
+               To fill the line next to Back first, the buttons are laid
+               out from the far end in reverse (see order() for the other
+               half of this), which still reads V W X Y Z. */
             .buttons {
                 display: flex;
-                justify-content: space-between;
-                align-items: center;
+                align-items: flex-end;
                 gap: var(--space-3);
                 padding: var(--space-3) var(--space-4);
             }
 
             .more {
+                flex: 1 1 0;
+                min-width: 0;
                 display: flex;
+                flex-direction: row-reverse;
+                flex-wrap: wrap-reverse;
                 gap: var(--space-3);
                 align-items: center;
             }
@@ -102,13 +123,30 @@ component(
                     flex-direction: row;
                 }
 
+                /* Sideways, the toolbar runs up the edge with Back at the
+                   bottom, and a second line becomes a second column further
+                   from the edge. */
                 .buttons {
                     flex-direction: column-reverse;
+                    align-items: flex-end;
                     padding: var(--space-4) var(--space-3);
                 }
 
+                /* Vertical writing mode makes "lines" run top to bottom
+                   and stack from the edge of the screen inward, so the
+                   same wrapping works and the toolbar is only as wide as
+                   the columns it really has. (A wrapping flex column or a
+                   grid reserves room for columns it doesn't use.) */
                 .more {
-                    flex-direction: column-reverse;
+                    writing-mode: vertical-rl;
+                    flex-direction: row;
+                    flex-wrap: wrap;
+                    min-width: auto;
+                    min-height: 0;
+                }
+
+                ::slotted(*) {
+                    writing-mode: horizontal-tb;
                 }
 
                 .outer {
@@ -134,7 +172,10 @@ component(
                 <div class="buttons">
                     <back-button></back-button>
                     <div class="more">
-                        <slot name="more-buttons"></slot>
+                        <slot
+                            name="more-buttons"
+                            @slotchange="order($event.target)"
+                        ></slot>
                     </div>
                 </div>
             </div>

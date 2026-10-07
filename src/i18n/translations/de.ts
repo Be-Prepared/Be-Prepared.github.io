@@ -587,6 +587,8 @@ export const strings: LanguageData = {
     'shared.access.unavailable.heading': 'Nicht verfügbar',
     'shared.access.unavailable.message': 'Diesem Gerät fehlt die Hardware, die dieses Werkzeug braucht.',
     'shared.prettyInput.close': 'Hilfe schließen',
+    'shared.cameraNumber': 'Kamera {{n}} von {{count}}',
+    'shared.switchCamera': 'Kamera wechseln',
     'shared.torch': 'Licht',
     'speed.average': 'Mittel:',
     'speed.maximum': 'Maximum:',

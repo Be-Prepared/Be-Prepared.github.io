@@ -40,7 +40,10 @@ const HANDLE_RADIUS = 14;
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 export class ProtractorAppComponent {
-    private _camera = di(CameraService).controller();
+    private _camera = di(CameraService).controller({ switchable: true });
+    // For the template: names starting with "_" are shortened by the
+    // production build, so templates can't use them.
+    cameraController = this._camera;
     private _drag: Drag | null = null;
     // SVG parts are created once and only updated afterwards. Replacing them
     // while a finger is on a handle ends the drag on iPhones, where touch
@@ -652,6 +655,10 @@ component(
                     .active="torchEnabled"
                     @click.stop.prevent="toggleTorch()"
                 ></icon-button>
+                <camera-switch
+                    slot="more-buttons"
+                    .camera="cameraController"
+                ></camera-switch>
                 <icon-button
                     slot="more-buttons"
                     href="/reset.svg"

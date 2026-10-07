@@ -576,6 +576,8 @@ export const strings: LanguageData = {
     'shared.access.unavailable.heading': '不可用',
     'shared.access.unavailable.message': '此设备没有该工具所需的硬件。',
     'shared.prettyInput.close': '关闭帮助',
+    'shared.cameraNumber': '摄像头 {{n}} / {{count}}',
+    'shared.switchCamera': '切换摄像头',
     'shared.torch': '补光灯',
     'speed.average': '平均：',
     'speed.maximum': '最大：',

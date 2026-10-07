@@ -45,6 +45,7 @@ An offline PWA toolbox (flashlight, compass, level, timers, and more). TypeScrip
 * Template expressions do NOT support the ternary `?:` operator. It fails at runtime with a parse error. Compute strings and classes in the controller and bind those.
 * `attr` names are camelCase in the controller and kebab-case in HTML (`labelId` → `label-id`). Props are bound with `.prop="expr"`.
 * Only top-level controller properties trigger updates; reassign objects and arrays.
+* Templates can only use properties whose names don't start with `_`. The production build shortens `_names` (`mangleProps` in `vite.config.ts`), so `.prop="_thing"` works in the dev server and silently passes `undefined` in production. The browser tests run against the production build for this reason; a default import from a CommonJS library can break the same way.
 * `#ref` elements inside `*if` exist a tick later. Attach things like a video `srcObject` in a `setTimeout`.
 * Lifecycle hooks: `onInit`, `onViewInit`, `onChange`, `onDestroy`. Clean up timers, animation frames, subscriptions, listeners, audio, and hardware in `onDestroy`.
 * Component styles are scoped to elements in the template. HTML injected with `i18n-html` doesn't get them; use inline styles there.
@@ -61,7 +62,7 @@ An offline PWA toolbox (flashlight, compass, level, timers, and more). TypeScrip
 * Use the CSS variables from `site/index.html` (`--bg`, `--surface`, `--fg`, `--fg-muted`, `--accent`, `--border`, `--space-1..5`, `--radius-s/m/l`, and so on). Dark mode is pure black for OLED screens.
 * Icons: 24×24 viewBox, `fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"`, no hard-coded colors, so they follow the theme.
 * Every screen must work in portrait, landscape, light, and dark.
-* Toolbar buttons (`slot="more-buttons"`) go in the same order on every screen: light first, then zoom out, zoom in, freeze, then reset, then calibrate or other settings. A button that's sometimes hidden keeps its place.
+* Toolbar buttons (`slot="more-buttons"`) go in the same order on every screen: light first, then switch camera (`<camera-switch>`, on every screen that shows the camera), zoom out, zoom in, freeze, then reset, then calibrate or other settings. A button that's sometimes hidden keeps its place. When they don't fit on one line, `default-layout` wraps the first ones onto a second line and keeps Back in the corner; don't shrink or drop buttons to make room.
 * All user-visible text goes through i18n, including unit symbols (`unit.*`), compass points (`direction.*`), and AM/PM. Format dates with `Intl` and `I18nService.locale()`, not `navigator.language`, so they follow the language picked in the app.
 * Arabic is right to left. Use logical CSS (`margin-inline-start`, `text-align: start`) for anything that follows reading direction; keep physical `left`/`right` for geometry such as centering and gauges.
 

@@ -81,6 +81,7 @@ What each tool needs is listed after the description. Tools are only hidden from
 
 * Each tool asks for a permission only when you open it, and explains why first.
 * Nothing about permissions is remembered by the app. If you deny one, the tool stays on the home screen, explains how to allow it again in your browser's settings, and offers a "Try Again" button.
+* Phones that offer more than one camera on a side get a Switch Camera button in the tools that show the camera (magnifier, mirror, protractor, picture hanging, barcode reader, and file transfer). Your choice is remembered. Many phones, including most iPhones, only offer one per side to web apps, and then there's no button.
 * The camera and microphone are only on while their tool is open. They turn off when you leave the tool or switch away from the app.
 
 ## Languages

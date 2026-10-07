@@ -585,6 +585,8 @@ export const strings: LanguageData = {
     'shared.access.unavailable.heading': 'Tidak Tersedia',
     'shared.access.unavailable.message': 'Perangkat ini tidak punya perangkat keras yang dibutuhkan alat ini.',
     'shared.prettyInput.close': 'Tutup Bantuan',
+    'shared.cameraNumber': 'Kamera {{n}} dari {{count}}',
+    'shared.switchCamera': 'Ganti kamera',
     'shared.torch': 'Lampu',
     'speed.average': 'Rata-rata:',
     'speed.maximum': 'Maksimum:',

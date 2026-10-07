@@ -22,7 +22,10 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 export class MagnifierAppComponent {
-    private _camera = di(CameraService).controller({ highResolution: true });
+    private _camera = di(CameraService).controller({ highResolution: true, switchable: true });
+    // For the template: names starting with "_" are shortened by the
+    // production build, so templates can't use them.
+    cameraController = this._camera;
     private _hardwareZoom: HardwareZoom | null = null;
     private _hardwareZoomApplied: number | null = null;
     private _hardwareZoomPending: number | null = null;
@@ -303,6 +306,10 @@ component(
                     .active="torchEnabled"
                     @click.stop.prevent="toggleTorch()"
                 ></icon-button>
+                <camera-switch
+                    slot="more-buttons"
+                    .camera="cameraController"
+                ></camera-switch>
                 <icon-button
                     slot="more-buttons"
                     href="/zoom-out.svg"

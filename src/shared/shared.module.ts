@@ -2,6 +2,7 @@ export * from './access-screen.component';
 export * from './back-button.component';
 export * from './big-qr.component';
 export * from './bottom-drawer.component';
+export * from './camera-switch.component';
 export * from './changeable-setting.component';
 export * from './default-layout.component';
 export * from './icon-button.component';

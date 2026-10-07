@@ -25,7 +25,10 @@ import { takeUntil } from 'rxjs/operators';
 const SMOOTHING = 0.2;
 
 export class PictureHangingAppComponent {
-    private _camera = di(CameraService).controller({ facing: 'environment' });
+    private _camera = di(CameraService).controller({ facing: 'environment', switchable: true });
+    // For the template: names starting with "_" are shortened by the
+    // production build, so templates can't use them.
+    cameraController = this._camera;
     private _cameraState = AccessState.CHECKING;
     private _frame: ReturnType<typeof requestAnimationFrame> | null = null;
     private _gravity: Vector3 | null = null;
@@ -401,6 +404,10 @@ component(
                     .active="torchEnabled"
                     @click.stop.prevent="toggleTorch()"
                 ></icon-button>
+                <camera-switch
+                    slot="more-buttons"
+                    .camera="cameraController"
+                ></camera-switch>
             </default-layout>
         `,
     },
