@@ -78,7 +78,7 @@ component(
             .detail {
                 font-weight: 400;
                 color: var(--fg-muted);
-                font-size: 0.9rem;
+                font-size: 1rem;
             }
         `,
         template: html`

@@ -7,7 +7,7 @@ component('info-header', {
     style: css`
         p {
             margin: 1.5em 0 0.5em;
-            font-size: 0.8em;
+            font-size: 0.9em;
             font-weight: 700;
             letter-spacing: 0.06em;
             text-transform: uppercase;

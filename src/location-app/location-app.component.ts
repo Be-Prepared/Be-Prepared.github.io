@@ -74,19 +74,6 @@ component('location-app', {
             text-align: center;
         }
 
-        @media (orientation: landscape) {
-            .content.reading {
-                flex-direction: row;
-                align-items: center;
-                max-width: 60rem;
-            }
-
-            .content.reading > * {
-                flex: 1;
-                min-width: 0;
-            }
-        }
-
         .card {
             box-sizing: border-box;
             padding: var(--space-3) var(--space-4);
@@ -100,11 +87,12 @@ component('location-app', {
             font-variant-numeric: tabular-nums;
         }
 
-        /* Rows of readings, smaller than the coordinates above them. */
+        /* Rows of readings, as easy to read as the coordinates above
+           them. */
         .fields {
             display: flex;
             flex-direction: column;
-            font-size: 0.7em;
+            font-size: 1.1em;
         }
 
         .fields > div {
@@ -113,6 +101,38 @@ component('location-app', {
 
         .fields > div + div {
             border-top: 1px solid var(--border);
+        }
+
+        @media (orientation: landscape) {
+            .content.reading {
+                flex-direction: row;
+                align-items: center;
+                max-width: 60rem;
+            }
+
+            .content.reading > * {
+                flex: 1;
+                min-width: 0;
+            }
+
+            /* Names and readings share a row, so they need more room than
+               the coordinates. */
+            .content.reading > .fields {
+                flex: 1.4;
+                max-height: 100%;
+                overflow: auto;
+            }
+        }
+
+        /* A phone on its side is short. */
+        @media (orientation: landscape) and (max-height: 360px) {
+            .fields {
+                font-size: 1em;
+            }
+
+            .fields > div {
+                padding: var(--space-1) 0;
+            }
         }
 
         p {

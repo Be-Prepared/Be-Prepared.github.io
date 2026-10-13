@@ -317,7 +317,7 @@ component(
             }
 
             .direction {
-                font-size: 0.9rem;
+                font-size: 1rem;
                 opacity: 0.85;
                 min-width: 7.5rem;
             }

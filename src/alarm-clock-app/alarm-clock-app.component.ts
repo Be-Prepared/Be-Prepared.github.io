@@ -460,7 +460,7 @@ component(
             }
 
             .field-label {
-                font-size: 0.85rem;
+                font-size: 0.9rem;
                 color: var(--fg-muted);
                 font-weight: 600;
             }
@@ -551,7 +551,7 @@ component(
             .nightstand .hint {
                 position: absolute;
                 bottom: var(--space-5);
-                font-size: 0.85rem;
+                font-size: 1rem;
             }
         `,
         template: html`

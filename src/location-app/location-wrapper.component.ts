@@ -75,9 +75,11 @@ component('location-wrapper', {
             }
         }
 
-        @media (max-width: 360px) {
+        /* Only the narrowest screens. Many phones are exactly 360px wide
+           and have room for the larger size. */
+        @media (max-width: 339px) {
             .full {
-                font-size: 1em;
+                font-size: 1.15em;
             }
         }
 
@@ -114,11 +116,6 @@ component('location-wrapper', {
                 }
             }
 
-            @media (max-width: 360px) {
-                .full {
-                    font-size: 1em;
-                }
-            }
         }
     `,
     template: html`

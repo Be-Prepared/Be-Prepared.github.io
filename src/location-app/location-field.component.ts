@@ -97,14 +97,20 @@ component('location-field', {
             gap: var(--space-3);
         }
 
+        /* The reading keeps its width, up to most of the row. The name
+           gets the rest and wraps onto a second line when it's long. */
         .field-label-wrapper {
-            flex-shrink: 0;
+            flex: 1 1 0;
+            min-width: 0;
             color: var(--fg-muted);
+            font-size: 0.8em;
+            text-align: start;
+            overflow-wrap: break-word;
         }
 
         .field-value-wrapper {
-            flex-shrink: 1;
-            min-width: 0;
+            flex: 0 0 auto;
+            max-width: 65%;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;

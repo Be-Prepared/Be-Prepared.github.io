@@ -195,7 +195,7 @@ component(
             }
 
             .meta {
-                font-size: 0.85rem;
+                font-size: 1rem;
                 color: var(--fg-muted);
             }
 
@@ -209,7 +209,7 @@ component(
                 background: var(--warning-bg);
                 border: 1px solid var(--warning);
                 text-align: start;
-                font-size: 0.95rem;
+                font-size: 1rem;
             }
 
             .notice load-svg {

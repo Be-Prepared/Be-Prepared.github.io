@@ -121,7 +121,7 @@ component(
                 align-items: center;
                 gap: 0.15rem;
                 white-space: nowrap;
-                font-size: 0.85rem;
+                font-size: 0.9rem;
                 font-weight: 600;
                 font-variant-numeric: tabular-nums;
             }
@@ -187,7 +187,7 @@ component(
                 position: relative;
                 height: 1.25rem;
                 margin-top: var(--space-1);
-                font-size: 0.75rem;
+                font-size: 0.85rem;
                 color: var(--fg-muted);
                 font-variant-numeric: tabular-nums;
             }
@@ -203,7 +203,7 @@ component(
                 flex-wrap: wrap;
                 gap: var(--space-1) var(--space-3);
                 margin-top: var(--space-3);
-                font-size: 0.8rem;
+                font-size: 0.9rem;
                 color: var(--fg-muted);
             }
 

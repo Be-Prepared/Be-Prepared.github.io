@@ -494,7 +494,7 @@ component(
                 border-radius: var(--radius-m);
                 background: var(--warning-bg);
                 border: 1px solid var(--warning);
-                font-size: 0.9rem;
+                font-size: 1rem;
             }
 
             .disclaimer strong {
@@ -508,7 +508,7 @@ component(
                 background: var(--surface-2);
                 border: 1px solid var(--border);
                 color: var(--fg-muted);
-                font-size: 0.9rem;
+                font-size: 1rem;
             }
 
             /* Measuring */
@@ -587,14 +587,14 @@ component(
                 display: flex;
                 justify-content: center;
                 gap: 0.3em;
-                font-size: 0.9rem;
+                font-size: 1rem;
                 color: var(--fg-muted);
                 text-align: center;
                 font-variant-numeric: tabular-nums;
             }
 
             .small {
-                font-size: 0.8rem;
+                font-size: 0.9rem;
                 color: var(--fg-muted);
                 text-align: center;
             }

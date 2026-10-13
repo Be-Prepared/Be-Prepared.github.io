@@ -234,7 +234,7 @@ component(
             }
 
             .laps th {
-                font-size: 0.8rem;
+                font-size: 0.9rem;
                 font-weight: 600;
                 color: var(--fg-muted);
                 text-transform: uppercase;
@@ -258,7 +258,7 @@ component(
 
             .tag {
                 display: block;
-                font-size: 0.75rem;
+                font-size: 0.85rem;
                 font-weight: 600;
             }
 

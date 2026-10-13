@@ -249,7 +249,7 @@ component(
             }
 
             .format {
-                font-size: 0.8rem;
+                font-size: 0.9rem;
                 color: var(--fg-muted);
                 text-transform: uppercase;
                 letter-spacing: 0.05em;
@@ -272,7 +272,7 @@ component(
                 background: var(--surface);
                 color: var(--fg);
                 font: inherit;
-                font-size: 0.85rem;
+                font-size: 0.9rem;
                 white-space: nowrap;
                 max-width: calc(100% - 2 * var(--space-4));
                 overflow: hidden;
@@ -304,7 +304,7 @@ component(
 
             .engine-help {
                 color: var(--fg-muted);
-                font-size: 0.9rem;
+                font-size: 1rem;
                 line-height: 1.4;
                 margin: var(--space-3) 0;
             }

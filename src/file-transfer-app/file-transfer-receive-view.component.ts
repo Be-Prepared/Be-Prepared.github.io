@@ -87,7 +87,7 @@ component('file-transfer-receive-view', {
         pre {
             margin: 0;
             padding: var(--space-3);
-            font-size: 0.85rem;
+            font-size: 1rem;
             white-space: pre-wrap;
             overflow-wrap: anywhere;
         }
@@ -118,7 +118,7 @@ component('file-transfer-receive-view', {
 
         .filename {
             font-weight: 400;
-            font-size: 0.9rem;
+            font-size: 1rem;
             overflow-wrap: anywhere;
             text-align: center;
         }

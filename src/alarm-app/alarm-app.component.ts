@@ -340,7 +340,7 @@ component(
             }
 
             .warning {
-                font-size: 0.85rem;
+                font-size: 1rem;
                 font-weight: 400;
                 opacity: 0.85;
             }

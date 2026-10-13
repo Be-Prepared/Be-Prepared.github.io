@@ -440,7 +440,7 @@ component(
                 position: fixed;
                 display: none;
                 z-index: 1;
-                font-size: 0.9rem;
+                font-size: 1rem;
                 pointer-events: none;
             }
 
@@ -518,13 +518,13 @@ component(
 
             .hint {
                 margin: 0;
-                font-size: 0.95rem;
+                font-size: 1rem;
                 color: var(--fg-muted);
             }
 
             .warning {
                 margin: 0;
-                font-size: 0.9rem;
+                font-size: 1rem;
                 padding: var(--space-2) var(--space-3);
                 border-radius: var(--radius-m);
                 background: var(--warning-bg);
@@ -559,14 +559,14 @@ component(
                 padding: var(--space-1);
                 color: var(--accent);
                 font: inherit;
-                font-size: 0.9rem;
+                font-size: 1rem;
                 text-decoration: underline;
                 cursor: pointer;
             }
 
             @media (orientation: landscape) and (max-height: 500px) {
                 .calibrating .hint {
-                    font-size: 0.85rem;
+                    font-size: 0.95rem;
                 }
 
                 .calibrating .panel {

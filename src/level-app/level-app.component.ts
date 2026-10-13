@@ -551,7 +551,7 @@ component(
                 border-radius: var(--radius-m);
                 background: var(--warning-bg);
                 border: 1px solid var(--warning);
-                font-size: 0.95rem;
+                font-size: 1rem;
             }
         `,
         template: html`

@@ -280,7 +280,7 @@ component(
             .readings {
                 display: flex;
                 gap: var(--space-4);
-                font-size: 0.95rem;
+                font-size: 1rem;
                 color: var(--fg-muted);
                 font-variant-numeric: tabular-nums;
             }
@@ -296,7 +296,7 @@ component(
 
             .note {
                 margin: 0;
-                font-size: 0.85rem;
+                font-size: 1rem;
                 color: var(--fg-muted);
             }
         `,

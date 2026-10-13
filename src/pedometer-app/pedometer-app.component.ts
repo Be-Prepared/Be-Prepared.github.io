@@ -321,7 +321,7 @@ component(
 
             .caption {
                 color: var(--fg-muted);
-                font-size: 0.95rem;
+                font-size: 1rem;
             }
 
             .stats {
@@ -349,7 +349,7 @@ component(
             }
 
             .status {
-                font-size: 0.95rem;
+                font-size: 1rem;
                 color: var(--fg-muted);
             }
 
@@ -362,7 +362,7 @@ component(
                 display: flex;
                 align-items: center;
                 gap: var(--space-3);
-                font-size: 0.95rem;
+                font-size: 1rem;
             }
 
             .setting input {
@@ -373,7 +373,7 @@ component(
 
             .note {
                 margin: 0;
-                font-size: 0.85rem;
+                font-size: 1rem;
                 color: var(--fg-muted);
             }
         `,

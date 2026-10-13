@@ -198,7 +198,7 @@ component('location-average-app', {
         }
 
         .label {
-            font-size: 0.8rem;
+            font-size: 1rem;
             color: var(--fg-muted);
         }
 
@@ -216,7 +216,7 @@ component('location-average-app', {
         }
 
         .help {
-            font-size: 0.9rem;
+            font-size: 1rem;
             line-height: 1.45;
             color: var(--fg-muted);
         }

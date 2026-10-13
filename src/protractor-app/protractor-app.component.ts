@@ -544,13 +544,13 @@ component(
                 background: var(--warning-bg);
                 border: 1px solid var(--warning);
                 color: var(--fg);
-                font-size: 0.85rem;
+                font-size: 1rem;
                 text-align: center;
                 pointer-events: auto;
             }
 
             .notice pretty-button {
-                font-size: 0.85rem;
+                font-size: 1rem;
             }
 
             /* Text gets a halo so it reads over any camera picture. */

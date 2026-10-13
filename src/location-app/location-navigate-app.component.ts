@@ -157,16 +157,17 @@ component('location-navigate-app', {
             border-top: 1px solid var(--border);
         }
 
-        /* Rows of readings in a card, smaller than the arrow's label. */
+        /* Rows of readings in a card, read at arm's length while
+           walking. */
         .fields {
             overflow: hidden;
             display: flex;
             flex-direction: column;
             width: 100%;
-            max-width: 30rem;
+            max-width: 34rem;
             box-sizing: border-box;
             padding: var(--space-2) var(--space-4);
-            font-size: 0.7em;
+            font-size: 1.1em;
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius-l);
@@ -174,8 +175,21 @@ component('location-navigate-app', {
 
         @media (orientation: landscape) {
             .fields {
-                width: 45%;
+                width: 52%;
                 flex-shrink: 0;
+                max-height: 100%;
+                overflow: auto;
+            }
+        }
+
+        /* A phone on its side is short. */
+        @media (orientation: landscape) and (max-height: 360px) {
+            .fields {
+                font-size: 1em;
+            }
+
+            .field {
+                padding: var(--space-1) 0;
             }
         }
 

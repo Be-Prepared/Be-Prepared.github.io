@@ -142,7 +142,7 @@ component(
 
             .content {
                 font-family: ui-monospace, monospace;
-                font-size: 0.75rem;
+                font-size: 0.9rem;
                 line-height: 1.3;
                 /* Two lines at most; the QR code and Copy have the rest. */
                 max-height: 2.6em;

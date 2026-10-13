@@ -102,7 +102,7 @@ component('pretty-select', {
         }
     `,
     template: html`
-        <changeable-setting>{{label}} ▿</changeable-setting>
+        <changeable-setting>{{label}}&nbsp;▿</changeable-setting>
         <select
             #ref="select"
             @change.stop.prevent="selectValue($event.target.value)"

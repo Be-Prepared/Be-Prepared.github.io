@@ -324,7 +324,7 @@ component(
             }
 
             .stat-label {
-                font-size: 0.8rem;
+                font-size: 0.9rem;
                 color: var(--fg-muted);
                 text-transform: uppercase;
                 letter-spacing: 0.05em;
@@ -338,7 +338,7 @@ component(
 
             .note {
                 margin: 0;
-                font-size: 0.85rem;
+                font-size: 1rem;
                 color: var(--fg-muted);
                 text-align: center;
                 max-width: 24rem;

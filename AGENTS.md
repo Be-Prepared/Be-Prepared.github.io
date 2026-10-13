@@ -63,6 +63,7 @@ An offline PWA toolbox (flashlight, compass, level, timers, and more). TypeScrip
 
 * 4-space indent, single quotes, Prettier settings in `.prettierrc`. Comments explain why, not what.
 * Use the CSS variables from `site/index.html` (`--bg`, `--surface`, `--fg`, `--fg-muted`, `--accent`, `--border`, `--space-1..5`, `--radius-s/m/l`, and so on). Dark mode is pure black for OLED screens.
+* Text sizes: anything people read (instructions, notices, help, table cells) is at least `1rem`. Captions such as the name of a reading, a table heading, or a tag are at least `0.9rem`; `0.85rem` only where a table or timeline has no room. Readings are larger than their captions. Check narrow phones (320px and 360px wide) after changing a size.
 * Icons: 24×24 viewBox, `fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"`, no hard-coded colors, so they follow the theme.
 * Every screen must work in portrait, landscape, light, and dark.
 * Toolbar buttons (`slot="more-buttons"`) go in the same order on every screen: light first, then switch camera (`<camera-switch>`, on every screen that shows the camera), zoom out, zoom in, freeze, then reset, then calibrate or other settings. A button that's sometimes hidden keeps its place. When they don't fit on one line, `default-layout` wraps the first ones onto a second line and keeps Back in the corner; don't shrink or drop buttons to make room.

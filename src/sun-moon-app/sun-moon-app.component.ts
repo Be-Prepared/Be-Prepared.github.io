@@ -798,7 +798,7 @@ component(
                 border-radius: 999px;
                 padding: 0.1rem 0.75rem;
                 font: inherit;
-                font-size: 0.85rem;
+                font-size: 0.9rem;
                 font-weight: 600;
                 cursor: pointer;
             }
@@ -819,7 +819,7 @@ component(
             }
 
             .field-label {
-                font-size: 0.85rem;
+                font-size: 0.9rem;
                 font-weight: 600;
                 color: var(--fg-muted);
             }
@@ -865,7 +865,7 @@ component(
 
             .card-title {
                 margin: 0 0 var(--space-3);
-                font-size: 0.8rem;
+                font-size: 0.9rem;
                 font-weight: 700;
                 letter-spacing: 0.06em;
                 text-transform: uppercase;
@@ -990,7 +990,7 @@ component(
             }
 
             .stat-label {
-                font-size: 0.8rem;
+                font-size: 0.9rem;
                 color: var(--fg-muted);
             }
 
@@ -999,7 +999,7 @@ component(
                 padding: var(--space-2) var(--space-3);
                 border-radius: var(--radius-s);
                 background: var(--surface-2);
-                font-size: 0.9rem;
+                font-size: 1rem;
             }
 
             .facts {
@@ -1029,7 +1029,7 @@ component(
             table {
                 width: 100%;
                 border-collapse: collapse;
-                font-size: 0.9rem;
+                font-size: 1rem;
                 font-variant-numeric: tabular-nums;
             }
 
@@ -1046,7 +1046,7 @@ component(
 
             thead th {
                 border-top: 0;
-                font-size: 0.75rem;
+                font-size: 0.85rem;
                 font-weight: 600;
                 color: var(--fg-muted);
                 padding-top: 0;
@@ -1074,8 +1074,10 @@ component(
                 margin: 0;
             }
 
+            /* Six columns of times. As large as the width allows; see the
+               media queries below. */
             .sun-table {
-                font-size: 0.85rem;
+                font-size: 0.9rem;
             }
 
             .sun-table td {
@@ -1092,7 +1094,7 @@ component(
             }
 
             .cell-note {
-                font-size: 0.75rem;
+                font-size: 0.85rem;
                 font-weight: 400;
                 color: var(--fg-muted);
             }
@@ -1103,7 +1105,7 @@ component(
 
             .muted {
                 color: var(--fg-muted);
-                font-size: 0.9rem;
+                font-size: 1rem;
             }
 
             .getting-location {
@@ -1122,6 +1124,13 @@ component(
 
                 .sun-table {
                     font-size: 0.8rem;
+                }
+            }
+
+            /* Most phones are wide enough for full-size times. */
+            @media (min-width: 24.375rem) {
+                .sun-table {
+                    font-size: 1rem;
                 }
             }
 

@@ -61,7 +61,7 @@ component(
             }
 
             .detected {
-                font-size: 0.85rem;
+                font-size: 1rem;
                 color: var(--fg-muted);
                 margin-top: var(--space-1);
             }

@@ -61,7 +61,7 @@ component('nfc-record', {
         }
 
         .type {
-            font-size: 0.8em;
+            font-size: 0.9em;
             font-weight: 700;
             letter-spacing: 0.04em;
             color: var(--fg-muted);
@@ -73,7 +73,7 @@ component('nfc-record', {
         }
 
         .meta {
-            font-size: 0.85em;
+            font-size: 0.9em;
             color: var(--fg-muted);
         }
 
@@ -89,7 +89,7 @@ component('nfc-record', {
 
         .hex {
             font-family: ui-monospace, monospace;
-            font-size: 0.85em;
+            font-size: 0.9em;
         }
 
         img {

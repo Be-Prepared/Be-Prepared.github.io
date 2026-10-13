@@ -230,7 +230,7 @@ component(
             }
 
             .unit-label {
-                font-size: 0.8rem;
+                font-size: 0.9rem;
                 color: var(--fg-muted);
                 text-transform: uppercase;
                 letter-spacing: 0.05em;
