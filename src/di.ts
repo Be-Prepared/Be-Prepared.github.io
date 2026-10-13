@@ -1,8 +1,8 @@
 /**
- * Using `di` that is exported from `fudgel` directly will not work in tests.
+ * All injection goes through this module so there is one container.
  *
- * Using `fudgel/dist/di` for just the affected code that should be tested causes two versions of the injector to be added to the project.
- *
- * All injection needs to be done through the same container.
+ * `fudgel/dist/di.js` is a second copy of the injector, separate from the
+ * one inside `fudgel`. A service overridden in one isn't overridden in the
+ * other, so tests import `diOverride` from here too.
  */
-export { di, diOverride } from 'fudgel/dist/di';
+export { di, diOverride } from 'fudgel';

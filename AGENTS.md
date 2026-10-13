@@ -42,13 +42,15 @@ An offline PWA toolbox (flashlight, compass, level, timers, and more). TypeScrip
 
 ## Fudgel pitfalls
 
-* Template expressions do NOT support the ternary `?:` operator. It fails at runtime with a parse error. Compute strings and classes in the controller and bind those.
+* Template expressions are a subset of JavaScript: property access, calls, `?.`, operators, `?:`, and parentheses. `?.` only guards the step it is on: `a?.b.c` and `a?.b()` still throw when `a` is null. Anything longer than a short expression belongs in the controller.
 * `attr` names are camelCase in the controller and kebab-case in HTML (`labelId` → `label-id`). Props are bound with `.prop="expr"`.
 * Only top-level controller properties trigger updates; reassign objects and arrays.
 * Templates can only use properties whose names don't start with `_`. The production build shortens `_names` (`mangleProps` in `vite.config.ts`), so `.prop="_thing"` works in the dev server and silently passes `undefined` in production. The browser tests run against the production build for this reason; a default import from a CommonJS library can break the same way.
 * `#ref` elements inside `*if` exist a tick later. Attach things like a video `srcObject` in a `setTimeout`.
 * Lifecycle hooks: `onInit`, `onViewInit`, `onChange`, `onDestroy`. Clean up timers, animation frames, subscriptions, listeners, audio, and hardware in `onDestroy`.
-* Component styles are scoped to elements in the template. HTML injected with `i18n-html` doesn't get them; use inline styles there.
+* Component styles are scoped to elements in the template, including in rules that start with `:host`. Anything added later doesn't get them: HTML injected with `i18n-html` uses inline styles, and `load-svg` sizes the image it loads itself.
+* An attribute that isn't given leaves the class field's default in place (it is not set to `null`).
+* Import `di` and `diOverride` from `src/di.ts`, in tests too. `fudgel/dist/di.js` is a separate container.
 * In RxJS pipes that `switchMap` into a long-lived source (like GPS), put `takeUntil` last, or the inner source keeps running after the screen closes.
 
 ## Test pitfalls

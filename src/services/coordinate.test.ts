@@ -2,7 +2,7 @@ import { CitiesService, City } from './cities.service';
 import { CoordinateService } from './coordinate.service';
 import { CoordinateSystem } from '../datatypes/coordinate-system';
 import { LatLon } from '../datatypes/lat-lon';
-import { diOverride } from 'fudgel/dist/di';
+import { diOverride } from '../di';
 import { firstValueFrom, Observable, of } from 'rxjs';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

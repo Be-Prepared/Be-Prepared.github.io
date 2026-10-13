@@ -46,13 +46,19 @@ export class LoadSvgComponent {
     }
 
     private _apply(svgContent: Element) {
-        const svg = document.importNode(svgContent, true);
+        const svg = document.importNode(svgContent, true) as SVGElement;
         const root = (this as Controller)[metadata]?.root;
 
         if (!root) {
             return;
         }
 
+        // Fill this element. Set on the image itself because it comes from
+        // a file, not the template, so the component's styles don't reach
+        // it.
+        svg.style.display = 'block';
+        svg.style.width = '100%';
+        svg.style.height = '100%';
         this._clearImage();
         root.appendChild(svg);
         this._svg = svg;
@@ -93,12 +99,6 @@ component('load-svg', {
     style: css`
         :host {
             display: block;
-        }
-
-        :host > svg {
-            display: block;
-            width: 100%;
-            height: 100%;
         }
     `,
     template: '',

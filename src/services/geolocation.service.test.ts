@@ -1,5 +1,5 @@
 import { CitiesService } from './cities.service';
-import { diOverride } from 'fudgel/dist/di';
+import { diOverride } from '../di';
 import {
     GeolocationCoordinateResult,
     GeolocationCoordinateResultSuccess,
