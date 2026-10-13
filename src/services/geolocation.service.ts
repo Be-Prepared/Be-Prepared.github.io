@@ -1,12 +1,73 @@
 import { AccessState } from './access/access-controller';
 import { CoordinateService } from './coordinate.service';
 import { di } from '../di';
-import { distinctUntilChanged, filter, finalize, map, share } from 'rxjs/operators';
+import {
+    distinctUntilChanged,
+    filter,
+    finalize,
+    map,
+    share,
+    switchMap,
+    tap,
+} from 'rxjs/operators';
 import { LatLon } from '../datatypes/lat-lon';
-import { combineLatest, Observable, of, ReplaySubject, Subject, timer } from 'rxjs';
+import {
+    BehaviorSubject,
+    Observable,
+    of,
+    ReplaySubject,
+    Subject,
+    timer,
+} from 'rxjs';
 import { PermissionStatus, watchPermission } from './access/permission-status';
 import { calculateAttributes } from './geolocation/position-attributes';
 import { initialVerticalState, VerticalState } from './geolocation/vertical';
+
+// A refusal that comes back faster than this can't have been a person
+// answering a prompt, so the browser refused on its own.
+const QUICK_REFUSAL_MS = 2000;
+
+// How long to show that a request is waiting for an answer. Browsers don't
+// say when a prompt is ignored or dismissed, and some never answer at all.
+const UNANSWERED_MS = 8000;
+
+// For tests.
+export interface GeolocationServiceOptions {
+    clearTimeout?: (handle: any) => void;
+    now?: () => number;
+    permission?: () => Observable<PermissionStatus>;
+    reload?: () => boolean;
+    setTimeout?: (fn: () => void, ms: number) => any;
+}
+
+// Loads the page again, which is the only way to make Safari ask again after
+// it has refused once. Not done when the page couldn't come back: offline
+// without the service worker in control.
+function reloadPage() {
+    if (typeof location === 'undefined') {
+        return false;
+    }
+
+    if (navigator.onLine === false && !navigator.serviceWorker?.controller) {
+        return false;
+    }
+
+    location.reload();
+
+    return true;
+}
+
+function stateFromStatus(status: PermissionStatus) {
+    if (status === PermissionStatus.GRANTED) {
+        return AccessState.READY;
+    }
+
+    if (status === PermissionStatus.DENIED) {
+        return AccessState.DENIED;
+    }
+
+    return AccessState.PROMPT;
+}
 
 export interface GeolocationCoordinateResultSuccess extends LatLon {
     success: true;
@@ -50,13 +111,32 @@ export type GeolocationCoordinateResult =
 export class GeolocationService {
     private _coordinateService = di(CoordinateService);
     private _observable: Observable<GeolocationCoordinateResult> | null = null;
-    // Outcome of the last request() during this run of the app. Only kept in
-    // memory because iOS doesn't report permission changes; never saved.
-    private _requestResult = new ReplaySubject<AccessState | null>(1);
+    private _options: Required<GeolocationServiceOptions>;
+    // The browser refused a request since this page loaded. Safari then
+    // refuses every later request from the same page without asking, even
+    // after the setting that blocked it is fixed.
+    private _refused = false;
+    // How the last attempt to use the GPS went: a request() or a refusal on
+    // the position watch. This is what really happened, so it counts for
+    // more than the permission the browser reports, until the browser
+    // reports a change. Only kept in memory; never saved.
+    private _requestResult = new BehaviorSubject<AccessState | null>(null);
     private _restartDeniedWatch: (() => void) | null = null;
+    // The browser reported the block before anything was asked, so it
+    // remembers the block itself and loading the page again won't help.
+    private _standingBlock = false;
+    private _status: PermissionStatus | null = null;
+    private _watchdog: any = null;
 
-    constructor() {
-        this._requestResult.next(null);
+    constructor(options: GeolocationServiceOptions = {}) {
+        this._options = {
+            clearTimeout: (handle) => clearTimeout(handle),
+            now: () => Date.now(),
+            permission: () => watchPermission('geolocation'),
+            reload: reloadPage,
+            setTimeout: (fn, ms) => setTimeout(fn, ms),
+            ...options,
+        };
     }
 
     // Looks at the permission without asking for it.
@@ -65,21 +145,13 @@ export class GeolocationService {
             return of(AccessState.UNAVAILABLE);
         }
 
-        return combineLatest([
-            watchPermission('geolocation'),
-            this._requestResult,
-        ]).pipe(
-            map(([status, requested]) => {
-                if (status === PermissionStatus.GRANTED) {
-                    return AccessState.READY;
-                }
-
-                if (status === PermissionStatus.DENIED) {
-                    return AccessState.DENIED;
-                }
-
-                return requested || AccessState.PROMPT;
-            }),
+        return this._options.permission().pipe(
+            tap((status) => this._statusSeen(status)),
+            switchMap((status) =>
+                this._requestResult.pipe(
+                    map((requested) => requested || stateFromStatus(status))
+                )
+            ),
             distinctUntilChanged()
         );
     }
@@ -89,21 +161,65 @@ export class GeolocationService {
     }
 
     // Shows the browser's prompt. Call from a button press.
+    //
+    // The state is CHECKING until the browser answers, so the press visibly
+    // does something even when the browser refuses without a prompt.
     request() {
+        const before = this._requestResult.value;
+        const retry = this._refused;
+        const started = this._options.now();
+        const answer = (state: AccessState) => {
+            this._options.clearTimeout(this._watchdog);
+            this._requestResult.next(state);
+        };
+
+        this._options.clearTimeout(this._watchdog);
+        this._requestResult.next(AccessState.CHECKING);
+        this._watchdog = this._options.setTimeout(() => {
+            // Bring the button back. A late answer still counts.
+            if (this._requestResult.value === AccessState.CHECKING) {
+                this._requestResult.next(
+                    before === AccessState.CHECKING ? null : before
+                );
+            }
+        }, UNANSWERED_MS);
         navigator.geolocation.getCurrentPosition(
             () => {
-                this._requestResult.next(AccessState.READY);
+                this._refused = false;
+                answer(AccessState.READY);
                 this._restartDeniedWatch && this._restartDeniedWatch();
             },
-            (error) =>
-                this._requestResult.next(
-                    error.code === error.PERMISSION_DENIED
-                        ? AccessState.DENIED
-                        : // Allowed, just no fix yet. The location screens
-                          // show their own messages for that.
-                          AccessState.READY
-                ),
-            { timeout: 10000 }
+            (error) => {
+                if (error.code !== error.PERMISSION_DENIED) {
+                    // Allowed, just no fix yet. The location screens show
+                    // their own messages for that.
+                    answer(AccessState.READY);
+
+                    return;
+                }
+
+                const quick = this._options.now() - started < QUICK_REFUSAL_MS;
+                this._refused = true;
+
+                if (
+                    retry &&
+                    quick &&
+                    !this._standingBlock &&
+                    this._options.reload()
+                ) {
+                    // Refused again without asking. This page is stuck
+                    // with the earlier refusal, so start over; the screen
+                    // keeps showing that it's working until then.
+                    this._options.clearTimeout(this._watchdog);
+
+                    return;
+                }
+
+                answer(AccessState.DENIED);
+            },
+            // Only the answer to the permission matters here, so an old
+            // position will do and there's no need to wait long for a fix.
+            { maximumAge: Infinity, timeout: 3000 }
         );
     }
 
@@ -173,6 +289,13 @@ export class GeolocationService {
                 // The browser never reports anything on this watch again.
                 denied = true;
                 stopWatch();
+                // Whatever permission the browser reports, it isn't letting
+                // this page have the position. Show how to fix that.
+                this._refused = true;
+
+                if (this._requestResult.value !== AccessState.CHECKING) {
+                    this._requestResult.next(AccessState.DENIED);
+                }
             }
 
             subject.next({
@@ -218,6 +341,34 @@ export class GeolocationService {
         startWatch();
 
         return this._observable;
+    }
+
+    private _statusSeen(status: PermissionStatus) {
+        if (status === this._status) {
+            return;
+        }
+
+        const first = this._status === null;
+        this._status = status;
+        this._standingBlock =
+            status === PermissionStatus.DENIED && !this._refused;
+
+        if (first) {
+            return;
+        }
+
+        if (status !== PermissionStatus.DENIED) {
+            // Only a browser that lets a page ask again reports this.
+            this._refused = false;
+        }
+
+        // The browser has news since the last attempt, so it knows better.
+        if (
+            this._requestResult.value !== null &&
+            this._requestResult.value !== AccessState.CHECKING
+        ) {
+            this._requestResult.next(null);
+        }
     }
 
     getPositionSuccess(): Observable<GeolocationCoordinateResultSuccess> {

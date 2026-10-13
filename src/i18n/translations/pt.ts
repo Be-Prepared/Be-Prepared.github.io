@@ -573,11 +573,33 @@ export const strings: LanguageData = {
     'reminderLimits.timer': 'Deixe o Be Prepared aberto com a tela ligada até o timer acabar. Ele não toca se o app for fechado, se você trocar de app ou se o celular entrar em repouso. O som segue o volume de mídia.',
     'shared.access.allow': 'Permitir',
     'shared.access.back': 'Voltar',
+    'shared.access.checking': 'Verificando…',
+    'shared.access.denied.again': 'Nova tentativa feita. Continua bloqueado.',
     'shared.access.denied.heading': 'Permissão bloqueada',
     'shared.access.denied.message': 'Esta ferramenta não funciona sem a permissão. Este app não guarda nada, então você pode tentar de novo a qualquer momento.',
-    'shared.access.deniedHint.android': 'Se "Tentar de novo" não fizer nada, o navegador está bloqueando. No Chrome, toque no ícone à esquerda do endereço (ou abra a página de informações do app instalado), escolha Permissões e permita. Depois volte aqui.',
-    'shared.access.deniedHint.ios': 'Se "Tentar de novo" não fizer nada, o iOS está bloqueando. Abra Ajustes → Apps → Safari (ou Ajustes → Safari) e permita o acesso à Câmera, Localização ou Movimento e Orientação. Para movimento e bússola, feche totalmente o app e abra de novo.',
-    'shared.access.deniedHint.other': 'Se "Tentar de novo" não fizer nada, o navegador está bloqueando. Abra as configurações do site (geralmente o ícone ao lado do endereço), permita e depois volte aqui.',
+    'shared.access.deniedHint.android': 'Se tentar de novo não adiantar, o navegador está bloqueando. No Chrome, toque no ícone à esquerda do endereço (ou abra a página de informações do app instalado), escolha Permissões e permita. Depois volte aqui.',
+    'shared.access.deniedHint.ios': 'Se tentar de novo não adiantar, o iOS está bloqueando. Abra Ajustes → Apps → Safari (ou Ajustes → Safari) e permita o acesso à Câmera, Localização ou Movimento e Orientação. Para movimento e bússola, feche totalmente o app e abra de novo.',
+    'shared.access.deniedHint.ios.location.html': `
+        <div style="margin-bottom: 0.5em">
+            No iPhone e no iPad, três ajustes podem bloquear a localização. Confira cada um no app Ajustes:
+        </div>
+        <ol style="margin: 0; padding-inline-start: 1.3em">
+            <li>
+                Privacidade e Segurança → Serviços de Localização: ative os Serviços de Localização.
+            </li>
+            <li>
+                Nessa mesma tela: Sites do Safari → Durante o Uso do App. Em outro navegador, escolha o nome dele.
+            </li>
+            <li>
+                Apps → Safari → Localização: Perguntar ou Permitir. No iOS 17 e anteriores é Safari → Localização.
+            </li>
+        </ol>
+        <div style="margin-top: 0.5em">
+            Depois volte aqui e toque em Tentar de novo. Se continuar sendo recusado sem perguntar, o Safari está lembrando uma resposta anterior para este site: abra o site no Safari, toque no botão na ponta esquerda da barra de endereço, abra os ajustes do site e defina Localização como Permitir.
+        </div>
+    `,
+    'shared.access.deniedHint.other': 'Se tentar de novo não adiantar, o navegador está bloqueando. Abra as configurações do site (geralmente o ícone ao lado do endereço), permita e depois volte aqui.',
+    'shared.access.error.again': 'Nova tentativa feita. Ainda não foi possível iniciar.',
     'shared.access.error.heading': 'Não foi possível iniciar',
     'shared.access.error.message': 'O hardware existe, mas não pôde ser iniciado. Outro app pode estar usando. Feche outros apps que o usam e tente de novo.',
     'shared.access.prompt.heading': 'Permissão necessária',

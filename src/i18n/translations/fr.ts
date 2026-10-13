@@ -573,11 +573,33 @@ export const strings: LanguageData = {
     'reminderLimits.timer': 'Gardez Be Prepared ouvert avec l’écran allumé jusqu’à la fin du minuteur. Il ne peut pas sonner si l’app est fermée, si vous changez d’app ou si le téléphone se met en veille. Le son suit le volume multimédia.',
     'shared.access.allow': 'Autoriser',
     'shared.access.back': 'Retour',
+    'shared.access.checking': 'Vérification…',
+    'shared.access.denied.again': 'Nouvel essai effectué. C’est toujours bloqué.',
     'shared.access.denied.heading': 'Autorisation bloquée',
     'shared.access.denied.message': 'Cet outil ne peut pas fonctionner sans l’autorisation. Cette app ne mémorise rien, vous pouvez donc réessayer à tout moment.',
-    'shared.access.deniedHint.android': 'Si « Réessayer » ne fait rien, le navigateur le bloque. Dans Chrome, touchez l’icône à gauche de l’adresse (ou ouvrez la page d’infos de l’app installée), choisissez Autorisations et autorisez-la. Puis revenez ici.',
-    'shared.access.deniedHint.ios': 'Si « Réessayer » ne fait rien, iOS le bloque. Ouvrez Réglages → Apps → Safari (ou Réglages → Safari) et autorisez l’accès à Appareil photo, Position ou Mouvement et orientation. Pour le mouvement et la boussole, fermez complètement l’app puis rouvrez-la.',
-    'shared.access.deniedHint.other': 'Si « Réessayer » ne fait rien, le navigateur le bloque. Ouvrez les paramètres du site (généralement l’icône à côté de l’adresse), autorisez l’accès, puis revenez ici.',
+    'shared.access.deniedHint.android': 'Si réessayer ne change rien, le navigateur le bloque. Dans Chrome, touchez l’icône à gauche de l’adresse (ou ouvrez la page d’infos de l’app installée), choisissez Autorisations et autorisez-la. Puis revenez ici.',
+    'shared.access.deniedHint.ios': 'Si réessayer ne change rien, iOS le bloque. Ouvrez Réglages → Apps → Safari (ou Réglages → Safari) et autorisez l’accès à Appareil photo, Position ou Mouvement et orientation. Pour le mouvement et la boussole, fermez complètement l’app puis rouvrez-la.',
+    'shared.access.deniedHint.ios.location.html': `
+        <div style="margin-bottom: 0.5em">
+            Sur iPhone et iPad, trois réglages peuvent bloquer la position. Vérifiez chacun dans l’app Réglages :
+        </div>
+        <ol style="margin: 0; padding-inline-start: 1.3em">
+            <li>
+                Confidentialité et sécurité → Service de localisation : activez Service de localisation.
+            </li>
+            <li>
+                Sur ce même écran : Sites web Safari → Lorsque l’app est active. Avec un autre navigateur, choisissez son nom.
+            </li>
+            <li>
+                Apps → Safari → Position : Demander ou Autoriser. Sous iOS 17 et versions antérieures, c’est Safari → Position.
+            </li>
+        </ol>
+        <div style="margin-top: 0.5em">
+            Revenez ensuite ici et touchez Réessayer. Si c’est encore refusé sans question, Safari se souvient d’une réponse précédente pour ce site : ouvrez le site dans Safari, touchez le bouton à l’extrémité gauche de la barre d’adresse, ouvrez les réglages du site web et réglez Position sur Autoriser.
+        </div>
+    `,
+    'shared.access.deniedHint.other': 'Si réessayer ne change rien, le navigateur le bloque. Ouvrez les paramètres du site (généralement l’icône à côté de l’adresse), autorisez l’accès, puis revenez ici.',
+    'shared.access.error.again': 'Nouvel essai effectué. Le démarrage a encore échoué.',
     'shared.access.error.heading': 'Démarrage impossible',
     'shared.access.error.message': 'Le matériel est présent mais n’a pas pu démarrer. Une autre app l’utilise peut-être. Fermez les autres apps qui l’utilisent et réessayez.',
     'shared.access.prompt.heading': 'Autorisation nécessaire',

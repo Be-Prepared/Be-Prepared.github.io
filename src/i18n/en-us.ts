@@ -488,15 +488,37 @@ export const enUS: LanguageData = {
     // Shared components
     'shared.access.allow': 'Allow',
     'shared.access.back': 'Back',
+    'shared.access.checking': 'Checking…',
+    'shared.access.denied.again': 'Tried again. It is still blocked.',
     'shared.access.denied.heading': 'Permission Blocked',
     'shared.access.denied.message':
         'This tool can\'t work without the permission. Nothing is remembered by this app, so you can try again at any time.',
     'shared.access.deniedHint.android':
-        'If "Try Again" does nothing, the browser is blocking it. In Chrome, tap the icon to the left of the address (or open the installed app\'s info page), choose Permissions, and allow it. Then come back here.',
+        'If trying again doesn\'t help, the browser is blocking it. In Chrome, tap the icon to the left of the address (or open the installed app\'s info page), choose Permissions, and allow it. Then come back here.',
     'shared.access.deniedHint.ios':
-        'If "Try Again" does nothing, iOS is blocking it. Open Settings → Apps → Safari (or Settings → Safari) and allow Camera, Location, or Motion & Orientation access. For motion and compass access, fully close and reopen the app as well.',
+        'If trying again doesn\'t help, iOS is blocking it. Open Settings → Apps → Safari (or Settings → Safari) and allow Camera, Location, or Motion & Orientation access. For motion and compass access, fully close and reopen the app as well.',
+    'shared.access.deniedHint.ios.location.html': `
+        <div style="margin-bottom: 0.5em">
+            On iPhone and iPad, three settings can block location. Check each one in the Settings app:
+        </div>
+        <ol style="margin: 0; padding-inline-start: 1.3em">
+            <li>
+                Privacy &amp; Security → Location Services: switch on Location Services.
+            </li>
+            <li>
+                On that same screen: Safari Websites → While Using the App. In another browser, pick its name instead.
+            </li>
+            <li>
+                Apps → Safari → Location: Ask or Allow. On iOS 17 and older it is Safari → Location.
+            </li>
+        </ol>
+        <div style="margin-top: 0.5em">
+            Then come back and tap Try Again. If it is still refused without asking, Safari is remembering an earlier answer for this site: open the site in Safari, tap the button at the left end of the address bar, open the website settings, and set Location to Allow.
+        </div>
+    `,
     'shared.access.deniedHint.other':
-        'If "Try Again" does nothing, the browser is blocking it. Open the site settings (usually the icon next to the address) and allow the permission, then come back here.',
+        'If trying again doesn\'t help, the browser is blocking it. Open the site settings (usually the icon next to the address) and allow the permission, then come back here.',
+    'shared.access.error.again': 'Tried again. It still couldn\'t start.',
     'shared.access.error.heading': 'Couldn\'t Start',
     'shared.access.error.message':
         'The hardware is there but could not be started. Another app may be using it. Close other apps that use it and try again.',

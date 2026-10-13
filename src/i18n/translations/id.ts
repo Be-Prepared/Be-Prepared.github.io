@@ -572,11 +572,33 @@ export const strings: LanguageData = {
     'reminderLimits.timer': 'Biarkan Be Prepared terbuka dengan layar menyala sampai timer selesai. Tidak bisa berbunyi jika aplikasi ditutup, Anda beralih aplikasi, atau ponsel tidur. Suara mengikuti volume media.',
     'shared.access.allow': 'Izinkan',
     'shared.access.back': 'Kembali',
+    'shared.access.checking': 'Memeriksa…',
+    'shared.access.denied.again': 'Sudah dicoba lagi. Masih diblokir.',
     'shared.access.denied.heading': 'Izin Diblokir',
     'shared.access.denied.message': 'Alat ini tidak bisa bekerja tanpa izin. Aplikasi ini tidak mengingat apa pun, jadi Anda bisa mencoba lagi kapan saja.',
-    'shared.access.deniedHint.android': 'Jika "Coba Lagi" tidak berfungsi, browser memblokirnya. Di Chrome, ketuk ikon di kiri alamat (atau buka halaman info aplikasi yang terpasang), pilih Izin, dan izinkan. Lalu kembali ke sini.',
-    'shared.access.deniedHint.ios': 'Jika "Coba Lagi" tidak berfungsi, iOS memblokirnya. Buka Pengaturan → App → Safari (atau Pengaturan → Safari) dan izinkan akses Kamera, Lokasi, atau Gerakan & Orientasi. Untuk akses gerak dan kompas, tutup aplikasi sepenuhnya lalu buka lagi.',
-    'shared.access.deniedHint.other': 'Jika "Coba Lagi" tidak berfungsi, browser memblokirnya. Buka setelan situs (biasanya ikon di samping alamat) dan izinkan, lalu kembali ke sini.',
+    'shared.access.deniedHint.android': 'Jika mencoba lagi tidak membantu, browser memblokirnya. Di Chrome, ketuk ikon di kiri alamat (atau buka halaman info aplikasi yang terpasang), pilih Izin, dan izinkan. Lalu kembali ke sini.',
+    'shared.access.deniedHint.ios': 'Jika mencoba lagi tidak membantu, iOS memblokirnya. Buka Pengaturan → App → Safari (atau Pengaturan → Safari) dan izinkan akses Kamera, Lokasi, atau Gerakan & Orientasi. Untuk akses gerak dan kompas, tutup aplikasi sepenuhnya lalu buka lagi.',
+    'shared.access.deniedHint.ios.location.html': `
+        <div style="margin-bottom: 0.5em">
+            Di iPhone dan iPad, tiga pengaturan dapat memblokir lokasi. Periksa satu per satu di app Pengaturan:
+        </div>
+        <ol style="margin: 0; padding-inline-start: 1.3em">
+            <li>
+                Privasi &amp; Keamanan → Layanan Lokasi: nyalakan Layanan Lokasi.
+            </li>
+            <li>
+                Di layar yang sama: Situs Web Safari → Saat Menggunakan App. Di browser lain, pilih namanya.
+            </li>
+            <li>
+                App → Safari → Lokasi: Tanya atau Izinkan. Di iOS 17 dan yang lebih lama: Safari → Lokasi.
+            </li>
+        </ol>
+        <div style="margin-top: 0.5em">
+            Lalu kembali dan ketuk Coba Lagi. Jika masih ditolak tanpa bertanya, Safari mengingat jawaban sebelumnya untuk situs ini: buka situs ini di Safari, ketuk tombol di ujung kiri bar alamat, buka pengaturan situs web, lalu atur Lokasi ke Izinkan.
+        </div>
+    `,
+    'shared.access.deniedHint.other': 'Jika mencoba lagi tidak membantu, browser memblokirnya. Buka setelan situs (biasanya ikon di samping alamat) dan izinkan, lalu kembali ke sini.',
+    'shared.access.error.again': 'Sudah dicoba lagi. Masih gagal dimulai.',
     'shared.access.error.heading': 'Gagal Dimulai',
     'shared.access.error.message': 'Perangkat kerasnya ada tetapi tidak dapat dimulai. Mungkin sedang dipakai aplikasi lain. Tutup aplikasi lain yang memakainya dan coba lagi.',
     'shared.access.prompt.heading': 'Perlu Izin',

@@ -382,6 +382,7 @@ component(
                 *if="screenState !== 'READY'"
                 state="{{screenState}}"
                 icon="/location.svg"
+                kind="location"
                 message-id="pedometer.explainAsk"
                 unavailable-id="pedometer.unavailable"
                 @grant.stop.prevent="grant()"

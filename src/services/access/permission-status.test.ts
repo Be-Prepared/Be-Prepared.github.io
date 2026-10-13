@@ -30,11 +30,37 @@ function fakePermissions(state: string | Error) {
             status.state = newState;
             status.onchange?.();
         },
+        // Changed where the browser doesn't tell the page, like the iOS
+        // Settings app.
+        changeQuietly(newState: string) {
+            state = newState;
+        },
         permissions,
         get queries() {
             return queries;
         },
         status,
+    };
+}
+
+function fakeDocument() {
+    const listeners = new Set<() => void>();
+
+    return {
+        visibilityState: 'visible' as DocumentVisibilityState,
+        addEventListener: (_name: string, fn: any) => listeners.add(fn),
+        removeEventListener: (_name: string, fn: any) => listeners.delete(fn),
+        get listeners() {
+            return listeners.size;
+        },
+        show() {
+            this.visibilityState = 'visible';
+            listeners.forEach((fn) => fn());
+        },
+        hide() {
+            this.visibilityState = 'hidden';
+            listeners.forEach((fn) => fn());
+        },
     };
 }
 
@@ -85,4 +111,39 @@ test('nothing is cached between subscriptions', async () => {
     watchPermission('camera', fake.permissions).subscribe();
     await tick();
     assert.equal(fake.queries, 2);
+});
+
+// iOS doesn't report changes made in the Settings app, so the permission is
+// looked at again when the person comes back.
+test('looks again when the page becomes visible', async () => {
+    const fake = fakePermissions('denied');
+    const doc = fakeDocument();
+    const seen: PermissionStatus[] = [];
+    const sub = watchPermission('geolocation', fake.permissions, doc).subscribe(
+        (s) => seen.push(s)
+    );
+    await tick();
+    assert.deepEqual(seen, [PermissionStatus.DENIED]);
+
+    doc.hide();
+    await tick();
+    assert.equal(fake.queries, 1);
+
+    fake.changeQuietly('prompt');
+    doc.show();
+    await tick();
+    assert.equal(fake.queries, 2);
+    assert.deepEqual(seen, [PermissionStatus.DENIED, PermissionStatus.PROMPT]);
+
+    // Nothing new, nothing reported.
+    doc.hide();
+    doc.show();
+    await tick();
+    assert.equal(seen.length, 2);
+
+    sub.unsubscribe();
+    assert.equal(doc.listeners, 0);
+    doc.show();
+    await tick();
+    assert.equal(fake.queries, 3);
 });

@@ -563,11 +563,33 @@ export const strings: LanguageData = {
     'reminderLimits.timer': '请保持 Be Prepared 打开且屏幕亮着，直到计时结束。如果应用关闭、切换应用或手机休眠，它就无法响铃。声音跟随媒体音量。',
     'shared.access.allow': '允许',
     'shared.access.back': '返回',
+    'shared.access.checking': '正在检查…',
+    'shared.access.denied.again': '已重试，仍然被阻止。',
     'shared.access.denied.heading': '权限被阻止',
     'shared.access.denied.message': '没有此权限，该工具无法工作。本应用不会记住你的选择，因此你可以随时重试。',
-    'shared.access.deniedHint.android': '如果“重试”没有反应，说明浏览器阻止了它。在 Chrome 中，轻点地址左侧的图标（或打开已安装应用的信息页面），选择“权限”并允许。然后回到这里。',
-    'shared.access.deniedHint.ios': '如果“重试”没有反应，说明 iOS 阻止了它。打开“设置”→“App”→“Safari 浏览器”（或“设置”→“Safari 浏览器”），允许访问相机、位置或运动与方向。对于运动和指南针访问，还需要完全关闭并重新打开应用。',
-    'shared.access.deniedHint.other': '如果“重试”没有反应，说明浏览器阻止了它。打开网站设置（通常是地址旁的图标）并允许该权限，然后回到这里。',
+    'shared.access.deniedHint.android': '如果重试后仍然不行，说明浏览器阻止了它。在 Chrome 中，轻点地址左侧的图标（或打开已安装应用的信息页面），选择“权限”并允许。然后回到这里。',
+    'shared.access.deniedHint.ios': '如果重试后仍然不行，说明 iOS 阻止了它。打开“设置”→“App”→“Safari 浏览器”（或“设置”→“Safari 浏览器”），允许访问相机、位置或运动与方向。对于运动和指南针访问，还需要完全关闭并重新打开应用。',
+    'shared.access.deniedHint.ios.location.html': `
+        <div style="margin-bottom: 0.5em">
+            在 iPhone 和 iPad 上，有三项设置可能阻止定位。请在“设置”App 中逐一检查：
+        </div>
+        <ol style="margin: 0; padding-inline-start: 1.3em">
+            <li>
+                隐私与安全性 → 定位服务：打开“定位服务”。
+            </li>
+            <li>
+                在同一屏幕上：Safari 网站 → 使用 App 期间。如果用的是其他浏览器，请选择它的名称。
+            </li>
+            <li>
+                App → Safari 浏览器 → 位置：询问或允许。在 iOS 17 及更早版本中是 Safari 浏览器 → 位置。
+            </li>
+        </ol>
+        <div style="margin-top: 0.5em">
+            然后回到这里，轻点“重试”。如果仍然不经询问就被拒绝，说明 Safari 记住了此网站之前的回答：在 Safari 中打开此网站，轻点地址栏最左侧的按钮，打开网站设置，将“位置”设为“允许”。
+        </div>
+    `,
+    'shared.access.deniedHint.other': '如果重试后仍然不行，说明浏览器阻止了它。打开网站设置（通常是地址旁的图标）并允许该权限，然后回到这里。',
+    'shared.access.error.again': '已重试，仍然无法启动。',
     'shared.access.error.heading': '无法启动',
     'shared.access.error.message': '硬件存在，但无法启动。可能有其他应用正在使用它。请关闭使用它的其他应用，然后重试。',
     'shared.access.prompt.heading': '需要权限',

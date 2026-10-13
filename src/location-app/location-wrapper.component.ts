@@ -126,6 +126,7 @@ component('location-wrapper', {
             *if="screenState !== 'READY'"
             state="{{screenState}}"
             icon="/location.svg"
+            kind="location"
             message-id="location.explainAsk"
             unavailable-id="location.unavailableMessage"
             @grant.stop.prevent="grant()"

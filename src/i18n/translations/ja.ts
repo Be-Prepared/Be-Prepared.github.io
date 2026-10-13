@@ -572,11 +572,33 @@ export const strings: LanguageData = {
     'reminderLimits.timer': 'タイマーが終わるまで Be Prepared を開いたまま画面をオンにしてください。アプリを閉じる、アプリを切り替える、スリープすると鳴りません。音はメディア音量に従います。',
     'shared.access.allow': '許可',
     'shared.access.back': '戻る',
+    'shared.access.checking': '確認中…',
+    'shared.access.denied.again': '再試行しましたが、まだブロックされています。',
     'shared.access.denied.heading': '許可がブロックされています',
     'shared.access.denied.message': 'このツールは許可がないと動作しません。このアプリは何も記憶しないので、いつでも再試行できます。',
-    'shared.access.deniedHint.android': '「再試行」を押しても何も起きない場合は、ブラウザがブロックしています。Chrome でアドレスの左のアイコンをタップ（またはインストールしたアプリの情報ページを開き）、「権限」を選んで許可してから、ここに戻ってください。',
-    'shared.access.deniedHint.ios': '「再試行」を押しても何も起きない場合は、iOS がブロックしています。設定 → アプリ → Safari（または 設定 → Safari）を開き、カメラ、位置情報、またはモーションと画面の向きへのアクセスを許可してください。モーションとコンパスの場合は、アプリを完全に閉じてから開き直してください。',
-    'shared.access.deniedHint.other': '「再試行」を押しても何も起きない場合は、ブラウザがブロックしています。サイトの設定（通常はアドレスの横のアイコン）を開いて許可し、ここに戻ってください。',
+    'shared.access.deniedHint.android': '再試行しても変わらない場合は、ブラウザがブロックしています。Chrome でアドレスの左のアイコンをタップ（またはインストールしたアプリの情報ページを開き）、「権限」を選んで許可してから、ここに戻ってください。',
+    'shared.access.deniedHint.ios': '再試行しても変わらない場合は、iOS がブロックしています。設定 → アプリ → Safari（または 設定 → Safari）を開き、カメラ、位置情報、またはモーションと画面の向きへのアクセスを許可してください。モーションとコンパスの場合は、アプリを完全に閉じてから開き直してください。',
+    'shared.access.deniedHint.ios.location.html': `
+        <div style="margin-bottom: 0.5em">
+            iPhone と iPad では、3 つの設定が位置情報をブロックすることがあります。「設定」アプリでそれぞれ確認してください：
+        </div>
+        <ol style="margin: 0; padding-inline-start: 1.3em">
+            <li>
+                プライバシーとセキュリティ → 位置情報サービス：「位置情報サービス」をオンにします。
+            </li>
+            <li>
+                同じ画面で：SafariのWebサイト → このアプリの使用中。ほかのブラウザの場合は、その名前を選びます。
+            </li>
+            <li>
+                アプリ → Safari → 位置情報：「確認」または「許可」。iOS 17 以前では Safari → 位置情報 です。
+            </li>
+        </ol>
+        <div style="margin-top: 0.5em">
+            そのあと、ここに戻って「再試行」をタップしてください。確認なしに拒否され続ける場合は、Safari がこのサイトへの以前の回答を覚えています。Safari でこのサイトを開き、アドレスバーの左端のボタンをタップして Web サイトの設定を開き、「位置情報」を「許可」にしてください。
+        </div>
+    `,
+    'shared.access.deniedHint.other': '再試行しても変わらない場合は、ブラウザがブロックしています。サイトの設定（通常はアドレスの横のアイコン）を開いて許可し、ここに戻ってください。',
+    'shared.access.error.again': '再試行しましたが、まだ起動できません。',
     'shared.access.error.heading': '起動できませんでした',
     'shared.access.error.message': 'ハードウェアはありますが、起動できませんでした。他のアプリが使用している可能性があります。それらのアプリを閉じて再試行してください。',
     'shared.access.prompt.heading': '許可が必要です',

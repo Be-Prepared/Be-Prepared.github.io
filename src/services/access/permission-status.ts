@@ -26,6 +26,11 @@ export function toPermissionStatus(state: string | undefined | null) {
     return PermissionStatus.UNKNOWN;
 }
 
+type VisibilityDocument = Pick<
+    Document,
+    'addEventListener' | 'removeEventListener' | 'visibilityState'
+>;
+
 // Reports the current state of a permission and any later changes, such as
 // when the person re-enables it in the browser's settings. This never shows a
 // prompt and nothing is cached between calls.
@@ -33,11 +38,14 @@ export function watchPermission(
     name: string,
     permissions: Permissions | undefined = typeof navigator === 'undefined'
         ? undefined
-        : navigator.permissions
+        : navigator.permissions,
+    doc: VisibilityDocument | undefined = typeof document === 'undefined'
+        ? undefined
+        : document
 ): Observable<PermissionStatus> {
     return new Observable<PermissionStatus>((subscriber) => {
         let status: PermissionStatus | null = null;
-        let permissionStatus: { onchange: any; state: string } | null = null;
+        let permissionStatus: PermissionStatusLike | null = null;
         let closed = false;
         const emit = (value: PermissionStatus) => {
             if (value !== status) {
@@ -52,34 +60,53 @@ export function watchPermission(
             return;
         }
 
-        let query: Promise<PermissionStatusLike>;
+        const check = () => {
+            let query: Promise<PermissionStatusLike>;
 
-        try {
-            query = permissions.query({ name: name as PermissionName });
-        } catch (_ignore) {
-            emit(PermissionStatus.UNKNOWN);
+            try {
+                query = permissions.query({ name: name as PermissionName });
+            } catch (_ignore) {
+                emit(PermissionStatus.UNKNOWN);
 
-            return;
-        }
+                return;
+            }
 
-        query.then(
-            (result) => {
-                if (closed) {
-                    return;
-                }
+            query.then(
+                (result) => {
+                    if (closed) {
+                        return;
+                    }
 
-                permissionStatus = result;
-                emit(toPermissionStatus(result.state));
+                    if (permissionStatus && permissionStatus !== result) {
+                        permissionStatus.onchange = null;
+                    }
 
-                // iOS has poor support for onchange, but where it works it
-                // lets the UI react to changes made in the settings.
-                result.onchange = () => emit(toPermissionStatus(result.state));
-            },
-            () => emit(PermissionStatus.UNKNOWN)
-        );
+                    permissionStatus = result;
+                    emit(toPermissionStatus(result.state));
+
+                    // iOS has poor support for onchange, but where it works
+                    // it lets the UI react to changes made in the settings.
+                    result.onchange = () =>
+                        emit(toPermissionStatus(result.state));
+                },
+                () => emit(PermissionStatus.UNKNOWN)
+            );
+        };
+        // Permissions are fixed in the Settings app or the browser's own
+        // settings, and the person comes back afterwards. Browsers that
+        // don't report the change (iOS) answer correctly when asked again.
+        const visibilityListener = () => {
+            if (doc?.visibilityState !== 'hidden') {
+                check();
+            }
+        };
+
+        doc?.addEventListener('visibilitychange', visibilityListener);
+        check();
 
         return () => {
             closed = true;
+            doc?.removeEventListener('visibilitychange', visibilityListener);
 
             if (permissionStatus) {
                 permissionStatus.onchange = null;

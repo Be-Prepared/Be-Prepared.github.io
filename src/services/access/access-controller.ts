@@ -2,7 +2,8 @@ import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { PermissionStatus } from './permission-status';
 
 export const enum AccessState {
-    // Looking at the permission. Nothing to show yet.
+    // Looking at the permission, or waiting for the browser to answer a
+    // request. Nothing to show yet.
     CHECKING = 'CHECKING',
 
     // Permission hasn't been asked for. Explain why it's needed and let the
@@ -41,6 +42,11 @@ export interface AccessControllerConfig<T> {
     // again when it comes back. Defaults to true.
     releaseWhenHidden?: boolean;
 
+    // How long request() shows CHECKING before giving the button back.
+    // Browsers don't say when a prompt is ignored or dismissed, and the
+    // acquire may then never finish. For tests.
+    unansweredMs?: number;
+
     // For tests.
     document?: Pick<
         Document,
@@ -48,6 +54,8 @@ export interface AccessControllerConfig<T> {
     >;
     window?: Pick<Window, 'addEventListener' | 'removeEventListener'>;
 }
+
+const UNANSWERED_MS = 8000;
 
 export function classifyMediaError(error: any): AccessState {
     switch (error && error.name) {
@@ -94,6 +102,7 @@ export class AccessController<T> {
     private _resumeWhenVisible = false;
     private _state = new BehaviorSubject<AccessState>(AccessState.CHECKING);
     private _subscription: Subscription | null = null;
+    private _unanswered: ReturnType<typeof setTimeout> | null = null;
     private _visibilityListener = () => this._visibilityChange();
     private _pageHideListener = () => this._pageHide();
     private _pageShowListener = () => this._resume();
@@ -130,6 +139,12 @@ export class AccessController<T> {
         this._window?.removeEventListener('pagehide', this._pageHideListener);
         this._window?.removeEventListener('pageshow', this._pageShowListener);
         this._releaseResource();
+
+        if (this._unanswered) {
+            clearTimeout(this._unanswered);
+            this._unanswered = null;
+        }
+
         this._state.complete();
         this._resource.complete();
     }
@@ -150,6 +165,27 @@ export class AccessController<T> {
     // Called from a button press. Tries to acquire the resource, which shows
     // the browser's permission prompt when needed.
     request() {
+        const before = this.currentState;
+
+        switch (before) {
+            case AccessState.PROMPT:
+            case AccessState.DENIED:
+            case AccessState.ERROR:
+                // Shows that the press did something. A browser that is
+                // blocking the resource refuses without a prompt, and the
+                // state would otherwise never change.
+                this._setState(AccessState.CHECKING);
+                // Bring the button back if no answer comes. A late answer
+                // still counts.
+                this._unanswered = setTimeout(() => {
+                    this._unanswered = null;
+
+                    if (this.currentState === AccessState.CHECKING) {
+                        this._setState(before);
+                    }
+                }, this._config.unansweredMs ?? UNANSWERED_MS);
+        }
+
         return this._acquire();
     }
 
@@ -229,7 +265,9 @@ export class AccessController<T> {
     }
 
     private _pageHide() {
-        if (this.resource) {
+        // An acquisition still waiting for an answer is thrown away by
+        // release(), so it has to be started again too.
+        if (this.resource || this._acquiringGeneration !== null) {
             this._resumeWhenVisible = true;
         }
 
@@ -282,6 +320,11 @@ export class AccessController<T> {
     }
 
     private _setState(state: AccessState) {
+        if (this._unanswered) {
+            clearTimeout(this._unanswered);
+            this._unanswered = null;
+        }
+
         if (!this._state.closed && this._state.value !== state) {
             this._state.next(state);
         }

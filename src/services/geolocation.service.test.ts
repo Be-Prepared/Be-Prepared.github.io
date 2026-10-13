@@ -5,6 +5,9 @@ import {
     GeolocationCoordinateResultSuccess,
     GeolocationService,
 } from './geolocation.service';
+import { AccessState } from './access/access-controller';
+import { PermissionStatus } from './access/permission-status';
+import { Subject } from 'rxjs';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
@@ -182,4 +185,213 @@ test('a new subscriber after a denial restarts the watch', () => {
     assert.equal(fake.watchCount, 2);
     first.subscription.unsubscribe();
     second.subscription.unsubscribe();
+});
+
+// A service with a clock, timers, permission reports, and page reloads that
+// the test controls.
+function access(initial: PermissionStatus | null = PermissionStatus.PROMPT) {
+    const fake = install();
+    const permission = new Subject<PermissionStatus>();
+    const timers: { at: number; fn: () => void }[] = [];
+    const clock = { now: 0, reloads: 0, canReload: true };
+    const service = new GeolocationService({
+        clearTimeout: (handle) => {
+            const index = timers.indexOf(handle);
+
+            if (index >= 0) {
+                timers.splice(index, 1);
+            }
+        },
+        now: () => clock.now,
+        permission: () => permission,
+        reload: () => {
+            if (clock.canReload) {
+                clock.reloads += 1;
+            }
+
+            return clock.canReload;
+        },
+        setTimeout: (fn, ms) => {
+            const timer = { at: clock.now + ms, fn };
+            timers.push(timer);
+
+            return timer;
+        },
+    });
+    const states: AccessState[] = [];
+    const subscription = service
+        .availabilityState()
+        .subscribe((state) => states.push(state));
+
+    if (initial) {
+        permission.next(initial);
+    }
+
+    return {
+        advance(ms: number) {
+            clock.now += ms;
+
+            for (const timer of [...timers]) {
+                if (timer.at <= clock.now) {
+                    timers.splice(timers.indexOf(timer), 1);
+                    timer.fn();
+                }
+            }
+        },
+        allow: () => fake.pending.shift()!.success({} as GeolocationPosition),
+        clock,
+        fake,
+        permission,
+        refuse: () => {
+            const callbacks = fake.pending.shift()!;
+            callbacks.error({
+                code: PERMISSION_DENIED,
+                message: '',
+                PERMISSION_DENIED,
+                POSITION_UNAVAILABLE,
+                TIMEOUT: 3,
+            } as GeolocationPositionError);
+        },
+        service,
+        states,
+        subscription,
+        timers,
+    };
+}
+
+test('nothing is reported until the permission has been looked at', () => {
+    const { permission, states, subscription } = access(null);
+    assert.equal(states.length, 0);
+    permission.next(PermissionStatus.GRANTED);
+    assert.deepEqual(states, [AccessState.READY]);
+    subscription.unsubscribe();
+});
+
+test('a request shows checking until the browser answers', () => {
+    const { allow, service, states, subscription, timers } = access();
+    assert.deepEqual(states, [AccessState.PROMPT]);
+    service.request();
+    assert.deepEqual(states, [AccessState.PROMPT, AccessState.CHECKING]);
+    allow();
+    assert.deepEqual(states.slice(2), [AccessState.READY]);
+    assert.equal(timers.length, 0);
+    subscription.unsubscribe();
+});
+
+test('a prompt that is never answered brings the button back', () => {
+    const { advance, allow, service, states, subscription } = access();
+    service.request();
+    advance(7000);
+    assert.equal(states[states.length - 1], AccessState.CHECKING);
+    advance(2000);
+    assert.equal(states[states.length - 1], AccessState.PROMPT);
+    // Answered at last.
+    allow();
+    assert.equal(states[states.length - 1], AccessState.READY);
+    subscription.unsubscribe();
+});
+
+// Regression test: Safari on iOS refuses every request from a page once it
+// has refused one, so "Try Again" did nothing even after Location Services
+// was switched on. Only a new page load asks again.
+test('a retry that is refused without asking reloads the page', () => {
+    const { advance, clock, refuse, service, states, subscription } = access();
+    service.request();
+    advance(50);
+    refuse();
+    assert.equal(states[states.length - 1], AccessState.DENIED);
+    assert.equal(clock.reloads, 0, 'the first refusal just shows the screen');
+
+    service.request();
+    advance(50);
+    refuse();
+    assert.equal(clock.reloads, 1);
+    // Still working, as far as the screen shows, until the page is replaced.
+    assert.equal(states[states.length - 1], AccessState.CHECKING);
+    subscription.unsubscribe();
+});
+
+test('a retry the person answered themselves does not reload', () => {
+    const { advance, clock, refuse, service, states, subscription } = access();
+    service.request();
+    advance(50);
+    refuse();
+    service.request();
+    // Long enough to have read a prompt and tapped "Don't Allow".
+    advance(4000);
+    refuse();
+    assert.equal(clock.reloads, 0);
+    assert.deepEqual(states.slice(-2), [AccessState.CHECKING, AccessState.DENIED]);
+    subscription.unsubscribe();
+});
+
+test('a block the browser remembers is not worth a reload', () => {
+    const { advance, clock, permission, refuse, service, states, subscription } =
+        access(PermissionStatus.DENIED);
+    assert.deepEqual(states, [AccessState.DENIED]);
+
+    for (let i = 0; i < 3; i += 1) {
+        service.request();
+        advance(10);
+        refuse();
+    }
+
+    assert.equal(clock.reloads, 0);
+    assert.deepEqual(states.slice(-2), [AccessState.CHECKING, AccessState.DENIED]);
+
+    // Fixed in the site settings; the browser says so.
+    permission.next(PermissionStatus.GRANTED);
+    assert.equal(states[states.length - 1], AccessState.READY);
+    subscription.unsubscribe();
+});
+
+test('a refused retry shows denied when the page cannot reload', () => {
+    const { advance, clock, refuse, service, states, subscription } = access();
+    clock.canReload = false;
+    service.request();
+    advance(10);
+    refuse();
+    service.request();
+    advance(10);
+    refuse();
+    assert.deepEqual(states.slice(-2), [AccessState.CHECKING, AccessState.DENIED]);
+    subscription.unsubscribe();
+});
+
+// Safari doesn't report changes made in the Settings app, so its "denied"
+// can be out of date.
+test('a request that works beats a permission reported as denied', () => {
+    const { allow, permission, service, states, subscription } = access(
+        PermissionStatus.DENIED
+    );
+    service.request();
+    allow();
+    assert.equal(states[states.length - 1], AccessState.READY);
+
+    // Later the browser reports it was taken away again.
+    permission.next(PermissionStatus.PROMPT);
+    permission.next(PermissionStatus.DENIED);
+    assert.equal(states[states.length - 1], AccessState.DENIED);
+    subscription.unsubscribe();
+});
+
+test('a refusal on the position watch shows the blocked screen', () => {
+    const { fake, service, states, subscription } = access(
+        PermissionStatus.GRANTED
+    );
+    const { subscription: watching } = track(service);
+    assert.deepEqual(states, [AccessState.READY]);
+    // Allowed for the site, blocked by the phone's own settings.
+    fake.fail(PERMISSION_DENIED);
+    assert.equal(states[states.length - 1], AccessState.DENIED);
+    watching.unsubscribe();
+    subscription.unsubscribe();
+});
+
+test('a position that is slow to arrive still counts as allowed', () => {
+    const { fake, service, states, subscription } = access();
+    service.request();
+    fake.fail(POSITION_UNAVAILABLE);
+    assert.equal(states[states.length - 1], AccessState.READY);
+    subscription.unsubscribe();
 });

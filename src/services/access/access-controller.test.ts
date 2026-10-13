@@ -56,7 +56,7 @@ function error(name: string) {
 function setup(
     initial: PermissionStatus,
     acquireImpl?: () => Promise<FakeResource>,
-    options: { releaseWhenHidden?: boolean } = {}
+    options: { releaseWhenHidden?: boolean; unansweredMs?: number } = {}
 ) {
     const permission = new BehaviorSubject(initial);
     const doc = new FakeDocument();
@@ -84,6 +84,7 @@ function setup(
         document: doc as any,
         window: win as any,
         releaseWhenHidden: options.releaseWhenHidden,
+        unansweredMs: options.unansweredMs,
     });
     const acquireCalls = { count: 0 };
     const states: AccessState[] = [];
@@ -365,4 +366,96 @@ test('an acquire that throws right away shows the error state', async () => {
     controller.init();
     await tick();
     assert.equal(controller.currentState, AccessState.UNAVAILABLE);
+});
+
+// Regression test: "Try Again" looked like it did nothing, because a browser
+// that is blocking the camera refuses without a prompt and the state never
+// changed.
+test('a request shows checking until the browser answers', async () => {
+    let allow = false;
+    const { controller, states } = setup(PermissionStatus.DENIED, () =>
+        allow
+            ? Promise.resolve({ id: 1, released: false })
+            : Promise.reject(error('NotAllowedError'))
+    );
+    controller.init();
+    await tick();
+    states.length = 0;
+
+    await controller.request();
+    assert.deepEqual(states, [AccessState.CHECKING, AccessState.DENIED]);
+
+    allow = true;
+    await controller.request();
+    assert.deepEqual(states.slice(2), [AccessState.CHECKING, AccessState.READY]);
+});
+
+test('reopening the camera while ready does not show checking', async () => {
+    const { controller, states } = setup(PermissionStatus.GRANTED);
+    controller.init();
+    await tick();
+    states.length = 0;
+    // What the switch camera button does.
+    controller.release();
+    await controller.request();
+    assert.equal(states.length, 0);
+    assert.equal(controller.currentState, AccessState.READY);
+    assert.ok(controller.resource);
+});
+
+test('leaving the page while the prompt is open asks again on return', async () => {
+    const pending: ((r: FakeResource) => void)[] = [];
+    const { controller, win } = setup(
+        PermissionStatus.PROMPT,
+        () => new Promise((resolve) => pending.push(resolve))
+    );
+    controller.init();
+    await tick();
+    controller.request();
+    assert.equal(controller.currentState, AccessState.CHECKING);
+    win.dispatch('pagehide');
+    const stale = { id: 1, released: false };
+    pending[0](stale);
+    await tick();
+    assert.ok(stale.released);
+
+    win.dispatch('pageshow');
+    assert.equal(pending.length, 2);
+    const fresh = { id: 2, released: false };
+    pending[1](fresh);
+    await tick();
+    assert.equal(controller.currentState, AccessState.READY);
+    assert.equal(controller.resource, fresh);
+});
+
+// Browsers don't say when a prompt is ignored or dismissed.
+test('a prompt that is never answered brings the button back', async () => {
+    const pending: ((r: FakeResource) => void)[] = [];
+    const { controller, states } = setup(
+        PermissionStatus.PROMPT,
+        () => new Promise((resolve) => pending.push(resolve)),
+        { unansweredMs: 5 }
+    );
+    controller.init();
+    await tick();
+    controller.request();
+    assert.equal(controller.currentState, AccessState.CHECKING);
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    assert.equal(controller.currentState, AccessState.PROMPT);
+
+    // Pressing again doesn't ask the browser twice.
+    controller.request();
+    assert.equal(pending.length, 1);
+    // Answered at last.
+    pending[0]({ id: 1, released: false });
+    await tick();
+    assert.equal(controller.currentState, AccessState.READY);
+    assert.deepEqual(states, [
+        AccessState.CHECKING,
+        AccessState.PROMPT,
+        AccessState.CHECKING,
+        AccessState.PROMPT,
+        AccessState.CHECKING,
+        AccessState.READY,
+    ]);
 });

@@ -574,11 +574,33 @@ export const strings: LanguageData = {
     'reminderLimits.timer': 'Lass Be Prepared mit eingeschaltetem Bildschirm offen, bis der Timer abläuft. Er kann nicht klingeln, wenn die App geschlossen ist, du die App wechselst oder das Handy schläft. Der Ton folgt der Medienlautstärke.',
     'shared.access.allow': 'Erlauben',
     'shared.access.back': 'Zurück',
+    'shared.access.checking': 'Wird geprüft …',
+    'shared.access.denied.again': 'Erneut versucht. Es ist weiterhin blockiert.',
     'shared.access.denied.heading': 'Berechtigung blockiert',
     'shared.access.denied.message': 'Dieses Werkzeug funktioniert nicht ohne die Berechtigung. Diese App speichert nichts davon, du kannst es also jederzeit erneut versuchen.',
-    'shared.access.deniedHint.android': 'Wenn „Erneut versuchen“ nichts tut, blockiert der Browser die Anfrage. Tippe in Chrome auf das Symbol links neben der Adresse (oder öffne die App-Info der installierten App), wähle Berechtigungen und erlaube sie. Komm dann hierher zurück.',
-    'shared.access.deniedHint.ios': 'Wenn „Erneut versuchen“ nichts tut, blockiert iOS die Anfrage. Öffne Einstellungen → Apps → Safari (oder Einstellungen → Safari) und erlaube den Zugriff auf Kamera, Standort oder Bewegung & Ausrichtung. Für Bewegung und Kompass schließe die App außerdem vollständig und öffne sie erneut.',
-    'shared.access.deniedHint.other': 'Wenn „Erneut versuchen“ nichts tut, blockiert der Browser die Anfrage. Öffne die Website-Einstellungen (meist über das Symbol neben der Adresse), erlaube die Berechtigung und komm dann hierher zurück.',
+    'shared.access.deniedHint.android': 'Wenn ein erneuter Versuch nicht hilft, blockiert der Browser die Anfrage. Tippe in Chrome auf das Symbol links neben der Adresse (oder öffne die App-Info der installierten App), wähle Berechtigungen und erlaube sie. Komm dann hierher zurück.',
+    'shared.access.deniedHint.ios': 'Wenn ein erneuter Versuch nicht hilft, blockiert iOS die Anfrage. Öffne Einstellungen → Apps → Safari (oder Einstellungen → Safari) und erlaube den Zugriff auf Kamera, Standort oder Bewegung & Ausrichtung. Für Bewegung und Kompass schließe die App außerdem vollständig und öffne sie erneut.',
+    'shared.access.deniedHint.ios.location.html': `
+        <div style="margin-bottom: 0.5em">
+            Auf iPhone und iPad können drei Einstellungen den Standort blockieren. Prüfe jede davon in der App „Einstellungen“:
+        </div>
+        <ol style="margin: 0; padding-inline-start: 1.3em">
+            <li>
+                Datenschutz &amp; Sicherheit → Ortungsdienste: Ortungsdienste einschalten.
+            </li>
+            <li>
+                Auf demselben Bildschirm: Safari-Websites → Beim Verwenden der App. In einem anderen Browser wähle stattdessen dessen Namen.
+            </li>
+            <li>
+                Apps → Safari → Standort: Fragen oder Erlauben. Bis iOS 17 heißt der Weg Safari → Standort.
+            </li>
+        </ol>
+        <div style="margin-top: 0.5em">
+            Komm dann zurück und tippe auf „Erneut versuchen“. Wird es weiterhin ohne Nachfrage abgelehnt, merkt sich Safari eine frühere Antwort für diese Website: Öffne die Website in Safari, tippe auf die Taste ganz links in der Adressleiste, öffne die Website-Einstellungen und stelle „Standort“ auf „Erlauben“.
+        </div>
+    `,
+    'shared.access.deniedHint.other': 'Wenn ein erneuter Versuch nicht hilft, blockiert der Browser die Anfrage. Öffne die Website-Einstellungen (meist über das Symbol neben der Adresse), erlaube die Berechtigung und komm dann hierher zurück.',
+    'shared.access.error.again': 'Erneut versucht. Der Start ist wieder fehlgeschlagen.',
     'shared.access.error.heading': 'Start fehlgeschlagen',
     'shared.access.error.message': 'Die Hardware ist vorhanden, konnte aber nicht gestartet werden. Vielleicht nutzt eine andere App sie. Schließe andere Apps, die sie nutzen, und versuche es erneut.',
     'shared.access.prompt.heading': 'Berechtigung nötig',

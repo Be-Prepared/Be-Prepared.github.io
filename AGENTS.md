@@ -5,7 +5,7 @@ An offline PWA toolbox (flashlight, compass, level, timers, and more). TypeScrip
 ## Rules of the project
 
 * Everything works offline. No network requests at runtime, no data leaves the device, no external libraries loaded from a CDN.
-* Never cache permission results or hardware probe results. Check the permission when a tool opens; only hide a home screen tile when the hardware is missing (see `hasHardware` in `src/tile-defs.ts`). A denied permission must stay recoverable with "Try Again".
+* Never cache permission results or hardware probe results. Check the permission when a tool opens; only hide a home screen tile when the hardware is missing (see `hasHardware` in `src/tile-defs.ts`). A denied permission must stay recoverable with "Try Again", and pressing it must visibly do something: report `AccessState.CHECKING` while the browser answers, which `access-screen` shows as a busy button and follows with "still blocked" when nothing changed.
 * Release hardware when a screen closes and when the app goes to the background. A camera stream that isn't stopped keeps the camera locked.
 * Be honest in the UI about what a web app can't do (accuracy, background limits, permissions). Timers and alarms show `<limits-notice>`.
 
@@ -22,13 +22,14 @@ An offline PWA toolbox (flashlight, compass, level, timers, and more). TypeScrip
 ## Layout
 
 * `src/<tool>-app/` — one directory per tool: `<tool>-app.component.ts`, `<tool>-app.module.ts` (exports), `<tool>-app.i18n.ts` (strings, keys prefixed with the tool name), plus pure logic modules and their tests.
-* `src/shared/` — shared components: `default-layout` (screen with toolbar and back button; `frame` and `overlay` attributes), `icon-button`, `pretty-button`, `access-screen` (permission / unavailable / error states), `limits-notice`, `show-modal`, `load-svg`.
+* `src/shared/` — shared components: `default-layout` (screen with toolbar and back button; `frame` and `overlay` attributes), `icon-button`, `pretty-button`, `access-screen` (permission / unavailable / error states; give it `kind="location"` when asking for the GPS so iPhones get the right Settings steps), `limits-notice`, `show-modal`, `load-svg`.
 * `src/services/` — hardware and app services:
     * `access/access-controller.ts` — permission-gated resource lifecycle (check, prompt, acquire, release on hidden/pagehide/destroy). Used by `CameraService.controller()`, `MicrophoneService.controller()`, `NfcService.controller()`.
     * `camera.service.ts` — all camera streams go through here; torch helpers act on the open track.
     * `compass.service.ts`, `motion.service.ts` — orientation sensors, including iOS's tap-to-allow permission. Math lives in `compass/` and `motion/` with tests.
     * `reminder.service.ts` — the countdown timer and alarm clock, so they ring from any screen through `<reminder-ringer>`.
-    * `geolocation.service.ts`, `wake-lock.service.ts`, `alarm-sound.service.ts`, `preference.service.ts`, `local-storage.service.ts`.
+    * `geolocation.service.ts` — the GPS watch and its permission. Safari refuses every request from a page it has refused once, even after the setting is fixed, so a retry that is refused without asking reloads the page.
+    * `wake-lock.service.ts`, `alarm-sound.service.ts`, `preference.service.ts`, `local-storage.service.ts`.
 * `src/tile-defs.ts` — home screen tiles and routes. `src/index.ts` exports every module. `src/i18n/en-us.ts` holds shared strings and spreads each tool's i18n file.
 * `src/i18n/translations/<tag>.ts` — one file per language, listed in `src/i18n/languages.ts` and loaded on demand. `translations.test.ts` fails if any language is missing a key or changes a `{{placeholder}}` or HTML tag. When you add or change an English string, update every translation (or ask for help); never leave a translation with English text silently.
 * `site/public/` — static files, including all icons.
