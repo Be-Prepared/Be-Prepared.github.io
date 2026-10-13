@@ -12,6 +12,9 @@ export interface ScanLoopOptions<R> {
     // Wait this long after a failed detection before trying again.
     errorDelayMs?: number;
 
+    // Told when onResult throws. Scanning continues. Defaults to logging.
+    onError?: (error: unknown) => void;
+
     // For tests.
     now?: () => number;
     setTimeout?: (fn: () => void, ms: number) => any;
@@ -22,9 +25,9 @@ export interface ScanLoopOptions<R> {
 //
 // Guarantees that only one detection runs at a time, that start() while
 // already running does not create a second loop, that stop() really stops
-// (even when a detection is in flight), and that a failed detection does not
-// end the loop. Any of those going wrong makes the scanner appear to "not
-// reset" after reading a code.
+// (even when a detection is in flight), and that neither a failed detection
+// nor a failing onResult ends the loop. Any of those going wrong makes the
+// scanner appear to "not reset" after reading a code.
 export class ScanLoop<R> {
     private _generation = 0;
     private _options: Required<ScanLoopOptions<R>>;
@@ -35,6 +38,7 @@ export class ScanLoop<R> {
         this._options = {
             intervalMs: 66,
             errorDelayMs: 250,
+            onError: (error) => console.error(error),
             now: () => Date.now(),
             setTimeout: (fn, ms) => setTimeout(fn, ms),
             clearTimeout: (handle) => clearTimeout(handle),
@@ -82,7 +86,28 @@ export class ScanLoop<R> {
                     return;
                 }
 
-                if (results && results.length && this._options.onResult(results)) {
+                let handled: boolean | void = false;
+                let failed = false;
+
+                try {
+                    handled =
+                        !!results &&
+                        results.length > 0 &&
+                        this._options.onResult(results);
+                } catch (error) {
+                    // Without this the loop would stay "running" with
+                    // nothing scheduled, and start() could never bring it
+                    // back.
+                    failed = true;
+                    this._options.onError(error);
+                }
+
+                if (generation !== this._generation) {
+                    // onResult stopped or restarted the loop itself.
+                    return;
+                }
+
+                if (handled) {
                     this.stop();
 
                     return;
@@ -91,7 +116,9 @@ export class ScanLoop<R> {
                 const elapsed = this._options.now() - started;
                 this._schedule(
                     generation,
-                    Math.max(0, this._options.intervalMs - elapsed)
+                    failed
+                        ? this._options.errorDelayMs
+                        : Math.max(0, this._options.intervalMs - elapsed)
                 );
             },
             () => {

@@ -222,3 +222,81 @@ test('stop then quick start does not leave two loops', async () => {
     await timers.advance(1000);
     assert.equal(timers.pending, 0);
 });
+
+// Regression test: closing the result made the screen's handler throw, and
+// the scanner never read a second code.
+test('an onResult that throws does not end the loop', async () => {
+    const timers = new FakeTimers();
+    const errors: unknown[] = [];
+    const seen: string[] = [];
+    let calls = 0;
+    const loop = new ScanLoop<string>({
+        detect: () => {
+            calls += 1;
+
+            return Promise.resolve([`code${calls}`]);
+        },
+        onResult: (results) => {
+            seen.push(results[0]);
+
+            if (calls === 1) {
+                throw new Error('redraw failed');
+            }
+
+            return true;
+        },
+        onError: (error) => errors.push(error),
+        intervalMs: 100,
+        errorDelayMs: 500,
+        now: () => timers.now,
+        setTimeout: timers.setTimeout,
+        clearTimeout: timers.clearTimeout,
+    });
+    loop.start();
+    await timers.advance(100);
+    assert.ok(loop.running);
+    assert.equal(errors.length, 1);
+    // Tries again after the error delay, and stops normally this time.
+    await timers.advance(1000);
+    assert.deepEqual(seen, ['code1', 'code2']);
+    assert.ok(!loop.running);
+    assert.equal(timers.pending, 0);
+    // And it can be started again.
+    loop.start();
+    await timers.advance(1000);
+    assert.deepEqual(seen, ['code1', 'code2', 'code3']);
+});
+
+test('onResult may restart the loop itself', async () => {
+    const timers = new FakeTimers();
+    let calls = 0;
+    let restarted = false;
+    const loop: ScanLoop<string> = new ScanLoop<string>({
+        detect: () => {
+            calls += 1;
+
+            return Promise.resolve(['code']);
+        },
+        onResult: () => {
+            if (!restarted) {
+                restarted = true;
+                loop.stop();
+                loop.start();
+            }
+        },
+        intervalMs: 100,
+        now: () => timers.now,
+        setTimeout: timers.setTimeout,
+        clearTimeout: timers.clearTimeout,
+    });
+    loop.start();
+    await timers.advance(250);
+    // Detections at 0 (restarts), 0 again, 100, and 200. The loop that was
+    // stopped must not also keep scheduling.
+    assert.equal(calls, 4);
+    assert.equal(timers.pending, 1);
+    loop.stop();
+    await timers.advance(1000);
+    assert.equal(calls, 4);
+    assert.equal(timers.pending, 0);
+});
