@@ -43,7 +43,7 @@ An offline PWA toolbox (flashlight, compass, level, timers, and more). TypeScrip
 
 ## Fudgel pitfalls
 
-* Template expressions are a subset of JavaScript: property access, calls, `?.`, operators, `?:`, and parentheses. `?.` only guards the step it is on: `a?.b.c` and `a?.b()` still throw when `a` is null. Anything longer than a short expression belongs in the controller.
+* Template expressions are a subset of JavaScript: property access, calls, `?.`, operators, `?:`, and parentheses. Anything longer than a short expression belongs in the controller.
 * `attr` names are camelCase in the controller and kebab-case in HTML (`labelId` → `label-id`). Props are bound with `.prop="expr"`.
 * Only top-level controller properties trigger updates; reassign objects and arrays.
 * Templates can only use properties whose names don't start with `_`. The production build shortens `_names` (`mangleProps` in `vite.config.ts`), so `.prop="_thing"` works in the dev server and silently passes `undefined` in production. The browser tests run against the production build for this reason; a default import from a CommonJS library can break the same way.
