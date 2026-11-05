@@ -47,7 +47,7 @@ jobs:
         # Screenshot baselines were made in this image, so fonts and rendering
         # match. Keep the version in step with @playwright/test.
         container:
-            image: mcr.microsoft.com/playwright:v1.63.0-noble
+            image: mcr.microsoft.com/playwright:v1.64.1-noble
             options: --ipc=host
 
         steps:
