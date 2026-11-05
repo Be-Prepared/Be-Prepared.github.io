@@ -94,20 +94,28 @@ test('try again asks again after location is unblocked in Settings', async ({ pa
 });
 
 test('try again says so when it is still blocked', async ({ page }) => {
+    await page.clock.install({ time: new Date('2026-11-05T12:00:00Z') });
     await page.addInitScript(installGeolocation, { reported: 'denied', sticky: false });
     await page.goto('/location');
     await expect(page.getByText('Permission Blocked')).toBeVisible();
     await expect(page.getByText('Tried again')).toHaveCount(0);
 
+    // "Checking…" shows for 600ms, and a busy test machine can take longer
+    // than that between the click and the next check. Stopping the page's
+    // clock keeps it up until it has been seen. Pausing has to jump forward,
+    // so it jumps well past the time the page took to load.
+    await page.clock.pauseAt(new Date('2026-11-05T13:00:00Z'));
     const retry = page.getByRole('button', { name: 'Try Again' });
     await retry.click();
     await expect(page.getByRole('button', { name: 'Checking…' })).toBeVisible();
+    await page.clock.runFor(1000);
     await expect(page.getByText('Tried again. It is still blocked.')).toBeVisible();
     await expect(retry).toBeVisible();
     // The browser itself remembers this block, so starting over is no use.
     expect(await loads(page)).toBe(1);
 
     // Allowed in the browser's settings: the next press works.
+    await page.clock.resume();
     await page.evaluate(() => sessionStorage.setItem('locationAllowed', '1'));
     await retry.click();
     await expect(coordinates(page)).toContainText('38°');
